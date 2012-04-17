@@ -1,0 +1,10 @@
+ProfileProject/
+.metadata/
+ProfileProject/
+*/_dist/*
+*/bin/*
+*_TRY.jrxml
+*.jasper
+*.log*
+*EIconfig.xml*
+*credentials.properties*
