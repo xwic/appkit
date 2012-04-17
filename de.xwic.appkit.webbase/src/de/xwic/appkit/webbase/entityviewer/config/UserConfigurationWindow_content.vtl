@@ -1,0 +1,8 @@
+$insert.control("tabPanel")
+<br/>
+<hr />
+#if($control.container.container.container.hasCurrentConfig())
+<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="JWic.fireAction('$control.container.container.container.controlID', 'duplicate', '')">Duplicate Current Profile</span>
+#else
+<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="JWic.fireAction('$control.container.container.container.controlID', 'create', '')">Create New Profile</span>
+#end

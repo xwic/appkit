@@ -1,0 +1,47 @@
+#if($control.isAttachmentsOnly() == true)
+<tr>
+  <td>$insert.control("ctlAttachments")</td>
+  <th valign="top">$insert.control("btAddAttachment")</th>
+</tr>
+<tr>
+  <td colspan="2">
+    <hr />
+  </td>
+</tr>
+#else
+<tr>
+  <td class="caption">$insert.control("lbDate")</td>
+  <td>$insert.control("fldDate")</td>
+  <td class="caption">$insert.control("lbAuthor")</td>
+  <td>$insert.control("fldAuthor")</td>
+</tr>
+<tr>
+    <td class="caption" valign="top">$insert.control("lbComment")</td>
+    <td colspan="4" style="background-color: #ffffff; border: 1px solid #808080;">$insert.control("inpComment")</td>
+</tr>
+
+<tr>
+  <td colspan="4">$insert.control("ctlAttachments")</td>
+</tr>    
+<tr>
+  <td colspan="4">
+	  	<table>
+	  		<tr>
+	  		<td>$insert.control("btEditComment")</td>
+  			<td>$insert.control("btAddAttachment")</td>
+	  		</tr>
+	  	</table>
+  </td>
+  
+</tr>
+<tr>
+  <td colspan="4">
+    <hr />
+  </td>
+</tr>
+<tr>
+  <td colspan="4">
+    &nbsp;
+  </td>
+</tr>
+#end

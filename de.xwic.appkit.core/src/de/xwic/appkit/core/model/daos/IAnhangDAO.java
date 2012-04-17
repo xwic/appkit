@@ -1,0 +1,19 @@
+/*
+ * Copyright 2005 pol GmbH
+ *
+ * de.xwic.appkit.core.model.daos.IAnhangDAO
+ * Created on 04.08.2005
+ *
+ */
+package de.xwic.appkit.core.model.daos;
+
+import de.xwic.appkit.core.dao.DAO;
+
+/**
+ * DAO Interface for the Anhang entity. <p> 
+ * 
+ * @author Ronny Pfretzschner
+ */
+public interface IAnhangDAO extends DAO {
+
+}

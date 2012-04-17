@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="de.xwic.appkit.core.model.entities.impl.Anhang" table="ATTACHMENT">
+
+        <id name="id" type="int">
+            <column name="AH_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+ 		
+        <property name="dateiName">
+        	<column name="DATEINAME" length="100"/>
+        </property>
+
+        <property name="dateiGroesse" type="long">
+        	<column name="DATEIGROESSE"/>
+        </property>
+
+        <property name="fileID" type="int">
+        	<column name="FILE_ID"/>
+        </property>
+
+        <property name="entityID" type="int">
+        	<column name="ENTITY_ID"/>
+        </property>
+        <property name="entityType">
+        	<column name="ENTITY_TYPE" length="255"/>
+        </property>
+        <property name="indirectReference" type="boolean">
+        	<column name="INDIRECT_REFERENCE"/>
+        </property>
+				
+		<many-to-one name="kategorie" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="KATEGORIE"/>
+				
+		<!-- additional object properties -->
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>
+
+
+

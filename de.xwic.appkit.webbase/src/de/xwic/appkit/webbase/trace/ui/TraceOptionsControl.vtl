@@ -1,0 +1,44 @@
+$insert.control("errorWarning")
+<table>
+	<colgroup>
+		<col width="120"/>
+		<col width="300"/>
+		<col/>
+	</colgroup>
+	<tr>
+		<th>Trace Status</th>
+		<td>$insert.control("lbTraceStatus")</td>
+		<td>$insert.control("btOnOff")</td>
+	</tr>
+</table>
+
+<h3>Trace Options</h3>
+<table>
+	<colgroup>
+		<col width="120"/>
+		<col width="300"/>
+		<col/>
+	</colgroup>
+	<tr>
+		<th>Trace Level</th>
+		<td>$insert.control("ddTraceLevel")</td>
+	</tr>
+	<tr>
+		<th>Log File</th>
+		<td>$insert.control("inpLogFile")</td>
+	</tr>
+	<tr>
+		<th>Log Threshold</th>
+		<td>$insert.control("inpLogThreshold")</td>
+		<td>$insert.control("chkLogEnabled")</td>
+	</tr>
+	<tr>
+		<th>Trace History Max</th>
+		<td>$insert.control("inpMaxHistory")</td>
+		<td>$insert.control("chkHistoryEnabled")</td>
+	</tr>
+	<tr>
+		<th>&nbsp;</th>
+		<td>$insert.control("btUpdate")</td>
+	</tr>
+</table>

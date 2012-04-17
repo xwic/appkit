@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+
+    <class name="de.xwic.appkit.core.model.entities.impl.ReportTemplate" table="REPORT_TEMPLATE">
+    
+            <id name="id" type="int">
+            <column name="RT_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+
+		<property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int" />
+
+        <property name="referenceId">
+            <column name="REFERENCE_ID"/>
+        </property>
+
+        <property name="title">
+            <column name="TITLE"/>
+        </property>
+        
+        <property name="scope">
+            <column name="SCOPE"/>
+        </property>
+        
+        <property name="templateCode" type="org.hibernate.type.TextType">
+            <column name="TEMPLATE_CODE"/>
+        </property>
+        
+        <property name="description">
+            <column name="DESCRIPTION"/>
+        </property>
+        
+        <property name="contextType">
+            <column name="CONTEXT_TYPE"/>
+        </property>                   
+
+        <property name="contentProviderId">
+            <column name="CONTENT_PROVIDER_ID"/>
+        </property>                   
+
+        <property name="hidden" >
+            <column name="HIDDEN" not-null="true"/>
+        </property>                   
+        
+        <many-to-one name="type" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="TYPE"/>             
+		<many-to-one name="folder" class="de.xwic.appkit.core.model.entities.impl.ReportFolder" column="REPORT_FOLDER"/>
+
+		<!-- additional object properties -->
+
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>

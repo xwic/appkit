@@ -1,0 +1,11 @@
+Change Notes
+============
+
+2011-06-05 FLI
+	- Started EntityTable view, which will become a replacement of the EntityTableViewer
+	
+2010-09-29 FLI
+	- Fixed ColumnSelector Issues
+	
+2010-09-14 FLI
+	- DefaultDAOContentProvider.getUniqueKey is now null-safe.

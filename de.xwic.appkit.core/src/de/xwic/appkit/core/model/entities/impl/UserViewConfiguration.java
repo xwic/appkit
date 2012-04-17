@@ -1,0 +1,156 @@
+package de.xwic.appkit.core.model.entities.impl;
+
+import de.xwic.appkit.core.dao.Entity;
+import de.xwic.appkit.core.model.entities.IMitarbeiter;
+import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
+
+/**
+ * @author Adrian Ionescu
+ */
+public class UserViewConfiguration extends Entity implements IUserViewConfiguration {
+	
+	private IMitarbeiter owner;
+	private String className;
+	private String viewId;
+	private String listSetupId;
+	private String name;
+	private String description;
+	private boolean isPublic;
+	private String columnsConfiguration;
+	private String sortField;
+	private String sortDirection;
+	private int maxRows;
+	
+	/**
+	 * @return the owner
+	 */
+	public IMitarbeiter getOwner() {
+		return owner;
+	}
+	/**
+	 * @param owner the owner to set
+	 */
+	public void setOwner(IMitarbeiter owner) {
+		this.owner = owner;
+	}
+	/**
+	 * @return the className
+	 */
+	public String getClassName() {
+		return className;
+	}
+	/**
+	 * @param className the className to set
+	 */
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	/**
+	 * @return the viewId
+	 */
+	public String getViewId() {
+		return viewId;
+	}
+	/**
+	 * @param viewId the viewId to set
+	 */
+	public void setViewId(String viewId) {
+		this.viewId = viewId;
+	}
+	/**
+	 * @return the listSetupId
+	 */
+	public String getListSetupId() {
+		return listSetupId;
+	}
+	/**
+	 * @param listSetupId the listSetupId to set
+	 */
+	public void setListSetupId(String listSetupId) {
+		this.listSetupId = listSetupId;
+	}
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	/**
+	 * @return the isPublic
+	 */
+	public boolean isPublic() {
+		return isPublic;
+	}
+	/**
+	 * @param isPublic the isPublic to set
+	 */
+	public void setPublic(boolean isPublic) {
+		this.isPublic = isPublic;
+	}
+	/**
+	 * @return the columnsConfiguration
+	 */
+	public String getColumnsConfiguration() {
+		return columnsConfiguration;
+	}
+	/**
+	 * @param columnsConfiguration the columnsConfiguration to set
+	 */
+	public void setColumnsConfiguration(String columnsConfiguration) {
+		this.columnsConfiguration = columnsConfiguration;
+	}
+	/**
+	 * @return the sortField
+	 */
+	public String getSortField() {
+		return sortField;
+	}
+	/**
+	 * @param sortField the sortField to set
+	 */
+	public void setSortField(String sortField) {
+		this.sortField = sortField;
+	}
+	/**
+	 * @return the sortDirection
+	 */
+	public String getSortDirection() {
+		return sortDirection;
+	}
+	/**
+	 * @param sortDirection the sortDirection to set
+	 */
+	public void setSortDirection(String sortDirection) {
+		this.sortDirection = sortDirection;
+	}
+	/**
+	 * @return the maxRows
+	 */
+	public int getMaxRows() {
+		return maxRows;
+	}
+	/**
+	 * @param maxRows the maxRows to set
+	 */
+	public void setMaxRows(int maxRows) {
+		this.maxRows = maxRows;
+	}
+}

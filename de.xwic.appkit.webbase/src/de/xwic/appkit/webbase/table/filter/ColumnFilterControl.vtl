@@ -1,0 +1,28 @@
+#set($winId = "win_${control.controlID}")
+#if(!$control.modal && $control.sessionContext.userAgent.isIE() && $control.sessionContext.userAgent.getMajorVersion() < 7) 
+<iframe src="javascript:'&lt;html&gt;&lt;/html&gt;';" scrolling="no" frameborder="0" id="${winId}_blocker"
+  style="position:absolute;width:50px;height:120px;top:0px;left:0px;border:none;display:block;z-index:0"></iframe>
+#end
+<span id="${winId}_container"></span>
+<div id="${winId}_div" style="display:none">
+#******************************* CONTENT **************************************#
+<div style="margin: 2px;">
+$insert.control("btSortUp")
+$insert.control("btSortDown")
+$insert.control("btFilterClear")
+
+<div style="width: 20px; height: ${control.filterHeight}px; float: left; border-right: 1px solid #E0E0E0; clear: both;  padding-left: 2px; padding-top: 2px; border-top: 1px dotted #e0e0e0;">
+	<img src="icons/tbl_filter.gif" width="13" height="13">
+</div>
+<div style="height: ${control.filterHeight}px; width: 264px; overflow: auto; margin-left: 6px; float: left;  padding-left: 2px; padding-top: 2px; font-size: 10pt; border-top: 1px dotted #e0e0e0;">
+	$insert.control("filters")
+</div>
+
+<div style="border-top: 1px solid #E0E0E0; padding-top: 3px; clear: both;">
+	<div style="float: left; margin: 3px;">$insert.control("btColSetup")</div>
+	<div style="float: right; margin: 3px;">$insert.control("btCancel")</div>
+	<div style="float: right; margin: 3px;">$insert.control("btOk")</div>
+</div>
+</div>
+#*******************************/CONTENT **************************************#
+</div>

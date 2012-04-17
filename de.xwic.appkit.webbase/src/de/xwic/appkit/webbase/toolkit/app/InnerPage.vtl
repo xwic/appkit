@@ -1,0 +1,13 @@
+#set($fixWidth = $control.fixedWidth)
+<div id="contentBody" #if($fixWidth != 0) style="width: ${fixWidth}px; margin: 0 auto;" #end>
+    <div class="contentHeader">
+       <table cellspacing="0" cellpadding="0">
+       	<tr>
+       	 <td  valign="bottom"><h1>$control.title</h1></td>
+       	 <td nowrap="nowrap" valign="bottom"><span class="subtitle">$control.subtitle</span></td>
+       	</tr>
+       </table>
+    </div>
+    $content.render()
+    <p style="clear:both;"></p>
+</div>

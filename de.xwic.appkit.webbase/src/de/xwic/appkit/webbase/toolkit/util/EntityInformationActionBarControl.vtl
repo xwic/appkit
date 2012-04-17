@@ -1,0 +1,53 @@
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+<tr>
+    <td height=32 class="e_dsk_bar">
+    <table cellspacing="0" cellpadding="0">
+    <tr height="24">
+    	#foreach ( $child in $control.elements ) 
+    		#if ($child.visible)
+    	<td>
+    	$insert.control($child.name)
+    	</td>
+    	<td><img src="$jwic.contextPath/jwic/gfx/clear.gif" width="2" height="1"></td>
+    		#end
+    	#end
+    </tr>
+    </table>
+    </td>
+    #if($control.isShowInformation())
+    <td align="right">
+    	<table width="540" border="0">
+    		<tr>
+    			<td class="entityinfolabel" width="80">Created at:</td>
+    			<td class="entityinfolabel" width="150">$insert.control("createdAt")</td>
+    			<td class="entityinfolabel" width="120">Lastmodified at:</td>
+    			<td class="entityinfolabel" width="150">$insert.control("lastModifiedAt")</td>
+    		</tr>
+    		<tr>
+    			<td class="entityinfolabel" width="80">Created by:</td>
+    			<td class="entityinfolabel" width="150" nowrap>$insert.control("createdFrom")</td>
+    			<td class="entityinfolabel" width="120">Lastmodified by:</td>
+    			<td class="entityinfolabel" width="150" nowrap>$insert.control("lastModifiedFrom")</td>
+    		</tr>
+    	</table>
+    </td>
+    #end
+    #if($control.rightElements.size() != 0)
+    <td height=32 class="e_dsk_bar"  align="right">
+    <table cellspacing="0" cellpadding="0">
+    <tr height="24">
+    	#foreach ( $child in $control.rightElements ) 
+    		#if ($child.visible)
+    	<td>
+    	$insert.control($child.name)
+    	</td>
+    	<td><img src="$jwic.contextPath/jwic/gfx/clear.gif" width="2" height="1"></td>
+    		#end
+    	#end
+    </tr>
+    </table>
+    </td>
+   #end
+    
+</tr>
+</table>

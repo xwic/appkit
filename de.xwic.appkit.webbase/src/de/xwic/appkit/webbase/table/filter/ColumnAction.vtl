@@ -1,0 +1,13 @@
+<div onClick="JWic.fireAction('$control.controlID', 'click', '')" 
+	onMouseOver="$(this).setStyle({ backgroundColor: '#7FC9FF'})" 
+	onMouseOut="$(this).setStyle({ backgroundColor: 'transparent'})"
+	style="height: 24px; cursor: pointer;">
+	<div style="width: 20px; height: 22px; float: left; border-right: 1px solid #E0E0E0; clear: both; padding-left: 2px; padding-top: 2px;">
+		#if($control.image)
+			$control.image.toImgTag()
+		#end
+	</div>
+	<div style="height: 22px; margin-left: 6px; float: left;  padding-left: 2px; padding-top: 2px; font-size: 10pt;">
+		$!control.title
+	</div>
+</div>

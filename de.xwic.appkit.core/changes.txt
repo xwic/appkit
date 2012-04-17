@@ -1,0 +1,20 @@
+Change Notes
+============
+
+2011-02-08 jbornema
+	- PropertyQueryResolver support now IN operator with an Array or Collection as value
+
+2010-09-30 jbornema
+	- PicklisteDAO.cacheAll() optimized to speed up application initialization
+	- AbstractHistoryDAO.getHistoryImplClass() is abstract again
+
+2010-09-29 jbornema
+	- HistoryTool catches any exception is setter method retrieval
+
+2010-09-14 FLI
+	- Added Equals helper class
+	
+2010-09-03 jbornema
+	- AbstractDAO handleHistory boolean property added (default false) to handle history entity creation on create, update and delete.
+	- AbstractHistoryDAO added with default enabled history handling
+	- IHistory extends IEntity

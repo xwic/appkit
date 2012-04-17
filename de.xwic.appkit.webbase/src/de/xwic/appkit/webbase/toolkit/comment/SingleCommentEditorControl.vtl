@@ -1,0 +1,13 @@
+## show comment
+
+#if($control.hasComment())
+<table width="100%" cellspacing="0" cellpadding="0" border="0" class="singleComment">
+$insert.control("comment")
+</table>
+#else
+<div class="singleComment">
+#if($control.isReadonlyView() == false)
+<a class="addComment" href="$control.createActionURL("addComment", "add")">&nbsp;</a>
+#end
+</div>
+#end

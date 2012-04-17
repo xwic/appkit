@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="de.xwic.appkit.core.model.entities.impl.EntityComment" table="ENTITY_COMMENT">
+
+        <id name="id" type="int">
+            <column name="EC_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+        
+        <property name="entityType">
+        	<column name="ENTITY_TYPE" length="255"/>
+        </property>
+        
+        <property name="comment" type="org.hibernate.type.TextType">
+        	<column name="ENT_COMMENT" />
+        </property>
+        
+        <property name="entityId" column="ENTITY_ID" type="int"/>
+        
+        
+        <property name="readonlyComment" type="boolean">
+	      <column name="READONLY"/>
+	    </property>
+	    <many-to-one name="attachment" class="de.xwic.appkit.core.model.entities.impl.Anhang" fetch="select">
+	      <column name="ANHANG_ID" />
+	    </many-to-one>
+
+        <property name="subject">
+        	<column name="SUBJECT" length="255"/>
+        </property>
+        
+        <property name="category">
+        	<column name="CATEGORY" length="255"/>
+        </property>
+        
+        <!-- additional object properties -->
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>

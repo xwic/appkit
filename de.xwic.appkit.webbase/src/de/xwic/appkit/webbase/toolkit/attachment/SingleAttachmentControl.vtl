@@ -1,0 +1,24 @@
+## list attachments
+<div class="attachmentBar">
+#if($control.hasAttachments())
+
+	<iframe name="dlFrame" style="width: 1px; height: 1px;" src="blank.html"></iframe>
+	#set($first = 1)
+	#set($attm = $control.getAttachment())
+	#if(!$attm.deleted)
+		#if($first == 1)
+			#set($first = 0)
+		#else;
+		#end
+		<a href="$control.getDownloadURL($attm)" title="Click here to download the Attachment." target="dlFrame">$attm.fileName</a>
+		#if($control.readonly()==false) 
+			<a class="delete" title="Click here to remove the Attachment." href="$control.createActionURL("delete", $attm.getKey())">&nbsp;</a>
+		#end
+	#end
+
+#else
+	#if($control.readonly() == false)
+	<a class="addAttm" title="Click here to upload an Attachment." href="$control.createActionURL("addAttm", "add")">&nbsp;</a>
+	#end
+#end
+</div>

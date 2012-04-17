@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+
+    <class name="de.xwic.appkit.core.model.entities.impl.UserViewConfiguration" table="USER_VIEW_CONFIG">
+
+        <id name="id" type="int">
+            <column name="USER_VIEW_CONFIG_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+		
+
+		<many-to-one name="owner" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="OWNER"/>
+		<property name="className" column="CLASS_NAME" />
+		<property name="viewId" column="VIEW_ID" />
+		<property name="listSetupId" column="LIST_SETUP_ID" />
+		<property name="name" column="CONFIG_NAME" />
+		<property name="description" column="CONFIG_DESCRIPTION" length="300"/>
+		<property name="public" column="IS_PUBLIC" type="boolean" />
+		<property name="columnsConfiguration" column="COLUMNS_CONFIG" type="org.hibernate.type.TextType" />
+ 		<property name="sortField" column="SORT_FIELD" />
+ 		<property name="sortDirection" column="SORT_DIRECTION" />
+ 		<property name="maxRows" column="MAX_ROWS" type="int" />
+
+		<!-- additional object properties -->
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+
+    <class name="de.xwic.appkit.core.model.entities.impl.PicklistEntry" table="PICKLIST_ENTRY">
+
+    <id name="id" type="int">
+        <column name="PE_ID" not-null="true"/>
+        <generator class="native"/>
+    </id>
+
+	<version column="VERSION" name="version" type="long"/>
+	<property name="deleted" column="DELETED" not-null="true"/>
+    <property name="downloadVersion" type="long">
+    	<column name="DOWNLOAD_VERSION"/>
+    </property>
+    <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+
+	<property name="veraltet">
+		<column name="VERALTET" not-null="true"/>
+	</property>
+ 
+ 	<property name="key" column="PE_KEY"/>
+ 	<property name="sortIndex" column="SORTINDEX" type="int" not-null="true"/>
+
+ 
+    <many-to-one lazy="false" name="pickliste" class="de.xwic.appkit.core.model.entities.impl.Pickliste">
+      	<column name="PL_ID" not-null="true"/>
+    </many-to-one>
+
+	<!-- Since axis does load the values anyway, its faster to not use a lazy collection here. -->
+    <set name="pickTextValues" lazy="false" inverse="true">
+      <key column="PE_ID"/>
+      <one-to-many class="de.xwic.appkit.core.model.entities.impl.PicklistText"/>
+    </set>
+
+		<!-- additional object properties -->
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+   </class>
+</hibernate-mapping>

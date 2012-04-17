@@ -1,0 +1,18 @@
+#set($list = $control.container.getConfigControls())
+#if($list.size() == 0)
+	<div style="text-align: center;margin-top: 85px">
+	#if($control.container.isSharedConfigsView())
+	No public profiles for this view could be found 
+	#else
+	You don't have any profiles for this view yet.<br/>To create a new profile, please click the 'Create New Profile' link below
+	#end
+	</div>
+#else
+<table width="100%" cellspacing="0">
+	#foreach($cc in $list)
+	<tr bgcolor=#if($velocityCount % 2 == 0) "#EFEFEF" #else "#F9F9F9" #end>
+		<td style="padding-bottom:5px;padding-top:5px;border-bottom: thin dashed #D0D0D0;">$insert.control($cc.getName())</td>
+	</tr>
+	#end
+</table>
+#end

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping default-lazy="false">
+
+    <class name="de.xwic.appkit.core.model.entities.impl.UserListProfile" table="USER_LIST_PROFILE">
+
+        <id name="id" type="int">
+            <column name="USER_PROFILE_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+		
+
+		<property name="baseProfileName" column="BASE_PROFILE_NAME" />
+		<property name="className" column="CLASS_NAME" />
+		<property name="description" column="DESCRIPTION" length="512" />
+		<property name="publicProfile" column="PUBLIC_PROFILE" />
+		<property name="xmlContent" type="org.hibernate.type.TextType" >
+   			<column name="XML_CONTENT"/>
+ 		</property>     
+ 		<property name="profileId" column="PROFILE_ID" />
+ 		
+ 		<property name="sortField" column="SORT_FIELD" />
+ 		<property name="sortDirection" column="SORT_DIRECTION" />
+ 		<property name="maxRows" column="MAX_ROWS" />
+		
+		<many-to-one name="owner" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="OWNER"/>
+
+		<!-- additional object properties -->
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>

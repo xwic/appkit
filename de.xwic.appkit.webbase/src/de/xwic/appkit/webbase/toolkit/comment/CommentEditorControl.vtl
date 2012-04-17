@@ -1,0 +1,9 @@
+<div class="viewActionBar">
+$insert.control("actionbar")
+</div>
+$insert.control("errorControl")
+<table>
+#foreach($cView in $control.getCommentViews())
+	$insert.control($cView.name)
+#end
+</table>

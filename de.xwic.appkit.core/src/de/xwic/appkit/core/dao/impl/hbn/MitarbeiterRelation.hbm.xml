@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+    <class name="de.xwic.appkit.core.model.entities.impl.MitarbeiterRelation" table="PEOPLE_REL">
+
+        <id name="id" type="int">
+            <column name="CM_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+        
+        <many-to-one name="mitarbeiter" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="MITARBEITER"/>
+        <many-to-one name="relatedMitarbeiter" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="RELATED_MITARBEITER"/>
+        
+        <many-to-one name="rolle" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="ROLLE"/>
+
+        <property name="startDate" type="timestamp">
+        	<column name="START_DATE"/>
+        </property>
+        <property name="endDate" type="timestamp">
+        	<column name="END_DATE"/>
+        </property>       
+        
+		<!-- additional object properties -->
+
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT"/>
+		</property>
+		<property name="changed" type="boolean">
+			<column name="CHANGED"/>
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50"/>
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT"/>
+		</property>
+
+    </class>
+</hibernate-mapping>        
