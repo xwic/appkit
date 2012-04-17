@@ -426,6 +426,10 @@ public class EntityTableViewer extends ControlContainer {
 	}
 
 	private boolean propertyExists(String propertyId) {
+		if (propertyId == null) {
+			return false;
+		}
+		
 		StringTokenizer stk = new StringTokenizer(propertyId, ".");
 		Class<?> clazz = daoClass.getEntityClass();
 		

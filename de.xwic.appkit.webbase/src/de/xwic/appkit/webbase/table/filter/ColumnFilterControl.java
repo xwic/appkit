@@ -140,7 +140,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		});
 		
 		Button btCancel = new Button(this, "btCancel");
-		btCancel.setTitle("Cancel");
+		btCancel.setTitle("Close");
 		btCancel.setWidth(80);
 		btCancel.addSelectionListener(new SelectionListener() {
 			@Override

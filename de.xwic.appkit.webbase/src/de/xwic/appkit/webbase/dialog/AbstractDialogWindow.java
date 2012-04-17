@@ -82,7 +82,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		btOk.setWidth(80);
 		
 		btCancel = new Button(buttonsContainer, "btCancel");
-		btCancel.setTitle("Cancel");
+		btCancel.setTitle("Close");
 		btCancel.addSelectionListener(new SelectionListener() {
 			@Override
 			public void objectSelected(SelectionEvent event) {
