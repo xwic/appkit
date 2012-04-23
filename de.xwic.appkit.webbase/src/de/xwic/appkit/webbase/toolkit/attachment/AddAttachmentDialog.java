@@ -48,6 +48,8 @@ public class AddAttachmentDialog extends  Dialog {
 	private InputStream fileInputStream = null;
 	
 	private int maxFileSize = MAX_FILE_SIZE;
+
+	protected WindowControl win;
 	
 	/**
 	 * Creates small dialog for uploading a file from local (client side) file system.
@@ -62,7 +64,7 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @see de.jwic.wap.core.Dialog#createControls(de.jwic.base.IControlContainer)
 	 */
 	public void createControls(IControlContainer container) {
-		WindowControl win = new WindowControl(container, "scrollcontainer");
+		win = new WindowControl(container, "scrollcontainer");
 		win.setTemplateName(getClass().getName());
 		win.setWidth("450");
 		win.setAlign("center");
