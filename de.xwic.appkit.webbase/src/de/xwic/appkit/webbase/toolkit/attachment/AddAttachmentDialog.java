@@ -36,20 +36,19 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 public class AddAttachmentDialog extends  Dialog {
 
 	public static final int MAX_FILE_SIZE_UNKNOWN = -1;
-	
-	private FileUploadControl fileUpload;
 	private final static int MAX_FILE_SIZE = 4;
-	
-	private ErrorWarningControl error = null;
 	
 	private String fileName = null;
 	private long fileSize = 0;
-	
 	private InputStream fileInputStream = null;
 	
 	private int maxFileSize = MAX_FILE_SIZE;
 
+	protected ErrorWarningControl error = null;
+	protected FileUploadControl fileUpload;
 	protected WindowControl win;
+	protected ButtonControl btFinish;
+	protected ButtonControl btAbort;
 	
 	/**
 	 * Creates small dialog for uploading a file from local (client side) file system.
@@ -73,10 +72,9 @@ public class AddAttachmentDialog extends  Dialog {
 		error = new ErrorWarningControl(win, "error");
 		
         fileUpload = new FileUploadControl(win, "fileUpload");
-        fileUpload.setWidth("100%");
+        fileUpload.setSize("53");
         
-        
-		ButtonControl btFinish = new ButtonControl(win, "Finish");
+		btFinish = new ButtonControl(win, "Finish");
 		btFinish.setTitle("Upload");
 		btFinish.setIconEnabled(ImageLibrary.ICON_SAVECLOSE_ACTIVE);
 		btFinish.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
@@ -90,7 +88,7 @@ public class AddAttachmentDialog extends  Dialog {
 			}
 		});
 	
-		ButtonControl btAbort = new ButtonControl(win, "Abort");
+		btAbort = new ButtonControl(win, "Abort");
 		btAbort.setTitle("Cancel");
 		btAbort.setIconDisabled(ImageLibrary.ICON_ABORT_INACTIVE);
 		btAbort.setIconEnabled(ImageLibrary.ICON_ABORT_ACTIVE);
@@ -107,7 +105,7 @@ public class AddAttachmentDialog extends  Dialog {
 	 * 
 	 * @return
 	 */
-	private boolean validate() {
+	protected boolean validate() {
         if (!fileUpload.isFileUploaded()) {
             error.showError("You must select a file");
             return false;
@@ -182,6 +180,20 @@ public class AddAttachmentDialog extends  Dialog {
 	 */
 	public void setMaxFileSize(int maxFileSize) {
 		this.maxFileSize = maxFileSize;
+	}
+
+	/**
+	 * @return the btFinish
+	 */
+	public ButtonControl getBtFinish() {
+		return btFinish;
+	}
+
+	/**
+	 * @return the btAbort
+	 */
+	public ButtonControl getBtAbort() {
+		return btAbort;
 	}
 	
 }
