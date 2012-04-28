@@ -33,7 +33,5 @@ Export-Package: de.xwic.appkit.core,
  de.xwic.appkit.core.ucexec
 Bundle-ClassPath: .
 Require-Bundle: org.junit,
- org.hibernate3,
- org.dom4j,
  org.apache.commons.logging
 Eclipse-LazyStart: true

@@ -3,8 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.appkit.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.apache.commons.logging"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.libs.common"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.cube"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
