@@ -72,7 +72,7 @@ public class AddAttachmentDialog extends  Dialog {
 		error = new ErrorWarningControl(win, "error");
 		
         fileUpload = new FileUploadControl(win, "fileUpload");
-//        fileUpload.setSize("53");
+        fileUpload.setSize("53");
         
 		btFinish = new ButtonControl(win, "Finish");
 		btFinish.setTitle("Upload");
