@@ -192,7 +192,7 @@ public class WizardContainerFix {
 		btFinish.addSelectionListener(navContr);
 
 		btAbort = new ButtonControl(win, "btAbort");
-		btAbort.setTitle("Abort"); // messages.getString("wizard.button.abort"));
+		btAbort.setTitle("Cancel"); // messages.getString("wizard.button.abort"));
 		btAbort.addSelectionListener(navContr);
 
 		activatePage(currentPage);
