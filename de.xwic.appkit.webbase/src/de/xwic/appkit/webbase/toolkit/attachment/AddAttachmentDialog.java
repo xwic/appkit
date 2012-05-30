@@ -115,7 +115,7 @@ public class AddAttachmentDialog extends  Dialog {
 			// check size! Recalculate to byte!
 			if (fileUpload.getFileSize() > (maxFileSize * 1024 * 1024)) {
 				error.showError("The filesize is too large for an upload. Only files smaller than "
-						+ NumberFormat.getIntegerInstance().format(new Integer(MAX_FILE_SIZE)) + "MB are allowed!");
+						+ NumberFormat.getIntegerInstance().format(new Integer(maxFileSize)) + "MB are allowed!");
 				return false;
 			}
 		}
