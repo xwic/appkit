@@ -13,6 +13,7 @@ import java.util.List;
 import de.jwic.base.Range;
 import de.jwic.data.IContentProvider;
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
@@ -67,6 +68,10 @@ public class SimpleEntityContentProvider<E extends IEntity> implements IContentP
 			result = dao.getEntities(limit, query);
 		} else {
 			result = dao.getEntities(limit);
+		}
+		
+		if (result != null && result instanceof EntityList) {
+			lastTotalSize = ((EntityList) result).getTotalSize();
 		}
 		
 		if (customComparator != null) {
