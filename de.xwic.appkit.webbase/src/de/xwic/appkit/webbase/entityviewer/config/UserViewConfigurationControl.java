@@ -142,13 +142,13 @@ public class UserViewConfigurationControl extends ControlContainer {
 			editError = "";
 		}
 
-		if (tableModel.configNameExists(ibName.getText(), userConfig.getId())) {
+		if (tableModel.getUserConfigHandler().configNameExists(ibName.getText(), userConfig.getId())) {
 			editError = "A configuration with this name already exists";
 			requireRedraw();
 			return;
 		}
 
-		userConfig = tableModel.updateConfig(userConfig, ibName.getText(), ibDescription.getText(), rbtnYes.isSelected());
+		userConfig = tableModel.getUserConfigHandler().updateConfig(userConfig, ibName.getText(), ibDescription.getText(), rbtnYes.isSelected());
 		
 		updateFieldsValues();
 		editMode = false;
@@ -232,7 +232,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 * @return
 	 */
 	public boolean isCurrentConfig() {
-		return tableModel.getCurrentConfigId() == userConfig.getId();
+		return tableModel.getUserConfigHandler().isCurrentConfig(userConfig);
 	}
 	
 	/**

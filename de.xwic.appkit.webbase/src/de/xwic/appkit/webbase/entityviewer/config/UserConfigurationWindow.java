@@ -45,7 +45,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 			@Override
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
-				tableModel.applyConfig(ctrl.getUserViewConfiguration());
+				tableModel.getUserConfigHandler().applyConfig(ctrl.getUserViewConfiguration());
 			}
 			
 			@Override
@@ -58,14 +58,14 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 				if (ctrl.isCurrentConfig()) {
 					
 					if (configControls.size() > 0) {
-						tableModel.applyConfig(configControls.get(0).getUserViewConfiguration());
-						tableModel.deleteConfig(ctrl.getUserViewConfiguration().getId());
+						tableModel.getUserConfigHandler().applyConfig(configControls.get(0).getUserViewConfiguration());
+						tableModel.getUserConfigHandler().deleteConfig(ctrl.getUserViewConfiguration().getId());
 					} else {
-						tableModel.resetConfig();
+						tableModel.getUserConfigHandler().resetConfig();
 					}
 					
 				} else {
-					tableModel.deleteConfig(ctrl.getUserViewConfiguration().getId());
+					tableModel.getUserConfigHandler().deleteConfig(ctrl.getUserViewConfiguration().getId());
 				}
 				
 				requireRedraw();
@@ -126,17 +126,17 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 	public void actionPerformed(String actionId, String parameter) {
 		if ("undoChanges".equalsIgnoreCase(actionId)) {
 			
-			tableModel.updateRelatedConfig(true);
+			tableModel.getUserConfigHandler().updateRelatedConfig(true);
 			onCancel(); // to close the window
 			
 		} else if ("saveCurrent".equalsIgnoreCase(actionId)) {
 			
-			tableModel.updateRelatedConfig(false);
+			tableModel.getUserConfigHandler().updateRelatedConfig(false);
 			onCancel(); // to close the window
 			
 		} else if ("saveNew".equalsIgnoreCase(actionId)) {
 			
-			final IUserViewConfiguration uvc = tableModel.createConfigWithCurrentSettings();
+			final IUserViewConfiguration uvc = tableModel.getUserConfigHandler().createConfigWithCurrentSettings();
 			UserViewConfigurationControl ctrl = createUserConfigControl(uvc);
 			ctrl.actionEdit();
 			
@@ -152,7 +152,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 				@Override
 				public void onConfigUpdated(Event event) {
 					// if it's a new config created from current settings, we need to apply it after it's saved, to make it the main one
-					tableModel.applyConfig(uvc);
+					tableModel.getUserConfigHandler().applyConfig(uvc);
 				}
 			});
 		}
@@ -184,7 +184,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 	 * @return
 	 */
 	public boolean isDefaultConfig() {
-		return tableModel.isDefaultConfig();
+		return tableModel.getUserConfigHandler().isDefaultConfig();
 	}
 	
 	/**
@@ -198,6 +198,6 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 	 * @return
 	 */
 	public boolean isCurrentUserConfigDirty() {
-		return tableModel.isCurrentConfigDirty();
+		return tableModel.getUserConfigHandler().isCurrentConfigDirty();
 	}
 }

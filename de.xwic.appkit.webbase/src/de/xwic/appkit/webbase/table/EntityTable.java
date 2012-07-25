@@ -100,12 +100,12 @@ public class EntityTable extends ControlContainer {
 	 * 
 	 */
 	private void onUserConfigurationChanged() {
-		model.setConfigDirty(false);
+		model.getUserConfigHandler().setConfigDirty(false);
 		
 		updateTableColumns();
 		
 		TableModel tm = tblViewer.getModel();
-		tm.setMaxLines(model.getMaxRows());
+		tm.setMaxLines(model.getUserConfigHandler().getMaxRows());
 		tm.clearSelection();
 		
 		tblViewer.requireRedraw();
@@ -204,7 +204,7 @@ public class EntityTable extends ControlContainer {
 
 		TableModel tblModel = tblViewer.getModel();
 		tblModel.setSelectionMode(TableModel.SELECTION_SINGLE);
-		tblModel.setMaxLines(model.getMaxRows());
+		tblModel.setMaxLines(model.getUserConfigHandler().getMaxRows());
 		tblModel.addTableModelListener(new TableModelAdapter() {
 			@Override
 			public void columnSelected(TableModelEvent event) {
@@ -216,15 +216,15 @@ public class EntityTable extends ControlContainer {
 				Column col = (Column) event.getTableColumn().getUserObject();
 				col.setWidth(event.getTableColumn().getWidth());
 				
-				model.setConfigDirty(true);
+				model.getUserConfigHandler().setConfigDirty(true);
 			}
 			
 			@Override
 			public void rangeUpdated(TableModelEvent event) {
 				// range updated is also fired when we switch through pages, that's why
 				// this check is needed
-				if (model.getMaxRows() != tblViewer.getModel().getMaxLines()) {
-					model.setNewMaxRows(tblViewer.getModel().getMaxLines());
+				if (model.getUserConfigHandler().getMaxRows() != tblViewer.getModel().getMaxLines()) {
+					model.getUserConfigHandler().setNewMaxRows(tblViewer.getModel().getMaxLines());
 				}
 			}
 		});
@@ -381,8 +381,8 @@ public class EntityTable extends ControlContainer {
 	@Override
 	public void destroy() {
 		
-		if (model.isCurrentConfigDirty()) {
-			model.saveCurrentDataToMainConfig();
+		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
+			model.getUserConfigHandler().saveCurrentDataToMainConfig();
 		}		
 		
 		super.destroy();

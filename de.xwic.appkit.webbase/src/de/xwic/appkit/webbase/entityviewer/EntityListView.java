@@ -218,9 +218,9 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * 
 	 */
 	private void setConfigButtonName() {
-		String title = entityTable.getModel().getCurrentConfigName();
+		String title = entityTable.getModel().getUserConfigHandler().getCurrentConfigName();
 		
-		if (entityTable.getModel().isCurrentConfigDirty()) {
+		if (entityTable.getModel().getUserConfigHandler().isCurrentConfigDirty()) {
 			title += " *";
 		}
 		
