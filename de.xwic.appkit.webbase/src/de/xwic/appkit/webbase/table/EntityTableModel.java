@@ -5,15 +5,14 @@
 
 package de.xwic.appkit.webbase.table;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,7 +23,6 @@ import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.list.ListColumn;
 import de.xwic.appkit.core.config.list.ListSetup;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
@@ -49,20 +47,21 @@ public class EntityTableModel {
 		COLUMN_SORT_CHANGE, 
 		COLUMN_FILTER_CHANGE,
 		COLUMN_REORDER,
-		BEFORE_USER_CONFIGURATION_CHANGE,
-		USER_CONFIGURATION_CHANGE,
-		USER_CONFIGURATION_DELETED,
-		NEW_USER_CONFIGURATION_CREATED
+		USER_CONFIGURATION_CHANGED,
+		NEW_USER_CONFIGURATION_CREATED,
+		USER_CONFIGURATION_DIRTY_CHANGED,		
+		USER_CONFIGURATION_DELETED
 	}
 	
 	private final static Log log = LogFactory.getLog(EntityTableModel.class);
 	
-	private final static String PREF_STORE_KEY = "de.xwic.appkit.webbase.UserViewConfiguration";
+	public final static String USER_CUSTOMIZED_NAME = "User Customized";
+	public final static String DEFAULT_PROFILE_NAME = "Default Profile";
 	
 	private final Class<? extends IEntity> entityClazz;
 	private ListSetup listSetup;
 	private String viewId;
-	private EntityTableConfiguration configuration;
+	private EntityTableConfiguration entityTableConfiguration;
 
 	private List<Column> columns;
 	private Map<String, Column> idMapColumns;
@@ -73,11 +72,13 @@ public class EntityTableModel {
 	private PropertyQuery baseFilter = null;
 	private PropertyQuery customQuickFilter = null;
 	
-	private CurrentConfigurationWrapper currentConfig;
-	
 	private List<IEntityTableListener> listeners = new ArrayList<IEntityTableListener>();
 
-	private IPreferenceStore userConfigPrefStore;
+	private IUserViewConfiguration mainConfig;
+	private IUserViewConfigurationDAO userConfigDao = (IUserViewConfigurationDAO) DAOSystem.getDAO(IUserViewConfigurationDAO.class);
+	private boolean userConfigDirty = false;
+	private IMitarbeiter currentUser;
+	private int newMaxRows;
 	
 	/**
 	 * @param configuration
@@ -86,11 +87,11 @@ public class EntityTableModel {
 	public EntityTableModel(EntityTableConfiguration configuration) throws ConfigurationException {
 		this.entityClazz = configuration.getEntityClass();
 		
-		// first load all the columns from the list setup
-		
 		this.baseFilter = configuration.getBaseFilter();
 		this.viewId = configuration.getViewId();	
-		this.configuration = configuration;
+		this.entityTableConfiguration = configuration;
+		
+		this.currentUser = ((IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class)).getByCurrentUser();
 		
 		try {
 			initModel(false);
@@ -99,37 +100,27 @@ public class EntityTableModel {
 			throw (e);
 		}
 		
-		// then search for a user configuration and, if found, apply it to the columns
-		
-		userConfigPrefStore = Platform.getContextPreferenceProvider().getPreferenceStore(PREF_STORE_KEY);
-		try {
-			int userConfigId = Integer.parseInt(userConfigPrefStore.getString(viewId, "-1"));
-			if (userConfigId > 0) {
-				applyUserViewConfiguration(userConfigId);		
-			}
-		} catch (Exception ex) {
-		}
+		initUserConfig();
 		
 		// sort to apply user sorting
 		Collections.sort(columns);
 	}
 
 	/**
+	 * @param fireConfigChangedEvent
 	 * @throws ConfigurationException
 	 */
-	public void initModel(boolean fireEvent) throws ConfigurationException {
-		listSetup = ConfigurationManager.getUserProfile().getListSetup(entityClazz.getName(), configuration.getListId());
-		bundle = listSetup.getEntityDescriptor().getDomain().getBundle(configuration.getLocale().getLanguage());
+	public void initModel(boolean fireConfigChangedEvent) throws ConfigurationException {
+		listSetup = ConfigurationManager.getUserProfile().getListSetup(entityClazz.getName(), entityTableConfiguration.getListId());
+		bundle = listSetup.getEntityDescriptor().getDomain().getBundle(entityTableConfiguration.getLocale().getLanguage());
 		
-		currentConfig = null;
-		
-		PropertyQuery defaultFilter = configuration.getDefaultFilter();
+		PropertyQuery defaultFilter = entityTableConfiguration.getDefaultFilter();
 		
 		columns = new ArrayList<Column>();
 		idMapColumns = new HashMap<String, Column>();
 		int c = 0;
 		for (ListColumn lc : listSetup.getColumns()) {
-			Column col = new Column(configuration.getLocale(), lc, entityClazz);
+			Column col = new Column(entityTableConfiguration.getLocale(), lc, entityClazz);
 			col.setColumnOrder(c++);
 			columns.add(col);
 			idMapColumns.put(col.getId(), col);
@@ -174,9 +165,9 @@ public class EntityTableModel {
 			}
 		}
 		
-		if (fireEvent) {
+		if (fireConfigChangedEvent) {
 			buildQuery();
-			fireEvent(EventType.USER_CONFIGURATION_CHANGE, new EntityTableEvent(this));
+			fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
 		}
 	}
 	
@@ -232,21 +223,27 @@ public class EntityTableModel {
 			switch (type) {
 			case COLUMN_SORT_CHANGE:
 				listener.columnSorted(event);
+				setConfigDirty(true);
 				break;
 			case COLUMN_FILTER_CHANGE:
 				listener.columnFiltered(event);
 				break;
 			case COLUMN_REORDER:
 				listener.columnsReordered(event);
+				setConfigDirty(true);
 				break;
-			case BEFORE_USER_CONFIGURATION_CHANGE:
-				listener.beforeUserConfigurationChanged(event);
-				break;
-			case USER_CONFIGURATION_CHANGE:
+			case USER_CONFIGURATION_CHANGED:
 				listener.userConfigurationChanged(event);
 				break;
 			case NEW_USER_CONFIGURATION_CREATED:
 				listener.newUserConfigurationCreated(event);
+				setConfigDirty(true);
+				break;
+			case USER_CONFIGURATION_DIRTY_CHANGED:
+				listener.userConfigurationDirtyChanged(event);
+				break;
+			case USER_CONFIGURATION_DELETED:
+				// nothing
 				break;
 			}
 		}
@@ -289,6 +286,13 @@ public class EntityTableModel {
 		return viewId;
 	}
 
+	/**
+	 * @return
+	 */
+	public IMitarbeiter getCurrentUser() {
+		return currentUser;
+	}
+	
 	/**
 	 * @return the bundle
 	 */
@@ -430,7 +434,7 @@ public class EntityTableModel {
 	 * @return
 	 */
 	public PropertyQuery getDefaultFilter() {
-		return configuration.getDefaultFilter();
+		return entityTableConfiguration.getDefaultFilter();
 	}
 	
 	/**
@@ -515,219 +519,102 @@ public class EntityTableModel {
 	// *********** USER CONFIGURATION METHODS ***********
 	
 	/**
-	 * @return the maxRows
+	 * 
 	 */
-	public int getMaxRows() {
-		int maxRows = currentConfig != null ? currentConfig.maxRows : 0; 
-		return maxRows < 0 ? 0 : maxRows;
-	}
-	
-	/**
-	 * @return
-	 */
-	public int getCurrentUserConfigurationId() {
-		return currentConfig != null ? currentConfig.id : -1;
-	}
-	
-	/**
-	 * @return
-	 */
-	public String getCurrentUserConfigurationName() {
-		return currentConfig != null ? currentConfig.name : "default";
-	}
-	
-	/**
-	 * @return
-	 */
-	public IUserViewConfiguration cloneUserViewConfiguration(int userConfigId) {
-		DAO dao = DAOSystem.getDAO(IUserViewConfigurationDAO.class);
+	private void initUserConfig() {
 		
-		IUserViewConfiguration newUvc = createNewUserViewConfiguration(false);		
-		IUserViewConfiguration existentUvc = (IUserViewConfiguration) dao.getEntity(userConfigId);
+		mainConfig = userConfigDao.getMainConfigurationForView(currentUser, entityClazz.getName(), viewId);
 		
-		String name = existentUvc.getName(); 
+		// the preference store is no longer used for view configurations, but since we can't migrate everything at once,
+		// the migration will be done one view at a time, when the user accesses it
 		
-		List<IUserViewConfiguration> allUVCs = getMyUserConfigurationsForCurrentView(); 
-		
-		boolean exists = true;
-		int index = 1;
-		String tempName = name;
-		while (exists) {
-			boolean inWhile = false;
-			for (IUserViewConfiguration uvc : allUVCs) {
-				if (uvc.getName().equals(tempName)) {
-					tempName = name + "_" + index;
-					index++;
-					inWhile = true;
-					break;
+		if (mainConfig == null) {
+			
+			// look in the preference store, maybe the user created a config for this view
+			
+			try {
+				IPreferenceStore userConfigPrefStore = Platform.getContextPreferenceProvider().getPreferenceStore("de.xwic.appkit.webbase.UserViewConfiguration");
+				int userConfigId = Integer.parseInt(userConfigPrefStore.getString(viewId, "-1"));
+				if (userConfigId > 0) {
+					IUserViewConfiguration uvc = (IUserViewConfiguration) userConfigDao.getEntity(userConfigId);
+					if (uvc != null) {
+						mainConfig = createNewConfig(DEFAULT_PROFILE_NAME);
+						mainConfig.setMainConfiguration(true);
+						mainConfig.setRelatedConfiguration(uvc);
+						
+						transferDataToMainConfig(uvc);
+					}
 				}
-			}
-
-			exists = inWhile;
+			} catch (Exception ex) {
+				log.error(ex.getMessage(), ex);
+			}	
+			
 		}
 		
-		name = tempName;
-		
-		newUvc.setName(name);		
-		newUvc.setDescription(existentUvc.getDescription());
-		//newUvc.setPublic(currentUvc.isPublic()); don't clone the Public flag!!
-		newUvc.setColumnsConfiguration(existentUvc.getColumnsConfiguration());
-		newUvc.setSortField(existentUvc.getSortField());
-		newUvc.setSortDirection(existentUvc.getSortDirection());
-		newUvc.setMaxRows(existentUvc.getMaxRows());			
-		
-		return newUvc;
-	}
-
-	/**
-	 * @param name
-	 * @param currentId
-	 * @return
-	 */
-	public boolean nameAlreadyExists(String name, int currentId) {
-		PropertyQuery pq = new PropertyQuery();
-		pq.addEquals("owner", ((IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class)).getByCurrentUser());
-		pq.addEquals("className", entityClazz.getName());
-		pq.addEquals("viewId", viewId);
-		pq.addEquals("name", name);
-		pq.addNotEquals("id", currentId);
-
-		return !DAOSystem.getDAO(IUserViewConfigurationDAO.class).getEntities(null, pq).isEmpty();
+		// if no config exists, we create one which will be the main
+		if (mainConfig == null) {
+			createDefaultMainConfig();
+			// no need to apply it again, as it contains the default values
+		} else {
+			applyConfig(mainConfig);
+		}
 	}
 	
 	/**
-	 * @return
+	 * 
 	 */
-	@SuppressWarnings("unchecked")
-	private List<IUserViewConfiguration> getMyUserConfigurationsForCurrentView() {
-		PropertyQuery pq = new PropertyQuery();
-		pq.addEquals("owner", ((IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class)).getByCurrentUser());
-		pq.addEquals("className", entityClazz.getName());
-		pq.addEquals("viewId", viewId);
+	private void createDefaultMainConfig() {
+		mainConfig = createNewConfig(DEFAULT_PROFILE_NAME);
+		mainConfig.setMainConfiguration(true);
+		mainConfig.setRelatedConfiguration(null);
 		
-		return DAOSystem.getDAO(IUserViewConfigurationDAO.class).getEntities(null, pq);
+		storeCurrentData(mainConfig, true);
 	}
 	
 	/**
-	 * @param firstUserConfig
+	 * @param name 
 	 * @return
 	 */
-	public IUserViewConfiguration createNewUserViewConfiguration(boolean firstUserConfig) {
-		DAO dao = DAOSystem.getDAO(IUserViewConfigurationDAO.class);
+	private IUserViewConfiguration createNewConfig(String name) {
+		IUserViewConfiguration uvc = (IUserViewConfiguration) userConfigDao.createEntity();
 		
-		IUserViewConfiguration uvc = (IUserViewConfiguration) dao.createEntity();
-		
-		uvc.setOwner(((IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class)).getByCurrentUser());
+		uvc.setOwner(currentUser);
 		uvc.setClassName(entityClazz.getName());
 		uvc.setViewId(viewId);			
 		uvc.setListSetupId(listSetup.getListId());
-		uvc.setName(listSetup.getListId());
-		
-		if (firstUserConfig) {
-			dao.update(uvc);
-			currentConfig = new CurrentConfigurationWrapper(uvc);
-			updateUserConfigInStore(uvc.getId());
-			
-			fireEvent(EventType.NEW_USER_CONFIGURATION_CREATED, new EntityTableEvent(this));
-		}
+		uvc.setName(name);
 		
 		return uvc;
 	}
 	
 	/**
-	 * @param userConfigId
+	 * @param existentUvc
 	 */
-	public void deleteUserViewConfiguration(IUserViewConfiguration userConfig) {
-		if (userConfig.getId() > 0) {
-			DAOSystem.getDAO(IUserViewConfigurationDAO.class).softDelete(userConfig);
-		}
+	private void transferDataToMainConfig(IUserViewConfiguration existentUvc) {
+		
+		mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
+		
+		mainConfig.setName(existentUvc.getName());
+		mainConfig.setDescription(existentUvc.getDescription());
+		//newUvc.setPublic(currentUvc.isPublic()); not the Public flag!!
+		mainConfig.setColumnsConfiguration(existentUvc.getColumnsConfiguration());
+		mainConfig.setSortField(existentUvc.getSortField());
+		mainConfig.setSortDirection(existentUvc.getSortDirection());
+		mainConfig.setMaxRows(existentUvc.getMaxRows());
+		
+		mainConfig.setRelatedConfiguration(existentUvc);
+		
+		userConfigDao.update(mainConfig);
 	}
 	
 	/**
-	 * @param userConfigId
+	 * @param uvc
+	 * @param updateDb
 	 */
-	public void applyUserViewConfiguration(int userConfigId) {
-		if (currentConfig != null && currentConfig.id == userConfigId) {
-			return;
-		}
-		
-		IUserViewConfiguration uvc = (IUserViewConfiguration) DAOSystem.getDAO(IUserViewConfigurationDAO.class).getEntity(userConfigId);
-		
-		if (uvc != null && !uvc.isDeleted()) {
-			applyUserViewConfiguration(uvc);
-		}
-	}
-	
-	/**
-	 * @param userConfiguration
-	 */
-	public void applyUserViewConfiguration(IUserViewConfiguration userConfiguration) {
-		fireEvent(EventType.BEFORE_USER_CONFIGURATION_CHANGE, new EntityTableEvent(this));
-		
-		ColumnsConfigurationUtil util = new ColumnsConfigurationUtil(userConfiguration);
-		
-		for (Column col : columns) {
-			ColumnConfigurationWrapper colConfig = util.getColumnConfiguration(col.getId());
-			// if it's null, it means it's a new column, which did not exist
-			// when the user configuration was created. We display it by
-			// default, so the users see it exists, they can take it out after
-			if (colConfig == null) {
-				col.setVisible(true);
-				continue;
-			}
-			
-			col.setWidth(colConfig.size);
-			col.setVisible(colConfig.visible);
-			col.setColumnOrder(colConfig.index);
-			
-			if (col.getId().equals(util.getSortField())) {
-				col.setSortState(util.getSortDirection());
-			} else {
-				col.setSortState(Sort.NONE);
-			}
-		}
-		
-		buildQuery();
-		
-		this.currentConfig = new CurrentConfigurationWrapper(userConfiguration);
-		
-		// if it's a public profile that doesn't belong to the current user, don't put it in the preference store
-		if (isCurrentConfigurationMine()) {
-			updateUserConfigInStore(userConfiguration.getId());
-		}
-		
-		fireEvent(EventType.USER_CONFIGURATION_CHANGE, new EntityTableEvent(this));
-	}
-	
-
-	/**
-	 * @param newMaxRows
-	 */
-	public void storeUserViewConfiguration(int newMaxRows) {
-		DAO dao = DAOSystem.getDAO(IUserViewConfigurationDAO.class);
-		
-		IUserViewConfiguration uvc = null;
-
-		boolean isNew = false;
-		
-		if (currentConfig != null) {
-			// if it's a public profile that doesn't belong to the current user, don't save it
-			if (!isCurrentConfigurationMine()) {
-				return;
-			}
-			
-			uvc = (IUserViewConfiguration) dao.getEntity(currentConfig.id);
-		} else {
-			uvc = createNewUserViewConfiguration(false);
-			isNew = true;
-		}
-
-		// just in case.. paranoid?
-		if (uvc == null) {
-			return;
-		}
+	private void storeCurrentData(IUserViewConfiguration uvc, boolean updateDb) {
 		
 		boolean changed = false;
+		
 		String sortField = "";
 		String sortDirection = "";		
 		StringBuilder sbColumnsConfiguration = new StringBuilder();
@@ -749,87 +636,299 @@ public class EntityTableModel {
 		}
 		
 		String columnsConfiguration = sbColumnsConfiguration.toString();
-		if (isNew || !columnsConfiguration.equals(uvc.getColumnsConfiguration())) {
+		if (!columnsConfiguration.equals(uvc.getColumnsConfiguration())) {
 			uvc.setColumnsConfiguration(columnsConfiguration);
 			changed = true;
 		}
 		
-		if (isNew || !sortField.equals(uvc.getSortField())) {
+		if (!sortField.equals(uvc.getSortField())) {
 			uvc.setSortField(sortField);
 			changed = true;
 		}
 		
-		if (isNew || !sortDirection.equals(uvc.getSortDirection())) {
+		if (!sortDirection.equals(uvc.getSortDirection())) {
 			uvc.setSortDirection(sortDirection);
 			changed = true;
 		}
 		
-		if (isNew || newMaxRows != uvc.getMaxRows()) {
+		if (newMaxRows != uvc.getMaxRows()) {
 			uvc.setMaxRows(newMaxRows);
 			changed = true;
 		}
 		
-		if (changed) {
-			dao.update(uvc);
+		if (updateDb && changed) {
+			userConfigDao.update(uvc);
 		}
-		
-		if (isNew) {
-			updateUserConfigInStore(uvc.getId());
-		}
-	}
-	
-	/**
-	 * @param uvc
-	 * @return
-	 */
-	public boolean isCurrentConfigurationMine() {
-		if (currentConfig != null) {
-			// if it's a public profile that doesn't belong to the current user, don't save it
-			IMitarbeiter mit = ((IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class)).getByCurrentUser();
-			if (currentConfig.id > 0 && currentConfig.isPublic && currentConfig.ownerId != mit.getId()) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 	
 	/**
 	 * 
 	 */
-	private void updateUserConfigInStore(int userConfigurationId) {
-		// if it's different from what we have in the user's store, update it
-		String oldUserConfig = userConfigPrefStore.getString(viewId, "");
-		if (!String.valueOf(userConfigurationId).equals(oldUserConfig)) {
-			userConfigPrefStore.setValue(viewId, String.valueOf(userConfigurationId));
-			try {
-				userConfigPrefStore.flush();
-			} catch (IOException e) {
-				throw new RuntimeException("Error while saving preferences: " + e.getMessage(), e);
-			}
+	private void deleteMainConfig() {
+		
+		if (mainConfig == null) {
+			return;
+		}
+		
+		IUserViewConfiguration related = mainConfig.getRelatedConfiguration();
+		
+		userConfigDao.delete(mainConfig);
+		
+		if (related != null) {
+			userConfigDao.delete(related);
 		}
 	}
 	
 	/**
-	 * @author Adrian Ionescu
+	 * 
 	 */
-	private class CurrentConfigurationWrapper {
-
-		private int id;
-		private int maxRows;
-		private String name;
-		private boolean isPublic;
-		private int ownerId;
-		
-		/**
-		 * @param config
-		 */
-		public CurrentConfigurationWrapper(IUserViewConfiguration config) {
-			id = config.getId();
-			maxRows = config.getMaxRows();
-			name = config.getName();
-			isPublic = config.isPublic();
-			ownerId = config.getOwner().getId();
+	public void resetConfig() {
+		try {							
+			initModel(true);
+			deleteMainConfig();
+			
+			newMaxRows = 0;
+			
+			createDefaultMainConfig();
+			
+			fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
+		} catch (ConfigurationException e) {
+			throw new RuntimeException("Can not create EntityTable: " + e, e);
 		}
+	}
+	
+	/**
+	 * @return
+	 */
+	public IUserViewConfiguration createConfigWithCurrentSettings() {
+		IUserViewConfiguration uvc = createNewConfig(mainConfig.getName());
+		storeCurrentData(uvc, false);
+		
+		return uvc;		
+	}
+	
+	/**
+	 * @param userConfig 
+	 * 
+	 */
+	public IUserViewConfiguration updateConfig(IUserViewConfiguration config, String name, String description, boolean isPublic) {
+		
+		if (config.getId() > 0) {
+			// refresh the entity, unless it's a new one
+			config = (IUserViewConfiguration) userConfigDao.getEntity(config.getId());
+		}
+		
+		config.setName(name);
+		config.setDescription(description);
+		config.setPublic(isPublic);
+		
+		userConfigDao.update(config);
+		
+		if (getCurrentConfigId() == config.getId()) {
+			
+			mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
+
+			// check again, maybe it was updated in the meantime (two browser windows?)
+			if (mainConfig.getRelatedConfiguration() != null && mainConfig.getRelatedConfiguration().getId() == config.getId()) {
+				mainConfig.setName(name);
+				mainConfig.setDescription(description);
+				
+				userConfigDao.update(mainConfig);
+				
+				// fire the event to trigger the button title change
+				fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
+			}
+		}
+		
+		return config;
+	}
+	
+	/**
+	 * 
+	 */
+	public void saveCurrentDataToMainConfig() {
+		mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
+		storeCurrentData(mainConfig, true);
+	}
+	
+	/**
+	 * 
+	 */
+	public void updateRelatedConfig(boolean undoChanges) {
+		
+		if (mainConfig.getRelatedConfiguration() == null) {
+			
+			// if we're still on the default config, reset it all			
+			if (undoChanges) {
+				resetConfig();
+			}
+			
+			return;
+		}
+			
+		IUserViewConfiguration relatedConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getRelatedConfiguration().getId());
+		
+		if (!undoChanges) {
+			storeCurrentData(relatedConfig, true);
+		}
+		
+		transferDataToMainConfig(relatedConfig);
+		
+		if (undoChanges) {
+			// if we undid the changes, we need to re-apply the config
+			applyConfig(mainConfig);
+		}
+		
+		setConfigDirty(false);
+	}
+	
+	/**
+	 * @param name
+	 * @param currentId
+	 * @return
+	 */
+	public boolean configNameExists(String name, int currentId) {
+		return userConfigDao.configNameExists(currentUser, entityClazz.getName(), viewId, name, currentId);
+	}
+	
+	/**
+	 * @param userConfigId
+	 */
+	public void deleteConfig(int id) {
+		if (id > 0) {
+			IEntity uvc = userConfigDao.getEntity(id);
+			if (uvc != null) {
+				userConfigDao.delete(uvc);
+			}
+		}
+	}
+
+	/**
+	 * @param userConfig
+	 */
+	public void applyConfig(IUserViewConfiguration userConfig) {
+		
+		if (!userConfig.isMainConfiguration()) {
+			// applying a configuration actually means copying its values to the main configuration 
+			
+			transferDataToMainConfig(userConfig);
+			applyConfig(mainConfig);
+			
+		} else {
+			
+			ColumnsConfigurationUtil util = new ColumnsConfigurationUtil(userConfig);
+			
+			for (Column col : columns) {
+				ColumnConfigurationWrapper colConfig = util.getColumnConfiguration(col.getId());
+				// if it's null, it means it's a new column, which did not exist
+				// when the user configuration was created. We display it by
+				// default, so the users see it exists, they can take it out after
+				if (colConfig == null) {
+					col.setVisible(true);
+					continue;
+				}
+				
+				col.setWidth(colConfig.size);
+				col.setVisible(colConfig.visible);
+				col.setColumnOrder(colConfig.index);
+				
+				if (col.getId().equals(util.getSortField())) {
+					col.setSortState(util.getSortDirection());
+				} else {
+					col.setSortState(Sort.NONE);
+				}
+			}
+			
+			newMaxRows = userConfig.getMaxRows();
+			
+			buildQuery();
+			
+			fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
+		}
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isCurrentConfigDirty() {
+		
+		// if the user has changed something or this is a modified default config
+		
+		if (userConfigDirty || (mainConfig.getRelatedConfiguration() == null && mainConfig.getName().equals(USER_CUSTOMIZED_NAME)) ) {
+			return true;
+		}
+		
+		IUserViewConfiguration relatedConfig = mainConfig.getRelatedConfiguration();
+		
+		if (relatedConfig != null) {
+			if (mainConfig.getMaxRows() != relatedConfig.getMaxRows()) {
+				return true;
+			}
+			
+			if (mainConfig.getSortField() != null && !mainConfig.getSortField().equals(relatedConfig.getSortField())) {
+				return true;
+			}
+			
+			if (mainConfig.getSortDirection() != null && !mainConfig.getSortDirection().equals(relatedConfig.getSortDirection())) {
+				return true;
+			}
+			
+			if (mainConfig.getColumnsConfiguration() != null && !mainConfig.getColumnsConfiguration().equals(relatedConfig.getColumnsConfiguration())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * @param dirty
+	 */
+	public void setConfigDirty(boolean dirty) {
+		
+		userConfigDirty = dirty;
+		
+		if (dirty && mainConfig.getName().equals(DEFAULT_PROFILE_NAME)) {
+			mainConfig.setName(USER_CUSTOMIZED_NAME);
+			userConfigDao.update(mainConfig);
+		}
+		
+		fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
+	}
+
+	/**
+	 * @return the maxRows
+	 */
+	public int getMaxRows() {
+		return mainConfig.getMaxRows() < 0 ? 0 : mainConfig.getMaxRows();
+	}
+	
+	/**
+	 * @param newMaxRows
+	 */
+	public void setNewMaxRows(int newMaxRows) {
+		this.newMaxRows = newMaxRows;
+		setConfigDirty(true);
+	}
+	
+	/**
+	 * @return
+	 */
+	public String getCurrentConfigName() {
+		return mainConfig.getName();
+	}
+	
+	/**
+	 * @return
+	 */
+	public int getCurrentConfigId() {
+		return mainConfig.getRelatedConfiguration() != null ? mainConfig.getRelatedConfiguration().getId() : mainConfig.getId();
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isDefaultConfig() {
+		return mainConfig.getName().equals(USER_CUSTOMIZED_NAME);
 	}
 }

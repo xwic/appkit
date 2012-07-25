@@ -42,8 +42,6 @@ public class EntityTable extends ControlContainer {
 	protected EntityTableModel model;
 	protected TableViewer tblViewer;
 	
-	private boolean isUserConfigDirty = false;
-	
 	private ColumnFilterControl colFilter;
 	
 	private List<ElementSelectedListener> elmSelListeners = new ArrayList<ElementSelectedListener>();
@@ -76,16 +74,8 @@ public class EntityTable extends ControlContainer {
 				onColumnsReordered();
 			}
 			@Override
-			public void beforeUserConfigurationChanged(EntityTableEvent event) {
-				storeCurrentConfig();
-			}
-			@Override
 			public void userConfigurationChanged(EntityTableEvent event) {
 				onUserConfigurationChanged();
-			}
-			@Override
-			public void newUserConfigurationCreated(EntityTableEvent event) {
-				onNewUserConfigurationCreated();
 			}
 		});
 		
@@ -99,20 +89,18 @@ public class EntityTable extends ControlContainer {
 	}
 
 	/**
-	 * Columns have been reordered.
+	 * 
 	 */
 	private void onColumnsReordered() {
 		updateTableColumns();
 		tblViewer.requireRedraw();
-		
-		isUserConfigDirty = true;
 	}
 	
 	/**
-	 * Columns have been reordered.
+	 * 
 	 */
 	private void onUserConfigurationChanged() {
-		isUserConfigDirty = false;
+		model.setConfigDirty(false);
 		
 		updateTableColumns();
 		
@@ -122,16 +110,9 @@ public class EntityTable extends ControlContainer {
 		
 		tblViewer.requireRedraw();
 		
-		lblPublicProfileWarning.setVisible(!model.isCurrentConfigurationMine());
+		//lblPublicProfileWarning.setVisible(!model.isCurrentUserConfigMine());
 	}
 
-	/**
-	 * The user created a new user config
-	 */
-	private void onNewUserConfigurationCreated() {
-		isUserConfigDirty = true;
-	}
-	
 	/**
 	 * Add a listener for selection events. The event will contain the ID of the entity
 	 * as Integer or NULL if the selection was lost.
@@ -175,18 +156,14 @@ public class EntityTable extends ControlContainer {
 			setColumnSortIcon(tc, col);
 		}
 		tblViewer.requireRedraw();
-		
-		isUserConfigDirty = true;
 	}
 	
 	/**
 	 * 
 	 */
 	private void createColumnFilter() {
-		
 		colFilter = new ColumnFilterControl(this, "balloon", model);
 		colFilter.setTableViewer(tblViewer);
-		
 	}
 
 	/**
@@ -231,15 +208,24 @@ public class EntityTable extends ControlContainer {
 		tblModel.addTableModelListener(new TableModelAdapter() {
 			@Override
 			public void columnSelected(TableModelEvent event) {
-				handleColumnSelected(event.getTableColumn());
+				colFilter.open(event.getTableColumn());
 			}
+			
 			@Override
 			public void columnResized(TableModelEvent event) {
-				handleColumnResize(event.getTableColumn());
+				Column col = (Column) event.getTableColumn().getUserObject();
+				col.setWidth(event.getTableColumn().getWidth());
+				
+				model.setConfigDirty(true);
 			}
+			
 			@Override
 			public void rangeUpdated(TableModelEvent event) {
-				handleRangeUpdated();
+				// range updated is also fired when we switch through pages, that's why
+				// this check is needed
+				if (model.getMaxRows() != tblViewer.getModel().getMaxLines()) {
+					model.setNewMaxRows(tblViewer.getModel().getMaxLines());
+				}
 			}
 		});
 		
@@ -258,34 +244,6 @@ public class EntityTable extends ControlContainer {
 		
 		updateTableColumns();
 		
-	}
-
-	/**
-	 * @param tableColumn
-	 */
-	private void handleColumnSelected(TableColumn tableColumn) {
-		colFilter.open(tableColumn);
-	}
-	
-	/**
-	 * @param tableColumn
-	 */
-	private void handleColumnResize(TableColumn tableColumn) {		
-		Column col = (Column) tableColumn.getUserObject();
-		col.setWidth(tableColumn.getWidth());
-		
-		isUserConfigDirty = true;
-	}
-	
-	/**
-	 * 
-	 */
-	private void handleRangeUpdated() {
-		// range updated is also fired when we switch through pages, that's why
-		// this check is needed
-		if (model.getMaxRows() != tblViewer.getModel().getMaxLines()) {
-			isUserConfigDirty = true;
-		}
 	}
 
 	/**
@@ -422,16 +380,11 @@ public class EntityTable extends ControlContainer {
 	 */
 	@Override
 	public void destroy() {
-		storeCurrentConfig();
-		super.destroy();
-	}
-	
-	/**
-	 * 
-	 */
-	public void storeCurrentConfig() {
-		if (isUserConfigDirty) {
-			getModel().storeUserViewConfiguration(tblViewer.getModel().getMaxLines());
+		
+		if (model.isCurrentConfigDirty()) {
+			model.saveCurrentDataToMainConfig();
 		}		
+		
+		super.destroy();
 	}
 }

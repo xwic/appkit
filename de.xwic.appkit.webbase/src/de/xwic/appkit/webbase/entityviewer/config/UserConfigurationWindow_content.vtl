@@ -1,8 +1,27 @@
-$insert.control("tabPanel")
-<br/>
-<hr />
-#if($control.container.container.container.hasCurrentConfig())
-<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="JWic.fireAction('$control.container.container.container.controlID', 'duplicate', '')">Duplicate Current Profile</span>
-#else
-<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="JWic.fireAction('$control.container.container.container.controlID', 'create', '')">Create New Profile</span>
+#if($control.container.container.container.isCurrentUserConfigDirty())
+<div style="font-size: 9pt; color: #707070; font-weight: bold; padding: 10px 10px 10px 10px">
+You have modified the current profile. Your changes will be lost if you switch to a different profile.
+</div>
+<table style="width: 99%; margin: 0 10px 0 10px">
+	<tr>
+		<td width="110px">
+			<span style="color: #FF8F07;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('undoChanges', '')">Undo Changes</span>
+		</td>
+		#if(!$control.container.container.container.isDefaultConfig())
+		<td width="210px">
+			<span style="color: #2200C1;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('saveCurrent', '')">Save Changes to Current Profile</span>
+		</td>
+		#end
+		<td align="left" width="130px">
+			<span style="color: #2200C1;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('saveNew', '')">Save as New Profile</span>
+		</td>
+	</tr>
+</table>
+<hr/>
 #end
+#if($control.container.container.container.getConfigControls().size() > 0)
+<div style="font-size: 11pt; color: #707070; font-weight: bold; padding: 7px 10px 0 10px">Load View Profile</div>
+#end
+<div style="padding: 10px">
+	$insert.control("configControls")
+</div>

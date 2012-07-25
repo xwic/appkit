@@ -28,6 +28,8 @@
  		<property name="sortField" column="SORT_FIELD" />
  		<property name="sortDirection" column="SORT_DIRECTION" />
  		<property name="maxRows" column="MAX_ROWS" type="int" />
+ 		<property name="mainConfiguration" column="IS_MAIN_CONFIG" type="boolean" />
+ 		<many-to-one name="relatedConfiguration" class="de.xwic.appkit.core.model.entities.impl.UserViewConfiguration" column="RELATED_CONFIG"/>
 
 		<!-- additional object properties -->
 

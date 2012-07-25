@@ -6,12 +6,11 @@ package de.xwic.appkit.webbase.entityviewer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 import de.jwic.base.ControlContainer;
-import de.jwic.base.Event;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.Page;
@@ -44,7 +43,6 @@ import de.xwic.appkit.webbase.actions.IEntityAction;
 import de.xwic.appkit.webbase.actions.IEntityProvider;
 import de.xwic.appkit.webbase.dialog.DialogEvent;
 import de.xwic.appkit.webbase.dialog.DialogWindowAdapter;
-import de.xwic.appkit.webbase.entityviewer.config.IUserConfigurationWindowListener;
 import de.xwic.appkit.webbase.entityviewer.config.UserConfigurationWindow;
 import de.xwic.appkit.webbase.entityviewer.quickfilter.AbstractQuickFilterPanel;
 import de.xwic.appkit.webbase.table.EntityTable;
@@ -160,13 +158,18 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		entityTable.getModel().addEntityTableListener(new EntityTableAdapter() {
 			@Override
 			public void userConfigurationChanged(EntityTableEvent event) {
-				btUserConfig.setTitle("Profile: " + entityTable.getModel().getCurrentUserConfigurationName());
-				dialog.close();
-				dialog = null;
+				setConfigButtonName();
+				closeDialog();
 			}
+			
+			@Override
+			public void userConfigurationDirtyChanged(EntityTableEvent event) {
+				setConfigButtonName();
+				closeDialog();
+			}			
 		});
 
-		if(configuration.getQuickFilterPanelCreator() != null) {
+		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
 		}
 		
@@ -190,8 +193,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			});
 
 			btUserConfig = grpRight.addButton();
-			btUserConfig.setIconEnabled(ImageLibrary.ICON_CONFIG);
-			btUserConfig.setTitle("Profile: " + entityTable.getModel().getCurrentUserConfigurationName());
+			btUserConfig.setIconEnabled(ImageLibrary.ICON_CONFIG);			
 			btUserConfig.setTooltip("Manage profiles");
 			btUserConfig.addSelectionListener(new SelectionListener() {
 				@Override
@@ -199,6 +201,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					openUserConfigWindow();
 				}
 			});
+			setConfigButtonName();
 		}
 
 		if (showExcelExport()) {
@@ -210,7 +213,30 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			excelExport.setIconEnabled(imgDef);
 		}
 	}
+
+	/**
+	 * 
+	 */
+	private void setConfigButtonName() {
+		String title = entityTable.getModel().getCurrentConfigName();
+		
+		if (entityTable.getModel().isCurrentConfigDirty()) {
+			title += " *";
+		}
+		
+		btUserConfig.setTitle(title);
+	}
 	
+	/**
+	 * 
+	 */
+	private void closeDialog() {
+		if (dialog != null) {
+			dialog.close();
+			dialog = null;
+		}
+	}
+
 	/**
 	 * Add the New, Edit, Delete actions
 	 */
@@ -294,6 +320,25 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	/**
 	 * 
 	 */
+	private void openUserConfigWindow() {
+		// to prevent multiple dialog openings
+		if (dialog != null) {
+			return;
+		}
+		
+		dialog = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
+		dialog.addDialogWindowListener(new DialogWindowAdapter() {
+			@Override
+			public void onDialogAborted(DialogEvent event) {
+				dialog = null;
+			}
+		});		
+		dialog.show();
+	}
+	
+	/**
+	 * 
+	 */
 	protected void init() {
 	}
 
@@ -316,31 +361,6 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	protected boolean showClearFilters() {
 		return true;
-	}
-	
-	/**
-	 * 
-	 */
-	private void openUserConfigWindow() {
-		// to prevent multiple dialog openings
-		if (dialog != null) {
-			return;
-		}
-		
-		dialog = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
-		dialog.addDuplicateProfileListener(new IUserConfigurationWindowListener() {
-			@Override
-			public void beforeDuplicateProfile(Event event) {
-				entityTable.storeCurrentConfig();
-			}
-		});
-		dialog.addDialogWindowListener(new DialogWindowAdapter() {
-			@Override
-			public void onDialogAborted(DialogEvent event) {				
-				dialog = null;
-			}
-		});		
-		dialog.show();
 	}
 	
 	/**

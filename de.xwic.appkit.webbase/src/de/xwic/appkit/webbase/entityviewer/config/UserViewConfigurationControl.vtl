@@ -1,62 +1,49 @@
-#set($sharedView = $control.isSharedView())
-<table width="100%" cellspacing="7">
+<table width="100%">
 #if($control.isEditMode())
 	#if($control.getEditError() != "")
 	<tr>
-		<td><span style="color: red;font-weight:bold" ">$control.getEditError()</span></td>
+		<td style="padding:5px"><span style="color: red;font-weight:bold" ">$control.getEditError()</span></td>
 	#end
 	<tr>
-		<td>$insert.control("ibName")</td>
+		<td style="padding:5px">$insert.control("ibName")</td>
 		<td rowspan="3" align="right">
-			<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('update', '')">Update</span>
+			<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('update', '')">Save</span>
 		</td>
 		<td rowspan="3" align="right">
 			<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('cancelUpdate', '')">Cancel</span>
 		</td>
 	</tr>	
 	<tr>
-		<td>$insert.control("ibDescription")</td>
+		<td style="padding:5px">$insert.control("ibDescription")</td>
 	</tr>
 	<tr>
-		<td><i>Share this configuration:</i> <b>$insert.control("rbtnYes")$insert.control("rbtnNo")</b></td>
+		<td style="padding:5px"><i>Share this configuration:</i> <b>$insert.control("rbtnYes")$insert.control("rbtnNo")</b></td>
 	</tr>
 #else
 	<tr>
-		<td>
+		<td style="padding:5px">
 		#if(!$control.isCurrentConfig())
-		<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-size: 12pt" onclick="$control.createActionURL('apply', '')">$insert.control("lblName")</span>
+		<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-size: 11pt" onclick="$control.createActionURL('apply', '')">$insert.control("lblName")</span>
 		#else
-		<span style="color: #84BD00;cursor: default;font-weight:bold;font-size: 12pt">$insert.control("lblName")</span>
+		<span style="color: #84BD00;cursor: default;font-weight:bold;font-size: 11pt">$insert.control("lblName")</span>
 		#end
-		#if(!$sharedView)
 		<span style="color: #000080; font-size: 8pt;">&nbsp;(created: $insert.control("lblDate"))</span>
-		#end
-		#if(!$sharedView && $control.getUserViewConfiguration().isPublic())
+		#if($control.getUserViewConfiguration().isPublic())
 		<span style="color: #000080; font-size: 8pt;">&nbsp;(shared)</span>
 		#end
 		</td>
-		<td>&nbsp;</td>
+		<td style="padding:5px">&nbsp;</td>
 		<td rowspan="2" align="right">
-		#if(!$sharedView)
 			<table cellspacing="5">
 				<tr>
-					<td><span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('edit', '')"><img src="icons/pencil.png" border="0" title="Edit profile name and description"></span></td>
-					<td><span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('delete', '')"><img src="icons/delete_a.png" border="0" title="Delete profile"></span></td>
+					<td><span style="color: #2200C1;cursor: pointer;" onclick="$control.createActionURL('edit', '')"><img src="icons/pencil.png" border="0" title="Edit profile name and description"></span></td>
+					<td><span style="color: #2200C1;cursor: pointer;" onclick="$control.createActionURL('delete', '')"><img src="icons/delete_a.png" border="0" title="Delete profile"></span></td>
 				</tr>
 			</table>
-		#else
-			<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.createActionURL('copyPublic', '')">Copy</span>			
-		#end
 		</td>
 	</tr>	
 	<tr>
-		<td colspan="2" style="font-size: 8pt; color: #707070;">$insert.control("lblDescription")</td>
-	</tr>
-#end
-#if($sharedView)
-	<tr>
-		<td style="font-size: 8pt; color: #707070;font-weight: bold">Owned by $control.getOwnerName()</td>
-		<td style="font-size: 8pt; color: #707070;font-weight: bold">Last modified on $insert.control("lblDate")</td>
+		<td colspan="2" style="padding:5px; font-size: 8pt; color: #707070;">$insert.control("lblDescription")</td>
 	</tr>
 #end
 </table>

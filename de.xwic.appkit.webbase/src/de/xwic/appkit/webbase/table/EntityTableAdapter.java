@@ -33,13 +33,6 @@ public abstract class EntityTableAdapter implements IEntityTableListener {
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.table.IEntityTableListener#beforeUserConfigurationChanged(de.xwic.appkit.webbase.table.EntityTableEvent)
-	 */
-	@Override
-	public void beforeUserConfigurationChanged(EntityTableEvent event) {
-	}
-	
-	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.IEntityTableListener#userConfigurationChanged(de.xwic.appkit.webbase.table.EntityTableEvent)
 	 */
 	@Override
@@ -51,5 +44,12 @@ public abstract class EntityTableAdapter implements IEntityTableListener {
 	 */
 	@Override
 	public void newUserConfigurationCreated(EntityTableEvent event) {
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.table.IEntityTableListener#userConfigurationDirty(de.xwic.appkit.webbase.table.EntityTableEvent)
+	 */
+	@Override
+	public void userConfigurationDirtyChanged(EntityTableEvent event) {
 	}
 }

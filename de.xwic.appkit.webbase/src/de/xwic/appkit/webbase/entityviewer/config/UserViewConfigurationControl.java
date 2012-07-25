@@ -13,10 +13,6 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.InputBoxControl;
 import de.jwic.controls.LabelControl;
 import de.jwic.controls.RadioButton;
-import de.xwic.appkit.core.dao.DAO;
-import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
-import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
 import de.xwic.appkit.webbase.table.EntityTableModel;
 
@@ -27,7 +23,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 
 	private final static int EVENT_TYPE_DELETE = 0;
 	private final static int EVENT_TYPE_APPLY = 1;
-	private final static int EVENT_TYPE_COPY_PUBLIC = 2;
+	private final static int EVENT_TYPE_UPDATE = 2;
 
 	private LabelControl lblName;
 	private LabelControl lblDescription;
@@ -40,11 +36,10 @@ public class UserViewConfigurationControl extends ControlContainer {
 	private IUserViewConfiguration userConfig;
 	private EntityTableModel tableModel;
 
-	private List<IUserViewConfigurationControlListener> listeners;
-
+	private List<IUserViewConfigurationControlListener> listeners = new ArrayList<IUserViewConfigurationControlListener>();
+	
 	private boolean editMode = false;
 	private String editError = "";
-	private boolean sharedView;
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -55,16 +50,12 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 * @param editMode
 	 * @param sharedView
 	 */
-	public UserViewConfigurationControl(IControlContainer container, IUserViewConfiguration userConfig, EntityTableModel tableModel, boolean editMode, boolean sharedView) {
+	public UserViewConfigurationControl(IControlContainer container, IUserViewConfiguration userConfig, EntityTableModel tableModel, boolean editMode) {
 		super(container);
 
 		this.userConfig = userConfig;
 		this.tableModel = tableModel;
 		this.editMode = editMode;
-
-		listeners = new ArrayList<IUserViewConfigurationControlListener>();
-
-		this.sharedView = sharedView;
 		
 		createControls();
 	}
@@ -80,12 +71,12 @@ public class UserViewConfigurationControl extends ControlContainer {
 		lblDate = new LabelControl(this, "lblDate");
 		
 		ibName = new InputBoxControl(this, "ibName");
-		ibName.setWidth(360);
+		ibName.setWidth(340);
 
 		ibDescription = new InputBoxControl(this, "ibDescription");
 		ibDescription.setEmptyInfoText("Enter a description of this list profile");
 		ibDescription.setMultiLine(true);
-		ibDescription.setWidth(360);
+		ibDescription.setWidth(340);
 		ibDescription.setHeight(70);
 
 		rbtnYes = new RadioButton(this, "rbtnYes");
@@ -104,11 +95,8 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 */
 	private void updateFieldsValues() {
 		lblName.setText(userConfig.getName());
-		if (isCurrentConfig()) {
-			lblName.setText(lblName.getText() + "*");
-		}
 		lblDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");
-		lblDate.setText(sdf.format(isSharedView() ? userConfig.getLastModifiedAt() : userConfig.getCreatedAt()));
+		lblDate.setText(sdf.format(userConfig.getCreatedAt()));
 		
 		ibName.setText(userConfig.getName());
 		ibDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");
@@ -126,13 +114,6 @@ public class UserViewConfigurationControl extends ControlContainer {
 		fireEvent(EVENT_TYPE_APPLY);
 	}
 
-	/**
-	 * 
-	 */
-	public void actionCopyPublic() {		
-		fireEvent(EVENT_TYPE_COPY_PUBLIC);
-	}
-	
 	/**
 	 * 
 	 */
@@ -161,22 +142,19 @@ public class UserViewConfigurationControl extends ControlContainer {
 			editError = "";
 		}
 
-		if (tableModel.nameAlreadyExists(ibName.getText(), userConfig.getId())) {
+		if (tableModel.configNameExists(ibName.getText(), userConfig.getId())) {
 			editError = "A configuration with this name already exists";
 			requireRedraw();
 			return;
 		}
 
-		userConfig.setName(ibName.getText());
-		userConfig.setDescription(ibDescription.getText());
-		userConfig.setPublic(rbtnYes.isSelected());
-
-		DAO dao = DAOSystem.getDAO(IUserViewConfigurationDAO.class);
-		dao.update(userConfig);
-
+		userConfig = tableModel.updateConfig(userConfig, ibName.getText(), ibDescription.getText(), rbtnYes.isSelected());
+		
 		updateFieldsValues();
 		editMode = false;
 		requireRedraw();
+		
+		fireEvent(EVENT_TYPE_UPDATE);
 	}
 
 	/**
@@ -205,10 +183,10 @@ public class UserViewConfigurationControl extends ControlContainer {
 	/**
 	 * @return
 	 */
-	public boolean isCurrentConfig() {
-		return tableModel.getCurrentUserConfigurationId() == userConfig.getId();
+	public IUserViewConfiguration getUserViewConfiguration() {
+		return userConfig;
 	}
-
+	
 	/**
 	 * @param listener
 	 */
@@ -232,25 +210,32 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 */
 	private void fireEvent(int eventType) {
 		for (IUserViewConfigurationControlListener listener : listeners) {
-			if (eventType == EVENT_TYPE_APPLY) {
+			switch (eventType) {
+			case EVENT_TYPE_APPLY:
 				listener.onConfigApplied(new Event(this));
-			} else if (eventType == EVENT_TYPE_COPY_PUBLIC) {
-				listener.onPublicConfigCopied(new Event(this));
-			} else if (eventType == EVENT_TYPE_DELETE) {
+				break;
+			case EVENT_TYPE_DELETE:
 				listener.onConfigDeleted(new Event(this));
+				break;
+			case EVENT_TYPE_UPDATE:
+				listener.onConfigUpdated(new Event(this));
+				break;
+			default:
+				break;
 			}
 		}
 	}
-
+	
+	// ************* USED IN THE VTL *************
+	
 	/**
 	 * @return
 	 */
-	public IUserViewConfiguration getUserViewConfiguration() {
-		return userConfig;
+	public boolean isCurrentConfig() {
+		return tableModel.getCurrentConfigId() == userConfig.getId();
 	}
 	
 	/**
-	 * Used in the VTL
 	 * @return
 	 */
 	public boolean isEditMode() {
@@ -258,26 +243,9 @@ public class UserViewConfigurationControl extends ControlContainer {
 	}
 
 	/**
-	 * Used in the VTL
 	 * @return
 	 */
 	public String getEditError() {
 		return editError;
-	}
-	
-	/**
-	 * Used in the VTL
-	 * @return
-	 */
-	public boolean isSharedView() {
-		return sharedView; 
-	}
-	
-	/**
-	 * Used in the VTL
-	 * @return
-	 */
-	public String getOwnerName() {
-		return DAOSystem.getDAO(IMitarbeiterDAO.class).buildTitle(userConfig.getOwner()); 
 	}
 }

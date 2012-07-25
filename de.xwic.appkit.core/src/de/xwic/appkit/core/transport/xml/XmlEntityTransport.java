@@ -7,7 +7,6 @@
  */
 package de.xwic.appkit.core.transport.xml;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Method;
@@ -28,20 +27,13 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.config.ConfigurationException;
-import de.xwic.appkit.core.config.ConfigurationManager;
-import de.xwic.appkit.core.config.Language;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.export.XmlExport;
-import de.xwic.appkit.core.model.daos.IPicklisteDAO;
-import de.xwic.appkit.core.model.entities.IPicklistEntry;
-import de.xwic.appkit.core.model.entities.IPickliste;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
