@@ -119,7 +119,10 @@ public class UserConfigHandler {
 	 */
 	private void transferDataToMainConfig(IUserViewConfiguration existentUvc) {
 		
-		mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
+		if (mainConfig.getId() > 0) {
+			// refresh the entity, unless it's a new one
+			mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
+		}
 		
 		mainConfig.setName(existentUvc.getName());
 		mainConfig.setDescription(existentUvc.getDescription());
