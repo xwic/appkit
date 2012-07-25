@@ -7,11 +7,13 @@ You have modified the current profile. Your changes will be lost if you switch t
 		<td width="110px">
 			<span style="color: #FF8F07;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('undoChanges', '')">Undo Changes</span>
 		</td>
-		#if(!$control.container.container.container.isDefaultConfig())
 		<td width="210px">
+			#if(!$control.container.container.container.isDefaultConfig())
 			<span style="color: #2200C1;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('saveCurrent', '')">Save Changes to Current Profile</span>
+			#else
+			&nbsp;
+			#end
 		</td>
-		#end
 		<td align="left" width="130px">
 			<span style="color: #2200C1;font-size: 10pt;cursor: pointer;font-weight:bold;font-family: sans-serif;" onclick="$control.container.container.container.createActionURL('saveNew', '')">Save as New Profile</span>
 		</td>
