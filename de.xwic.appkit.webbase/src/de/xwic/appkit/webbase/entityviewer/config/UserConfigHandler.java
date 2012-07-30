@@ -12,13 +12,12 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
 import de.xwic.appkit.webbase.core.Platform;
+import de.xwic.appkit.webbase.entityviewer.config.ColumnsConfigurationDeserializer.ColumnConfigurationWrapper;
 import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
 import de.xwic.appkit.webbase.table.Column;
-import de.xwic.appkit.webbase.table.ColumnsConfigurationUtil;
+import de.xwic.appkit.webbase.table.Column.Sort;
 import de.xwic.appkit.webbase.table.EntityTableEvent;
 import de.xwic.appkit.webbase.table.EntityTableModel;
-import de.xwic.appkit.webbase.table.Column.Sort;
-import de.xwic.appkit.webbase.table.ColumnsConfigurationUtil.ColumnConfigurationWrapper;
 import de.xwic.appkit.webbase.table.EntityTableModel.EventType;
 
 /**
@@ -127,6 +126,7 @@ public class UserConfigHandler {
 		
 		//newUvc.setPublic(currentUvc.isPublic()); not the Public flag!!
 		mainConfig.setColumnsConfiguration(existentUvc.getColumnsConfiguration());
+		mainConfig.setFiltersConfiguration(existentUvc.getFiltersConfiguration());
 		mainConfig.setSortField(existentUvc.getSortField());
 		mainConfig.setSortDirection(existentUvc.getSortDirection());
 		mainConfig.setMaxRows(existentUvc.getMaxRows());
@@ -149,39 +149,25 @@ public class UserConfigHandler {
 		
 		boolean changed = false;
 		
-		String sortField = "";
-		String sortDirection = "";		
-		StringBuilder sbColumnsConfiguration = new StringBuilder();
+		ColumnsConfigurationSerializer serializer = new ColumnsConfigurationSerializer(model);
 		
-		for (Column col : model.getColumns()) {
-			if (sbColumnsConfiguration.length() > 0) {
-				sbColumnsConfiguration.append(";");
-			}
-			
-			sbColumnsConfiguration.append(col.getId()).append(",");
-			sbColumnsConfiguration.append(col.getWidth()).append(",");
-			sbColumnsConfiguration.append(col.isVisible()).append(",");
-			sbColumnsConfiguration.append(col.getColumnOrder());
-			
-			if (col.getSortState() != Sort.NONE) {
-				sortField = col.getId();
-				sortDirection = col.getSortState().name();
-			}
-		}
-		
-		String columnsConfiguration = sbColumnsConfiguration.toString();
-		if (!columnsConfiguration.equals(uvc.getColumnsConfiguration())) {
-			uvc.setColumnsConfiguration(columnsConfiguration);
+		if (!serializer.getColumns().equals(uvc.getColumnsConfiguration())) {
+			uvc.setColumnsConfiguration(serializer.getColumns());
 			changed = true;
 		}
 		
-		if (!sortField.equals(uvc.getSortField())) {
-			uvc.setSortField(sortField);
+		if (!serializer.getSortField().equals(uvc.getSortField())) {
+			uvc.setSortField(serializer.getSortField());
 			changed = true;
 		}
 		
-		if (!sortDirection.equals(uvc.getSortDirection())) {
-			uvc.setSortDirection(sortDirection);
+		if (!serializer.getSortDirection().equals(uvc.getSortDirection())) {
+			uvc.setSortDirection(serializer.getSortDirection());
+			changed = true;
+		}
+		
+		if (!serializer.getFilters().equals(uvc.getFiltersConfiguration())) {
+			uvc.setFiltersConfiguration(serializer.getFilters());
 			changed = true;
 		}
 		
@@ -343,17 +329,17 @@ public class UserConfigHandler {
 	public void applyConfig(IUserViewConfiguration userConfig) {
 		
 		if (!userConfig.isMainConfiguration()) {
-			// applying a configuration actually means copying its values to the main configuration 
 			
+			// applying a configuration actually means copying its values to the main configuration			
 			transferDataToMainConfig(userConfig, true);
 			applyConfig(mainConfig);
 			
 		} else {
 			
-			ColumnsConfigurationUtil util = new ColumnsConfigurationUtil(userConfig);
+			ColumnsConfigurationDeserializer deserializer = new ColumnsConfigurationDeserializer(userConfig);
 			
 			for (Column col : model.getColumns()) {
-				ColumnConfigurationWrapper colConfig = util.getColumnConfiguration(col.getId());
+				ColumnConfigurationWrapper colConfig = deserializer.getColumnConfiguration(col.getId());
 				// if it's null, it means it's a new column, which did not exist
 				// when the user configuration was created. We display it by
 				// default, so the users see it exists, they can take it out after
@@ -366,12 +352,16 @@ public class UserConfigHandler {
 				col.setVisible(colConfig.visible);
 				col.setColumnOrder(colConfig.index);
 				
-				if (col.getId().equals(util.getSortField())) {
-					col.setSortState(util.getSortDirection());
+				if (col.getId().equals(deserializer.getSortField())) {
+					col.setSortState(deserializer.getSortDirection());
 				} else {
 					col.setSortState(Sort.NONE);
 				}
+				
+				col.setFilter(colConfig.filter);
 			}
+			
+			model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
 			
 			newMaxRows = userConfig.getMaxRows();
 			
@@ -416,6 +406,10 @@ public class UserConfigHandler {
 			}
 			
 			if (mainConfig.getColumnsConfiguration() != null && !mainConfig.getColumnsConfiguration().equals(relatedConfig.getColumnsConfiguration())) {
+				return true;
+			}
+			
+			if (mainConfig.getFiltersConfiguration() != null && !mainConfig.getFiltersConfiguration().equals(relatedConfig.getFiltersConfiguration())) {
 				return true;
 			}
 		}

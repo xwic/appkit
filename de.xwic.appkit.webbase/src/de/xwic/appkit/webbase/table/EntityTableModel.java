@@ -326,6 +326,7 @@ public class EntityTableModel {
 			}
 			
 			if (col.getFilter() != null) {
+				
 				// quick filters have priority, so if the column specifies a filter that is already specified 
 				// by the quickfilter, we remove it from the column
 				boolean quickFilterExists = false;
@@ -351,7 +352,6 @@ public class EntityTableModel {
 				} else {
 					userFilter.addQueryElement(col.getFilter());
 				}
-				
 				
 			}
 			
@@ -381,7 +381,7 @@ public class EntityTableModel {
 		if (baseFilter != null && baseFilter.size() > 0) {
 			q.addSubQuery(baseFilter);
 			
-			// if we have no filters yet but the base filter has a filter, apply it
+			// if we have no sorting yet but the base filter has a sorting, apply it
 			if ((q.getSortField() == null || q.getSortField().isEmpty()) 
 					&& baseFilter.getSortField() != null && !baseFilter.getSortField().isEmpty()) {
 				q.setSortField(baseFilter.getSortField());
@@ -506,6 +506,20 @@ public class EntityTableModel {
 		fireEvent(EventType.COLUMN_REORDER, new EntityTableEvent(this));
 		
 	}	
+
+	/**
+	 * @return
+	 */
+	public PropertyQuery getCustomQuickFilter() {
+		return customQuickFilter;
+	}
+	
+	/**
+	 * @param customQuickFilter
+	 */
+	public void setCustomQuickFilter(PropertyQuery customQuickFilter) {
+		this.customQuickFilter = customQuickFilter;
+	}
 	
 	/**
 	 * @return

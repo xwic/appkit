@@ -22,6 +22,7 @@ public class UserViewConfiguration extends Entity implements IUserViewConfigurat
 	private int maxRows;
 	private boolean mainConfiguration;
 	private IUserViewConfiguration relatedConfiguration;
+	private String filtersConfiguration;
 	
 	
 	/**
@@ -179,5 +180,17 @@ public class UserViewConfiguration extends Entity implements IUserViewConfigurat
 	 */
 	public void setRelatedConfiguration(IUserViewConfiguration relatedConfiguration) {
 		this.relatedConfiguration = relatedConfiguration;
+	}
+	/**
+	 * @return the filtersConfiguration
+	 */
+	public String getFiltersConfiguration() {
+		return filtersConfiguration;
+	}
+	/**
+	 * @param filtersConfiguration the filtersConfiguration to set
+	 */
+	public void setFiltersConfiguration(String filtersConfiguration) {
+		this.filtersConfiguration = filtersConfiguration;
 	}
 }

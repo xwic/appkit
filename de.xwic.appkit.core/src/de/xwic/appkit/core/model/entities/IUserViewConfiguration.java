@@ -147,5 +147,15 @@ public interface IUserViewConfiguration extends IEntity {
 	 * @param relatedConfiguration the relatedConfiguration to set
 	 */
 	public void setRelatedConfiguration(IUserViewConfiguration relatedConfiguration);
+	
+	/**
+	 * @return the filtersConfiguration
+	 */
+	public String getFiltersConfiguration();
+	
+	/**
+	 * @param filtersConfiguration the filtersConfiguration to set
+	 */
+	public void setFiltersConfiguration(String filtersConfiguration);
 
 }
