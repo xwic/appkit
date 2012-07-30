@@ -71,7 +71,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected int widthDecrease = 50;
 	protected int heightDecrease = 230;
 	
-	private UserConfigurationWindow dialog;
+	private UserConfigurationWindow userConfigWindow;
 	private Button btUserConfig;
 	
 	protected List<IEntityAction> standardActions;
@@ -159,13 +159,13 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			@Override
 			public void userConfigurationChanged(EntityTableEvent event) {
 				setConfigButtonName();
-				closeDialog();
+				closeUserConfigWindow();
 			}
 			
 			@Override
 			public void userConfigurationDirtyChanged(EntityTableEvent event) {
 				setConfigButtonName();
-				closeDialog();
+				closeUserConfigWindow();
 			}			
 		});
 
@@ -225,16 +225,6 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		}
 		
 		btUserConfig.setTitle(title);
-	}
-	
-	/**
-	 * 
-	 */
-	private void closeDialog() {
-		if (dialog != null) {
-			dialog.close();
-			dialog = null;
-		}
 	}
 
 	/**
@@ -321,19 +311,29 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * 
 	 */
 	private void openUserConfigWindow() {
-		// to prevent multiple dialog openings
-		if (dialog != null) {
+		// to prevent opening the dialog multiple times
+		if (userConfigWindow != null) {
 			return;
 		}
 		
-		dialog = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
-		dialog.addDialogWindowListener(new DialogWindowAdapter() {
+		userConfigWindow = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
+		userConfigWindow.addDialogWindowListener(new DialogWindowAdapter() {
 			@Override
 			public void onDialogAborted(DialogEvent event) {
-				dialog = null;
+				userConfigWindow = null;
 			}
 		});		
-		dialog.show();
+		userConfigWindow.show();
+	}
+	
+	/**
+	 * 
+	 */
+	private void closeUserConfigWindow() {
+		if (userConfigWindow != null) {
+			userConfigWindow.close();
+			userConfigWindow = null;
+		}
 	}
 	
 	/**
@@ -607,10 +607,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	@Override
 	public void destroy() {
-		if (dialog != null) {
-			dialog.close();
-		}
-		
+		closeUserConfigWindow();		
 		super.destroy();
 	}
 	

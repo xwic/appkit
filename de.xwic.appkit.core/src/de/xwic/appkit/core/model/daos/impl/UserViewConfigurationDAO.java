@@ -83,6 +83,26 @@ public class UserViewConfigurationDAO extends AbstractDAO implements IUserViewCo
 	}
 	
 	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO#getPublicUserConfigurationsForView(de.xwic.appkit.core.model.entities.IMitarbeiter, java.lang.String, java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<IUserViewConfiguration> getPublicUserConfigurationsForView(IMitarbeiter currentUser, String entityClassName, String viewId) {
+		PropertyQuery pq = new PropertyQuery();
+		
+		pq.addEquals("owner", currentUser);
+		pq.addEquals("className", entityClassName);
+		pq.addEquals("viewId", viewId);
+		pq.addEquals("public", true);
+		pq.addEquals("mainConfiguration", false); // the main config should never be public, but just in case
+		
+		pq.setSortField("name");
+		pq.setSortDirection(PropertyQuery.SORT_DIRECTION_UP);
+		
+		return getEntities(null, pq);
+	}
+	
+	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO#configNameExists(de.xwic.appkit.core.model.entities.IMitarbeiter, java.lang.String, java.lang.String, java.lang.String, int)
 	 */
 	@Override

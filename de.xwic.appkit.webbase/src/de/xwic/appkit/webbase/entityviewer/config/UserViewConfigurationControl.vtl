@@ -20,18 +20,20 @@
 		<td style="padding:5px"><i>Share this configuration:</i> <b>$insert.control("rbtnYes")$insert.control("rbtnNo")</b></td>
 	</tr>
 #else
+	#set($publicProfileMode = $control.isPublicProfileMode())
 	<tr>
 		<td style="padding:5px">
-		#if(!$control.isCurrentConfig())
-		<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-size: 11pt" onclick="$control.createActionURL('apply', '')">$insert.control("lblName")</span>
-		#else
+		#if(!$publicProfileMode && $control.isCurrentConfig())
 		<span style="color: #84BD00;cursor: default;font-weight:bold;font-size: 11pt">$insert.control("lblName")</span>
+		#else
+		<span style="color: #2200C1;cursor: pointer;font-weight:bold;font-size: 11pt" onclick="$control.createActionURL('apply', '')">$insert.control("lblName")</span>		
 		#end
 		<span style="color: #000080; font-size: 8pt;">&nbsp;(created: $insert.control("lblDate"))</span>
-		#if($control.getUserViewConfiguration().isPublic())
+		#if(!$publicProfileMode && $control.getUserViewConfiguration().isPublic())
 		<span style="color: #000080; font-size: 8pt;">&nbsp;(shared)</span>
 		#end
 		</td>
+		#if (!$publicProfileMode)
 		<td style="padding:5px">&nbsp;</td>
 		<td rowspan="2" align="right">
 			<table cellspacing="5">
@@ -41,9 +43,10 @@
 				</tr>
 			</table>
 		</td>
+		#end
 	</tr>	
 	<tr>
-		<td colspan="2" style="padding:5px; font-size: 8pt; color: #707070;">$insert.control("lblDescription")</td>
+		<td colspan="2" style="padding:0 5px 3px 5px; font-size: 8pt; color: #707070;">$insert.control("lblDescription")</td>
 	</tr>
 #end
 </table>

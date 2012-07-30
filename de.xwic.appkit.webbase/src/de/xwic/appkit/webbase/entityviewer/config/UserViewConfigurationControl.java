@@ -40,6 +40,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 	
 	private boolean editMode = false;
 	private String editError = "";
+	private boolean publicProfileMode;
 	
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -50,12 +51,13 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 * @param editMode
 	 * @param sharedView
 	 */
-	public UserViewConfigurationControl(IControlContainer container, IUserViewConfiguration userConfig, EntityTableModel tableModel, boolean editMode) {
+	public UserViewConfigurationControl(IControlContainer container, IUserViewConfiguration userConfig, EntityTableModel tableModel, boolean editMode, boolean publicProfileMode) {
 		super(container);
 
 		this.userConfig = userConfig;
 		this.tableModel = tableModel;
 		this.editMode = editMode;
+		this.publicProfileMode = publicProfileMode;
 		
 		createControls();
 	}
@@ -77,7 +79,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 		ibDescription.setEmptyInfoText("Enter a description of this list profile");
 		ibDescription.setMultiLine(true);
 		ibDescription.setWidth(340);
-		ibDescription.setHeight(70);
+		ibDescription.setHeight(50);
 
 		rbtnYes = new RadioButton(this, "rbtnYes");
 		rbtnYes.setCssClass("radioButton");
@@ -242,6 +244,13 @@ public class UserViewConfigurationControl extends ControlContainer {
 		return editMode;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean isPublicProfileMode() {
+		return publicProfileMode;
+	}
+	
 	/**
 	 * @return
 	 */

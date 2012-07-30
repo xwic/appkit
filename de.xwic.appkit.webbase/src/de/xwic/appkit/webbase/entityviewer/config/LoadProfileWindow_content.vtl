@@ -1,0 +1,9 @@
+#if($control.container.container.container.getConfigControls().size() > 0)
+#if($control.container.container.container.isCurrentUserConfigDirty())
+<div style="font-weight:bold;color:#FF8F07;padding: 5px 5px 5px 10px" >Warning, you have unsaved changes. Loading a public profile will override those changes!</div>
+#end
+<div style="font-size: 11pt; color: #707070; font-weight: bold; padding: 7px 10px 0 10px">Load Public Profile</div>
+#end
+<div style="padding: 10px">
+	$insert.control("configControls")
+</div>

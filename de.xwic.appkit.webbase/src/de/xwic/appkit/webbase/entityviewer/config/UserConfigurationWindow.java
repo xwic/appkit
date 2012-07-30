@@ -15,7 +15,10 @@ import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
 import de.xwic.appkit.webbase.dialog.AbstractPopUpDialogWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
+import de.xwic.appkit.webbase.dialog.DialogEvent;
+import de.xwic.appkit.webbase.dialog.DialogWindowAdapter;
 import de.xwic.appkit.webbase.table.EntityTableModel;
+import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**
@@ -27,6 +30,8 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 	private IUserViewConfigurationControlListener controlListener;
 	private ScrollableContainer configControlsContainer;
 	private List<UserViewConfigurationControl> configControls;
+	
+	private LoadProfileWindow loadProfileWindow;
 	
 	/**
 	 * @param container
@@ -46,6 +51,8 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
 				tableModel.getUserConfigHandler().applyConfig(ctrl.getUserViewConfiguration());
+				
+				closeProfileWindow();
 			}
 			
 			@Override
@@ -78,7 +85,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 			}
 		};
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#createContent(de.xwic.appkit.webbase.dialog.DialogContent)
 	 */
@@ -101,18 +108,25 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 				// don't add a control for the main config
 				continue;
 			}
-			createUserConfigControl(config);
+			createUserConfigControl(config, false);
 		}
+		
+		// custom template to add the Load Profile link
+		buttonsContainer.setTemplateName(getClass().getName() + "_buttonsContainer");
 	}
 	
 	/**
 	 * @param userConfig
 	 * @return
 	 */
-	public UserViewConfigurationControl createUserConfigControl(IUserViewConfiguration userConfig) {
-		UserViewConfigurationControl ctrl = new UserViewConfigurationControl(configControlsContainer, userConfig, tableModel, userConfig.getId() == 0);
+	private UserViewConfigurationControl createUserConfigControl(IUserViewConfiguration userConfig, boolean isNew) {
+		UserViewConfigurationControl ctrl = new UserViewConfigurationControl(configControlsContainer, userConfig, tableModel, userConfig.getId() == 0, false);
 		ctrl.addListener(controlListener);
-		configControls.add(0, ctrl);
+		if (isNew) {
+			configControls.add(0, ctrl);
+		} else {
+			configControls.add(ctrl);
+		}
 		
 		requireRedraw();
 		
@@ -137,7 +151,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 		} else if ("saveNew".equalsIgnoreCase(actionId)) {
 			
 			final IUserViewConfiguration uvc = tableModel.getUserConfigHandler().createConfigWithCurrentSettings();
-			UserViewConfigurationControl ctrl = createUserConfigControl(uvc);
+			UserViewConfigurationControl ctrl = createUserConfigControl(uvc, true);
 			ctrl.actionEdit();
 			
 			ctrl.addListener(new IUserViewConfigurationControlListener() {
@@ -155,6 +169,20 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 					tableModel.getUserConfigHandler().applyConfig(uvc);
 				}
 			});
+		} else if ("loadProfile".equalsIgnoreCase(actionId)) {
+			// to prevent opening the dialog multiple times
+			if (loadProfileWindow != null) {
+				return;
+			}
+			
+			loadProfileWindow = new LoadProfileWindow(ExtendedApplication.getInstance(this).getSite(), tableModel);
+			loadProfileWindow.addDialogWindowListener(new DialogWindowAdapter() {
+				@Override
+				public void onDialogAborted(DialogEvent event) {
+					loadProfileWindow = null;
+				}
+			});
+			loadProfileWindow.show();
 		}
 	}
 	
@@ -177,7 +205,35 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 		
 		setVisible(true);
 	}
+	
+	/**
+	 * 
+	 */
+	public void closeProfileWindow() {
+		if (loadProfileWindow != null) {
+			loadProfileWindow.close();
+			loadProfileWindow = null;
+		}
+	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.CenteredWindow#close()
+	 */
+	@Override
+	public void close() {
+		closeProfileWindow();
+		super.close();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.jwic.base.ControlContainer#destroy()
+	 */
+	@Override
+	public void destroy() {
+		closeProfileWindow();
+		super.destroy();
+	}
+	
 	// ************* USED IN THE VTL *************
 	
 	/**

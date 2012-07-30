@@ -69,7 +69,7 @@ public class UserConfigHandler {
 						mainConfig.setMainConfiguration(true);
 						mainConfig.setRelatedConfiguration(uvc);
 						
-						transferDataToMainConfig(uvc);
+						transferDataToMainConfig(uvc, true);
 					}
 				}
 			} catch (Exception ex) {
@@ -116,23 +116,27 @@ public class UserConfigHandler {
 	
 	/**
 	 * @param existentUvc
+	 * @param linkConfig
 	 */
-	private void transferDataToMainConfig(IUserViewConfiguration existentUvc) {
+	private void transferDataToMainConfig(IUserViewConfiguration existentUvc, boolean linkConfig) {
 		
 		if (mainConfig.getId() > 0) {
 			// refresh the entity, unless it's a new one
 			mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
 		}
 		
-		mainConfig.setName(existentUvc.getName());
-		mainConfig.setDescription(existentUvc.getDescription());
 		//newUvc.setPublic(currentUvc.isPublic()); not the Public flag!!
 		mainConfig.setColumnsConfiguration(existentUvc.getColumnsConfiguration());
 		mainConfig.setSortField(existentUvc.getSortField());
 		mainConfig.setSortDirection(existentUvc.getSortDirection());
 		mainConfig.setMaxRows(existentUvc.getMaxRows());
 		
-		mainConfig.setRelatedConfiguration(existentUvc);
+		if (linkConfig) {
+			mainConfig.setName(existentUvc.getName());
+			mainConfig.setDescription(existentUvc.getDescription());
+			
+			mainConfig.setRelatedConfiguration(existentUvc);
+		}
 		
 		userConfigDao.update(mainConfig);
 	}
@@ -302,7 +306,7 @@ public class UserConfigHandler {
 			storeCurrentData(relatedConfig, true);
 		}
 		
-		transferDataToMainConfig(relatedConfig);
+		transferDataToMainConfig(relatedConfig, true);
 		
 		if (undoChanges) {
 			// if we undid the changes, we need to re-apply the config
@@ -341,7 +345,7 @@ public class UserConfigHandler {
 		if (!userConfig.isMainConfiguration()) {
 			// applying a configuration actually means copying its values to the main configuration 
 			
-			transferDataToMainConfig(userConfig);
+			transferDataToMainConfig(userConfig, true);
 			applyConfig(mainConfig);
 			
 		} else {
@@ -375,6 +379,14 @@ public class UserConfigHandler {
 			
 			model.fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
 		}
+	}
+	
+	/**
+	 * @param userConfig
+	 */
+	public void applyPublicConfig(IUserViewConfiguration userConfig) {
+		transferDataToMainConfig(userConfig, false);
+		applyConfig(mainConfig);
 	}
 	
 	/**

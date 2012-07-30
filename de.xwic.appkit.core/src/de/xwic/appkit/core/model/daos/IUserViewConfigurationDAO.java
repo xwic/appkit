@@ -31,6 +31,14 @@ public interface IUserViewConfigurationDAO extends DAO {
 	 * @return
 	 */
 	public List<IUserViewConfiguration> getUserConfigurationsForView(IMitarbeiter owner, String entityClassName, String viewId);
+
+	/**
+	 * @param currentUser
+	 * @param entityClassName
+	 * @param viewId
+	 * @return
+	 */
+	public List<IUserViewConfiguration> getPublicUserConfigurationsForView(IMitarbeiter currentUser, String entityClassName, String viewId);
 	
 	/**
 	 * @param owner
