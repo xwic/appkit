@@ -90,7 +90,7 @@ public class UserViewConfigurationDAO extends AbstractDAO implements IUserViewCo
 	public List<IUserViewConfiguration> getPublicUserConfigurationsForView(IMitarbeiter currentUser, String entityClassName, String viewId) {
 		PropertyQuery pq = new PropertyQuery();
 		
-		pq.addEquals("owner", currentUser);
+		pq.addNotEquals("owner", currentUser);
 		pq.addEquals("className", entityClassName);
 		pq.addEquals("viewId", viewId);
 		pq.addEquals("public", true);

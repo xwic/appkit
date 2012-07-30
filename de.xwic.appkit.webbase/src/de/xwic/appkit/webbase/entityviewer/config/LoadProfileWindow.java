@@ -36,7 +36,7 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 		
 		this.tableModel = tableModel;
 		
-		setWidth(450);
+		setWidth(460);
 		setHeight(270);
 		
 		configControls = new ArrayList<UserViewConfigurationControl>();
@@ -103,12 +103,12 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 			createControls();
 		}
 		
-		int left = Page.findPage(this).getPageSize().width - getWidth() - 210;
+		int left = Page.findPage(this).getPageSize().width - getWidth() - 340;
 		if (left != getLeft()) {
 			setLeft(left);
 		}
 		
-		setTop(330);
+		setTop(310);
 		
 		setVisible(true);
 	}
