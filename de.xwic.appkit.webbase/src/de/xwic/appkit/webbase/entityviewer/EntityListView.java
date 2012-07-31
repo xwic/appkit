@@ -155,19 +155,6 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
         errorWarning.setShowStackTrace(false);
 		
 		entityTable = new EntityTable(this, "entityTable", configuration);
-		entityTable.getModel().addEntityTableListener(new EntityTableAdapter() {
-			@Override
-			public void userConfigurationChanged(EntityTableEvent event) {
-				setConfigButtonName();
-				closeUserConfigWindow();
-			}
-			
-			@Override
-			public void userConfigurationDirtyChanged(EntityTableEvent event) {
-				setConfigButtonName();
-				closeUserConfigWindow();
-			}			
-		});
 
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
@@ -212,12 +199,30 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			ImageRef imgDef = ImageLibrary.ICON_EXCEL;
 			excelExport.setIconEnabled(imgDef);
 		}
+		
+		entityTable.getModel().addEntityTableListener(new EntityTableAdapter() {
+			@Override
+			public void userConfigurationChanged(EntityTableEvent event) {
+				setConfigButtonName();
+				closeUserConfigWindow();
+			}
+			
+			@Override
+			public void userConfigurationDirtyChanged(EntityTableEvent event) {
+				setConfigButtonName();
+				closeUserConfigWindow();
+			}			
+		});
 	}
 
 	/**
 	 * 
 	 */
 	private void setConfigButtonName() {
+		if (btUserConfig == null) {
+			return;
+		}
+		
 		String title = entityTable.getModel().getUserConfigHandler().getCurrentConfigName();
 		
 		if (entityTable.getModel().getUserConfigHandler().isCurrentConfigDirty()) {

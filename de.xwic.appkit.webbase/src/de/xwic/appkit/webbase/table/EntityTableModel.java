@@ -105,11 +105,10 @@ public class EntityTableModel {
 		listSetup = ConfigurationManager.getUserProfile().getListSetup(entityClazz.getName(), entityTableConfiguration.getListId());
 		bundle = listSetup.getEntityDescriptor().getDomain().getBundle(entityTableConfiguration.getLocale().getLanguage());
 		
-		PropertyQuery defaultFilter = entityTableConfiguration.getDefaultFilter();
-		
 		columns = new ArrayList<Column>();
 		idMapColumns = new HashMap<String, Column>();
 		int c = 0;
+		
 		for (ListColumn lc : listSetup.getColumns()) {
 			Column col = new Column(entityTableConfiguration.getLocale(), lc, entityClazz);
 			col.setColumnOrder(c++);
@@ -125,40 +124,58 @@ public class EntityTableModel {
 				title = getResString(col.getListColumn().getFinalProperty());
 			}
 			col.setTitle(title);
-			
-			if(defaultFilter != null ){
-				if (defaultFilter.getSortField() != null && lc.getPropertyId().equals(defaultFilter.getSortField())) {
-					col.setSortState(defaultFilter.getSortDirection() == PropertyQuery.SORT_DIRECTION_DOWN ? Sort.DOWN : Sort.UP);
-					defaultFilter.setSortField(null);
-				}
-				
-				if (defaultFilter.size() > 0) {
-					for (QueryElement qe : defaultFilter.getElements()) {
-						String propName;
-						if (qe.getSubQuery() != null && !qe.getSubQuery().getElements().isEmpty()) {
-							QueryElement q = qe.getSubQuery().getElements().get(0);
-							propName = q.getPropertyName();
-						} else {
-							propName = qe.getPropertyName();
-						}
-						if (propName != null) {
-							int index = propName.lastIndexOf(".id"); // taking out any ".id"
-							if (index > -1) {
-								propName = propName.substring(0, index);
-							}
-							
-							if(propName.equals(lc.getPropertyId())){
-								col.setFilter(qe);
-							}
-						}
-					}	
-				}
-			}
 		}
+		
+		applyDefaultFilter();
 		
 		if (fireConfigChangedEvent) {
 			buildQuery();
 			fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void applyDefaultFilter() {
+		
+		PropertyQuery defaultFilter = entityTableConfiguration.getDefaultFilter();
+		
+		if(defaultFilter == null ){
+			return;
+		}
+		
+		boolean sorted = false;
+		
+		for (Column col : getColumns()) {
+			
+			if (!sorted && defaultFilter.getSortField() != null && col.getId().equals(defaultFilter.getSortField())) {
+				col.setSortState(defaultFilter.getSortDirection() == PropertyQuery.SORT_DIRECTION_DOWN ? Sort.DOWN : Sort.UP);
+				sorted = true;
+			}
+			
+			if (defaultFilter.size() > 0) {
+				for (QueryElement qe : defaultFilter.getElements()) {
+					String propName;
+					if (qe.getSubQuery() != null && !qe.getSubQuery().getElements().isEmpty()) {
+						QueryElement q = qe.getSubQuery().getElements().get(0);
+						propName = q.getPropertyName();
+					} else {
+						propName = qe.getPropertyName();
+					}
+					if (propName != null) {
+						int index = propName.lastIndexOf(".id"); // taking out any ".id"
+						if (index > -1) {
+							propName = propName.substring(0, index);
+						}
+						
+						if(propName.equals(col.getId())){
+							col.setFilter(qe);
+						}
+					}
+				}	
+			}
+			
 		}
 	}
 	
@@ -218,6 +235,7 @@ public class EntityTableModel {
 				break;
 			case COLUMN_FILTER_CHANGE:
 				listener.columnFiltered(event);
+				userConfigHandler.setConfigDirty(true);
 				break;
 			case COLUMN_REORDER:
 				listener.columnsReordered(event);

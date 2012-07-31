@@ -124,7 +124,7 @@ public class UserConfigHandler {
 			mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
 		}
 		
-		//newUvc.setPublic(currentUvc.isPublic()); not the Public flag!!
+		//mainConfig.setPublic(currentUvc.isPublic()); not the Public flag!!
 		mainConfig.setColumnsConfiguration(existentUvc.getColumnsConfiguration());
 		mainConfig.setFiltersConfiguration(existentUvc.getFiltersConfiguration());
 		mainConfig.setSortField(existentUvc.getSortField());
@@ -336,6 +336,11 @@ public class UserConfigHandler {
 			
 		} else {
 			
+			// if a user config has no filters config, it means it's an old one, created before we started tracking
+			// the filters. In this case we must load the view's default configuration
+			
+			boolean hasFiltersConfig = userConfig.getFiltersConfiguration() != null;
+			
 			ColumnsConfigurationDeserializer deserializer = new ColumnsConfigurationDeserializer(userConfig);
 			
 			for (Column col : model.getColumns()) {
@@ -358,10 +363,16 @@ public class UserConfigHandler {
 					col.setSortState(Sort.NONE);
 				}
 				
-				col.setFilter(colConfig.filter);
+				if (hasFiltersConfig) {
+					col.setFilter(colConfig.filter);
+				}
 			}
 			
-			model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
+			if (hasFiltersConfig) {
+				model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
+			} else {
+				model.applyDefaultFilter();
+			}
 			
 			newMaxRows = userConfig.getMaxRows();
 			

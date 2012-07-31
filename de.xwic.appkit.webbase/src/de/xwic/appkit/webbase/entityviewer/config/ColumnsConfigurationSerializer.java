@@ -3,6 +3,10 @@
  */
 package de.xwic.appkit.webbase.entityviewer.config;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.webbase.table.Column;
@@ -14,9 +18,25 @@ import de.xwic.appkit.webbase.table.EntityTableModel;
  */
 public class ColumnsConfigurationSerializer {
 
-	public static final String CATEGORY_SEPARATOR = "<||>";
 	public static final String ITEM_SEPARATOR = ";";
 	public static final String SUBITEM_SEPARATOR = ",";
+	
+	public static final String ROOT_START = "<filters>";
+	public static final String ROOT_END = "</filters>";
+	
+	public static final String CUSTOM_QUICK_FILTER = "cqf";
+	public static final String COLS = "cols";
+	public static final String COL = "col";
+	public static final String ID = "id";
+	public static final String PROPERTY_QUERY = "pq";
+	public static final String QUERY_ELEMENT = "qe";
+	public static final String LINK_TYPE = "l";
+	public static final String PROPERTY = "p";
+	public static final String OPERATION = "o";
+	public static final String VALUE = "v";
+	
+	public static final SimpleDateFormat SDF_DATE = new SimpleDateFormat("dd-MM-yyyy");
+	public static final SimpleDateFormat SDF_DATE_TIME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 	
 	private EntityTableModel model;
 	
@@ -62,35 +82,47 @@ public class ColumnsConfigurationSerializer {
 	}
 
 	/**
-	 * 
+	 * The filters are serialized as XML
 	 */
 	private void serializeFilters() {
 		StringBuilder sbFilters = new StringBuilder();
 		
+		sbFilters.append(ROOT_START);
+		
 		// first serialize the custom quick filter
 		
-		PropertyQuery pq = model.getCustomQuickFilter();
-
-		for (QueryElement qe : pq.getElements()) {
-			if (sbFilters.length() != 0) {
-				sbFilters.append(ITEM_SEPARATOR);
-			}
-			sbFilters.append(serializeQueryElement(qe));
+		sbFilters.append("<").append(CUSTOM_QUICK_FILTER).append(">");
+		
+		PropertyQuery customQuickFilter = model.getCustomQuickFilter();
+		
+		if (customQuickFilter != null) {
+			serializePropertyQuery(customQuickFilter, sbFilters);
 		}
 		
-		// separate the two filters with a custom separator
-		sbFilters.append(CATEGORY_SEPARATOR);
+		sbFilters.append("</").append(CUSTOM_QUICK_FILTER).append(">");
 		
 		// then serialize the column filters
 		
-		boolean first = true;
+		sbFilters.append("<").append(COLS).append(">");
+		
 		for (Column col : model.getColumns()) {
-			if (!first) {
-				sbFilters.append(ITEM_SEPARATOR);
+			
+			if (col.getFilter() == null) {
+				continue;
 			}
-			sbFilters.append(col.getId()).append(SUBITEM_SEPARATOR).append(serializeQueryElement(col.getFilter()));
-			first = false;
+
+			sbFilters.append("<").append(COL).append(">");
+			
+			sbFilters.append("<").append(ID).append(col.getId()).append("</").append(ID).append(">");
+			
+			serializeQueryElement(col.getFilter(), sbFilters);
+			
+			sbFilters.append("</").append(COL).append(">");
 		}
+		
+		sbFilters.append("</").append(COLS).append(">");
+		
+		sbFilters.append(ROOT_END);
 		
 		this.filters = sbFilters.toString();
 	}
@@ -98,12 +130,81 @@ public class ColumnsConfigurationSerializer {
 	/**
 	 * @return
 	 */
-	private String serializeQueryElement(QueryElement qe) {
-		if (qe == null) {
-			return "";
+	private void serializeQueryElement(QueryElement queryElement, StringBuilder sb) {
+		if (queryElement == null) {
+			return;
 		}
 		
-		return null;
+		sb.append("<").append(QUERY_ELEMENT).append(">");
+		
+		sb.append("<").append(LINK_TYPE).append(">").append(queryElement.getLinkType()).append("</").append(LINK_TYPE).append(">");
+		
+		if (queryElement.getSubQuery() != null) {
+			serializePropertyQuery(queryElement.getSubQuery(), sb);
+		} else {
+			if (queryElement.getPropertyName() != null && !queryElement.getPropertyName().trim().isEmpty()) {
+				sb.append("<").append(PROPERTY).append(">").append(queryElement.getPropertyName()).append("</").append(PROPERTY).append(">");
+				sb.append("<").append(OPERATION).append(">").append(queryElement.getOperation()).append("</").append(OPERATION).append(">");
+				sb.append("<").append(VALUE).append(">").append(serializeValue(queryElement)).append("</").append(VALUE).append(">");
+			}
+		}
+		
+		sb.append("</").append(QUERY_ELEMENT).append(">");
+	}
+
+	/**
+	 * @param pq
+	 * @param sb
+	 */
+	private void serializePropertyQuery(PropertyQuery pq, StringBuilder sb) {
+		
+		if (pq.size() < 1) {
+			return;
+		}
+		
+		sb.append("<").append(PROPERTY_QUERY).append(">");
+		
+		for (QueryElement qe : pq.getElements()) {
+			serializeQueryElement(qe, sb);
+		}
+		
+		sb.append("</").append(PROPERTY_QUERY).append(">");
+	}
+	
+	/**
+	 * @param query
+	 * @param q
+	 * @param element
+	 * @param index
+	 * @return
+	 */
+	private String serializeValue(QueryElement qe) {
+		
+		Object value = qe.getValue();
+		
+		if (value == null) {
+			return "|n|";
+		} else if (value instanceof String) {
+			return "|s|" + value;
+		} else if (value instanceof Integer) {
+			return "|i|" + String.valueOf(value);
+		} else if (value instanceof Long) { 
+			return "|l|" + String.valueOf(value);
+		} else if (value instanceof Double) {
+			return "|d|" + String.valueOf(value);
+		} else if (value instanceof Boolean) {
+			return "|b|" + String.valueOf(value);
+		} else if (value instanceof Date) {
+			if (qe.isTimestamp()) {
+				return "|dt|" + SDF_DATE_TIME.format((Date) value);
+			} else {
+				return "|da|" + SDF_DATE.format((Date) value);				
+			}
+		} else if (value instanceof IEntity) {
+			return "|i|" + String.valueOf(((IEntity) value).getId());
+		} else {
+			throw new IllegalArgumentException("Invalid value type: " + value.getClass());
+		}
 	}
 	
 	/**
