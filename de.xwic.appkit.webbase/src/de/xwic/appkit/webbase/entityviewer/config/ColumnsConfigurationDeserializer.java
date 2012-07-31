@@ -109,7 +109,7 @@ public class ColumnsConfigurationDeserializer {
 		
 		if (colsElement != null) {
 			
-			for (Iterator<Element> it = colsElement.elementIterator(ColumnsConfigurationSerializer.QUERY_ELEMENT); it.hasNext();) {
+			for (Iterator<Element> it = colsElement.elementIterator(ColumnsConfigurationSerializer.COL); it.hasNext();) {
 				Element colElem = it.next();
 				
 				Element idElem = colElem.element(ColumnsConfigurationSerializer.ID);
@@ -185,28 +185,28 @@ public class ColumnsConfigurationDeserializer {
 	 */
 	private Object deserializeValue(String str) {
 		
-		if (str == null || str.trim().isEmpty() || str.startsWith("|n|")) {
+		if (str == null || str.trim().isEmpty() || str.startsWith(ColumnsConfigurationSerializer.NULL)) {
 			return null;
-		} else if (str.startsWith("|s|")) {
-			return str.replace("|s|", "");
-		} else if (str.startsWith("|i|")) {
-			return Integer.parseInt(str.replace("|i|", ""));
-		} else if (str.startsWith("|l|")) {
-			return Long.parseLong(str.replace("|l|", ""));
-		} else if (str.startsWith("|d|")) {
-			return Double.parseDouble(str.replace("|d|", ""));
-		} else if (str.startsWith("|b|")) {
-			return Boolean.parseBoolean(str.replace("|b|", ""));
-		} else if (str.startsWith("|dt|")) {
+		} else if (str.startsWith(ColumnsConfigurationSerializer.STRING)) {
+			return str.replace(ColumnsConfigurationSerializer.STRING, "");
+		} else if (str.startsWith(ColumnsConfigurationSerializer.INT)) {
+			return Integer.parseInt(str.replace(ColumnsConfigurationSerializer.INT, ""));
+		} else if (str.startsWith(ColumnsConfigurationSerializer.LONG)) {
+			return Long.parseLong(str.replace(ColumnsConfigurationSerializer.LONG, ""));
+		} else if (str.startsWith(ColumnsConfigurationSerializer.DOUBLE)) {
+			return Double.parseDouble(str.replace(ColumnsConfigurationSerializer.DOUBLE, ""));
+		} else if (str.startsWith(ColumnsConfigurationSerializer.BOOLEAN)) {
+			return Boolean.parseBoolean(str.replace(ColumnsConfigurationSerializer.BOOLEAN, ""));
+		} else if (str.startsWith(ColumnsConfigurationSerializer.DATE_TIME)) {
 			try {
-				return ColumnsConfigurationSerializer.SDF_DATE_TIME.parse(str.replace("|dt|", ""));
+				return ColumnsConfigurationSerializer.SDF_DATE_TIME.parse(str.replace(ColumnsConfigurationSerializer.DATE_TIME, ""));
 			} catch (ParseException e) {
 				log.error(e.getMessage(), e);
 				return null;
 			}
-		} else if (str.startsWith("|da|")) {
+		} else if (str.startsWith(ColumnsConfigurationSerializer.DATE)) {
 			try {
-				return ColumnsConfigurationSerializer.SDF_DATE.parse(str.replace("|da|", ""));
+				return ColumnsConfigurationSerializer.SDF_DATE.parse(str.replace(ColumnsConfigurationSerializer.DATE, ""));
 			} catch (ParseException e) {
 				log.error(e.getMessage(), e);
 				return null;

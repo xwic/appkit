@@ -35,8 +35,18 @@ public class ColumnsConfigurationSerializer {
 	public static final String OPERATION = "o";
 	public static final String VALUE = "v";
 	
+	public static final String NULL = "{n}";
+	public static final String STRING = "{s}";
+	public static final String INT = "{i}";
+	public static final String LONG = "{l}";
+	public static final String DOUBLE = "{d}";
+	public static final String BOOLEAN = "{b}";
+	public static final String DATE_TIME = "{t}";
+	public static final String DATE = "{da}";
+	
 	public static final SimpleDateFormat SDF_DATE = new SimpleDateFormat("dd-MM-yyyy");
 	public static final SimpleDateFormat SDF_DATE_TIME = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	
 	
 	private EntityTableModel model;
 	
@@ -113,7 +123,7 @@ public class ColumnsConfigurationSerializer {
 
 			sbFilters.append("<").append(COL).append(">");
 			
-			sbFilters.append("<").append(ID).append(col.getId()).append("</").append(ID).append(">");
+			sbFilters.append("<").append(ID).append(">").append(col.getId()).append("</").append(ID).append(">");
 			
 			serializeQueryElement(col.getFilter(), sbFilters);
 			
@@ -183,25 +193,25 @@ public class ColumnsConfigurationSerializer {
 		Object value = qe.getValue();
 		
 		if (value == null) {
-			return "|n|";
+			return NULL;
 		} else if (value instanceof String) {
-			return "|s|" + value;
+			return STRING + value;
 		} else if (value instanceof Integer) {
-			return "|i|" + String.valueOf(value);
+			return INT + String.valueOf(value);
 		} else if (value instanceof Long) { 
-			return "|l|" + String.valueOf(value);
+			return LONG + String.valueOf(value);
 		} else if (value instanceof Double) {
-			return "|d|" + String.valueOf(value);
+			return DOUBLE + String.valueOf(value);
 		} else if (value instanceof Boolean) {
-			return "|b|" + String.valueOf(value);
+			return BOOLEAN + String.valueOf(value);
 		} else if (value instanceof Date) {
 			if (qe.isTimestamp()) {
-				return "|dt|" + SDF_DATE_TIME.format((Date) value);
+				return DATE_TIME + SDF_DATE_TIME.format((Date) value);
 			} else {
-				return "|da|" + SDF_DATE.format((Date) value);				
+				return DATE + SDF_DATE.format((Date) value);				
 			}
 		} else if (value instanceof IEntity) {
-			return "|i|" + String.valueOf(((IEntity) value).getId());
+			return INT + String.valueOf(((IEntity) value).getId());
 		} else {
 			throw new IllegalArgumentException("Invalid value type: " + value.getClass());
 		}
