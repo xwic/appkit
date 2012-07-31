@@ -4,7 +4,6 @@
 package de.xwic.appkit.webbase.entityviewer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -155,7 +154,8 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
         errorWarning.setAutoClose(true);
         errorWarning.setShowStackTrace(false);
 		
-		entityTable = new EntityTable(this, "entityTable", configuration);
+        // we will do the user config init after the QuickFilterPanel is created
+		entityTable = new EntityTable(this, "entityTable", configuration, false);
 
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
@@ -164,12 +164,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		// init the user config only after the QuickFilterPanel is created, so that the sync between the columns and the
 		// panel is maintained
 		entityTable.getModel().getUserConfigHandler().initUserConfig();
-		Collections.sort(entityTable.getModel().getColumns()); // sort to apply user sorting
 		entityTable.getTableViewer().getModel().setMaxLines(entityTable.getModel().getUserConfigHandler().getMaxRows());
-		
-		// the user config handler should only now start to listen to the model, because before default filters might've been set 
-		// and we don't want the config to appear dirty even if it's not
-		entityTable.getModel().getUserConfigHandler().startListeningToDirtyChanged();
 		
 		ToolbarGroup grpRight = toolbar.addRightGroup();
 

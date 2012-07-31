@@ -28,6 +28,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 	private LabelControl lblName;
 	private LabelControl lblDescription;
 	private LabelControl lblDate;
+	private LabelControl lblOwner;
 	private InputBoxControl ibName;
 	private InputBoxControl ibDescription;
 	private RadioButton rbtnYes;
@@ -42,7 +43,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 	private String editError = "";
 	private boolean publicProfileMode;
 	
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd h:mm a");
 
 	/**
 	 * @param container
@@ -72,6 +73,8 @@ public class UserViewConfigurationControl extends ControlContainer {
 
 		lblDate = new LabelControl(this, "lblDate");
 		
+		lblOwner = new LabelControl(this, "lblOwner");
+		
 		ibName = new InputBoxControl(this, "ibName");
 		ibName.setWidth(340);
 
@@ -99,6 +102,7 @@ public class UserViewConfigurationControl extends ControlContainer {
 		lblName.setText(userConfig.getName());
 		lblDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");
 		lblDate.setText(sdf.format(userConfig.getCreatedAt()));
+		lblOwner.setText(userConfig.getOwner().getNachname() + ", " + userConfig.getOwner().getVorname());
 		
 		ibName.setText(userConfig.getName());
 		ibDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");

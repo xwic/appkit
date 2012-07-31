@@ -48,12 +48,16 @@ public class EntityTable extends ControlContainer {
 	private LabelControl lblPublicProfileWarning;
 	
 	/**
+	 * If used without the EntityListView ALWAYS instantiate with initUserConfig=true.
+	 * Otherwise the EntityListView will take care of initiating the UserConfigHandler
+	 * 
 	 * @param container
 	 * @param name
 	 * @param configuration
+	 * @param initUserConfig
 	 * @throws ConfigurationException
 	 */
-	public EntityTable(IControlContainer container, String name, EntityTableConfiguration configuration) throws ConfigurationException {
+	public EntityTable(IControlContainer container, String name, EntityTableConfiguration configuration, boolean initUserConfig) throws ConfigurationException {
 		super(container, name);
 		
 		configuration.setLocale(container.getSessionContext().getLocale());
@@ -86,6 +90,11 @@ public class EntityTable extends ControlContainer {
 		lblPublicProfileWarning.setCssClass("publicProfileWarning");
 		lblPublicProfileWarning.setText("This list is currenly using a public profile, therefore all changes you bring to it will not be remembered. In order to modify the profile you must first copy it to your own profiles.");
 		lblPublicProfileWarning.setVisible(false);
+		
+		if (initUserConfig) {
+			getModel().getUserConfigHandler().initUserConfig();
+			getTableViewer().getModel().setMaxLines(getModel().getUserConfigHandler().getMaxRows());
+		}
 	}
 
 	/**

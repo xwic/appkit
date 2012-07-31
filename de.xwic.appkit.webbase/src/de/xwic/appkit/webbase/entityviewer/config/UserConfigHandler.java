@@ -3,6 +3,8 @@
  */
 package de.xwic.appkit.webbase.entityviewer.config;
 
+import java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,6 +88,12 @@ public class UserConfigHandler {
 		} else {
 			applyConfig(mainConfig);
 		}
+		
+		Collections.sort(model.getColumns()); // sort to apply user sorting
+		
+		// the user config handler should only now start to listen to the model, because before default filters might've been set 
+		// and we don't want the config to appear dirty even if it's not
+		listenToDirtyChanged = true;
 	}
 	
 	/**
@@ -461,13 +469,6 @@ public class UserConfigHandler {
 		model.fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
 	}
 
-	/**
-	 * 
-	 */
-	public void startListeningToDirtyChanged() {
-		listenToDirtyChanged = true;
-	}
-	
 	/**
 	 * @return the maxRows
 	 */
