@@ -40,7 +40,7 @@ public class ColumnsConfigurationDeserializer {
 	
 	private IUserViewConfiguration userConfiguration;
 	private Map<String, ColumnConfigurationWrapper> columnConfigsMap;
-	private PropertyQuery customQuickFilter;
+	//private PropertyQuery customQuickFilter;
 	
 	/**
 	 * @param userConfiguration
@@ -99,9 +99,9 @@ public class ColumnsConfigurationDeserializer {
 		
 		// first deserialize the custom quick filter
 		
-		Element cqf = root.element(ColumnsConfigurationSerializer.CUSTOM_QUICK_FILTER);
-		Element pq = cqf.element(ColumnsConfigurationSerializer.PROPERTY_QUERY);
-		customQuickFilter = deserializePropertyQuery(pq);
+		//Element cqf = root.element(ColumnsConfigurationSerializer.CUSTOM_QUICK_FILTER);
+		//Element pq = cqf.element(ColumnsConfigurationSerializer.PROPERTY_QUERY);
+		//customQuickFilter = deserializePropertyQuery(pq);
 		
 		// then deserlialize the column filters
 
@@ -241,7 +241,7 @@ public class ColumnsConfigurationDeserializer {
 	/**
 	 * @return
 	 */
-	public PropertyQuery getCustomQuickFilter() {
-		return customQuickFilter;
-	}
+	//public PropertyQuery getCustomQuickFilter() {
+	//	return customQuickFilter;
+	//}
 }

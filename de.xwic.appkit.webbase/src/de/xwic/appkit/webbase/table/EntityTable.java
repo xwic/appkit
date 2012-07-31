@@ -204,7 +204,6 @@ public class EntityTable extends ControlContainer {
 
 		TableModel tblModel = tblViewer.getModel();
 		tblModel.setSelectionMode(TableModel.SELECTION_SINGLE);
-		tblModel.setMaxLines(model.getUserConfigHandler().getMaxRows());
 		tblModel.addTableModelListener(new TableModelAdapter() {
 			@Override
 			public void columnSelected(TableModelEvent event) {

@@ -35,6 +35,8 @@ public class UserConfigHandler {
 	private boolean userConfigDirty = false;
 	private int newMaxRows;
 	
+	private boolean listenToDirtyChanged = false;
+	
 	private EntityTableModel model;
 	
 	/**
@@ -250,13 +252,21 @@ public class UserConfigHandler {
 
 			// check again, maybe it was updated in the meantime (two browser windows?)
 			if (mainConfig.getRelatedConfiguration() != null && mainConfig.getRelatedConfiguration().getId() == config.getId()) {
+				
+				boolean fireEvent = false;
+				if (!name.equals(mainConfig.getName())) {
+					fireEvent = true;
+				}
+				
 				mainConfig.setName(name);
 				mainConfig.setDescription(description);
 				
 				userConfigDao.update(mainConfig);
 				
-				// fire the event to trigger the button title change
-				model.fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
+				if (fireEvent) {
+					// fire the event to trigger the button title change
+					model.fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
+				}
 			}
 		}
 		
@@ -337,7 +347,7 @@ public class UserConfigHandler {
 		} else {
 			
 			// if a user config has no filters config, it means it's an old one, created before we started tracking
-			// the filters. In this case we must load the view's default configuration
+			// the filters. In this case we must load the view's default filters
 			
 			boolean hasFiltersConfig = userConfig.getFiltersConfiguration() != null;
 			
@@ -365,13 +375,17 @@ public class UserConfigHandler {
 				
 				if (hasFiltersConfig) {
 					col.setFilter(colConfig.filter);
+					// fire the event so that any listening quick filter controls updates themselves
+					model.fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(model, col));
+				} else {
+					col.setFilter(null);
 				}
 			}
 			
-			if (hasFiltersConfig) {
-				model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
-			} else {
+			if (!hasFiltersConfig) {
 				model.applyDefaultFilter();
+			//} else {
+			//	model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
 			}
 			
 			newMaxRows = userConfig.getMaxRows();
@@ -433,6 +447,10 @@ public class UserConfigHandler {
 	 */
 	public void setConfigDirty(boolean dirty) {
 		
+		if (!listenToDirtyChanged) {
+			return;
+		}
+		
 		userConfigDirty = dirty;
 		
 		if (dirty && mainConfig.getName().equals(DEFAULT_PROFILE_NAME)) {
@@ -444,10 +462,17 @@ public class UserConfigHandler {
 	}
 
 	/**
+	 * 
+	 */
+	public void startListeningToDirtyChanged() {
+		listenToDirtyChanged = true;
+	}
+	
+	/**
 	 * @return the maxRows
 	 */
 	public int getMaxRows() {
-		return mainConfig.getMaxRows() < 0 ? 0 : mainConfig.getMaxRows();
+		return (mainConfig == null || mainConfig.getMaxRows() < 0) ? 0 : mainConfig.getMaxRows();
 	}
 	
 	/**

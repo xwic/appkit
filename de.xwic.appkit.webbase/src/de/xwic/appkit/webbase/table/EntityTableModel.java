@@ -90,11 +90,6 @@ public class EntityTableModel {
 			log.error(e);
 			throw (e);
 		}
-		
-		userConfigHandler.initUserConfig();
-		
-		// sort to apply user sorting
-		Collections.sort(columns);
 	}
 
 	/**
@@ -127,9 +122,10 @@ public class EntityTableModel {
 		}
 		
 		applyDefaultFilter();
+
+		buildQuery();
 		
 		if (fireConfigChangedEvent) {
-			buildQuery();
 			fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
 		}
 	}
@@ -176,6 +172,8 @@ public class EntityTableModel {
 				}	
 			}
 			
+			// fire the event so that any listening quick filter controls updates themselves
+			fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(this, col));
 		}
 	}
 	

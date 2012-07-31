@@ -24,7 +24,7 @@ public class ColumnsConfigurationSerializer {
 	public static final String ROOT_START = "<filters>";
 	public static final String ROOT_END = "</filters>";
 	
-	public static final String CUSTOM_QUICK_FILTER = "cqf";
+	//public static final String CUSTOM_QUICK_FILTER = "cqf";
 	public static final String COLS = "cols";
 	public static final String COL = "col";
 	public static final String ID = "id";
@@ -101,15 +101,15 @@ public class ColumnsConfigurationSerializer {
 		
 		// first serialize the custom quick filter
 		
-		sbFilters.append("<").append(CUSTOM_QUICK_FILTER).append(">");
+		//sbFilters.append("<").append(CUSTOM_QUICK_FILTER).append(">");
 		
-		PropertyQuery customQuickFilter = model.getCustomQuickFilter();
+		//PropertyQuery customQuickFilter = model.getCustomQuickFilter();
 		
-		if (customQuickFilter != null) {
-			serializePropertyQuery(customQuickFilter, sbFilters);
-		}
+		//if (customQuickFilter != null) {
+		//	serializePropertyQuery(customQuickFilter, sbFilters);
+		//}
 		
-		sbFilters.append("</").append(CUSTOM_QUICK_FILTER).append(">");
+		//sbFilters.append("</").append(CUSTOM_QUICK_FILTER).append(">");
 		
 		// then serialize the column filters
 		
