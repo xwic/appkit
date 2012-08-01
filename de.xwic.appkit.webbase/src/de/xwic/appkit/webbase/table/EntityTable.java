@@ -8,7 +8,6 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.RenderContext;
-import de.jwic.controls.LabelControl;
 import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
 import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.TableColumn;
@@ -45,7 +44,6 @@ public class EntityTable extends ControlContainer {
 	private ColumnFilterControl colFilter;
 	
 	private List<ElementSelectedListener> elmSelListeners = new ArrayList<ElementSelectedListener>();
-	private LabelControl lblPublicProfileWarning;
 	
 	/**
 	 * If used without the EntityListView ALWAYS instantiate with initUserConfig=true.
@@ -86,11 +84,6 @@ public class EntityTable extends ControlContainer {
 		createTableViewer();
 		createColumnFilter();
 
-		lblPublicProfileWarning = new LabelControl(this, "lblPublicProfileWarning");
-		lblPublicProfileWarning.setCssClass("publicProfileWarning");
-		lblPublicProfileWarning.setText("This list is currenly using a public profile, therefore all changes you bring to it will not be remembered. In order to modify the profile you must first copy it to your own profiles.");
-		lblPublicProfileWarning.setVisible(false);
-		
 		if (initUserConfig) {
 			getModel().getUserConfigHandler().initUserConfig();
 			getTableViewer().getModel().setMaxLines(getModel().getUserConfigHandler().getMaxRows());
@@ -118,8 +111,6 @@ public class EntityTable extends ControlContainer {
 		tm.clearSelection();
 		
 		tblViewer.requireRedraw();
-		
-		//lblPublicProfileWarning.setVisible(!model.isCurrentUserConfigMine());
 	}
 
 	/**
