@@ -45,7 +45,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		setResizable(false);
 		setMinimizable(false);
 		setMaximizable(false);
-
+		
 	}
 	
 	/* (non-Javadoc)
