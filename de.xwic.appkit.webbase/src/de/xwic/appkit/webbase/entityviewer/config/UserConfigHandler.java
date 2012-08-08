@@ -90,6 +90,7 @@ public class UserConfigHandler {
 		}
 		
 		Collections.sort(model.getColumns()); // sort to apply user sorting
+		model.fireEvent(EventType.COLUMN_REORDER, new EntityTableEvent(model));
 		
 		// the user config handler should only now start to listen to the model, because before default filters might've been set 
 		// and we don't want the config to appear dirty even if it's not

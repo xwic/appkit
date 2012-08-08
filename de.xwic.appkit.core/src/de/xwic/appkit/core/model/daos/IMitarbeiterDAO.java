@@ -28,4 +28,10 @@ public interface IMitarbeiterDAO extends DAO {
 	 * @return
 	 */
 	public IMitarbeiter getByCurrentUser();
+	
+	/**
+	 * @param username
+	 * @return
+	 */
+	public IMitarbeiter getMittarbeiterByUsername(String username);
 }
