@@ -141,6 +141,7 @@ public class EntityTable extends ControlContainer {
 			setColumnFilterIcon(tc, col);
 		}
 		tblViewer.getModel().clearSelection();
+		tblViewer.getModel().pageFirst();
 		tblViewer.requireRedraw();
 		
 	}
