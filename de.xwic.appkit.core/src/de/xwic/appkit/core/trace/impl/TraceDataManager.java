@@ -6,8 +6,10 @@
 package de.xwic.appkit.core.trace.impl;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -57,7 +59,21 @@ public class TraceDataManager implements ITraceDataManager {
 		
 		if (logTraceAboveThreshold && traceContext.getDuration() > logThreshold) {
 			log.info("Trace cycle exceeded threshold: " + traceContext.getDuration());
-			logContext(traceContext);
+			try {
+				if (traceLogFile != null) {
+					FileOutputStream fos = new FileOutputStream(traceLogFile, true);
+					try {
+						logContext(traceContext, fos);
+					} finally {
+						fos.close();
+					}
+				}
+				logContext(traceContext, System.out); // log to console
+			} catch (IOException e) {
+				log.error("Error writing trace log file", e);
+
+			}
+			
 		}
 		
 		if (keepHistory) {
@@ -76,53 +92,45 @@ public class TraceDataManager implements ITraceDataManager {
 	/**
 	 * @param traceContext
 	 */
-	private synchronized void logContext(ITraceContext tx) {
+	private synchronized void logContext(ITraceContext tx, OutputStream out) {
 		
 		if (traceLogFile != null) {
 			
-			try {
-				long start = tx.getStartTime();
-				FileOutputStream fos = new FileOutputStream(traceLogFile, true);
-				try {
-					PrintWriter pw = new PrintWriter(fos);
-					pw.println("---------------------------------------------------------------------");
-					pw.println("Start-Time: " + DateFormat.getDateTimeInstance().format(new Date(start)));
-					pw.println("Total-Duration: " + tx.getDuration());
-					if (tx.getName() != null) {
-						pw.println("Name: " + tx.getName());
-					}
-					if (tx.getInfo() != null) {
-						pw.println("Info: " + tx.getInfo());
-					}
-					pw.println("Attributes:");
-					Map<String, String> attrs = tx.getAttributes();
-					for (String key : attrs.keySet()) {
-						pw.println("   " + key + "=" + attrs.get(key));
-					}
-					if (traceLevel != TraceLevel.BASIC) { 
-						pw.println();
-						Map<String, ITraceCategory> catMap = tx.getTraceCategories();
-						for (String cat : catMap.keySet()) {
-							ITraceCategory category = catMap.get(cat);
-							pw.println("[ " + cat + " (" + category.getCount() + " op(s) / " + category.getTotalDuration() + "ms)]");
-							if (traceLevel == TraceLevel.DETAILED) {
-								for (ITraceOperation op : category.getTraceOperations()) {
-									pw.println(String.format("# %s [start: %d; end: %d; total: %d ms]", op.getName(), op.getStartTime() - start, op.getEndTime() - start, op.getDuration()));
-									if (op.getInfo() != null) {
-										pw.println(op.getInfo());
-									}
-								}
+			long start = tx.getStartTime();
+			PrintWriter pw = new PrintWriter(out);
+			pw.println("---------------------------------------------------------------------");
+			pw.println("Start-Time: " + DateFormat.getDateTimeInstance().format(new Date(start)));
+			pw.println("Total-Duration: " + tx.getDuration());
+			if (tx.getName() != null) {
+				pw.println("Name: " + tx.getName());
+			}
+			if (tx.getInfo() != null) {
+				pw.println("Info: " + tx.getInfo());
+			}
+			pw.println("Attributes:");
+			Map<String, String> attrs = tx.getAttributes();
+			for (String key : attrs.keySet()) {
+				pw.println("   " + key + "=" + attrs.get(key));
+			}
+			if (traceLevel != TraceLevel.BASIC) { 
+				pw.println();
+				Map<String, ITraceCategory> catMap = tx.getTraceCategories();
+				for (String cat : catMap.keySet()) {
+					ITraceCategory category = catMap.get(cat);
+					pw.println("[ " + cat + " (" + category.getCount() + " op(s) / " + category.getTotalDuration() + "ms)]");
+					if (traceLevel == TraceLevel.DETAILED) {
+						for (ITraceOperation op : category.getTraceOperations()) {
+							pw.println(String.format("# %s [start: %d; end: %d; total: %d ms]", op.getName(), op.getStartTime() - start, op.getEndTime() - start, op.getDuration()));
+							if (op.getInfo() != null) {
+								pw.println(op.getInfo());
 							}
 						}
-						
 					}
-					pw.flush();
-				} finally {
-					fos.close();
 				}
-			} catch (IOException ie) {
-				log.error("Error writing log file: " + ie, ie);
+				
 			}
+			pw.flush();
+
 			
 		} else {
 			log.warn("Can not log trace details as no traceLogFile is defined.");
