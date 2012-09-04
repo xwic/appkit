@@ -31,6 +31,12 @@ import de.jwic.base.IControlContainer;
  */
 public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 
+
+	/**
+	 * css class should set to right aligned since we are accessing/displaying numbers
+	 */
+	public static final String CSS_CLASS = "de_xwic_appkit_webbase_controls_input_emailInputBoxControl";
+	
 	private NumberFormat format = NumberFormat.getInstance(Locale.US);
 	
 	/**
@@ -56,6 +62,7 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 	}
 	
 	private void init(){
+		setCssClass(CSS_CLASS);
 		
 		//we handle german formats
 		Locale locale = getSessionContext().getLocale();
@@ -73,6 +80,11 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 		return getTypedValue();
 	}
 	
+	/**
+	 * Sets this field's text to a string representation of d.
+	 * 
+	 * @param d the Double to set.
+	 */
 	public void setDouble(Double d){
 		if(d == null){
 			setText(null);
@@ -82,6 +94,10 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.controls.input.TypedInputBoxControl#parseTypedValue()
+	 */
 	@Override
 	protected Double parseTypedValue() throws TypedInputBoxControlParseException {
 		Double returnValue;

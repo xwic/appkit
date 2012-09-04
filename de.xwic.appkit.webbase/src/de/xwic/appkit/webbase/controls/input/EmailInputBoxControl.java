@@ -22,6 +22,9 @@ package de.xwic.appkit.webbase.controls.input;
 import de.jwic.base.IControlContainer;
 
 /**
+ * Meant to check the input and roughly validate it using a simple regex.
+ * 
+ * Parsing is handled by {@link EmailInputType}
  *
  * @author Martin Weinand
  */
@@ -63,6 +66,10 @@ public class EmailInputBoxControl extends TypedInputBoxControl<EmailInputType> {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.controls.input.TypedInputBoxControl#parseTypedValue()
+	 */
 	@Override
 	protected EmailInputType parseTypedValue() throws TypedInputBoxControlParseException {
 		EmailInputType returnValue;

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * A type just to provide as type parameter for the TypedInoutBoxControl. Also, the field should not know what
  * a valid string value is, the type knows what a valid string representation looks like.
  *
- * Might hold several email addresses, separated by ','.
+ * May hold several email addresses, separated by ','.
  * Checks for the separate email addresses having <one or more characters>@<one or more characters>.<one or more characters>
  *
  * @author Martin Weinand
@@ -47,7 +47,7 @@ public class EmailInputType {
 	
 	/**
 	 * 
-	 * @param emailString may hold several email addresses separated by ',' or ';'; whitespaces are trimmed
+	 * @param emailString may hold several email addresses separated by ',' or ';'; whitespaces are trimmed.
 	 */
 	public EmailInputType(String emailString) {
 		super();
@@ -55,6 +55,13 @@ public class EmailInputType {
 		
 	}
 
+	/**
+	 * the email srtring this was constructed with, but normalized.
+	 * 
+	 * @link #normalize(String)
+	 * 
+	 * @return
+	 */
 	public String getString(){
 		return emailString;
 	}
@@ -77,7 +84,7 @@ public class EmailInputType {
 	}
 	
 	/*
-	 * removes white spaces
+	 * removes white spaces around delimiters, replaces all ';' with ','
 	 */
 	private String normalize(String emailString2) {
 		if(emailString2 == null){
