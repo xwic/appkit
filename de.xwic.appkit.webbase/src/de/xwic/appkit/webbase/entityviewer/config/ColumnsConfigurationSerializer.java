@@ -31,6 +31,7 @@ public class ColumnsConfigurationSerializer {
 	public static final String PROPERTY_QUERY = "pq";
 	public static final String QUERY_ELEMENT = "qe";
 	public static final String LINK_TYPE = "l";
+	public static final String COLLECTION_ELEM = "ce";
 	public static final String PROPERTY = "p";
 	public static final String OPERATION = "o";
 	public static final String VALUE = "v";
@@ -125,7 +126,7 @@ public class ColumnsConfigurationSerializer {
 			
 			sbFilters.append("<").append(ID).append(">").append(col.getId()).append("</").append(ID).append(">");
 			
-			serializeQueryElement(col.getFilter(), sbFilters);
+			serializeQueryElement(col.getFilter(), sbFilters, col.getListColumn().getFinalProperty().isCollection());
 			
 			sbFilters.append("</").append(COL).append(">");
 		}
@@ -140,7 +141,7 @@ public class ColumnsConfigurationSerializer {
 	/**
 	 * @return
 	 */
-	private void serializeQueryElement(QueryElement queryElement, StringBuilder sb) {
+	private void serializeQueryElement(QueryElement queryElement, StringBuilder sb, boolean collectionElem) {
 		if (queryElement == null) {
 			return;
 		}
@@ -150,13 +151,21 @@ public class ColumnsConfigurationSerializer {
 		sb.append("<").append(LINK_TYPE).append(">").append(queryElement.getLinkType()).append("</").append(LINK_TYPE).append(">");
 		
 		if (queryElement.getSubQuery() != null) {
-			serializePropertyQuery(queryElement.getSubQuery(), sb);
+			
+			// if a sub query, the collection element flag is applied to the query elements
+			sb.append("<").append(COLLECTION_ELEM).append(">").append("n").append("</").append(COLLECTION_ELEM).append(">");
+			
+			serializePropertyQuery(queryElement.getSubQuery(), sb, collectionElem);
+			
 		} else {
+			
 			if (queryElement.getPropertyName() != null && !queryElement.getPropertyName().trim().isEmpty()) {
+				sb.append("<").append(COLLECTION_ELEM).append(">").append(collectionElem ? "y" : "n").append("</").append(COLLECTION_ELEM).append(">");
 				sb.append("<").append(PROPERTY).append(">").append(queryElement.getPropertyName()).append("</").append(PROPERTY).append(">");
 				sb.append("<").append(OPERATION).append(">").append(queryElement.getOperation()).append("</").append(OPERATION).append(">");
 				sb.append("<").append(VALUE).append(">").append(serializeValue(queryElement)).append("</").append(VALUE).append(">");
 			}
+			
 		}
 		
 		sb.append("</").append(QUERY_ELEMENT).append(">");
@@ -165,8 +174,9 @@ public class ColumnsConfigurationSerializer {
 	/**
 	 * @param pq
 	 * @param sb
+	 * @param collectionElem 
 	 */
-	private void serializePropertyQuery(PropertyQuery pq, StringBuilder sb) {
+	private void serializePropertyQuery(PropertyQuery pq, StringBuilder sb, boolean collectionElem) {
 		
 		if (pq.size() < 1) {
 			return;
@@ -175,7 +185,7 @@ public class ColumnsConfigurationSerializer {
 		sb.append("<").append(PROPERTY_QUERY).append(">");
 		
 		for (QueryElement qe : pq.getElements()) {
-			serializeQueryElement(qe, sb);
+			serializeQueryElement(qe, sb, collectionElem);
 		}
 		
 		sb.append("</").append(PROPERTY_QUERY).append(">");
