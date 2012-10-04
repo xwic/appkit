@@ -30,7 +30,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/json.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xwic-cube.jar"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/jWic"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/jwic.ecolib"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwic-4.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwic-ecolib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
