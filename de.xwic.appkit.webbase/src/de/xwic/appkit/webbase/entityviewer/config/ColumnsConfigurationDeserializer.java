@@ -149,6 +149,14 @@ public class ColumnsConfigurationDeserializer {
 				
 				el = qeElement.element(ColumnsConfigurationSerializer.VALUE);
 				result.setValue(deserializeValue(el.getTextTrim()));
+
+				boolean isCollectionElement = false;
+				el = qeElement.element(ColumnsConfigurationSerializer.COLLECTION_ELEM);
+				if (el != null) {
+					isCollectionElement = el.getTextTrim().equalsIgnoreCase("y");
+				}
+				
+				result.setCollectionElement(isCollectionElement);
 			}
 			
 		}
@@ -157,7 +165,7 @@ public class ColumnsConfigurationDeserializer {
 	}
 
 	/**
-	 * @param cqf
+	 * @param pqElement
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")

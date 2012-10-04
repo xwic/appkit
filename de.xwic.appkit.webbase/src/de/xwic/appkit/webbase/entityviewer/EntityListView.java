@@ -15,6 +15,7 @@ import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.Page;
 import de.jwic.controls.Button;
+import de.jwic.controls.ListBoxControl;
 import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.ecolib.tableviewer.export.ExcelExportControl;
 import de.jwic.ecolib.toolbar.Toolbar;
@@ -157,6 +158,18 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
         // we will do the user config init after the QuickFilterPanel is created
 		entityTable = new EntityTable(this, "entityTable", configuration, false);
 
+		// remove the - All - selection and add 200 and 500 
+		ListBoxControl lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
+		lbMaxLines.clear();
+		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
+		String msg = "%s rows per page";
+		for (int i = 0; i < choices.length; i++) {
+			lbMaxLines.addElement(
+					String.format( msg, choices[i]), 
+					Integer.toString(choices[i]));
+		}
+		lbMaxLines.addElement("- Auto -", "0");
+		
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
 		}
