@@ -51,7 +51,7 @@ public class EmailInputBoxControl extends TypedInputBoxControl<EmailInputType> {
 	}
 
 	/**
-	 * String with potentially multiple emails, delimited by ','.
+	 * String with potentially multiple email addresses, delimited by ','.
 	 * No whitespaces.
 	 * 
 	 * @return
