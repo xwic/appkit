@@ -221,22 +221,30 @@ public abstract class AbstractDAO implements DAO {
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit,
-	 * de.xwic.appkit.core.dao.EntityFilter)
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
-	public EntityList getEntities(final Limit limit, final EntityQuery filter) {
+	public EntityList getEntities(Limit limit, EntityQuery filter) {
 
-		checkRights(ApplicationData.SECURITY_ACTION_READ);
+		return getEntities(limit, filter, true);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery, boolean)
+	 */
+	public EntityList getEntities(final Limit limit, final EntityQuery filter, boolean checkReadRights) {
+		
+		
+		if (checkReadRights) {
+			checkRights(ApplicationData.SECURITY_ACTION_READ);
+		}
 
 		return (EntityList) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getEntityImplClass(), limit, filter);
 			}
 		});
+		
 	}
 	
 	/* (non-Javadoc)
