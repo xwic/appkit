@@ -35,7 +35,7 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 	/**
 	 * css class should set to right aligned since we are accessing/displaying numbers
 	 */
-	public static final String CSS_CLASS = "de_xwic_appkit_webbase_controls_input_emailInputBoxControl";
+	public static final String CSS_CLASS = "de_xwic_appkit_webbase_controls_input_doubleInputBoxControl";
 	
 	private NumberFormat format = NumberFormat.getInstance(Locale.US);
 	
@@ -62,7 +62,8 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 	}
 	
 	private void init(){
-		setCssClass(CSS_CLASS);
+		
+		setCssClass(getCssClass() + " " +CSS_CLASS);
 		
 		//we handle german formats
 		Locale locale = getSessionContext().getLocale();
