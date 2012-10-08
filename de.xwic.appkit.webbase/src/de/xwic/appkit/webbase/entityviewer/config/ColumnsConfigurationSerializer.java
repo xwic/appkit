@@ -142,7 +142,14 @@ public class ColumnsConfigurationSerializer {
 	 * @return
 	 */
 	private void serializeQueryElement(QueryElement queryElement, StringBuilder sb, boolean collectionElem) {
-		if (queryElement == null) {
+		// if the qe is null or has no elements, return 
+		if (queryElement == null || 
+				( 
+					(queryElement.getPropertyName() == null || queryElement.getPropertyName().trim().isEmpty())
+					&&
+					(queryElement.getSubQuery() == null || queryElement.getSubQuery().size() == 0)
+				)				
+			) {
 			return;
 		}
 		
@@ -160,10 +167,12 @@ public class ColumnsConfigurationSerializer {
 		} else {
 			
 			if (queryElement.getPropertyName() != null && !queryElement.getPropertyName().trim().isEmpty()) {
+				
 				sb.append("<").append(COLLECTION_ELEM).append(">").append(collectionElem ? "y" : "n").append("</").append(COLLECTION_ELEM).append(">");
 				sb.append("<").append(PROPERTY).append(">").append(queryElement.getPropertyName()).append("</").append(PROPERTY).append(">");
 				sb.append("<").append(OPERATION).append(">").append(queryElement.getOperation()).append("</").append(OPERATION).append(">");
 				sb.append("<").append(VALUE).append(">").append(serializeValue(queryElement)).append("</").append(VALUE).append(">");
+				
 			}
 			
 		}
