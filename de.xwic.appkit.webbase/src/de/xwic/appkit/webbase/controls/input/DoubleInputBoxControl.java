@@ -26,18 +26,18 @@ import java.util.Locale;
 import de.jwic.base.IControlContainer;
 
 /**
+ *	Default NumberFormat is the US number format returned by <code>NumberFormat.getInstance(Locale.US)</code>
  *
  * @author Martin Weinand
  */
 public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
-
 
 	/**
 	 * css class should set to right aligned since we are accessing/displaying numbers
 	 */
 	public static final String CSS_CLASS = "de_xwic_appkit_webbase_controls_input_doubleInputBoxControl";
 	
-	private NumberFormat format = NumberFormat.getInstance(Locale.US);
+	private NumberFormat format;
 	
 	/**
 	 * 
@@ -48,9 +48,26 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 	 * @param container
 	 * @param name
 	 */
+	public DoubleInputBoxControl(IControlContainer container, String name, NumberFormat format) {
+		super(container, name);
+		init(format);
+	}
+
+	/**
+	 * @param container
+	 */
+	public DoubleInputBoxControl(IControlContainer container, NumberFormat format) {
+		super(container);
+		init(format);
+	}
+	
+	/**
+	 * @param container
+	 * @param name
+	 */
 	public DoubleInputBoxControl(IControlContainer container, String name) {
 		super(container, name);
-		init();
+		init(null);
 	}
 
 	/**
@@ -58,18 +75,18 @@ public class DoubleInputBoxControl extends TypedInputBoxControl<Double>{
 	 */
 	public DoubleInputBoxControl(IControlContainer container) {
 		super(container);
-		init();
+		init(null);
 	}
 	
-	private void init(){
+	private void init(NumberFormat format2){
 		
 		setCssClass(getCssClass() + " " +CSS_CLASS);
 		
-		//we handle german formats
-		Locale locale = getSessionContext().getLocale();
-		if(Locale.GERMAN.equals(locale)){
-			format = NumberFormat.getInstance(locale);
+		if(format2 == null){
+			format2 = NumberFormat.getInstance(Locale.US);
 		}
+		
+		this.format = format2;
 		
 	}
 	
