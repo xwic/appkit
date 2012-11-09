@@ -101,7 +101,10 @@ public class ColumnsConfigurationDeserializer {
 		
 		//Element cqf = root.element(ColumnsConfigurationSerializer.CUSTOM_QUICK_FILTER);
 		//Element pq = cqf.element(ColumnsConfigurationSerializer.PROPERTY_QUERY);
-		//customQuickFilter = deserializePropertyQuery(pq);
+		//PropertyQuery pq = deserializePropertyQuery(pq);
+		//if (pq != null && pq.size() > 0) {
+		//customQuickFilter = pq;
+		//}
 		
 		// then deserlialize the column filters
 
@@ -139,7 +142,13 @@ public class ColumnsConfigurationDeserializer {
 			el = qeElement.element(ColumnsConfigurationSerializer.PROPERTY_QUERY);
 			
 			if (el != null) {
-				result.setSubQuery(deserializePropertyQuery(el));
+				PropertyQuery pq = deserializePropertyQuery(el);
+				if (pq != null && pq.size() > 0) {
+					result.setSubQuery(pq);
+				} else {
+					// if, from whatever reason, the subquery found is null or empty, the result must be null
+					result = null;
+				}
 			} else {
 				el = qeElement.element(ColumnsConfigurationSerializer.PROPERTY);
 				result.setPropertyName(el.getTextTrim());
@@ -149,6 +158,14 @@ public class ColumnsConfigurationDeserializer {
 				
 				el = qeElement.element(ColumnsConfigurationSerializer.VALUE);
 				result.setValue(deserializeValue(el.getTextTrim()));
+
+				boolean isCollectionElement = false;
+				el = qeElement.element(ColumnsConfigurationSerializer.COLLECTION_ELEM);
+				if (el != null) {
+					isCollectionElement = el.getTextTrim().equalsIgnoreCase("y");
+				}
+				
+				result.setCollectionElement(isCollectionElement);
 			}
 			
 		}
@@ -157,7 +174,7 @@ public class ColumnsConfigurationDeserializer {
 	}
 
 	/**
-	 * @param cqf
+	 * @param pqElement
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -165,6 +182,7 @@ public class ColumnsConfigurationDeserializer {
 		PropertyQuery result = new PropertyQuery();
 
 		if (pqElement != null) {
+			
 			for (Iterator<Element> it = pqElement.elementIterator(ColumnsConfigurationSerializer.QUERY_ELEMENT); it.hasNext();) {
 				Element el = it.next();
 				result.addQueryElement(deserializeQueryElement(el));
@@ -172,7 +190,11 @@ public class ColumnsConfigurationDeserializer {
 			
 			for (Iterator<Element> it = pqElement.elementIterator(ColumnsConfigurationSerializer.PROPERTY_QUERY); it.hasNext();) {
 				Element el = it.next();
-				result.addSubQuery(deserializePropertyQuery(el));
+				
+				PropertyQuery pq = deserializePropertyQuery(el);				
+				if (pq != null && pq.size() > 0) {
+					result.addSubQuery(pq);
+				}
 			}
 		}
 		
