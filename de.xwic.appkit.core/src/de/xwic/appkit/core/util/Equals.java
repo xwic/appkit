@@ -48,6 +48,23 @@ public class Equals {
 	}
 
 	/**
+	 * @param s1
+	 * @param s2
+	 * @return
+	 */
+	public static boolean equalNonNullAndTrim(String s1, String s2) {
+		if (s1 == null) {
+			s1 = "";
+		}
+		
+		if (s2 == null) {
+			s2 = "";
+		}
+		
+		return s1.trim().equals(s2.trim());
+	}
+	
+	/**
 	 * Compares two strings. Ignores whitespaces and case.
 	 * @param s1
 	 * @param s2
