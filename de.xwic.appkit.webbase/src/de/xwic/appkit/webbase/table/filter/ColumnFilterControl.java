@@ -316,6 +316,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					} else {
 						currentFilter = defFilter;
 					}
+					btSortUp.setTitle("Sort First to Last");
+					btSortDown.setTitle("Sort Last to First");
 				} else if ("java.util.Date".equals(finalProperty.getEntityType())) {
 					currentFilter = dateFilter;
 					btSortUp.setTitle("Sort Oldest to Newest");
