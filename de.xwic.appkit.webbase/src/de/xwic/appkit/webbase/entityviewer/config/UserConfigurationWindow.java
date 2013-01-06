@@ -9,25 +9,29 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.Event;
 import de.jwic.base.Page;
+import de.jwic.controls.ScrollableContainer;
+import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
-import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
+import de.xwic.appkit.webbase.dialog.AbstractPopUpDialogWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
+import de.xwic.appkit.webbase.dialog.DialogEvent;
+import de.xwic.appkit.webbase.dialog.DialogWindowAdapter;
 import de.xwic.appkit.webbase.table.EntityTableModel;
+import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.Site;
-import de.xwic.appkit.webbase.toolkit.components.TabStripControlFix;
 
 /**
  * @author Adrian Ionescu
  */
-public class UserConfigurationWindow extends AbstractDialogWindow {
+public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 
 	private EntityTableModel tableModel;
-	private TabStripControlFix tabPanel;
-	private UserConfigurationsTab tabOwn;
-	private UserConfigurationsTab tabShared;
-
-	private List<IUserConfigurationWindowListener> listeners;
-	private UserViewConfigurationControlAdapter controlListener;	
+	private IUserViewConfigurationControlListener controlListener;
+	private ScrollableContainer configControlsContainer;
+	private List<UserViewConfigurationControl> configControls;
+	
+	private LoadProfileWindow loadProfileWindow;
 	
 	/**
 	 * @param container
@@ -35,30 +39,53 @@ public class UserConfigurationWindow extends AbstractDialogWindow {
 	public UserConfigurationWindow(Site site, final EntityTableModel tableModel) {
 		super(site);
 		
-		listeners = new ArrayList<IUserConfigurationWindowListener>();
 		this.tableModel = tableModel;
 		
-		setTemplateName(getClass().getName());
 		setWidth(520);
-		setHeight(350);
-		setCssClass("j-combo-content");
-		setModal(false);
+		setHeight(365);
 		
-		controlListener = new UserViewConfigurationControlAdapter() {
+		configControls = new ArrayList<UserViewConfigurationControl>();
+		
+		controlListener = new IUserViewConfigurationControlListener() {
 			@Override
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
-				tableModel.applyUserViewConfiguration(ctrl.getUserViewConfiguration().getId());
+				tableModel.getUserConfigHandler().applyConfig(ctrl.getUserViewConfiguration());
+				
+				closeProfileWindow();
 			}
 			
 			@Override
-			public void onPublicConfigCopied(Event event) {
+			public void onConfigDeleted(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
-				copySharedConfig(ctrl.getUserViewConfiguration().getId());
+
+				configControls.remove(ctrl);
+				
+				// if the current config was deleted, apply the next one.. if no other exist, reset to the default list
+				if (ctrl.isCurrentConfig()) {
+					
+					if (configControls.size() > 0) {
+						tableModel.getUserConfigHandler().applyConfig(configControls.get(0).getUserViewConfiguration());
+						tableModel.getUserConfigHandler().deleteConfig(ctrl.getUserViewConfiguration().getId());
+					} else {
+						tableModel.getUserConfigHandler().resetConfig();
+					}
+					
+				} else {
+					tableModel.getUserConfigHandler().deleteConfig(ctrl.getUserViewConfiguration().getId());
+				}
+				
+				requireRedraw();
+				
+				ctrl.destroy();
+			}
+
+			@Override
+			public void onConfigUpdated(Event event) {
 			}
 		};
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#createContent(de.xwic.appkit.webbase.dialog.DialogContent)
 	 */
@@ -71,86 +98,91 @@ public class UserConfigurationWindow extends AbstractDialogWindow {
 		ControlContainer container = new ControlContainer(content);
 		container.setTemplateName(getClass().getName() + "_content");
 		
-		tabPanel = new TabStripControlFix(container, "tabPanel");
-
-		tabOwn = new UserConfigurationsTab(tabPanel, "tabOwn", tableModel, false);
-		tabOwn.setTitle("&nbsp;&nbsp;&nbsp;Own Profiles&nbsp;&nbsp;&nbsp;");
-		for (UserViewConfigurationControl ctrl : tabOwn.getConfigControls()) {
-			ctrl.addListener(controlListener);			
+		configControlsContainer = new ScrollableContainer(container, "configControls");
+		configControlsContainer.setTemplateName(getClass().getName() + "_controlsContainer");
+		configControlsContainer.setHeight(isCurrentUserConfigDirty() ? "183px" : "265px");
+		
+		List<IUserViewConfiguration> list = ((IUserViewConfigurationDAO) DAOSystem.getDAO(IUserViewConfigurationDAO.class)).getUserConfigurationsForView(tableModel.getCurrentUser(), tableModel.getEntityClass().getName(), tableModel.getViewId());
+		for (IUserViewConfiguration config : list) {
+			if (config.isMainConfiguration()) {
+				// don't add a control for the main config
+				continue;
+			}
+			createUserConfigControl(config, false);
 		}
 		
-		tabShared = new UserConfigurationsTab(tabPanel, "tabShared", tableModel, true);
-		tabShared.setTitle("&nbsp;&nbsp;&nbsp;Public Profiles&nbsp;&nbsp;&nbsp;");
-		for (UserViewConfigurationControl ctrl : tabShared.getConfigControls()) {
-			ctrl.addListener(controlListener);			
-		}
-		
-		tabPanel.setActiveTabName(tableModel.isCurrentConfigurationMine() ? tabOwn.getName() : tabShared.getName());
+		// custom template to add the Load Profile link
+		buttonsContainer.setTemplateName(getClass().getName() + "_buttonsContainer");
 	}
 	
 	/**
-	 * 
+	 * @param userConfig
+	 * @return
 	 */
-	public void actionDuplicate() {
-		fireUserConfigurationWindowEvent();
-		addNewConfigControl(tableModel.cloneUserViewConfiguration(tableModel.getCurrentUserConfigurationId()));
-	}
-	
-	/**
-	 * 
-	 */
-	public void actionCreate() {
-		addNewConfigControl(tableModel.createNewUserViewConfiguration(true));
-		requireRedraw();
-	}
-	
-	/**
-	 * 
-	 */
-	private void copySharedConfig(int id) {
-		UserViewConfigurationControl ctrl = addNewConfigControl(tableModel.cloneUserViewConfiguration(id));
-		ctrl.actionUpdate();
-		ctrl.actionApply();
-	}
-	
-	/**
-	 * 
-	 */
-	private UserViewConfigurationControl addNewConfigControl(IUserViewConfiguration config) {
-		UserViewConfigurationControl ctrl = tabOwn.createUserConfigControl(config);
+	private UserViewConfigurationControl createUserConfigControl(IUserViewConfiguration userConfig, boolean isNew) {
+		UserViewConfigurationControl ctrl = new UserViewConfigurationControl(configControlsContainer, userConfig, tableModel, userConfig.getId() == 0, false);
 		ctrl.addListener(controlListener);
-		
-		if (!tabOwn.getName().equals(tabPanel.getActiveTabName())) {
-			tabPanel.setActiveTabName(tabOwn.getName());
+		if (isNew) {
+			configControls.add(0, ctrl);
+		} else {
+			configControls.add(ctrl);
 		}
+		
+		requireRedraw();
 		
 		return ctrl;
 	}
 	
-	/**
-	 * @param listener
+	/* (non-Javadoc)
+	 * @see de.jwic.base.Control#actionPerformed(java.lang.String, java.lang.String)
 	 */
-	public void addDuplicateProfileListener(IUserConfigurationWindowListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
-	
-	/**
-	 * @param listener
-	 */
-	public void removeDuplicateProfileListener(IUserConfigurationWindowListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.remove(listener);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	private void fireUserConfigurationWindowEvent() {
-		for (IUserConfigurationWindowListener l : listeners) {
-			l.beforeDuplicateProfile(new Event(this));
+	@Override
+	public void actionPerformed(String actionId, String parameter) {
+		if ("undoChanges".equalsIgnoreCase(actionId)) {
+			
+			tableModel.getUserConfigHandler().updateRelatedConfig(true);
+			onCancel(); // to close the window
+			
+		} else if ("saveCurrent".equalsIgnoreCase(actionId)) {
+			
+			tableModel.getUserConfigHandler().updateRelatedConfig(false);
+			onCancel(); // to close the window
+			
+		} else if ("saveNew".equalsIgnoreCase(actionId)) {
+			
+			final IUserViewConfiguration uvc = tableModel.getUserConfigHandler().createConfigWithCurrentSettings();
+			UserViewConfigurationControl ctrl = createUserConfigControl(uvc, true);
+			ctrl.actionEdit();
+			
+			ctrl.addListener(new IUserViewConfigurationControlListener() {
+				@Override
+				public void onConfigDeleted(Event event) {
+				}
+				
+				@Override
+				public void onConfigApplied(Event event) {
+				}
+
+				@Override
+				public void onConfigUpdated(Event event) {
+					// if it's a new config created from current settings, we need to apply it after it's saved, to make it the main one
+					tableModel.getUserConfigHandler().applyConfig(uvc);
+				}
+			});
+		} else if ("loadProfile".equalsIgnoreCase(actionId)) {
+			// to prevent opening the dialog multiple times
+			if (loadProfileWindow != null) {
+				return;
+			}
+			
+			loadProfileWindow = new LoadProfileWindow(ExtendedApplication.getInstance(this).getSite(), tableModel);
+			loadProfileWindow.addDialogWindowListener(new DialogWindowAdapter() {
+				@Override
+				public void onDialogAborted(DialogEvent event) {
+					loadProfileWindow = null;
+				}
+			});
+			loadProfileWindow.show();
 		}
 	}
 	
@@ -173,12 +205,55 @@ public class UserConfigurationWindow extends AbstractDialogWindow {
 		
 		setVisible(true);
 	}
-
+	
 	/**
-	 * Used in the VTL
+	 * 
+	 */
+	public void closeProfileWindow() {
+		if (loadProfileWindow != null) {
+			loadProfileWindow.close();
+			loadProfileWindow = null;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.CenteredWindow#close()
+	 */
+	@Override
+	public void close() {
+		closeProfileWindow();
+		super.close();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.jwic.base.ControlContainer#destroy()
+	 */
+	@Override
+	public void destroy() {
+		closeProfileWindow();
+		super.destroy();
+	}
+	
+	// ************* USED IN THE VTL *************
+	
+	/**
 	 * @return
 	 */
-	public boolean hasCurrentConfig() {
-		return tableModel.getCurrentUserConfigurationId() > 0;
+	public boolean isDefaultConfig() {
+		return tableModel.getUserConfigHandler().isDefaultConfig();
+	}
+	
+	/**
+	 * @return
+	 */
+	public List<UserViewConfigurationControl> getConfigControls() {
+		return configControls;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isCurrentUserConfigDirty() {
+		return tableModel.getUserConfigHandler().isCurrentConfigDirty();
 	}
 }

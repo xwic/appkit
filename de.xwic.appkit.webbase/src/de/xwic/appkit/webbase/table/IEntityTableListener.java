@@ -30,12 +30,6 @@ public interface IEntityTableListener {
 	public void columnsReordered(EntityTableEvent event);
 	
 	/**
-	 * Before the user configuration will be changed
-	 * @param event
-	 */
-	public void beforeUserConfigurationChanged(EntityTableEvent event);
-	
-	/**
 	 * The user configuration has been changed
 	 * @param event
 	 */
@@ -45,5 +39,11 @@ public interface IEntityTableListener {
 	 * Called when a new User Configuration has been created by the user
 	 * @param event
 	 */
-	public void newUserConfigurationCreated(EntityTableEvent event);		
+	public void newUserConfigurationCreated(EntityTableEvent event);
+	
+	/**
+	 * Called when the current User Configuration has been modified
+	 * @param event
+	 */
+	public void userConfigurationDirtyChanged(EntityTableEvent event);
 }

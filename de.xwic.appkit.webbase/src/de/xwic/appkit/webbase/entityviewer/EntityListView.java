@@ -6,16 +6,16 @@ package de.xwic.appkit.webbase.entityviewer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 import de.jwic.base.ControlContainer;
-import de.jwic.base.Event;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.Page;
 import de.jwic.controls.Button;
+import de.jwic.controls.ListBoxControl;
 import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.ecolib.tableviewer.export.ExcelExportControl;
 import de.jwic.ecolib.toolbar.Toolbar;
@@ -44,7 +44,6 @@ import de.xwic.appkit.webbase.actions.IEntityAction;
 import de.xwic.appkit.webbase.actions.IEntityProvider;
 import de.xwic.appkit.webbase.dialog.DialogEvent;
 import de.xwic.appkit.webbase.dialog.DialogWindowAdapter;
-import de.xwic.appkit.webbase.entityviewer.config.IUserConfigurationWindowListener;
 import de.xwic.appkit.webbase.entityviewer.config.UserConfigurationWindow;
 import de.xwic.appkit.webbase.entityviewer.quickfilter.AbstractQuickFilterPanel;
 import de.xwic.appkit.webbase.table.EntityTable;
@@ -73,7 +72,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected int widthDecrease = 50;
 	protected int heightDecrease = 230;
 	
-	private UserConfigurationWindow dialog;
+	private UserConfigurationWindow userConfigWindow;
 	private Button btUserConfig;
 	
 	protected List<IEntityAction> standardActions;
@@ -156,19 +155,29 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
         errorWarning.setAutoClose(true);
         errorWarning.setShowStackTrace(false);
 		
-		entityTable = new EntityTable(this, "entityTable", configuration);
-		entityTable.getModel().addEntityTableListener(new EntityTableAdapter() {
-			@Override
-			public void userConfigurationChanged(EntityTableEvent event) {
-				btUserConfig.setTitle("Profile: " + entityTable.getModel().getCurrentUserConfigurationName());
-				dialog.close();
-				dialog = null;
-			}
-		});
+        // we will do the user config init after the QuickFilterPanel is created
+		entityTable = new EntityTable(this, "entityTable", configuration, false);
 
-		if(configuration.getQuickFilterPanelCreator() != null) {
+		// remove the - All - selection and add 200 and 500 
+		ListBoxControl lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
+		lbMaxLines.clear();
+		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
+		String msg = "%s rows per page";
+		for (int i = 0; i < choices.length; i++) {
+			lbMaxLines.addElement(
+					String.format( msg, choices[i]), 
+					Integer.toString(choices[i]));
+		}
+		lbMaxLines.addElement("- Auto -", "0");
+		
+		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
 		}
+		
+		// init the user config only after the QuickFilterPanel is created, so that the sync between the columns and the
+		// panel is maintained
+		entityTable.getModel().getUserConfigHandler().initUserConfig();
+		entityTable.getTableViewer().getModel().setMaxLines(entityTable.getModel().getUserConfigHandler().getMaxRows());
 		
 		ToolbarGroup grpRight = toolbar.addRightGroup();
 
@@ -190,8 +199,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			});
 
 			btUserConfig = grpRight.addButton();
-			btUserConfig.setIconEnabled(ImageLibrary.ICON_CONFIG);
-			btUserConfig.setTitle("Profile: " + entityTable.getModel().getCurrentUserConfigurationName());
+			btUserConfig.setIconEnabled(ImageLibrary.ICON_CONFIG);			
 			btUserConfig.setTooltip("Manage profiles");
 			btUserConfig.addSelectionListener(new SelectionListener() {
 				@Override
@@ -199,6 +207,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					openUserConfigWindow();
 				}
 			});
+			setConfigButtonName();
 		}
 
 		if (showExcelExport()) {
@@ -209,8 +218,39 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			ImageRef imgDef = ImageLibrary.ICON_EXCEL;
 			excelExport.setIconEnabled(imgDef);
 		}
+		
+		entityTable.getModel().addEntityTableListener(new EntityTableAdapter() {
+			@Override
+			public void userConfigurationChanged(EntityTableEvent event) {
+				setConfigButtonName();
+				closeUserConfigWindow();
+			}
+			
+			@Override
+			public void userConfigurationDirtyChanged(EntityTableEvent event) {
+				setConfigButtonName();
+				closeUserConfigWindow();
+			}			
+		});
 	}
-	
+
+	/**
+	 * 
+	 */
+	private void setConfigButtonName() {
+		if (btUserConfig == null) {
+			return;
+		}
+		
+		String title = entityTable.getModel().getUserConfigHandler().getCurrentConfigName();
+		
+		if (entityTable.getModel().getUserConfigHandler().isCurrentConfigDirty()) {
+			title += " *";
+		}
+		
+		btUserConfig.setTitle(title);
+	}
+
 	/**
 	 * Add the New, Edit, Delete actions
 	 */
@@ -294,6 +334,35 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	/**
 	 * 
 	 */
+	private void openUserConfigWindow() {
+		// to prevent opening the dialog multiple times
+		if (userConfigWindow != null) {
+			return;
+		}
+		
+		userConfigWindow = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
+		userConfigWindow.addDialogWindowListener(new DialogWindowAdapter() {
+			@Override
+			public void onDialogAborted(DialogEvent event) {
+				userConfigWindow = null;
+			}
+		});		
+		userConfigWindow.show();
+	}
+	
+	/**
+	 * 
+	 */
+	private void closeUserConfigWindow() {
+		if (userConfigWindow != null) {
+			userConfigWindow.close();
+			userConfigWindow = null;
+		}
+	}
+	
+	/**
+	 * 
+	 */
 	protected void init() {
 	}
 
@@ -316,31 +385,6 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	protected boolean showClearFilters() {
 		return true;
-	}
-	
-	/**
-	 * 
-	 */
-	private void openUserConfigWindow() {
-		// to prevent multiple dialog openings
-		if (dialog != null) {
-			return;
-		}
-		
-		dialog = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
-		dialog.addDuplicateProfileListener(new IUserConfigurationWindowListener() {
-			@Override
-			public void beforeDuplicateProfile(Event event) {
-				entityTable.storeCurrentConfig();
-			}
-		});
-		dialog.addDialogWindowListener(new DialogWindowAdapter() {
-			@Override
-			public void onDialogAborted(DialogEvent event) {				
-				dialog = null;
-			}
-		});		
-		dialog.show();
 	}
 	
 	/**
@@ -587,10 +631,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	@Override
 	public void destroy() {
-		if (dialog != null) {
-			dialog.close();
-		}
-		
+		closeUserConfigWindow();		
 		super.destroy();
 	}
 	

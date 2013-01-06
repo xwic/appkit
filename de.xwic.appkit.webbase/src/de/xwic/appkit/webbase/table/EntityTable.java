@@ -8,7 +8,6 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.RenderContext;
-import de.jwic.controls.LabelControl;
 import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
 import de.jwic.ecolib.tableviewer.ITableLabelProvider;
 import de.jwic.ecolib.tableviewer.TableColumn;
@@ -42,20 +41,21 @@ public class EntityTable extends ControlContainer {
 	protected EntityTableModel model;
 	protected TableViewer tblViewer;
 	
-	private boolean isUserConfigDirty = false;
-	
 	private ColumnFilterControl colFilter;
 	
 	private List<ElementSelectedListener> elmSelListeners = new ArrayList<ElementSelectedListener>();
-	private LabelControl lblPublicProfileWarning;
 	
 	/**
+	 * If used without the EntityListView ALWAYS instantiate with initUserConfig=true.
+	 * Otherwise the EntityListView will take care of initiating the UserConfigHandler
+	 * 
 	 * @param container
 	 * @param name
 	 * @param configuration
+	 * @param initUserConfig
 	 * @throws ConfigurationException
 	 */
-	public EntityTable(IControlContainer container, String name, EntityTableConfiguration configuration) throws ConfigurationException {
+	public EntityTable(IControlContainer container, String name, EntityTableConfiguration configuration, boolean initUserConfig) throws ConfigurationException {
 		super(container, name);
 		
 		configuration.setLocale(container.getSessionContext().getLocale());
@@ -76,62 +76,43 @@ public class EntityTable extends ControlContainer {
 				onColumnsReordered();
 			}
 			@Override
-			public void beforeUserConfigurationChanged(EntityTableEvent event) {
-				storeCurrentConfig();
-			}
-			@Override
 			public void userConfigurationChanged(EntityTableEvent event) {
 				onUserConfigurationChanged();
-			}
-			@Override
-			public void newUserConfigurationCreated(EntityTableEvent event) {
-				onNewUserConfigurationCreated();
 			}
 		});
 		
 		createTableViewer();
 		createColumnFilter();
 
-		lblPublicProfileWarning = new LabelControl(this, "lblPublicProfileWarning");
-		lblPublicProfileWarning.setCssClass("publicProfileWarning");
-		lblPublicProfileWarning.setText("This list is currenly using a public profile, therefore all changes you bring to it will not be remembered. In order to modify the profile you must first copy it to your own profiles.");
-		lblPublicProfileWarning.setVisible(false);
+		if (initUserConfig) {
+			getModel().getUserConfigHandler().initUserConfig();
+			getTableViewer().getModel().setMaxLines(getModel().getUserConfigHandler().getMaxRows());
+		}
 	}
 
 	/**
-	 * Columns have been reordered.
+	 * 
 	 */
 	private void onColumnsReordered() {
 		updateTableColumns();
 		tblViewer.requireRedraw();
-		
-		isUserConfigDirty = true;
 	}
 	
 	/**
-	 * Columns have been reordered.
+	 * 
 	 */
 	private void onUserConfigurationChanged() {
-		isUserConfigDirty = false;
+		model.getUserConfigHandler().setConfigDirty(false);
 		
 		updateTableColumns();
 		
 		TableModel tm = tblViewer.getModel();
-		tm.setMaxLines(model.getMaxRows());
+		tm.setMaxLines(model.getUserConfigHandler().getMaxRows());
 		tm.clearSelection();
 		
 		tblViewer.requireRedraw();
-		
-		lblPublicProfileWarning.setVisible(!model.isCurrentConfigurationMine());
 	}
 
-	/**
-	 * The user created a new user config
-	 */
-	private void onNewUserConfigurationCreated() {
-		isUserConfigDirty = true;
-	}
-	
 	/**
 	 * Add a listener for selection events. The event will contain the ID of the entity
 	 * as Integer or NULL if the selection was lost.
@@ -160,6 +141,7 @@ public class EntityTable extends ControlContainer {
 			setColumnFilterIcon(tc, col);
 		}
 		tblViewer.getModel().clearSelection();
+		tblViewer.getModel().pageFirst();
 		tblViewer.requireRedraw();
 		
 	}
@@ -175,18 +157,14 @@ public class EntityTable extends ControlContainer {
 			setColumnSortIcon(tc, col);
 		}
 		tblViewer.requireRedraw();
-		
-		isUserConfigDirty = true;
 	}
 	
 	/**
 	 * 
 	 */
 	private void createColumnFilter() {
-		
 		colFilter = new ColumnFilterControl(this, "balloon", model);
 		colFilter.setTableViewer(tblViewer);
-		
 	}
 
 	/**
@@ -227,19 +205,27 @@ public class EntityTable extends ControlContainer {
 
 		TableModel tblModel = tblViewer.getModel();
 		tblModel.setSelectionMode(TableModel.SELECTION_SINGLE);
-		tblModel.setMaxLines(model.getMaxRows());
 		tblModel.addTableModelListener(new TableModelAdapter() {
 			@Override
 			public void columnSelected(TableModelEvent event) {
-				handleColumnSelected(event.getTableColumn());
+				colFilter.open(event.getTableColumn());
 			}
+			
 			@Override
 			public void columnResized(TableModelEvent event) {
-				handleColumnResize(event.getTableColumn());
+				Column col = (Column) event.getTableColumn().getUserObject();
+				col.setWidth(event.getTableColumn().getWidth());
+				
+				model.getUserConfigHandler().setConfigDirty(true);
 			}
+			
 			@Override
 			public void rangeUpdated(TableModelEvent event) {
-				handleRangeUpdated();
+				// range updated is also fired when we switch through pages, that's why
+				// this check is needed
+				if (model.getUserConfigHandler().getMaxRows() != tblViewer.getModel().getMaxLines()) {
+					model.getUserConfigHandler().setNewMaxRows(tblViewer.getModel().getMaxLines());
+				}
 			}
 		});
 		
@@ -258,34 +244,6 @@ public class EntityTable extends ControlContainer {
 		
 		updateTableColumns();
 		
-	}
-
-	/**
-	 * @param tableColumn
-	 */
-	private void handleColumnSelected(TableColumn tableColumn) {
-		colFilter.open(tableColumn);
-	}
-	
-	/**
-	 * @param tableColumn
-	 */
-	private void handleColumnResize(TableColumn tableColumn) {		
-		Column col = (Column) tableColumn.getUserObject();
-		col.setWidth(tableColumn.getWidth());
-		
-		isUserConfigDirty = true;
-	}
-	
-	/**
-	 * 
-	 */
-	private void handleRangeUpdated() {
-		// range updated is also fired when we switch through pages, that's why
-		// this check is needed
-		if (model.getMaxRows() != tblViewer.getModel().getMaxLines()) {
-			isUserConfigDirty = true;
-		}
 	}
 
 	/**
@@ -422,16 +380,11 @@ public class EntityTable extends ControlContainer {
 	 */
 	@Override
 	public void destroy() {
-		storeCurrentConfig();
-		super.destroy();
-	}
-	
-	/**
-	 * 
-	 */
-	public void storeCurrentConfig() {
-		if (isUserConfigDirty) {
-			getModel().storeUserViewConfiguration(tblViewer.getModel().getMaxLines());
+		
+		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
+			model.getUserConfigHandler().saveCurrentDataToMainConfig();
 		}		
+		
+		super.destroy();
 	}
 }

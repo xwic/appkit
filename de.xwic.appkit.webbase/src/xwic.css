@@ -1,0 +1,54 @@
+div.xwic-notify-error {
+	border: 1px solid #FF0000;
+	background-color: #E0E0E0;
+	color: #000000;
+	position: absolute;
+	font-size: 10pt;
+	padding: 13px 15px 16px 50px;
+	margin: 5px;
+	text-align: center;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	background-image: url(icons/error_large.png);
+	background-repeat: no-repeat;
+	background-position: 10px 6px;
+	z-index: 9999;
+}
+
+div.xwic-notify-warning {
+	border: 1px solid #B76814;
+	background-color: #FFF0AD;
+	color: #000000;
+	position: absolute;
+	font-size: 10pt;
+	padding: 13px 15px 16px 50px;
+	margin: 5px;
+	text-align: center;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	background-image: url(icons/warning_large.png);
+	background-repeat: no-repeat;
+	background-position: 10px 6px;
+	z-index: 9999;
+}
+
+div.xwic-notify-info {
+	border: 1px solid #232BFF;
+	background-color: #A8D9FF;
+	color: #000000;
+	position: absolute;
+	font-size: 10pt;
+	padding: 13px 15px 16px 50px;
+	margin: 5px;
+	text-align: center;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	background-image: url(icons/information_large.png);
+	background-repeat: no-repeat;
+	background-position: 10px 6px;
+	z-index: 9999;
+}
+
+.de_xwic_appkit_webbase_controls_input_doubleInputBoxControl {
+	text-align:right;
+}

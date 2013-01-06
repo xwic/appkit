@@ -127,5 +127,35 @@ public interface IUserViewConfiguration extends IEntity {
 	 *            the maxRows to set
 	 */
 	public void setMaxRows(int maxRows);
+	
+	/**
+	 * @return the mainConfiguration
+	 */
+	public boolean isMainConfiguration();
+	
+	/**
+	 * @param mainConfiguration the mainConfiguration to set
+	 */
+	public void setMainConfiguration(boolean mainConfiguration);
+	
+	/**
+	 * @return the relatedConfiguration
+	 */
+	public IUserViewConfiguration getRelatedConfiguration();
+	
+	/**
+	 * @param relatedConfiguration the relatedConfiguration to set
+	 */
+	public void setRelatedConfiguration(IUserViewConfiguration relatedConfiguration);
+	
+	/**
+	 * @return the filtersConfiguration
+	 */
+	public String getFiltersConfiguration();
+	
+	/**
+	 * @param filtersConfiguration the filtersConfiguration to set
+	 */
+	public void setFiltersConfiguration(String filtersConfiguration);
 
 }

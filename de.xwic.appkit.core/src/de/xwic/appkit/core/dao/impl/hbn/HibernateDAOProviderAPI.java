@@ -390,7 +390,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
 			PropertyQuery query = new PropertyQuery();
 			query.addEquals(prop.getName(), intEntityId);
 			
-			List<IEntity> result = dao.getEntities(null, query);
+			List<IEntity> result = dao.getEntities(null, query, false);
 			
 			// handle results
 			for (Iterator<IEntity> itR = result.iterator(); itR.hasNext(); ) {

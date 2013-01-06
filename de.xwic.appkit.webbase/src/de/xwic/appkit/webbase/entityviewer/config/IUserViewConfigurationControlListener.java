@@ -21,7 +21,7 @@ public interface IUserViewConfigurationControlListener {
 	public void onConfigApplied(Event event);
 	
 	/**
-	 * @param event
+	 * @param event 
 	 */
-	public void onPublicConfigCopied(Event event);
+	public void onConfigUpdated(Event event);
 }

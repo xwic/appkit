@@ -22,6 +22,11 @@ public class CenteredWindow extends Window {
 		setVisible(false);
 		setModal(true);
 		
+		setDraggable(false);
+		setMaximizable(false);
+		setMinimizable(false);
+		setResizable(false);
+		
 	}
 
 	private void centerWindow() {

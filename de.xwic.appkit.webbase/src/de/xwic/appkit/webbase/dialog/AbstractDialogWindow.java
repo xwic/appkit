@@ -45,7 +45,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		setResizable(false);
 		setMinimizable(false);
 		setMaximizable(false);
-
+		
 	}
 	
 	/* (non-Javadoc)
@@ -67,7 +67,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		baseContainer = new ControlContainer(this, "baseContainer");
 		baseContainer.setTemplateName(AbstractDialogWindow.class.getPackage().getName() + ".AbstractDialogLayout");
 		buttonsContainer = new ControlContainer(baseContainer, "buttonsContainer");
-		buttonsContainer.setTemplateName(AbstractDialogWindow.class.getPackage().getName() + ".ButtonContainer");
+		buttonsContainer.setTemplateName(AbstractDialogWindow.class.getPackage().getName() + ".ButtonsContainer");
 
 		content = new DialogContent(baseContainer, "content");
 		

@@ -103,6 +103,17 @@ public interface DAO {
 	 * @return
 	 */
 	public EntityList getEntities(Limit limit, EntityQuery filter);
+	
+	/**
+	 * Returns a list of entities filtered by the EntityFilter. If the filter argument
+	 * is <code>null</code>, all entities are returned (only limited by the Limit).
+	 * Offers the possibility to bypass the read rights check. Useful for example in case we want to get the entities for a softDelete validation
+	 * @param limit
+	 * @param filter
+	 * @param checkReadRights
+	 * @return
+	 */
+	public EntityList getEntities(Limit limit, EntityQuery filter, boolean checkReadRights);
 
 	/**
 	 * Fetches the collection specified in a single property for the given type.

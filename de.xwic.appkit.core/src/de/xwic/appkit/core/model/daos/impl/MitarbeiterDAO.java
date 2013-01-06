@@ -26,6 +26,7 @@ import de.xwic.appkit.core.model.entities.impl.Mitarbeiter;
 import de.xwic.appkit.core.model.entities.impl.history.MitarbeiterHistory;
 import de.xwic.appkit.core.model.queries.AllUNBetreuerQuery;
 import de.xwic.appkit.core.model.queries.CMFastSearchQuery;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
 
 /**
  * @author Ronny Pfretzschner
@@ -104,6 +105,24 @@ public class MitarbeiterDAO extends AbstractDAO implements
 		EntityList list = cmDAO.getEntities(new Limit(0, 1), query);
 		if (list.size() > 0) {
 			return (IMitarbeiter) list.get(0);
+		}
+		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.daos.IMitarbeiterDAO#getMittarbeiterByUsername(java.lang.String)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public IMitarbeiter getMittarbeiterByUsername(String username) {
+		if (username != null && username.trim().length() > 0) {
+			PropertyQuery query = new PropertyQuery();
+			query.addEquals("logonName", username);
+			List<IMitarbeiter> list  = getEntities(null, query);
+			
+			if (list != null && list.size() > 0) {
+				return list.get(0);
+			}
 		}
 		return null;
 	}

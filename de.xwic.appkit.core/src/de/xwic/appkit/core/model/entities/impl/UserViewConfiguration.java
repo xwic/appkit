@@ -20,6 +20,10 @@ public class UserViewConfiguration extends Entity implements IUserViewConfigurat
 	private String sortField;
 	private String sortDirection;
 	private int maxRows;
+	private boolean mainConfiguration;
+	private IUserViewConfiguration relatedConfiguration;
+	private String filtersConfiguration;
+	
 	
 	/**
 	 * @return the owner
@@ -152,5 +156,41 @@ public class UserViewConfiguration extends Entity implements IUserViewConfigurat
 	 */
 	public void setMaxRows(int maxRows) {
 		this.maxRows = maxRows;
+	}
+	/**
+	 * @return the mainConfiguration
+	 */
+	public boolean isMainConfiguration() {
+		return mainConfiguration;
+	}
+	/**
+	 * @param mainConfiguration the mainConfiguration to set
+	 */
+	public void setMainConfiguration(boolean mainConfiguration) {
+		this.mainConfiguration = mainConfiguration;
+	}
+	/**
+	 * @return the relatedConfiguration
+	 */
+	public IUserViewConfiguration getRelatedConfiguration() {
+		return relatedConfiguration;
+	}
+	/**
+	 * @param relatedConfiguration the relatedConfiguration to set
+	 */
+	public void setRelatedConfiguration(IUserViewConfiguration relatedConfiguration) {
+		this.relatedConfiguration = relatedConfiguration;
+	}
+	/**
+	 * @return the filtersConfiguration
+	 */
+	public String getFiltersConfiguration() {
+		return filtersConfiguration;
+	}
+	/**
+	 * @param filtersConfiguration the filtersConfiguration to set
+	 */
+	public void setFiltersConfiguration(String filtersConfiguration) {
+		this.filtersConfiguration = filtersConfiguration;
 	}
 }
