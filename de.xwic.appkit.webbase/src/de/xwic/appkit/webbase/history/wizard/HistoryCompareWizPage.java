@@ -33,7 +33,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	private TableViewer tableViewer = null;
 	private String[] colNames = null;
 
-	private final static String PATTERN = "dd. MMMMMMMMMM yyyy";
+	private final static String PATTERN = "dd. MMMMMMMMMM yyyy H:m:s";
 	private final static SimpleDateFormat format = new SimpleDateFormat(PATTERN);
 
 	/**
