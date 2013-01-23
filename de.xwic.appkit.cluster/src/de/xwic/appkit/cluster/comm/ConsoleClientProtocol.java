@@ -31,4 +31,12 @@ public class ConsoleClientProtocol implements ICommProtocol {
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.cluster.comm.ICommProtocol#onConnectionLost()
+	 */
+	@Override
+	public void onConnectionLost() {
+		// nothing to do
+	}
+	
 }

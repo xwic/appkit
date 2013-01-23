@@ -17,16 +17,23 @@ import de.xwic.appkit.cluster.comm.Response;
  */
 public class ClusterNode implements INode {
 
+	private static int _INT_NUM = 0;
+	
 	private NodeAddress nodeAddress;
 	private OutboundChannel channel;
 
+	private NodeStatus status = NodeStatus.NEW; 
+	private String name = null;
+	private int internalNumber;
+	
+	
 	/**
 	 * @param newNode
 	 * @param oc
 	 */
-	public ClusterNode(NodeAddress nodeAddress, OutboundChannel channel) {
+	public ClusterNode(NodeAddress nodeAddress) {
 		this.nodeAddress = nodeAddress;
-		this.channel = channel;
+		internalNumber = _INT_NUM++;
 	}
 
 	/* (non-Javadoc)
@@ -47,4 +54,64 @@ public class ClusterNode implements INode {
 		return channel.sendMessage(message);
 	}
 
+	/**
+	 * @return the status
+	 */
+	public NodeStatus getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(NodeStatus status) {
+		this.status = status;
+	}
+
+	/**
+	 * A connection was established
+	 * @param outboundChannel
+	 */
+	public void _connected(OutboundChannel outboundChannel) {
+		this.channel = outboundChannel;
+		status = NodeStatus.CONNECTED;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	/**
+	 * @return the internalNumber
+	 */
+	public int getInternalNumber() {
+		return internalNumber;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		if (name == null) {
+			sb.append("Unnamed");
+		} else {
+			sb.append(name);
+		}
+		sb.append(" [").append(nodeAddress).append("]")
+		.append(" #").append(internalNumber);
+		return sb.toString();
+	}
+	
 }

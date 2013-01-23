@@ -10,6 +10,8 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.appkit.cluster.impl.Cluster;
+
 /**
  * Listens to the specified port for connections from other nodes. If a node connects, it spins of
  * a separate thread to handle the communication with this client.
@@ -21,13 +23,15 @@ public class InboundConnectionHandler implements Runnable {
 
 	private Log log = LogFactory.getLog(getClass());
 	private int port;
+	private Cluster cluster;
 	
 	
 	/**
 	 * @param port
 	 */
-	public InboundConnectionHandler(int port) {
+	public InboundConnectionHandler(Cluster cluster, int port) {
 		super();
+		this.cluster = cluster;
 		this.port = port;
 	}
 
@@ -57,7 +61,7 @@ public class InboundConnectionHandler implements Runnable {
 				
 				log.debug("Accepted connection from " + socket.getInetAddress().getHostAddress());
 				
-				ClientHandler ch = new ClientHandler(socket);
+				ClientHandler ch = new ClientHandler(cluster, socket);
 				
 				Thread t = new Thread(ch, "ConnectionHandler-" + socket.getInetAddress().getHostAddress() + "-" + conHandlerCount++);
 				t.setDaemon(true); // launch as a Deamon

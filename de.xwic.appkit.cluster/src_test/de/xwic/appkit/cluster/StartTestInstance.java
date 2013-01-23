@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.BasicConfigurator;
 
+import de.xwic.appkit.cluster.impl.Cluster;
+
 /**
  * @author lippisch
  *
@@ -41,7 +43,7 @@ public class StartTestInstance {
 		}
 		
 		System.out.println("Initializing Cluster....");
-		Cluster.init(cc);
+		ClusterManager.init(cc);
 		
 		
 		// be in wait state...

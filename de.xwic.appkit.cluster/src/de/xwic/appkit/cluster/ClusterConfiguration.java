@@ -71,6 +71,7 @@ public class ClusterConfiguration {
 	}
 
 	/**
+	 * The Node Name must be unique within the cluster!
 	 * @param nodeName the nodeName to set
 	 */
 	public void setNodeName(String nodeName) {

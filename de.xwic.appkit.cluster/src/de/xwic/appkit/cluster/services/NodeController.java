@@ -6,10 +6,10 @@ package de.xwic.appkit.cluster.services;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.cluster.Cluster;
-import de.xwic.appkit.cluster.NodeAddress;
+import de.xwic.appkit.cluster.INode;
+import de.xwic.appkit.cluster.NodeUnavailableException;
 import de.xwic.appkit.cluster.comm.OutboundChannel;
-import de.xwic.appkit.cluster.impl.ClusterNode;
+import de.xwic.appkit.cluster.impl.Cluster;
 
 /**
  * Controls the vital functions of the current node. Performs heartbeat checks with known nodes,
@@ -26,13 +26,19 @@ public class NodeController implements Runnable {
 
 	private Cluster cluster;
 
+	/**
+	 * @param cluster
+	 */
+	public NodeController(Cluster cluster) {
+		super();
+		this.cluster = cluster;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
 	public void run() {
-		
-		cluster = Cluster.instance();
 		
 		while (true) {
 			
@@ -50,28 +56,38 @@ public class NodeController implements Runnable {
 	/**
 	 * 
 	 */
+	@SuppressWarnings("incomplete-switch")
 	private void checkNewNodes() {
 		
 		if (System.currentTimeMillis() - lastCheckNewNodes > MIN_WAIT_CHECK_NEW_NODES) {
 			
-			NodeAddress newNode;
-			while ((newNode = cluster.nextNewNode()) != null) {
-				log.info("Attempting to connect to node " + newNode);
-				
-				try {
-					OutboundChannel oc = new OutboundChannel();
-					oc.openConnection(newNode, false);
+			INode nodes[]  = new INode[0];
+			nodes = cluster.getNodes().toArray(nodes);
+			
+			for (INode node : nodes) {
+				switch (node.getStatus()) {
+				case NEW:
+				case DISCONNECTED :
+					log.debug("Attempting to connect to node " + node);
 					
-					ClusterNode cNode = new ClusterNode(newNode, oc);
-					cluster.registerNode(cNode);
+					try {
+						OutboundChannel oc = new OutboundChannel(cluster);
+						oc.openConnection(node, false);
+						
+						log.info("Connection to " + node + " established.");
+						
+					} catch (NodeUnavailableException nue) {
+						log.debug("The node '" + node + "' is unavailable at the moment.");
+					} catch (Exception e) {
+						log.error("Attempt to connect to node '" + node + "' failed", e);
+					}
 					
-				} catch (Exception e) {
-					log.error("Attempt to connect to node '" + newNode + "' failed", e);
+					break;
 				}
 			}
 			
+			lastCheckNewNodes = System.currentTimeMillis();
 		}
-		lastCheckNewNodes = System.currentTimeMillis();
 		
 	}
 

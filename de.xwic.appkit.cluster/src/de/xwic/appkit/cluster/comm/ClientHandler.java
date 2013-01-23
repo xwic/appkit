@@ -11,7 +11,8 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.cluster.comm.cnode.ClusterNodeClientProtocol;
+import de.xwic.appkit.cluster.impl.Cluster;
+import de.xwic.appkit.cluster.impl.ClusterNodeClientProtocol;
 
 /**
  * Handles an incoming connection.
@@ -27,11 +28,14 @@ public class ClientHandler implements Runnable {
 	private ICommProtocol protocol = null;
 	
 	
+	private Cluster cluster;
+	
 	/**
 	 * @param socket
 	 */
-	public ClientHandler(Socket socket) {
+	public ClientHandler(Cluster cluster, Socket socket) {
 		super();
+		this.cluster = cluster;
 		this.socket = socket;
 	}
 
@@ -72,7 +76,7 @@ public class ClientHandler implements Runnable {
 						// hard-coded here right now, but might get externalized into some configuration file
 						// later on...
 						if ("ClusterNode".equals(msgIn.getArgument())) {
-							protocol = new ClusterNodeClientProtocol();
+							protocol = new ClusterNodeClientProtocol(cluster);
 						} else if ("Console".equals(msgIn.getArgument())) {
 							protocol = new ConsoleClientProtocol();
 						} else {
@@ -102,6 +106,16 @@ public class ClientHandler implements Runnable {
 		} catch (IOException e) {
 			log.error("Communication error with client", e);
 			// will cause an exit.. 
+		}
+		
+		if (protocol != null) {
+			protocol.onConnectionLost();
+		}
+		// close the socket.
+		try {
+			socket.close();
+		} catch (IOException e) {
+			log.warn("Error closing socket.", e);
 		}
 		
 		// handle exiting properly (i.e. notify Cluster instance)

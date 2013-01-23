@@ -21,4 +21,8 @@ public interface ICommProtocol {
 	 */
 	public Response handleMessage(Socket socket, Message inMessage);
 	
+	/**
+	 * Invoked by the ClientHandler if the connection is lost to the remote client.
+	 */
+	public void onConnectionLost();
 }

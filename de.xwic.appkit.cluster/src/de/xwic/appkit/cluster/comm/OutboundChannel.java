@@ -12,11 +12,14 @@ import java.net.UnknownHostException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.cluster.Cluster;
 import de.xwic.appkit.cluster.CommunicationException;
+import de.xwic.appkit.cluster.INode;
+import de.xwic.appkit.cluster.INode.NodeStatus;
 import de.xwic.appkit.cluster.NodeAddress;
 import de.xwic.appkit.cluster.NodeUnavailableException;
-import de.xwic.appkit.cluster.comm.cnode.ClusterNodeClientProtocol;
+import de.xwic.appkit.cluster.impl.Cluster;
+import de.xwic.appkit.cluster.impl.ClusterNode;
+import de.xwic.appkit.cluster.impl.ClusterNodeClientProtocol;
 
 /**
  * Holds the connection to a remote Node. 
@@ -33,11 +36,14 @@ public class OutboundChannel {
 
 	private ObjectInputStream in;
 
+	private Cluster cluster;
+
 	/**
 	 * Constructor.
 	 * @param nodeAddress
 	 */
-	public OutboundChannel() {
+	public OutboundChannel(Cluster cluster) {
+		this.cluster = cluster;
 		
 	}
 	
@@ -45,13 +51,23 @@ public class OutboundChannel {
 	 * Initiate the connection to the given node.
 	 * @param nodeAddress
 	 */
-	public void openConnection(NodeAddress nodeAddress, boolean callBack) throws NodeUnavailableException {
-		this.nodeAddress = nodeAddress;
+	public void openConnection(INode node, boolean callBack) throws NodeUnavailableException {
+		openConnection(node, callBack, 0);
+	}
+	
+	/**
+	 * Initiate the connection to the given node.
+	 * @param nodeAddress
+	 */
+	public void openConnection(INode node, boolean callBack, int remoteNodeId) throws NodeUnavailableException {
+		
+		this.nodeAddress = node.getAddress();
+		int internalId = ((ClusterNode)node).getInternalNumber();
 		
 		try {
 			openConnection();
 		} catch (IOException e) {
-			log.error("Can not connect to node", e);
+			log.debug("Can not connect to node (" + e + ")");
 			throw new NodeUnavailableException("Can not connect to node " + nodeAddress, e);
 		}
 		
@@ -66,17 +82,22 @@ public class OutboundChannel {
 			}
 			
 			
-			int myPort = Cluster.instance().getConfig().getPortNumber();
+			int myPort = cluster.getConfig().getPortNumber();
 			Message msg;
 			if (callBack) {
-				msg = new Message(ClusterNodeClientProtocol.CMD_CALLBACK, Integer.toString(myPort));
+				msg = new Message(ClusterNodeClientProtocol.CMD_CALLBACK, cluster.getConfig().getNodeName(), new Integer[] {myPort, remoteNodeId});
 			} else {
-				msg = new Message(ClusterNodeClientProtocol.CMD_CONNECT, Integer.toString(myPort));
+				msg = new Message(ClusterNodeClientProtocol.CMD_CONNECT, cluster.getConfig().getNodeName(), new Integer[] {myPort, internalId});
 			}
 			res = sendMessage(msg);
 			if (!res.isSuccess()) {
 				log.error("The callback/connect process failed. " + res.getReason());
 				throw new NodeUnavailableException("Connection callback failed...");
+			}
+			
+			// connection successfully established
+			if (node.getStatus() == NodeStatus.DISCONNECTED || node.getStatus() == NodeStatus.NEW) {
+				((ClusterNode)node)._connected(this);
 			}
 			
 		} catch (CommunicationException ce) {
