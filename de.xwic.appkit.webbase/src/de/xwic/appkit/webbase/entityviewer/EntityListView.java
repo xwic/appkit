@@ -341,12 +341,14 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		}
 		
 		userConfigWindow = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
+		userConfigWindow.setClosable(false);
 		userConfigWindow.addDialogWindowListener(new DialogWindowAdapter() {
 			@Override
 			public void onDialogAborted(DialogEvent event) {
 				userConfigWindow = null;
 			}
 		});		
+		
 		userConfigWindow.show();
 	}
 	
