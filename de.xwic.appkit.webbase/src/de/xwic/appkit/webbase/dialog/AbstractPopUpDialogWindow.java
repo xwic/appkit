@@ -3,6 +3,7 @@
  */
 package de.xwic.appkit.webbase.dialog;
 
+import de.jwic.controls.Window;
 import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
@@ -17,7 +18,7 @@ public abstract class AbstractPopUpDialogWindow extends AbstractDialogWindow {
 	public AbstractPopUpDialogWindow(Site site) {
 		super(site);
 		
-		setTemplateName(AbstractPopUpDialogWindow.class.getName());
+		setTemplateName(Window.class.getName());
 		setCssClass("j-combo-content");
 		setModal(false);
 	}

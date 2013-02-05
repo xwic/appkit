@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.controls.Button;
+import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.webbase.toolkit.app.Site;
@@ -39,7 +40,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 	 */
 	public AbstractDialogWindow(Site site) {
 		super(site);
-		
+		setTemplateName(Window.class.getName());
 		setVisible(false);
 		setClosable(false);
 		setResizable(false);
