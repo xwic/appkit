@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.comm;
+package de.xwic.appkit.cluster.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,8 +11,8 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.cluster.impl.Cluster;
-import de.xwic.appkit.cluster.impl.ClusterNodeClientProtocol;
+import de.xwic.appkit.cluster.Message;
+import de.xwic.appkit.cluster.Response;
 
 /**
  * Handles an incoming connection.
@@ -78,7 +78,7 @@ public class ClientHandler implements Runnable {
 						if ("ClusterNode".equals(msgIn.getArgument())) {
 							protocol = new ClusterNodeClientProtocol(cluster);
 						} else if ("Console".equals(msgIn.getArgument())) {
-							protocol = new ConsoleClientProtocol();
+							protocol = new ConsoleClientProtocol(cluster);
 						} else {
 							log.debug("Invalid protocol selected.");
 							response = new Response(false, "Invalid protocol selected.");

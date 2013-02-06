@@ -10,8 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import de.xwic.appkit.cluster.comm.Message;
-import de.xwic.appkit.cluster.comm.Response;
 
 /**
  * @author lippisch
@@ -27,20 +25,26 @@ public class TestClient {
 	 */
 	public static void main(String[] args) {
 
-		new TestClient().start();
+		new TestClient().start(args);
 
 	}
 	
-	public void start () {
+	public void start (String[] args) {
 		
 		try {
 			
-			Socket s = new Socket("localhost", 11150);
+			int port = 11150;
+			if (args.length > 0) {
+				port = Integer.parseInt(args[0]);
+			}
+			Socket s = new Socket("localhost", port);
 			out = new ObjectOutputStream(s.getOutputStream());
 			in = new ObjectInputStream(s.getInputStream());
 			
 			
-			
+			out.writeObject(new Message(Message.CMD_IDENTIFY_CLIENT, "Console"));
+			Response res = (Response)in.readObject();
+			System.out.println(res);
 			
 			
 			System.out.println("Enter commands or 'exit' to exit.");
@@ -66,15 +70,19 @@ public class TestClient {
 						msg = new Message(line);
 					}
 
+					long start = System.currentTimeMillis();
 					System.out.println("Sending " + msg);
 					out.writeObject(msg);
 					Response response = (Response)in.readObject();
 					
-					System.out.println(">> " + response);
+					System.out.println("[" + (System.currentTimeMillis() - start) + "]  >> " + response);
+					if (response.getData() != null) {
+						System.out.println(response.getData());
+					}
+					
 					
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			

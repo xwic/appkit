@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.comm;
+package de.xwic.appkit.cluster;
 
 import java.io.Serializable;
 

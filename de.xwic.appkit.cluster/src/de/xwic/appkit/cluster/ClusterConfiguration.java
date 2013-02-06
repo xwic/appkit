@@ -19,6 +19,8 @@ public class ClusterConfiguration {
 	
 	private List<NodeAddress> knownNodes = new ArrayList<NodeAddress>();
 
+	private int masterPriority = 0;
+	
 	/**
 	 * Add a known cluster node address. This is the list of initially known nodes. During runtime,
 	 * the cluster might connect to additional nodes or disconnect if nodes become unavailable.
@@ -76,6 +78,22 @@ public class ClusterConfiguration {
 	 */
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
+	}
+
+	/**
+	 * @return the masterPriority
+	 */
+	public int getMasterPriority() {
+		return masterPriority;
+	}
+
+	/**
+	 * The master priority needs to be unique across all nodes. The node with the highest priority in the cluster 
+	 * may be elected for the master node if a cluster service requires a master.
+	 * @param masterPriority the masterPriority to set
+	 */
+	public void setMasterPriority(int masterPriority) {
+		this.masterPriority = masterPriority;
 	}
 	
 }

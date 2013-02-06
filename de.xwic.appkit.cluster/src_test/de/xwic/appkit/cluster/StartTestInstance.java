@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.BasicConfigurator;
 
-import de.xwic.appkit.cluster.impl.Cluster;
-
 /**
  * @author lippisch
  *
@@ -34,6 +32,7 @@ public class StartTestInstance {
 
 		cc.setClusterName("Testcluster");
 		cc.setNodeName("Node" + cc.getPortNumber());
+		cc.setMasterPriority(cc.getPortNumber());
 		
 		
 		if (args.length > 1) {
@@ -45,6 +44,75 @@ public class StartTestInstance {
 		System.out.println("Initializing Cluster....");
 		ClusterManager.init(cc);
 		
+		
+		ICluster cluster = ClusterManager.getCluster();
+		cluster.addEventListener(new ClusterEventListener() {
+			
+			@Override
+			public void receivedEvent(ClusterEvent event) {
+				System.out.println("General Event received: " + event);
+			}
+		});
+
+		cluster.addEventListener(new ClusterEventListener() {
+			
+			@Override
+			public void receivedEvent(ClusterEvent event) {
+				System.out.println("TEST Event received: " + event);
+			}
+		}, "test");
+
+
+		// register the test service
+		cluster.registerClusterService(ITestClusterService.SERVICE_NAME, new TestClusterService());
+		
+		// create a test-thread that issues a number from the testClusterService and validates its sequence
+
+		final TestServiceTest tst = new TestServiceTest();
+		Thread t = new Thread(tst);
+		t.setDaemon(true);
+		t.start();
+		
+		cluster.addEventListener(new ClusterEventListener() {
+			
+			@Override
+			public void receivedEvent(ClusterEvent event) {
+				if ("NumberToken".equals(event.getName())) {
+					Long number = (Long)event.getData();
+					if (number != null) {
+						tst.addNumber(number);
+					}
+				}
+			}
+		}, "TestNumberSequence");
+
+		
+		// create 20 test-threads that send messages all the time.
+		/*
+		for (int i = 0; i < 20; i++) {
+			final String xn = "t" + i;
+			Runnable tRun = new Runnable() {
+				@Override
+				public void run() {
+
+					ICluster cluster = ClusterManager.instance();
+					while (true) {
+						try {
+								cluster.sendEvent(new ClusterEvent(xn, Long.toString(System.currentTimeMillis())), false);
+								Thread.sleep(new Random().nextInt(1000));
+						} catch (EventTimeOutException e) {
+							e.printStackTrace();
+						} catch (InterruptedException e) {
+						}
+					}
+					
+				}
+			};
+			Thread t = new Thread(tRun);
+			t.setDaemon(true);
+			t.start();
+		}
+		*/
 		
 		// be in wait state...
 		System.out.println("Press ENTER to exit.");

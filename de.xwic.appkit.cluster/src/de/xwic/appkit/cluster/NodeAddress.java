@@ -3,11 +3,13 @@
  */
 package de.xwic.appkit.cluster;
 
+import java.io.Serializable;
+
 /**
  * Represents the address of a node, which includes the hostname and port.
  * @author lippisch
  */
-public class NodeAddress {
+public class NodeAddress implements Serializable {
 
 	private String hostname;
 	private int port;

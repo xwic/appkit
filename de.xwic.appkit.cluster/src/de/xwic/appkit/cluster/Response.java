@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.comm;
+package de.xwic.appkit.cluster;
 
 import java.io.Serializable;
 
@@ -13,7 +13,7 @@ public class Response implements Serializable {
 
 	private boolean success;
 	private String reason = null;
-	private Message details = null;
+	private Serializable data = null;
 	
 	/**
 	 * @param success
@@ -39,11 +39,12 @@ public class Response implements Serializable {
 	 * @param success
 	 * @param details
 	 */
-	public Response(boolean success, Message details) {
+	public Response(boolean success, String reason, Serializable data) {
 		super();
 		this.success = success;
-		this.details = details;
+		this.data = data;
 	}
+
 	/**
 	 * @return the success
 	 */
@@ -53,8 +54,8 @@ public class Response implements Serializable {
 	/**
 	 * @return the details
 	 */
-	public Message getDetails() {
-		return details;
+	public Serializable getData() {
+		return data;
 	}
 	/**
 	 * @return the reason

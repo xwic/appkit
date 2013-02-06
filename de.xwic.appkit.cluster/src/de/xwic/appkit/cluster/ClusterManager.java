@@ -26,7 +26,7 @@ public class ClusterManager {
 	 * an instance can be accessed. 
 	 * @return
 	 */
-	public static ICluster instance() {
+	public static ICluster getCluster() {
 		if (instance == null) {
 			throw new IllegalStateException("The Cluster has not yet been initialized.");
 		}

@@ -3,12 +3,13 @@
  */
 package de.xwic.appkit.cluster.impl;
 
+import java.util.Date;
+
 import de.xwic.appkit.cluster.CommunicationException;
 import de.xwic.appkit.cluster.INode;
+import de.xwic.appkit.cluster.Message;
 import de.xwic.appkit.cluster.NodeAddress;
-import de.xwic.appkit.cluster.comm.Message;
-import de.xwic.appkit.cluster.comm.OutboundChannel;
-import de.xwic.appkit.cluster.comm.Response;
+import de.xwic.appkit.cluster.Response;
 
 /**
  * Represents a node within the cluster.
@@ -25,7 +26,9 @@ public class ClusterNode implements INode {
 	private NodeStatus status = NodeStatus.NEW; 
 	private String name = null;
 	private int internalNumber;
+	private int masterPriority;
 	
+	private Date disconnectedSince = null;
 	
 	/**
 	 * @param newNode
@@ -62,19 +65,22 @@ public class ClusterNode implements INode {
 	}
 
 	/**
-	 * @param status the status to set
-	 */
-	public void setStatus(NodeStatus status) {
-		this.status = status;
-	}
-
-	/**
 	 * A connection was established
 	 * @param outboundChannel
 	 */
 	public void _connected(OutboundChannel outboundChannel) {
 		this.channel = outboundChannel;
 		status = NodeStatus.CONNECTED;
+		disconnectedSince = null;
+	}
+	
+	/**
+	 * A connection was disconnected.
+	 */
+	public void _disconnected() {
+		this.channel = null;
+		status = NodeStatus.DISCONNECTED;
+		disconnectedSince = new Date();
 	}
 
 	/**
@@ -112,6 +118,54 @@ public class ClusterNode implements INode {
 		sb.append(" [").append(nodeAddress).append("]")
 		.append(" #").append(internalNumber);
 		return sb.toString();
+	}
+
+	/**
+	 * @return the disconnectedSince
+	 */
+	public Date getDisconnectedSince() {
+		return disconnectedSince;
+	}
+
+	/**
+	 * Node gets disabled, no more retries. 
+	 */
+	public void _disable() {
+		status = NodeStatus.DISABLED;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.cluster.INode#sameNode(de.xwic.appkit.cluster.INode)
+	 */
+	@Override
+	public boolean sameNode(INode n) {
+		if (n == null) {
+			return false;
+		}
+		ClusterNode cn = (ClusterNode)n;
+		if (nodeAddress == null && cn.nodeAddress != null) {
+			return false;
+		}
+		if (nodeAddress == null && cn.nodeAddress == null) {
+			// return FALSE! Both nodes can not be identified..
+			return false;
+		}
+		return nodeAddress.equals(cn.nodeAddress);
+		
+	}
+
+	/**
+	 * @return the masterPriority
+	 */
+	public int getMasterPriority() {
+		return masterPriority;
+	}
+
+	/**
+	 * @param masterPriority the masterPriority to set
+	 */
+	public void setMasterPriority(int masterPriority) {
+		this.masterPriority = masterPriority;
 	}
 	
 }

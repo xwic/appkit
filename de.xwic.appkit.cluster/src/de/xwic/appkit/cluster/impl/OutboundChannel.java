@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.comm;
+package de.xwic.appkit.cluster.impl;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -14,12 +14,11 @@ import org.apache.commons.logging.LogFactory;
 
 import de.xwic.appkit.cluster.CommunicationException;
 import de.xwic.appkit.cluster.INode;
+import de.xwic.appkit.cluster.Message;
+import de.xwic.appkit.cluster.Response;
 import de.xwic.appkit.cluster.INode.NodeStatus;
 import de.xwic.appkit.cluster.NodeAddress;
 import de.xwic.appkit.cluster.NodeUnavailableException;
-import de.xwic.appkit.cluster.impl.Cluster;
-import de.xwic.appkit.cluster.impl.ClusterNode;
-import de.xwic.appkit.cluster.impl.ClusterNodeClientProtocol;
 
 /**
  * Holds the connection to a remote Node. 
@@ -83,11 +82,12 @@ public class OutboundChannel {
 			
 			
 			int myPort = cluster.getConfig().getPortNumber();
+			int masterPriority = cluster.getConfig().getMasterPriority();
 			Message msg;
 			if (callBack) {
-				msg = new Message(ClusterNodeClientProtocol.CMD_CALLBACK, cluster.getConfig().getNodeName(), new Integer[] {myPort, remoteNodeId});
+				msg = new Message(ClusterNodeClientProtocol.CMD_CALLBACK, cluster.getConfig().getNodeName(), new Integer[] {myPort, remoteNodeId, masterPriority});
 			} else {
-				msg = new Message(ClusterNodeClientProtocol.CMD_CONNECT, cluster.getConfig().getNodeName(), new Integer[] {myPort, internalId});
+				msg = new Message(ClusterNodeClientProtocol.CMD_CONNECT, cluster.getConfig().getNodeName(), new Integer[] {myPort, internalId, masterPriority});
 			}
 			res = sendMessage(msg);
 			if (!res.isSuccess()) {
@@ -96,8 +96,24 @@ public class OutboundChannel {
 			}
 			
 			// connection successfully established
+			
+			
+			// Ask remote node for the list of nodes
+			res = sendMessage(new Message(ClusterNodeClientProtocol.CMD_GET_NODES));
+			if (res.isSuccess()) {
+				NodeInfo[] naList = (NodeInfo[])res.getData();
+				for (NodeInfo na : naList) {
+					// register the nodes. If the node is already known, it will not be registered by the cluster
+					if (na != null && !na.getName().equals(cluster.getConfig().getNodeName())) {
+						cluster.registerNode(na.getNodeAddress());
+					}
+				}
+			}
+			
 			if (node.getStatus() == NodeStatus.DISCONNECTED || node.getStatus() == NodeStatus.NEW) {
 				((ClusterNode)node)._connected(this);
+				
+				cluster.getClusterServiceManager().handleNewNode(node);
 			}
 			
 		} catch (CommunicationException ce) {

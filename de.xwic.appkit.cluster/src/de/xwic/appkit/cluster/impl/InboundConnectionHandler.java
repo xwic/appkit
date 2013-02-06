@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.comm;
+package de.xwic.appkit.cluster.impl;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,7 +10,6 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.cluster.impl.Cluster;
 
 /**
  * Listens to the specified port for connections from other nodes. If a node connects, it spins of

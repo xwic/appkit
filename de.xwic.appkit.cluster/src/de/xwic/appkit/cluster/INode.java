@@ -3,8 +3,8 @@
  */
 package de.xwic.appkit.cluster;
 
-import de.xwic.appkit.cluster.comm.Message;
-import de.xwic.appkit.cluster.comm.Response;
+import java.util.Date;
+
 
 /**
  * A node within the cluster.
@@ -50,4 +50,23 @@ public interface INode {
 	 * @return
 	 */
 	public String getName();
+	
+	/**
+	 * @return the disconnectedSince
+	 */
+	public Date getDisconnectedSince();
+
+	/**
+	 * Compare if this node is the address as the other node.
+	 * @param n
+	 * @return
+	 */
+	public boolean sameNode(INode n);
+	
+	/**
+	 * Returns the master priority of this node.
+	 * @return
+	 */
+	public int getMasterPriority();
+
 }
