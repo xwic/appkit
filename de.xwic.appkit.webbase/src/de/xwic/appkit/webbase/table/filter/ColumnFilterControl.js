@@ -39,12 +39,9 @@
 		var header = jQuery('#'+JQryEscape('tblViewData_${control.tableViewerId}'));
 		if(header){
 			var column = jQuery(jQuery('table.tbvColHeader',header)[$control.positionIdx]);
-			console.log(column.offset());
 			var offset = column.offset();
-			console.log(win.dialog('option','position'));
 			win.dialog('option','position',[offset.left,offset.top+column.height()])
 			
-			console.log(win.dialog('option','position'));
 		}	
 			
 	},
