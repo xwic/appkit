@@ -26,25 +26,25 @@
 	afterUpdate: function(element) {
 		
 		
-		var elm = $("${control.controlID}_graph");
-		var elmScale = $("${control.controlID}_scale");
-		var elmScaleH = $("${control.controlID}_hScale");
+		var elm = jQuery("#"+JQryEscape("${control.controlID}_graph"));
+		var elmScale = jQuery("#"+JQryEscape("${control.controlID}_scale"));
+		var elmScaleH = jQuery("#"+JQryEscape("${control.controlID}_hScale"));
 		if (elm) {
 			#if(!$control.hasData)
-				elm.update("No data available.");
+				elm.html("No data available.");
 			#else
-				elm.update("Loading...");
+				elm.html("Loading...");
 		
-				var param = new Hash();
+				var param = [];
 				JWic.resourceRequest("${control.controlID}", function(ajaxResponse) {
 					try {
-						var response = ajaxResponse.responseText.evalJSON(true);
+						var response = jQuery.parseJSON(ajaxResponse.responseText)
 						if (response.maxScale) {
-							elmScale.update(parseInt(response.maxScale) + response.measureTitle);
+							elmScale.html(parseInt(response.maxScale) + response.measureTitle);
 							var code = "<table width=\"100%\" cellspacing=0 cellpadding=0><tr>";
-							var data = $A(response.data);
-							var height = elm.getHeight() - 2;
-							data.each(function(slice) {
+							var data =jQuery.makeArray(response.data);
+							var height = elm.height() - 2;
+							jQuery.each(function(index,slice) {
 								var vH = height * (slice.value / response.maxScale);
 								code += "<td valign=\"bottom\">";
 								code += "<div style=\"height: " + parseInt(vH) + "px; background-color: #0000FF;\"></div>";
@@ -58,10 +58,10 @@
 							
 							if (data.length > 0) {
 								var scale = data[0].title + " - " + data[data.length - 1].title;
-								elmScaleH.update(scale);
+								elmScaleH.html(scale);
 							}
 						}
-						elm.update(code);
+						elm.html(code);
 						
 					} catch (x) {
 						alert(x);
