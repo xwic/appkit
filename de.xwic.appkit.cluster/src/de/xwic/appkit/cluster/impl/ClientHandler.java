@@ -11,6 +11,7 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.appkit.cluster.ICommProtocol;
 import de.xwic.appkit.cluster.Message;
 import de.xwic.appkit.cluster.Response;
 

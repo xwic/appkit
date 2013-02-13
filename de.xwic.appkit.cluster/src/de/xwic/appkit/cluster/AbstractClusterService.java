@@ -5,6 +5,7 @@ package de.xwic.appkit.cluster;
 
 import java.io.Serializable;
 
+
 /**
  * Abstract implementation of the IClusterService interface.
  * @author lippisch
@@ -15,14 +16,17 @@ public abstract class AbstractClusterService implements IClusterService {
 	protected ICluster cluster;
 
 	protected boolean master = false;
+	protected IClusterServiceHandler csHandler;
+	
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.cluster.IClusterService#onRegistration(java.lang.String, de.xwic.appkit.cluster.ICluster)
+	 * @see de.xwic.appkit.cluster.IClusterService#onRegistration(java.lang.String, de.xwic.appkit.cluster.ICluster, de.xwic.appkit.cluster.impl.ClusterServiceHandler)
 	 */
 	@Override
-	public void onRegistration(String name, ICluster cluster) {
+	public void onRegistration(String name, ICluster cluster, IClusterServiceHandler csHandler) {
 		this.myName = name;
 		this.cluster = cluster;
+		this.csHandler = csHandler;
 	}
 
 	/* (non-Javadoc)
@@ -38,7 +42,6 @@ public abstract class AbstractClusterService implements IClusterService {
 	 */
 	@Override
 	public Serializable surrenderMasterRole() {
-		
 		master = false;
 		return null;
 	}

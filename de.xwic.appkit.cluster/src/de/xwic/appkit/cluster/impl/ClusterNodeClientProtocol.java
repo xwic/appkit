@@ -10,13 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.xwic.appkit.cluster.ClusterEvent;
+import de.xwic.appkit.cluster.ClusterServiceStatus;
 import de.xwic.appkit.cluster.IClusterService;
+import de.xwic.appkit.cluster.ICommProtocol;
 import de.xwic.appkit.cluster.INode;
 import de.xwic.appkit.cluster.Message;
 import de.xwic.appkit.cluster.NodeAddress;
 import de.xwic.appkit.cluster.NodeUnavailableException;
+import de.xwic.appkit.cluster.RemoteInvokationException;
 import de.xwic.appkit.cluster.Response;
-import de.xwic.appkit.cluster.impl.ClusterServiceManager.ClusterServiceStatus;
 
 /**
  * @author lippisch
@@ -32,6 +34,7 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 	public final static String CMD_GET_SERVICE_STATUS = "getServiceStatus";
 	public final static String CMD_TAKE_MASTER_ROLE = "takeMasterRole";
 	public final static String CMD_SURRENDER_SERVICE = "surrenderService";
+	public final static String CMD_INVOKE_SERVICE = "invokeService";
 	
 	private final Log log = LogFactory.getLog(getClass());
 	
@@ -80,11 +83,33 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 				
 			} else if (command.equals(CMD_SURRENDER_SERVICE)) {
 				res = onSurrenderService(socket, inMessage);
+			
+			} else if (command.equals(CMD_INVOKE_SERVICE)) {
+				res = onInvokeService(socket, inMessage);
 				
 			}
 		}
 		return res;
 	}
+	/**
+	 * @param socket
+	 * @param inMessage
+	 * @return
+	 */
+	private Response onInvokeService(Socket socket, Message inMessage) {
+		
+		String[] args = inMessage.getArgument().split(":");
+		String serviceName = args[0];
+		String methodName = args[1];
+		
+		try {
+			return cluster.getClusterServiceManager().invokeService(serviceName, methodName, (Serializable[]) inMessage.getContainer());
+		} catch (RemoteInvokationException e) {
+			return new Response(false, e.toString());
+		}
+		
+	}
+
 	/**
 	 * @param socket
 	 * @param inMessage

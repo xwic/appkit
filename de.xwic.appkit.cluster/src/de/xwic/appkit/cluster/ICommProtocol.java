@@ -1,12 +1,10 @@
 /**
  * 
  */
-package de.xwic.appkit.cluster.impl;
+package de.xwic.appkit.cluster;
 
 import java.net.Socket;
 
-import de.xwic.appkit.cluster.Message;
-import de.xwic.appkit.cluster.Response;
 
 /**
  * A communication protocol to handle a specific client. Allows handling of different client types such 

@@ -8,6 +8,7 @@ import java.util.Date;
 
 import de.xwic.appkit.cluster.ClusterEvent;
 import de.xwic.appkit.cluster.IClusterService;
+import de.xwic.appkit.cluster.ICommProtocol;
 import de.xwic.appkit.cluster.INode;
 import de.xwic.appkit.cluster.Message;
 import de.xwic.appkit.cluster.Response;

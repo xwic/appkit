@@ -5,6 +5,7 @@ package de.xwic.appkit.cluster;
 
 import java.io.Serializable;
 
+
 /**
  * Cluster Services use the cluster messaging infrastructure to behave as one single service across
  * the entire cluster. There is always one master instance on one single node. As nodes get added
@@ -20,8 +21,9 @@ public interface IClusterService {
 	 * Invoked during the registration of the service on a cluster. If this method throws
 	 * an exception, the service will not be registered.
 	 * @param cluster
+	 * @param csHandler 
 	 */
-	public void onRegistration(String name, ICluster cluster);
+	public void onRegistration(String name, ICluster cluster, IClusterServiceHandler csHandler);
 	
 	/**
 	 * Returns true if this service instance is the master instance in the cluster.

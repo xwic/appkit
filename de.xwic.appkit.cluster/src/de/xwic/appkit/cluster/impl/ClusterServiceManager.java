@@ -4,6 +4,7 @@
 package de.xwic.appkit.cluster.impl;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -12,11 +13,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.appkit.cluster.ClusterServiceStatus;
 import de.xwic.appkit.cluster.CommunicationException;
 import de.xwic.appkit.cluster.IClusterService;
 import de.xwic.appkit.cluster.INode;
 import de.xwic.appkit.cluster.INode.NodeStatus;
+import de.xwic.appkit.cluster.IRemoteService;
 import de.xwic.appkit.cluster.Message;
+import de.xwic.appkit.cluster.RemoteInvokationException;
 import de.xwic.appkit.cluster.Response;
 
 /**
@@ -26,15 +30,9 @@ import de.xwic.appkit.cluster.Response;
  */
 public class ClusterServiceManager {
 
-	public enum ClusterServiceStatus {
-		NO_SUCH_SERVICE,
-		ACTIVE_MASTER,
-		ACTIVE_SLAVE
-	}
-	
 	private final static Log log = LogFactory.getLog(ClusterServiceManager.class);
 	
-	private Map<String, ClusterServiceWrapper> services = new HashMap<String, ClusterServiceWrapper>();
+	private Map<String, ClusterServiceHandler> services = new HashMap<String, ClusterServiceHandler>();
 	private Cluster cluster;
 
 	/**
@@ -53,18 +51,18 @@ public class ClusterServiceManager {
 			if (services.containsKey(name)) {
 				throw new IllegalArgumentException("A IClusterService with the name '" + name + "' is already registered.");
 			}
-			service.onRegistration(name, cluster);
 			
-			ClusterServiceWrapper csWrapper = new ClusterServiceWrapper(service);
+			ClusterServiceHandler csHandler = new ClusterServiceHandler(service);
 			
-			services.put(name, csWrapper);
+			service.onRegistration(name, cluster, csHandler);
+			services.put(name, csHandler);
 			
 			// now that the service is registered, we need to check if there are other nodes
 			// running the same service. If a node is found, the one with the higher priority
 			// will host the master service. This might lead to handing over (surrendering)
 			// the master on the remote node
 			
-			List<RemoteServiceData> rsList = csWrapper.getRemoteServices();
+			List<IRemoteService> rsList = csHandler.getRemoteServices();
 			
 			INode[] nodes = cluster.getNodes();
 			for (INode node : nodes) {
@@ -74,7 +72,7 @@ public class ClusterServiceManager {
 						Response resp = node.sendMessage(msg);
 						if (resp.isSuccess()) {
 							ClusterServiceStatus status = ClusterServiceStatus.valueOf(resp.getReason());
-							rsList.add(new RemoteServiceData(node, status));
+							rsList.add(new RemoteService(node, name, status));
 						} else {
 							log.warn("Can not retrieve remote service status : " + resp.getReason());
 						}
@@ -86,18 +84,18 @@ public class ClusterServiceManager {
 			
 			// now that we know about all the other nodes, we can search for the master...
 			boolean foundOneMaster = false;
-			for (RemoteServiceData rsd : rsList) {
+			for (IRemoteService rsd : rsList) {
 				if (rsd.getServiceStatus() == ClusterServiceStatus.ACTIVE_MASTER) {
 					foundOneMaster = true;
-					log.debug("Found a remote service that is currently master with MasterPriority (" + rsd.getRemoteNode().getMasterPriority() + ")");
-					if (rsd.getRemoteNode().getMasterPriority() < cluster.getConfig().getMasterPriority()) {
+					log.debug("Found a remote service that is currently master with MasterPriority (" + rsd.getNode().getMasterPriority() + ")");
+					if (rsd.getNode().getMasterPriority() < cluster.getConfig().getMasterPriority()) {
 						// this node has a higher master priority. This means that we have to take over the master role
 						// from the remote node.
 						
-						obtainMasterRole(name, service, rsd.getRemoteNode());
+						obtainMasterRole(name, service, rsd.getNode());
 						
 					} else {
-						csWrapper.setMasterNode(rsd.getRemoteNode());
+						csHandler.setMasterService(rsd);
 					}
 				}
 			}
@@ -168,27 +166,33 @@ public class ClusterServiceManager {
 		
 		synchronized (services) {
 
-			ClusterServiceWrapper csWrapper = services.get(serviceName);
+			ClusterServiceHandler csWrapper = services.get(serviceName);
 			if (csWrapper != null) {
 				
+				IRemoteService masterService = null;
 				IClusterService service = csWrapper.getClusterService();
 				if (service.isMaster()) {
 					data = service.surrenderMasterRole();
 					
 					boolean found = false;
-					List<RemoteServiceData> remoteServices = csWrapper.getRemoteServices();
-					for (RemoteServiceData rsd : remoteServices) {
-						if (rsd.getRemoteNode().sameNode(remoteNode)) {
+					List<IRemoteService> remoteServices = csWrapper.getRemoteServices();
+					for (IRemoteService rservice : remoteServices) {
+						RemoteService rsd = (RemoteService)rservice;
+						if (rsd.getNode().sameNode(remoteNode)) {
 							rsd.setServiceStatus(ClusterServiceStatus.ACTIVE_MASTER);
+							masterService = rsd;
 							found = true;
 							break;
 						}
 					}
 					if (!found) {
 						// this is a new node, add it to the list
-						remoteServices.add(new RemoteServiceData(remoteNode, ClusterServiceStatus.ACTIVE_MASTER));
+						RemoteService rs = new RemoteService(remoteNode, serviceName, ClusterServiceStatus.ACTIVE_MASTER);
+						remoteServices.add(rs);
+						masterService = rs;
 					}
-					csWrapper.setMasterNode(remoteNode);
+					
+					csWrapper.setMasterService(masterService);
 					
 				}
 				
@@ -207,7 +211,7 @@ public class ClusterServiceManager {
 		synchronized (services) {
 			for (String name : getInstalledClusterServiceNames()) {
 	
-				ClusterServiceWrapper csWrapper = services.get(name);
+				ClusterServiceHandler csWrapper = services.get(name);
 				
 				if (node.getStatus() == NodeStatus.CONNECTED) {
 					Message msg = new Message(ClusterNodeClientProtocol.CMD_GET_SERVICE_STATUS, name);
@@ -215,6 +219,9 @@ public class ClusterServiceManager {
 						Response resp = node.sendMessage(msg);
 						if (resp.isSuccess()) {
 							ClusterServiceStatus status = ClusterServiceStatus.valueOf(resp.getReason());
+							
+							IRemoteService rs = new RemoteService(node, name, status);
+							csWrapper.getRemoteServices().add(rs);
 							
 							if (status == ClusterServiceStatus.ACTIVE_MASTER) {
 								// the remote service is currently a master
@@ -232,7 +239,7 @@ public class ClusterServiceManager {
 										Serializable data = clusterService.surrenderMasterRole();
 										Message msgSur = new Message(ClusterNodeClientProtocol.CMD_SURRENDER_SERVICE, name, data);
 										node.sendMessage(msgSur);
-										csWrapper.setMasterNode(node);
+										csWrapper.setMasterService(rs);
 										
 									}
 								}
@@ -266,7 +273,7 @@ public class ClusterServiceManager {
 
 		synchronized (services) {
 			
-			ClusterServiceWrapper csWrapper = services.get(serviceName);
+			ClusterServiceHandler csWrapper = services.get(serviceName);
 			if (csWrapper != null) {
 				
 				IClusterService service = csWrapper.getClusterService();
@@ -282,6 +289,68 @@ public class ClusterServiceManager {
 				
 			}
 			
+		}
+		
+	}
+
+	/**
+	 * @param serviceName
+	 * @param methodName
+	 * @param container
+	 * @return
+	 * @throws RemoteInvokationException 
+	 */
+	public Response invokeService(String serviceName, String methodName, Serializable[] arguments) throws RemoteInvokationException {
+
+		ClusterServiceHandler csWrapper = services.get(serviceName);
+		IClusterService clusterService = csWrapper.getClusterService();
+
+		// find the best matching method for the arguments given
+		Method bestMatch = null;
+		int matchIdx = 0;
+		for (Method m : clusterService.getClass().getMethods()) {
+			
+			if (m.getName().equals(methodName)) { // found a method with the same name
+				// check which arguments match best
+				Class<?>[] paramTypes = m.getParameterTypes();
+				
+				if (paramTypes.length == 0 && (arguments == null || arguments.length == 0)) {
+					bestMatch = m;
+					matchIdx = 9999;
+					break; // there will be no better match
+				} else if (arguments != null && paramTypes.length == arguments.length) {
+					// same length
+					int mNum = 0;
+					for (int i = 0; i < arguments.length; i++) {
+						if (arguments[i] != null) {
+							if (paramTypes[i].isAssignableFrom(arguments[i].getClass())) {
+								mNum++;
+							} else {
+								mNum = -1;
+								break;
+							}
+						} 
+					}
+					if (mNum != -1 && mNum > matchIdx) {
+						matchIdx = mNum;
+						bestMatch = m;
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+		if (bestMatch == null) {
+			throw new IllegalArgumentException("No such method: " + methodName);
+		}
+		
+		try {
+			Object result = bestMatch.invoke(clusterService, (Object[])arguments);
+			return new Response(true, null, (Serializable)result);
+		} catch (Exception e) {
+			throw new RemoteInvokationException("Error invoking method.", e);
 		}
 		
 	}
