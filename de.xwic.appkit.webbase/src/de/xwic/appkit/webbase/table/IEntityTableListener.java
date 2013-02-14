@@ -36,12 +36,6 @@ public interface IEntityTableListener {
 	public void userConfigurationChanged(EntityTableEvent event);
 	
 	/**
-	 * Called when a new User Configuration has been created by the user
-	 * @param event
-	 */
-	public void newUserConfigurationCreated(EntityTableEvent event);
-	
-	/**
 	 * Called when the current User Configuration has been modified
 	 * @param event
 	 */

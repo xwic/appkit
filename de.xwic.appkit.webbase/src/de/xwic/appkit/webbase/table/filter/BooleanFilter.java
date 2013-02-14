@@ -18,6 +18,7 @@ import de.xwic.appkit.webbase.table.Column;
 public class BooleanFilter extends AbstractFilterControl {
 
 	private RadioGroupControl rgFilter;
+	private ElementSelectedListener listener;
 	
 	/**
 	 * @param container
@@ -26,6 +27,13 @@ public class BooleanFilter extends AbstractFilterControl {
 	public BooleanFilter(IControlContainer container, String name) {
 		super(container, name);
 		
+		listener = new ElementSelectedListener() {
+			@Override
+			public void elementSelected(ElementSelectedEvent event) {
+				notifyListeners();
+			}
+		};
+		
 		rgFilter = new RadioGroupControl(this, "filter");
 		rgFilter.addElement("<i>All</i>", "all");
 		rgFilter.addElement("True", "true");
@@ -33,13 +41,7 @@ public class BooleanFilter extends AbstractFilterControl {
 		rgFilter.setColumns(1);
 		
 		rgFilter.setChangeNotification(true);
-		rgFilter.addElementSelectedListener(new ElementSelectedListener() {
-			@Override
-			public void elementSelected(ElementSelectedEvent event) {
-				notifyListeners();
-			}
-		});
-
+		rgFilter.addElementSelectedListener(listener);
 	}
 
 	/* (non-Javadoc)
@@ -70,6 +72,8 @@ public class BooleanFilter extends AbstractFilterControl {
 	public void initialize(Column column, QueryElement queryElement) {
 		this.column = column;
 		
+		rgFilter.removeElementSelectedListener(listener);
+		
 		if (queryElement == null) {
 			rgFilter.setSelectedKey("all");
 		} else if (queryElement.getValue() == Boolean.TRUE) {
@@ -78,6 +82,7 @@ public class BooleanFilter extends AbstractFilterControl {
 			rgFilter.setSelectedKey("false");
 		}
 		
+		rgFilter.addElementSelectedListener(listener);
 	}
 
 }
