@@ -30,7 +30,7 @@ public class TestServiceTest implements Runnable {
 			try {
 				ITestClusterService service = (ITestClusterService) cluster.getClusterService(ITestClusterService.SERVICE_NAME);
 				if (service == null) {
-					System.out.println("ERROR: service is null");
+					System.err.println("ERROR: service is null");
 				} else {
 					
 					long nextNumber = service.takeNextNumber();

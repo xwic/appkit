@@ -5,6 +5,9 @@ package de.xwic.appkit.cluster.impl;
 
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.appkit.cluster.ClusterServiceStatus;
 import de.xwic.appkit.cluster.CommunicationException;
 import de.xwic.appkit.cluster.INode;
@@ -17,6 +20,8 @@ import de.xwic.appkit.cluster.Response;
  */
 public class RemoteService implements IRemoteService {
 
+	private final static Log log = LogFactory.getLog(RemoteService.class);
+	
 	private INode remoteNode;
 	private ClusterServiceStatus serviceStatus;
 	private String serviceName;
@@ -65,6 +70,7 @@ public class RemoteService implements IRemoteService {
 	@Override
 	public Serializable invokeMethod(String method, Serializable[] arguments) throws CommunicationException {
 	
+		log.debug("Invoke method '" + method + "' on node '" + remoteNode + "'");
 		Response res = remoteNode.sendMessage(new Message(ClusterNodeClientProtocol.CMD_INVOKE_SERVICE, serviceName + ":" + method, arguments));
 		if (res.isSuccess()) {
 			return res.getData();

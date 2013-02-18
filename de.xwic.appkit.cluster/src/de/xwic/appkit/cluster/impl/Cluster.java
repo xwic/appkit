@@ -308,5 +308,14 @@ public class Cluster implements ICluster {
 	public ClusterServiceManager getClusterServiceManager() {
 		return clServiceManager;
 	}
+
+
+	/**
+	 * A node was disconnected.
+	 * @param remoteNode
+	 */
+	public void nodeDisconnected(INode remoteNode) {
+		clServiceManager.handleDisconnectedNode(remoteNode);
+	}
 	
 }

@@ -16,7 +16,7 @@ import de.xwic.appkit.cluster.NodeUnavailableException;
  */
 public class NodeController implements Runnable {
 
-	private final static long MIN_WAIT_CHECK_NEW_NODES = 5000; // 5 seconds
+	private final static long MIN_WAIT_CHECK_NEW_NODES = 2000; // 5 seconds
 	private final static long MAX_RETRY_AGE = 1000 * 60; // 1 minute
 
 	private final Log log = LogFactory.getLog(getClass());

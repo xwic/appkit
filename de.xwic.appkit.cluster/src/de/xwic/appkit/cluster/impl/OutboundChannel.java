@@ -6,6 +6,7 @@ package de.xwic.appkit.cluster.impl;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -37,6 +38,8 @@ public class OutboundChannel {
 
 	private Cluster cluster;
 
+	private INode node;
+
 	/**
 	 * Constructor.
 	 * @param nodeAddress
@@ -60,6 +63,7 @@ public class OutboundChannel {
 	 */
 	public void openConnection(INode node, boolean callBack, int remoteNodeId) throws NodeUnavailableException {
 		
+		this.node = node;
 		this.nodeAddress = node.getAddress();
 		int internalId = ((ClusterNode)node).getInternalNumber();
 		
@@ -152,6 +156,12 @@ public class OutboundChannel {
 			
 			Response response = (Response)in.readObject();
 			return response;
+		} catch (StreamCorruptedException sce) {
+			// so the stream is corrupt.. disconnect the node and try to reconnect
+			closeConnection();
+			cluster.nodeDisconnected(node); // notify the cluster that the node was disconnected. The cluster will attempt to reconnect
+			throw new CommunicationException("The connection to another node was corrupted and closed.");
+			
 		} catch (Exception e) {
 			// if the de-serialization of the object failed, the stream might be corrupted
 			// need to test if the 'De'serialization can resume properly or if the channel needs to be re-opened.

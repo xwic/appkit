@@ -348,9 +348,63 @@ public class ClusterServiceManager {
 		
 		try {
 			Object result = bestMatch.invoke(clusterService, (Object[])arguments);
+			
+			log.debug("Invoke of local '" + methodName + "' returned " + result);
+			
 			return new Response(true, null, (Serializable)result);
 		} catch (Exception e) {
 			throw new RemoteInvokationException("Error invoking method.", e);
+		}
+		
+	}
+
+	/**
+	 * The given node was disconnected. Checks if the remote node is hosting the master for any
+	 * service and if so, surrenders the master. 
+	 * @param remoteNode
+	 */
+	void handleDisconnectedNode(INode remoteNode) {
+		
+		int myMasterPrio = cluster.getConfig().getMasterPriority();
+		synchronized (services) {
+			for (String name : getInstalledClusterServiceNames()) {
+	
+				ClusterServiceHandler csWrapper = services.get(name);
+				IRemoteService rsMaster = csWrapper.getMasterService();
+				if (rsMaster != null) {
+					if (rsMaster.getNode().sameNode(remoteNode)) {
+						// the node that went down was hosting the master service.
+						// We need to check if we are the logical next master and if so, become master. If a different, active node
+						// is the next master, change to the new master
+						
+						IRemoteService nextMaster = null;
+						for (IRemoteService rs : csWrapper.getRemoteServices()) {
+							if (rs.getServiceStatus() != ClusterServiceStatus.NO_SUCH_SERVICE &&
+								rs.getNode().getStatus() == NodeStatus.CONNECTED) {
+								// the node is active
+								
+								if (rs.getNode().getMasterPriority() > myMasterPrio && (nextMaster == null || rs.getNode().getMasterPriority() > nextMaster.getNode().getMasterPriority())) {
+									nextMaster = rs;
+								}
+							}
+						}
+						
+						if (nextMaster == null) {
+							// either no other node exists or we have the highest master priority of all remaining active tasks
+							csWrapper.getClusterService().obtainMasterRole(null);
+							csWrapper.setMasterService(null);
+						} else {
+							// simply point to the newly identified master node. We assume that the other node
+							// also experienced the connection loss to the old master, so the new master node will
+							// obtain the master role by itself.
+							((RemoteService)nextMaster).setServiceStatus(ClusterServiceStatus.ACTIVE_MASTER);
+							csWrapper.setMasterService(nextMaster);
+						}
+						
+					}
+				}
+
+			}
 		}
 		
 	}

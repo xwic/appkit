@@ -202,6 +202,7 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 	public void onConnectionLost() {
 		if (remoteNode != null) {
 			remoteNode._disconnected();
+			cluster.nodeDisconnected(remoteNode);
 		}
 	}
 	
