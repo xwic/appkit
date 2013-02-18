@@ -400,13 +400,12 @@ public class UserConfigHandler {
 				
 				for (Column col : model.getColumns()) {
 					ColumnConfigurationWrapper colConfig = deserializer.getColumnConfiguration(col.getId());
-					// if it's null, it means it's a new column, which did not exist
-					// when the user configuration was created. We display it by
-					// default, so the users see it exists, they can take it out after
-					if (colConfig == null) {
-						col.setVisible(true);
+					
+					 if (colConfig == null) {
+						// AI 18-FEB-2013: no longer add new columns as visible by default
+						// col.setVisible(true);
 						continue;
-					}
+					 }
 					
 					col.setWidth(colConfig.size);
 					col.setVisible(colConfig.visible);
