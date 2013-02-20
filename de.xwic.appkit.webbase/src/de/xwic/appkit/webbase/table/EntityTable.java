@@ -217,6 +217,7 @@ public class EntityTable extends ControlContainer {
 				col.setWidth(event.getTableColumn().getWidth());
 				
 				model.getUserConfigHandler().setConfigDirty(true);
+				model.getUserConfigHandler().saveCurrentDataToMainConfig();
 			}
 			
 			@Override
@@ -381,9 +382,9 @@ public class EntityTable extends ControlContainer {
 	@Override
 	public void destroy() {
 		
-		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
-			model.getUserConfigHandler().saveCurrentDataToMainConfig();
-		}		
+//		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
+//			model.getUserConfigHandler().saveCurrentDataToMainConfig();
+//		}		
 		
 		super.destroy();
 	}
