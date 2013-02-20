@@ -15,11 +15,11 @@ import org.apache.commons.logging.LogFactory;
 
 import de.xwic.appkit.cluster.CommunicationException;
 import de.xwic.appkit.cluster.INode;
-import de.xwic.appkit.cluster.Message;
-import de.xwic.appkit.cluster.Response;
 import de.xwic.appkit.cluster.INode.NodeStatus;
+import de.xwic.appkit.cluster.Message;
 import de.xwic.appkit.cluster.NodeAddress;
 import de.xwic.appkit.cluster.NodeUnavailableException;
+import de.xwic.appkit.cluster.Response;
 
 /**
  * Holds the connection to a remote Node. 
@@ -27,6 +27,8 @@ import de.xwic.appkit.cluster.NodeUnavailableException;
  */
 public class OutboundChannel {
 
+	private final static int SOCKET_TIMEOUT = 10000; // 10 seconds
+	
 	private final Log log = LogFactory.getLog(getClass()); 
 	
 	private Socket socket = null;
@@ -136,7 +138,11 @@ public class OutboundChannel {
 	 */
 	private void openConnection() throws UnknownHostException, IOException {
 
+		
 		socket = new Socket(nodeAddress.getHostname(), nodeAddress.getPort());
+		
+//		socket.setSoTimeout(SOCKET_TIMEOUT);
+		
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream(socket.getInputStream());
 	

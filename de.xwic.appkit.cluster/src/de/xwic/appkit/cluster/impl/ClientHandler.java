@@ -50,7 +50,7 @@ public class ClientHandler implements Runnable {
 		
 		try {
 			
-			socket.setSoTimeout(10000); // set the timeout to 10 seconds.
+			//socket.setSoTimeout(10000); // set the timeout to 10 seconds.
 			
 			ObjectInputStream oIn = new ObjectInputStream(socket.getInputStream());
 			ObjectOutputStream oOut = new ObjectOutputStream(socket.getOutputStream());
