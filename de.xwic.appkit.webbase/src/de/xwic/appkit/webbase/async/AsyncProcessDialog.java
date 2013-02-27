@@ -1,5 +1,6 @@
 package de.xwic.appkit.webbase.async;
 
+import de.jwic.base.JavaScriptSupport;
 import de.jwic.ecolib.async.IAsyncProcess;
 import de.jwic.ecolib.async.IProcessListener;
 import de.jwic.ecolib.async.ProcessEvent;
@@ -13,12 +14,14 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
  * 
  * @author lippisch
  */
+@JavaScriptSupport
 public class AsyncProcessDialog extends AbstractDialogWindow {
 
 	private final IAsyncProcess process;
 	private ProcessInfo processInfo;
 	
 	private boolean autoClose = true;
+	private boolean closeMe = false;
 
 	/**
 	 * Construct a new dialog with a process. Call the start() method to
@@ -68,6 +71,13 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	}
 
 	/**
+	 * Invoked by the JavaScript if the dialog is ready to be closed.
+	 */
+	public void actionCloseDialog() {
+		close();
+	}
+	
+	/**
 	 * @param e
 	 */
 	protected void onProcessFinished(ProcessEvent e) {
@@ -80,7 +90,8 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 		}
 		
 		if (autoClose) {
-			close();
+			closeMe = true;
+			requireRedraw();
 		} else {
 			btCancel.setEnabled(true);
 			btCancel.setTitle("Close");
@@ -120,6 +131,20 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	 */
 	public void setAutoClose(boolean autoClose) {
 		this.autoClose = autoClose;
+	}
+
+	/**
+	 * @return the closeMe
+	 */
+	public boolean isCloseMe() {
+		return closeMe;
+	}
+
+	/**
+	 * @param closeMe the closeMe to set
+	 */
+	public void setCloseMe(boolean closeMe) {
+		this.closeMe = closeMe;
 	}
 
 }
