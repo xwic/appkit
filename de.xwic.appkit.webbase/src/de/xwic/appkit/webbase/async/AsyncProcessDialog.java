@@ -22,6 +22,7 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	
 	private boolean autoClose = true;
 	private boolean closeMe = false;
+	private AsyncProcessControlHelper pcHelper;
 
 	/**
 	 * Construct a new dialog with a process. Call the start() method to
@@ -50,6 +51,8 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 		processInfo = new ProcessInfo(content, "processInfo");
 		processInfo.setProgressMonitor(process.getMonitor());
 		
+		pcHelper = new AsyncProcessControlHelper(content, "controller", this);
+		
 	}
 	
 	/**
@@ -71,31 +74,23 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	}
 
 	/**
-	 * Invoked by the JavaScript if the dialog is ready to be closed.
-	 */
-	public void actionCloseDialog() {
-		close();
-	}
-	
-	/**
 	 * @param e
 	 */
 	protected void onProcessFinished(ProcessEvent e) {
-		processInfo.globalRefresh();
-		processInfo.stopRefresh();
-		
 		if (process.getResult() instanceof Throwable) { // an error occured
 			autoClose = false;
 			getSessionContext().notifyMessage("Error: " + process.getResult(), "xwic-notify-warning");
 		}
 		
 		if (autoClose) {
-			closeMe = true;
-			requireRedraw();
+			pcHelper.setDestroyNow(true);
 		} else {
 			btCancel.setEnabled(true);
 			btCancel.setTitle("Close");
 		}
+
+		processInfo.globalRefresh();
+		processInfo.stopRefresh();
 		
 	}
 
