@@ -15,6 +15,8 @@ public class Response implements Serializable {
 	private String reason = null;
 	private Serializable data = null;
 	
+	private long responseTo = 0;
+	
 	/**
 	 * @param success
 	 */
@@ -70,6 +72,22 @@ public class Response implements Serializable {
 	@Override
 	public String toString() {
 		return (success ? "Success" : "Failed") + (reason != null ? " (" + reason + ")" : "");
+	}
+
+
+	/**
+	 * @return the responseTo
+	 */
+	public long getResponseTo() {
+		return responseTo;
+	}
+
+
+	/**
+	 * @param responseTo the responseTo to set
+	 */
+	public void setResponseTo(long responseTo) {
+		this.responseTo = responseTo;
 	}
 	
 }

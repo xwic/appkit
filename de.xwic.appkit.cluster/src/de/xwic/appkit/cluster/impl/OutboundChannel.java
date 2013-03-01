@@ -161,6 +161,10 @@ public class OutboundChannel {
 			out.writeObject(message);
 			
 			Response response = (Response)in.readObject();
+			if (response.getResponseTo() != 0 && response.getResponseTo() != message.getMessageId()) {
+				// the response is not the one we expected
+				throw new CommunicationException("Communication out of sync. Expected response to " + message.getMessageId() + " but received response #" + response.getResponseTo());
+			}
 			return response;
 		} catch (StreamCorruptedException sce) {
 			// so the stream is corrupt.. disconnect the node and try to reconnect

@@ -89,6 +89,9 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 				
 			}
 		}
+		if (res != null) {
+			res.setResponseTo(inMessage.getMessageId());
+		}
 		return res;
 	}
 	/**
