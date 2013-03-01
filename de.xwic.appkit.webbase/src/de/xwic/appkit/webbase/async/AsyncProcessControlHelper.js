@@ -1,7 +1,8 @@
 
 {
+	
 	afterUpdate: function(element) {
-		#if($control.closeMe)
+		#if($control.destroyNow)
 			JWic.fireAction('$control.controlID', 'closeDialog', '');
 		#end
 	}
