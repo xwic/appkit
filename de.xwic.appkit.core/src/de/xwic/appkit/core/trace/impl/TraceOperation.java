@@ -12,11 +12,11 @@ import de.xwic.appkit.core.trace.ITraceOperation;
  */
 public class TraceOperation implements ITraceOperation {
 
-	private long startTime;
-	private long endTime = 0;
+	protected long startTime;
+	protected long endTime = 0;
 	
-	private String name = null;
-	private String info = null;
+	protected String name = null;
+	protected String info = null;
 	
 	/**
 	 * Start a new duration based on the current system time.

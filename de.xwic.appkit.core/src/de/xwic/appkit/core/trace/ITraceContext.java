@@ -5,7 +5,9 @@
 
 package de.xwic.appkit.core.trace;
 
+import java.util.List;
 import java.util.Map;
+
 
 /**
  * @author lippisch
@@ -67,5 +69,16 @@ public interface ITraceContext extends ITraceOperation {
 	/**
 	 * @return the attributes
 	 */
-	public Map<String, String> getAttributes();	
+	public Map<String, String> getAttributes();
+
+	/**
+	 * Take a stack trace snapshot and add it to the list.
+	 */
+	public abstract void doStackTraceSnapShot();
+	
+	/**
+	 * Returns the list of SnapShots taken.
+	 * @return
+	 */
+	public List<StackTraceSnapShot> getStackTraceSnapShots();
 }

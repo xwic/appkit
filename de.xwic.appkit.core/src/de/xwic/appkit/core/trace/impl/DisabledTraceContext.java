@@ -5,12 +5,15 @@
 
 package de.xwic.appkit.core.trace.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.xwic.appkit.core.trace.ITraceCategory;
 import de.xwic.appkit.core.trace.ITraceContext;
 import de.xwic.appkit.core.trace.ITraceOperation;
+import de.xwic.appkit.core.trace.StackTraceSnapShot;
 
 /**
  * This ITraceContext implementation is used when the Trace is disabled. It does not 
@@ -147,5 +150,20 @@ public class DisabledTraceContext extends DisabledTraceOperation implements ITra
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#getEndTime()
 	 */
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.trace.ITraceContext#doStackTraceSnapShot()
+	 */
+	@Override
+	public void doStackTraceSnapShot() {
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.trace.ITraceContext#getStackTraceSnapShots()
+	 */
+	@Override
+	public List<StackTraceSnapShot> getStackTraceSnapShots() {
+		return new ArrayList<StackTraceSnapShot>();
+	}
 	
 }
