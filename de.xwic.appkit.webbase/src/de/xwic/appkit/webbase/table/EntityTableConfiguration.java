@@ -4,6 +4,7 @@
 package de.xwic.appkit.webbase.table;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.core.dao.IEntity;
@@ -19,6 +20,7 @@ public class EntityTableConfiguration {
 	private PropertyQuery baseFilter = null;
 	private PropertyQuery defaultFilter = null;
 	private Locale locale;
+	private TimeZone timeZone;
 	
 	/**
 	 * 
@@ -92,5 +94,19 @@ public class EntityTableConfiguration {
 	 */
 	public void setLocale(Locale locale) {
 		this.locale = locale;
+	}
+
+	/**
+	 * @return the timeZone
+	 */
+	public TimeZone getTimeZone() {
+		return timeZone;
+	}
+
+	/**
+	 * @param timeZone the timeZone to set
+	 */
+	public void setTimeZone(TimeZone timeZone) {
+		this.timeZone = timeZone;
 	}
 }

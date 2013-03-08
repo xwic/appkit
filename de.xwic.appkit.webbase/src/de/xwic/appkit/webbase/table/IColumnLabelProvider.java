@@ -6,6 +6,7 @@
 package de.xwic.appkit.webbase.table;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 import de.jwic.ecolib.tableviewer.CellLabel;
 import de.xwic.appkit.core.config.list.ListColumn;
@@ -28,7 +29,7 @@ public interface IColumnLabelProvider {
 	 * @param locale
 	 * @param column
 	 */
-	public void initialize(Locale locale, Column column);
+	public void initialize(TimeZone timeZone, Locale locale, Column column);
 	
 	/**
 	 * Create the cell from the given row data object.

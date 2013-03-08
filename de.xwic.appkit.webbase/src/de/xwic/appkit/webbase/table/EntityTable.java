@@ -59,6 +59,8 @@ public class EntityTable extends ControlContainer {
 		super(container, name);
 		
 		configuration.setLocale(container.getSessionContext().getLocale());
+		configuration.setTimeZone(container.getSessionContext().getTimeZone());
+		
 		model = new EntityTableModel(configuration);
 		
 		// Register listener to act on updates and refresh properly
