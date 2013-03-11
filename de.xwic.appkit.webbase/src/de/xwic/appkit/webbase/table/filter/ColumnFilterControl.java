@@ -47,6 +47,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	private DefaultFilter defFilter = null;
 	private PicklistFilter plFilter = null;
 	private DateFilter dateFilter = null;
+	private NumberFilter numFilter = null;
 	private LabelControl lblNoFilter = null;
 	private AbstractFilterControl currentFilter = null;
 	private BooleanFilter bolFilter = null;
@@ -90,6 +91,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		dateFilter.addListener(this);
 		bolFilter = new BooleanFilter(filterStack, "bolFilter");
 		bolFilter.addListener(this);
+		numFilter = new NumberFilter(filterStack, "numFilter");
+		numFilter.addListener(this);
 	}
 
 	/**
@@ -377,6 +380,10 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					btSortUp.setTitle("Sort False to True ");
 					btSortDown.setTitle("Sort True to False");
 					rdToogleBlanks.setVisible(false);
+				} else if ("int".equals(finalProperty.getEntityType()) || "java.lang.Integer".equals(finalProperty.getEntityType())) {
+					currentFilter = numFilter;
+					btSortUp.setTitle("Sort 0-9");
+					btSortDown.setTitle("Sort 9-0");
 				} else if (finalProperty.isCollection()) {
 					btSortUp.setVisible(false);
 					btSortDown.setVisible(false);
