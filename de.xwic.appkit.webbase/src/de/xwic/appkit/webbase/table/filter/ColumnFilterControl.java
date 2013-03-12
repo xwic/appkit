@@ -402,7 +402,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					btSortUp.setTitle("Sort False to True ");
 					btSortDown.setTitle("Sort True to False");
 					rdToogleBlanks.setVisible(false);
-				} else if ("int".equals(finalProperty.getEntityType()) || "java.lang.Integer".equals(finalProperty.getEntityType())) {
+				} else if (/*"int".equals(finalProperty.getEntityType()) || 
+						"java.lang.Integer".equals(finalProperty.getEntityType()) ||*/
+						"java.lang.Double".equals(finalProperty.getEntityType())) {
 					currentFilter = numFilter;
 					btSortUp.setTitle("Sort 0-9");
 					btSortDown.setTitle("Sort 9-0");

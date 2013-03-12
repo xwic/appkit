@@ -34,7 +34,7 @@ public class NumberFilter extends AbstractFilterControl {
 		ddLogic.addElement(">", "gt");
 		ddLogic.addElement(">=", "gte");
 		ddLogic.addElement("Between", "in");
-		ddLogic.setWidth(150);
+		ddLogic.setWidth(200);
 		
 		ddLogic.selectedByKey("in");
 		ddLogic.addElementSelectedListener(new ElementSelectedListener() {
@@ -45,10 +45,10 @@ public class NumberFilter extends AbstractFilterControl {
 		});
 
 		inpNumberFrom = new InputBoxControl(this, "inpNumberFrom");
-		inpNumberFrom.setWidth(50);
+		inpNumberFrom.setWidth(70);
 		
 		inpNumberTo = new InputBoxControl(this, "inpNumberTo");
-		inpNumberTo.setWidth(50);
+		inpNumberTo.setWidth(70);
 		
 		lblTo = new LabelControl(this, "lblTo");
 		lblTo.setText("and");
@@ -94,7 +94,7 @@ public class NumberFilter extends AbstractFilterControl {
 				}
 			} else {
 				Object value = queryElement.getValue();
-				if (value instanceof Integer) {
+				if (value instanceof Integer || value instanceof Double) {
 					inpNumberFrom.setText(String.valueOf(value));
 					String operation = queryElement.getOperation();
 					if (QueryElement.LOWER_THEN.equals(operation)) {
@@ -121,19 +121,18 @@ public class NumberFilter extends AbstractFilterControl {
 	@Override
 	public QueryElement getQueryElement() {
 		QueryElement qe = null;
-		Integer from = null;
-		Integer to = null;
+		Double from = null;
+		Double to = null;
 		String property = column.getListColumn().getPropertyId();
 		try {
-			from = Integer.parseInt(inpNumberFrom.getText());
+			from = Double.parseDouble(inpNumberFrom.getText());
 		} catch(NumberFormatException e) {
 			
 		}
 		if (from != null && property != null) {
 			String logic = ddLogic.getSelectedKey();
-			String operation = null;
 			try {
-				to = Integer.parseInt(inpNumberTo.getText());
+				to = Double.parseDouble(inpNumberTo.getText());
 			} catch(NumberFormatException e) {
 				
 			}
