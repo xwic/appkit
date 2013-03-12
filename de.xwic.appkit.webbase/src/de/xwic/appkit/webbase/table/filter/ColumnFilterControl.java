@@ -112,6 +112,17 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		return height;
 		
 	}
+	
+	/**
+	 * Returns the width of the filter control
+	 * @return
+	 */
+	public int getWidth() {
+		if (currentFilter != null) {
+			return currentFilter.getPreferredWidth() + 40;
+		}
+		return 300;
+	}
 
 	/**
 	 * Returns the height of the filter.
@@ -123,6 +134,17 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		} else {
 			return currentFilter.getPreferredHeight();
 		}
+	}
+	
+	/**
+	 * Returns the width of the filter
+	 * @return
+	 */
+	public int getFilterWidth() {
+		if (currentFilter != null) {
+			return currentFilter.getPreferredWidth();
+		}
+		return 264;
 	}
 	
 	/**

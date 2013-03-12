@@ -18,7 +18,7 @@
 			// open the window
 			
 			// find the column
-			var myWidth = 300;
+			var myWidth = $control.getWidth();
 			var top = 0;
 			var left = 0;
 			var header = $("tblViewData_${control.tableViewerId}");
