@@ -170,7 +170,7 @@ public class ColumnsConfigurationSerializer {
 				
 				sb.append("<").append(COLLECTION_ELEM).append(">").append(queryElement.isCollectionElement() ? "y" : "n").append("</").append(COLLECTION_ELEM).append(">");
 				sb.append("<").append(PROPERTY).append(">").append(queryElement.getPropertyName()).append("</").append(PROPERTY).append(">");
-				sb.append("<").append(OPERATION).append(">").append(queryElement.getOperation()).append("</").append(OPERATION).append(">");
+				sb.append("<").append(OPERATION).append(">").append(escapeOperation(queryElement.getOperation())).append("</").append(OPERATION).append(">");
 				sb.append("<").append(VALUE).append(">").append(serializeValue(queryElement)).append("</").append(VALUE).append(">");
 				
 			}
@@ -235,6 +235,10 @@ public class ColumnsConfigurationSerializer {
 		}
 	}
 	
+	
+	private String escapeOperation(String op) {
+		return op.replace("<", "&lt;").replace(">", "&gt;");
+	}
 	/**
 	 * @return the columns
 	 */
