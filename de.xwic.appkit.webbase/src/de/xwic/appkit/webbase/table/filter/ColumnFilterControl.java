@@ -54,8 +54,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	private AbstractFilterControl customFilter = null;
 	private IFilterControlCreator customFilterCreator = null;
 	private ColumnAction btFilterClear;
-	private ColumnAction btSortUp;
-	private ColumnAction btSortDown;
+	// make these protected so we can  hide them when we want from the custom filter
+	protected ColumnAction btSortUp;
+	protected ColumnAction btSortDown;
 
 	private RadioGroupControl rdToogleBlanks;
 	
@@ -364,8 +365,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 			fcc = EntityTableExtensionHelper.getFieldColumnFilterControl(fieldName);
 			
 			// if not found and the property is an entity, look for a custom filter control for the entity type
+			String entityType = finalProperty.getEntityType();
 			if (fcc == null && finalProperty.isEntity()) {
-				fcc = EntityTableExtensionHelper.getEntityColumnFilterControl(finalProperty.getEntityType());
+				fcc = EntityTableExtensionHelper.getEntityColumnFilterControl(entityType);
 			}
 
 			if(fcc != null){
@@ -393,18 +395,18 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					}
 					btSortUp.setTitle("Sort A-Z, 0-9");
 					btSortDown.setTitle("Sort Z-A, 9-0");
-				} else if ("java.util.Date".equals(finalProperty.getEntityType())) {
+				} else if ("java.util.Date".equals(entityType)) {
 					currentFilter = dateFilter;
 					btSortUp.setTitle("Sort Oldest to Newest");
 					btSortDown.setTitle("Sort Newest to Oldest");
-				} else if ("java.lang.Boolean".equals(finalProperty.getEntityType()) || "boolean".equals(finalProperty.getEntityType())) {
+				} else if ("java.lang.Boolean".equals(entityType) || "boolean".equals(entityType)) {
 					currentFilter = bolFilter;
 					btSortUp.setTitle("Sort False to True ");
 					btSortDown.setTitle("Sort True to False");
 					rdToogleBlanks.setVisible(false);
-				} else if (/*"int".equals(finalProperty.getEntityType()) || 
-						"java.lang.Integer".equals(finalProperty.getEntityType()) ||*/
-						"java.lang.Double".equals(finalProperty.getEntityType())) {
+				} else if ("int".equals(entityType) || "java.lang.Integer".equals(entityType) ||
+						"long".equals(entityType) || "java.lang.Long".equals(entityType) ||
+						"double".equals(entityType) || "java.lang.Double".equals(entityType)) {
 					currentFilter = numFilter;
 					btSortUp.setTitle("Sort 0-9");
 					btSortDown.setTitle("Sort 9-0");

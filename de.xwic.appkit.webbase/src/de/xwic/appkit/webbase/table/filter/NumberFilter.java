@@ -24,6 +24,10 @@ public class NumberFilter extends AbstractFilterControl {
 	private final InputBoxControl inpNumberTo;
 	private final LabelControl lblTo;
 	
+	/**
+	 * @param container
+	 * @param name
+	 */
 	public NumberFilter(IControlContainer container, String name) {
 		super(container, name);
 
@@ -56,6 +60,9 @@ public class NumberFilter extends AbstractFilterControl {
 		onLogicUpdate();
 	}
 
+	/**
+	 * 
+	 */
 	protected void onLogicUpdate() {
 		
 		String logic = ddLogic.getSelectedKey();
@@ -121,18 +128,31 @@ public class NumberFilter extends AbstractFilterControl {
 	@Override
 	public QueryElement getQueryElement() {
 		QueryElement qe = null;
-		Double from = null;
-		Double to = null;
+		Object from = null;
+		Object to = null;
 		String property = column.getListColumn().getPropertyId();
+		String type = column.getListColumn().getFinalProperty().getEntityType();
 		try {
-			from = Double.parseDouble(inpNumberFrom.getText());
+			if ("java.lang.Integer".equals(type) || "int".equals(type)) {
+				from = Integer.parseInt(inpNumberFrom.getText());
+			} else if ("java.lang.Double".equals(type) || "double".equals(type)) {
+				from = Double.parseDouble(inpNumberFrom.getText());
+			} else if ("java.lang.Long".equals(type) || "long".equals(type)) {
+				from = Long.parseLong(inpNumberFrom.getText());
+			}
 		} catch(NumberFormatException e) {
 			
 		}
 		if (from != null && property != null) {
 			String logic = ddLogic.getSelectedKey();
 			try {
-				to = Double.parseDouble(inpNumberTo.getText());
+				if ("java.lang.Integer".equals(type) || "int".equals(type)) {
+					to = Integer.parseInt(inpNumberTo.getText());
+				} else if ("java.lang.Double".equals(type) || "double".equals(type)) {
+					to = Double.parseDouble(inpNumberTo.getText());
+				} else if ("java.lang.Long".equals(type) || "long".equals(type)) {
+					to = Long.parseLong(inpNumberTo.getText());
+				}
 			} catch(NumberFormatException e) {
 				
 			}
@@ -141,8 +161,8 @@ public class NumberFilter extends AbstractFilterControl {
 					logic = "gt";
 				} else {
 					PropertyQuery query = new PropertyQuery();
-					query.addGreaterThen(property, from);
-					query.addLowerThen(property, to);
+					query.addGreaterEqualsThen(property, from);
+					query.addLowerEqualsThen(property, to);
 					qe = new QueryElement(QueryElement.AND, query);
 				}
 			}
