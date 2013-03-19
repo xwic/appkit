@@ -403,7 +403,7 @@ public class UserConfigHandler {
 					
 					 if (colConfig == null) {
 						// AI 18-FEB-2013: no longer add new columns as visible by default
-						// col.setVisible(true);
+						col.setVisible(false);
 						continue;
 					 }
 					
