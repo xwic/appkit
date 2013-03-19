@@ -19,6 +19,8 @@ import de.jwic.ecolib.tableviewer.TableColumn;
 import de.jwic.ecolib.tableviewer.TableViewer;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
+import de.jwic.events.KeyEvent;
+import de.jwic.events.KeyListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.model.Property;
@@ -94,6 +96,13 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		bolFilter.addListener(this);
 		numFilter = new NumberFilter(filterStack, "numFilter");
 		numFilter.addListener(this);
+		numFilter.addKeyPressedListener(new KeyListener() {
+			
+			@Override
+			public void keyPressed(KeyEvent event) {
+				actionOk();
+			}
+		});
 	}
 
 	/**
@@ -217,8 +226,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		});
 		
 		rdToogleBlanks = new RadioGroupControl(this, "rdToogleBlanks");
-		rdToogleBlanks.addElement("Is Not Null/Blank", "notNull");
-		rdToogleBlanks.addElement("Is Null/Blank", "null");
+		rdToogleBlanks.addElement("Is Not Empty", "notNull");
+		rdToogleBlanks.addElement("Is Empty", "null");
 		rdToogleBlanks.addElement("All", "all");
 		rdToogleBlanks.setSelectedKey("all");
 		rdToogleBlanks.setChangeNotification(true);
@@ -408,6 +417,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 						"long".equals(entityType) || "java.lang.Long".equals(entityType) ||
 						"double".equals(entityType) || "java.lang.Double".equals(entityType)) {
 					currentFilter = numFilter;
+				
 					btSortUp.setTitle("Sort 0-9");
 					btSortDown.setTitle("Sort 9-0");
 				} else if (finalProperty.isCollection()) {
