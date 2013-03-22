@@ -6,6 +6,7 @@
 package de.xwic.appkit.webbase.table;
 
 import java.util.Locale;
+import java.util.TimeZone;
 
 import de.xwic.appkit.core.config.list.ListColumn;
 import de.xwic.appkit.core.dao.IEntity;
@@ -45,7 +46,7 @@ public class Column implements Comparable<Column> {
 	 * @param lc
 	 */
 	@SuppressWarnings("unchecked")
-	public Column(Locale locale, ListColumn listColumn, Class<? extends IEntity> entityClazz) {
+	public Column(TimeZone timeZone, Locale locale, ListColumn listColumn, Class<? extends IEntity> entityClazz) {
 		this.listColumn = listColumn;
 		this.entityClazz = entityClazz;
 		id = listColumn.getPropertyId();
@@ -70,7 +71,7 @@ public class Column implements Comparable<Column> {
 				throw new RuntimeException("Error creating column label provider " + listColumn.getCustomLabelProviderClass() + ": " + e, e);
 			} 
 		}
-		columnLabelProvider.initialize(locale, this);
+		columnLabelProvider.initialize(timeZone, locale, this);
 		
 	}
 

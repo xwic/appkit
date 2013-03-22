@@ -59,6 +59,8 @@ public class EntityTable extends ControlContainer {
 		super(container, name);
 		
 		configuration.setLocale(container.getSessionContext().getLocale());
+		configuration.setTimeZone(container.getSessionContext().getTimeZone());
+		
 		model = new EntityTableModel(configuration);
 		
 		// Register listener to act on updates and refresh properly
@@ -217,6 +219,7 @@ public class EntityTable extends ControlContainer {
 				col.setWidth(event.getTableColumn().getWidth());
 				
 				model.getUserConfigHandler().setConfigDirty(true);
+				model.getUserConfigHandler().saveCurrentDataToMainConfig();
 			}
 			
 			@Override
@@ -381,9 +384,9 @@ public class EntityTable extends ControlContainer {
 	@Override
 	public void destroy() {
 		
-		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
-			model.getUserConfigHandler().saveCurrentDataToMainConfig();
-		}		
+//		if (model.getUserConfigHandler().isCurrentConfigDirty()) {
+//			model.getUserConfigHandler().saveCurrentDataToMainConfig();
+//		}		
 		
 		super.destroy();
 	}

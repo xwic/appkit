@@ -6,7 +6,6 @@
 package de.xwic.appkit.core.trace.impl;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +28,7 @@ import de.xwic.appkit.core.trace.ITraceCategory;
 import de.xwic.appkit.core.trace.ITraceContext;
 import de.xwic.appkit.core.trace.ITraceDataManager;
 import de.xwic.appkit.core.trace.ITraceOperation;
+import de.xwic.appkit.core.trace.StackTraceSnapShot;
 
 /**
  * Manages the results of a trace. Ops may be stored if a certain threshold is exceeded 
@@ -61,11 +61,13 @@ public class TraceDataManager implements ITraceDataManager {
 			log.info("Trace cycle exceeded threshold: " + traceContext.getDuration());
 			try {
 				if (traceLogFile != null) {
-					FileOutputStream fos = new FileOutputStream(traceLogFile, true);
-					try {
-						logContext(traceContext, fos);
-					} finally {
-						fos.close();
+					synchronized (traceLogFile) {
+						FileOutputStream fos = new FileOutputStream(traceLogFile, true);
+						try {
+							logContext(traceContext, fos);
+						} finally {
+							fos.close();
+						}
 					}
 				}
 				logContext(traceContext, System.out); // log to console
@@ -127,6 +129,29 @@ public class TraceDataManager implements ITraceDataManager {
 						}
 					}
 				}
+				
+				List<StackTraceSnapShot> snapShots = tx.getStackTraceSnapShots();
+				if (snapShots.size() > 0) {
+					pw.println();
+					pw.println("SnapShots taken:");
+					StringBuilder sb = new StringBuilder();
+					String previous = null;
+					for (StackTraceSnapShot ss : snapShots) {
+						sb.setLength(0);
+						pw.println("StackTrace at " + (ss.getSnapShotTime() - start) + "ms");
+						for (StackTraceElement elm : ss.getStackTrace()) {
+							sb.append("  " + elm.getClassName() + "." + elm.getMethodName() + "(..):" + elm.getLineNumber()).append("\n");
+						}
+						if (sb.toString().equals(previous)) {
+							pw.println("[ SAME AS PREVIOUS Stack Trace ]");
+						} else {
+							previous = sb.toString();
+							pw.print(previous);
+						}
+						pw.println("----");
+					}
+				}
+				
 				
 			}
 			pw.flush();

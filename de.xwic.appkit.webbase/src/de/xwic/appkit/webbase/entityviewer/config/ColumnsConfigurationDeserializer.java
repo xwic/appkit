@@ -153,6 +153,7 @@ public class ColumnsConfigurationDeserializer {
 				el = qeElement.element(ColumnsConfigurationSerializer.PROPERTY);
 				result.setPropertyName(el.getTextTrim());
 				
+				// apparently we don't need to unescape the operations (<, >)
 				el = qeElement.element(ColumnsConfigurationSerializer.OPERATION);
 				result.setOperation(el.getTextTrim());
 				

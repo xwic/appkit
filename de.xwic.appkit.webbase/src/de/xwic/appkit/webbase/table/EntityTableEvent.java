@@ -14,6 +14,8 @@ public class EntityTableEvent {
 	private Object source = null;
 	private Column column = null;
 	
+	private boolean clearedFilters = false;
+	private boolean columnFilterSetFromQuickFilter;
 	
 	/**
 	 * @param source
@@ -21,6 +23,17 @@ public class EntityTableEvent {
 	public EntityTableEvent(Object source) {
 		super();
 		this.source = source;
+	}
+	
+	/**
+	 * @param source
+	 * @param clearedFilters
+	 */
+	public EntityTableEvent(Object source, boolean clearedFilters, boolean columnFilterSetFromQuickFilter) {
+		super();
+		this.source = source;
+		this.clearedFilters = clearedFilters;
+		this.columnFilterSetFromQuickFilter = columnFilterSetFromQuickFilter;
 	}
 
 	/**
@@ -47,5 +60,18 @@ public class EntityTableEvent {
 		return column;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean isClearedFilters() {
+		return clearedFilters;
+	}
+	
+	/**
+	 * @return
+	 */
+	public boolean isColumnFilterSetFromQuickFilter() {
+		return columnFilterSetFromQuickFilter;
+	}
 
 }

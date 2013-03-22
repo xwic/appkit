@@ -1,5 +1,6 @@
 package de.xwic.appkit.webbase.async;
 
+import de.jwic.base.JavaScriptSupport;
 import de.jwic.ecolib.async.IAsyncProcess;
 import de.jwic.ecolib.async.IProcessListener;
 import de.jwic.ecolib.async.ProcessEvent;
@@ -13,12 +14,15 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
  * 
  * @author lippisch
  */
+@JavaScriptSupport
 public class AsyncProcessDialog extends AbstractDialogWindow {
 
 	private final IAsyncProcess process;
 	private ProcessInfo processInfo;
 	
 	private boolean autoClose = true;
+	private boolean closeMe = false;
+	private AsyncProcessControlHelper pcHelper;
 
 	/**
 	 * Construct a new dialog with a process. Call the start() method to
@@ -47,6 +51,8 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 		processInfo = new ProcessInfo(content, "processInfo");
 		processInfo.setProgressMonitor(process.getMonitor());
 		
+		pcHelper = new AsyncProcessControlHelper(content, "controller", this);
+		
 	}
 	
 	/**
@@ -71,20 +77,20 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	 * @param e
 	 */
 	protected void onProcessFinished(ProcessEvent e) {
-		processInfo.globalRefresh();
-		processInfo.stopRefresh();
-		
 		if (process.getResult() instanceof Throwable) { // an error occured
 			autoClose = false;
 			getSessionContext().notifyMessage("Error: " + process.getResult(), "xwic-notify-warning");
 		}
 		
 		if (autoClose) {
-			close();
+			pcHelper.setDestroyNow(true);
 		} else {
 			btCancel.setEnabled(true);
 			btCancel.setTitle("Close");
 		}
+
+		processInfo.globalRefresh();
+		processInfo.stopRefresh();
 		
 	}
 
@@ -120,6 +126,20 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	 */
 	public void setAutoClose(boolean autoClose) {
 		this.autoClose = autoClose;
+	}
+
+	/**
+	 * @return the closeMe
+	 */
+	public boolean isCloseMe() {
+		return closeMe;
+	}
+
+	/**
+	 * @param closeMe the closeMe to set
+	 */
+	public void setCloseMe(boolean closeMe) {
+		this.closeMe = closeMe;
 	}
 
 }

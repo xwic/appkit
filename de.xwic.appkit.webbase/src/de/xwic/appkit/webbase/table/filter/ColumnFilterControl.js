@@ -7,6 +7,7 @@
 	/**
 	 * Initialize the window if it does not already exist.
 	 */
+	 
 	afterUpdate: function(element) {
 		//var win = jQuery('#'+JQryEscape('win_${control.controlID}_div'));	
 		var dialogWidth = 300;

@@ -13,6 +13,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
+import de.xwic.appkit.core.util.Equals;
 import de.xwic.appkit.webbase.core.Platform;
 import de.xwic.appkit.webbase.entityviewer.config.ColumnsConfigurationDeserializer.ColumnConfigurationWrapper;
 import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
@@ -38,6 +39,7 @@ public class UserConfigHandler {
 	private int newMaxRows;
 	
 	private boolean listenToDirtyChanged = false;
+	private boolean listenToConfigUpdateCalls = false;
 	
 	private EntityTableModel model;
 	
@@ -95,6 +97,9 @@ public class UserConfigHandler {
 		// the user config handler should only now start to listen to the model, because before default filters might've been set 
 		// and we don't want the config to appear dirty even if it's not
 		listenToDirtyChanged = true;
+		
+		// same thing as for above, but for the DB update of the config
+		listenToConfigUpdateCalls = true;
 	}
 	
 	/**
@@ -162,22 +167,22 @@ public class UserConfigHandler {
 		
 		ColumnsConfigurationSerializer serializer = new ColumnsConfigurationSerializer(model);
 		
-		if (!serializer.getColumns().equals(uvc.getColumnsConfiguration())) {
+		if (!Equals.equalNonNullAndTrim(serializer.getColumns(), uvc.getColumnsConfiguration())) {
 			uvc.setColumnsConfiguration(serializer.getColumns());
 			changed = true;
 		}
 		
-		if (!serializer.getSortField().equals(uvc.getSortField())) {
+		if (!Equals.equalNonNullAndTrim(serializer.getSortField(), uvc.getSortField())) {
 			uvc.setSortField(serializer.getSortField());
 			changed = true;
 		}
 		
-		if (!serializer.getSortDirection().equals(uvc.getSortDirection())) {
+		if (!Equals.equalNonNullAndTrim(serializer.getSortDirection(), uvc.getSortDirection())) {
 			uvc.setSortDirection(serializer.getSortDirection());
 			changed = true;
 		}
 		
-		if (!serializer.getFilters().equals(uvc.getFiltersConfiguration())) {
+		if (!Equals.equalNonNullAndTrim(serializer.getFilters(), uvc.getFiltersConfiguration())) {
 			uvc.setFiltersConfiguration(serializer.getFilters());
 			changed = true;
 		}
@@ -214,7 +219,14 @@ public class UserConfigHandler {
 	 * 
 	 */
 	public void resetConfig() {
-		try {							
+		
+		boolean originalListenToConfigUpdateCalls = listenToConfigUpdateCalls;
+		boolean originalListenToDirtyChanged = listenToDirtyChanged;
+		
+		listenToConfigUpdateCalls = false;
+		listenToDirtyChanged = false;
+		
+		try {	
 			model.initModel(true);
 			deleteMainConfig();
 			
@@ -225,6 +237,10 @@ public class UserConfigHandler {
 			model.fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
 		} catch (ConfigurationException e) {
 			throw new RuntimeException("Can not create EntityTable: " + e, e);
+		} finally {
+			listenToConfigUpdateCalls = originalListenToConfigUpdateCalls;
+			listenToDirtyChanged = originalListenToDirtyChanged;
+			setConfigDirty(false); // if we reset the config, it's no longer dirty
 		}
 	}
 	
@@ -286,39 +302,52 @@ public class UserConfigHandler {
 	 * 
 	 */
 	public void saveCurrentDataToMainConfig() {
+		if (!listenToConfigUpdateCalls) {
+			return;
+		}
+		
 		mainConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getId());
 		storeCurrentData(mainConfig, true);
 	}
 	
 	/**
-	 * 
+	 * @param undoChanges
 	 */
 	public void updateRelatedConfig(boolean undoChanges) {
 		
-		if (mainConfig.getRelatedConfiguration() == null) {
+		boolean originalListenToConfigUpdateCalls = listenToConfigUpdateCalls;
+		
+		listenToConfigUpdateCalls = false;
+		
+		try {		
+			if (mainConfig.getRelatedConfiguration() == null) {
+				
+				// if we're still on the default config, reset it all			
+				if (undoChanges) {
+					resetConfig();
+				}
+				
+				return;
+			}
+				
+			IUserViewConfiguration relatedConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getRelatedConfiguration().getId());
 			
-			// if we're still on the default config, reset it all			
-			if (undoChanges) {
-				resetConfig();
+			if (!undoChanges) {
+				storeCurrentData(relatedConfig, true);
 			}
 			
-			return;
-		}
+			transferDataToMainConfig(relatedConfig, true);
 			
-		IUserViewConfiguration relatedConfig = (IUserViewConfiguration) userConfigDao.getEntity(mainConfig.getRelatedConfiguration().getId());
-		
-		if (!undoChanges) {
-			storeCurrentData(relatedConfig, true);
+			if (undoChanges) {
+				// if we undid the changes, we need to re-apply the config
+				applyConfig(mainConfig);
+			} else {
+				// this is in an else because the same call is executed in applyConfig(mainConfig) of the if block 
+				setConfigDirty(false);
+			}
+		} finally {
+			listenToConfigUpdateCalls = originalListenToConfigUpdateCalls;
 		}
-		
-		transferDataToMainConfig(relatedConfig, true);
-		
-		if (undoChanges) {
-			// if we undid the changes, we need to re-apply the config
-			applyConfig(mainConfig);
-		}
-		
-		setConfigDirty(false);
 	}
 	
 	/**
@@ -347,61 +376,72 @@ public class UserConfigHandler {
 	 */
 	public void applyConfig(IUserViewConfiguration userConfig) {
 		
-		if (!userConfig.isMainConfiguration()) {
-			
-			// applying a configuration actually means copying its values to the main configuration			
-			transferDataToMainConfig(userConfig, true);
-			applyConfig(mainConfig);
-			
-		} else {
-			
-			// if a user config has no filters config, it means it's an old one, created before we started tracking
-			// the filters. In this case we must load the view's default filters
-			
-			boolean hasFiltersConfig = userConfig.getFiltersConfiguration() != null;
-			
-			ColumnsConfigurationDeserializer deserializer = new ColumnsConfigurationDeserializer(userConfig);
-			
-			for (Column col : model.getColumns()) {
-				ColumnConfigurationWrapper colConfig = deserializer.getColumnConfiguration(col.getId());
-				// if it's null, it means it's a new column, which did not exist
-				// when the user configuration was created. We display it by
-				// default, so the users see it exists, they can take it out after
-				if (colConfig == null) {
-					col.setVisible(true);
-					continue;
+		boolean originalListenToConfigUpdateCalls = listenToConfigUpdateCalls;
+		boolean originalListenToDirtyChanged = listenToDirtyChanged;
+		
+		listenToConfigUpdateCalls = false;
+		listenToDirtyChanged = false;
+		
+		try {
+			if (!userConfig.isMainConfiguration()) {
+				
+				// applying a configuration actually means copying its values to the main configuration			
+				transferDataToMainConfig(userConfig, true);
+				applyConfig(mainConfig);
+				
+			} else {
+				
+				// if a user config has no filters config, it means it's an old one, created before we started tracking
+				// the filters. In this case we must load the view's default filters
+				
+				boolean hasFiltersConfig = userConfig.getFiltersConfiguration() != null;
+				
+				ColumnsConfigurationDeserializer deserializer = new ColumnsConfigurationDeserializer(userConfig);
+				
+				for (Column col : model.getColumns()) {
+					ColumnConfigurationWrapper colConfig = deserializer.getColumnConfiguration(col.getId());
+					
+					 if (colConfig == null) {
+						// AI 18-FEB-2013: no longer add new columns as visible by default
+						col.setVisible(false);
+						continue;
+					 }
+					
+					col.setWidth(colConfig.size);
+					col.setVisible(colConfig.visible);
+					col.setColumnOrder(colConfig.index);
+					
+					if (col.getId().equals(deserializer.getSortField())) {
+						col.setSortState(deserializer.getSortDirection());
+					} else {
+						col.setSortState(Sort.NONE);
+					}
+					
+					if (hasFiltersConfig) {
+						col.setFilter(colConfig.filter);
+						// fire the event so that any listening quick filter controls updates themselves
+						model.fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(model, col));
+					} else {
+						col.setFilter(null);
+					}
 				}
 				
-				col.setWidth(colConfig.size);
-				col.setVisible(colConfig.visible);
-				col.setColumnOrder(colConfig.index);
-				
-				if (col.getId().equals(deserializer.getSortField())) {
-					col.setSortState(deserializer.getSortDirection());
-				} else {
-					col.setSortState(Sort.NONE);
+				if (!hasFiltersConfig) {
+					model.applyDefaultFilter();
+				//} else {
+				//	model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
 				}
 				
-				if (hasFiltersConfig) {
-					col.setFilter(colConfig.filter);
-					// fire the event so that any listening quick filter controls updates themselves
-					model.fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(model, col));
-				} else {
-					col.setFilter(null);
-				}
+				newMaxRows = userConfig.getMaxRows();
+				
+				model.buildQuery();
+				
+				model.fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
 			}
-			
-			if (!hasFiltersConfig) {
-				model.applyDefaultFilter();
-			//} else {
-			//	model.setCustomQuickFilter(deserializer.getCustomQuickFilter());
-			}
-			
-			newMaxRows = userConfig.getMaxRows();
-			
-			model.buildQuery();
-			
-			model.fireEvent(EventType.USER_CONFIGURATION_CHANGED, new EntityTableEvent(this));
+		} finally {
+			listenToConfigUpdateCalls = originalListenToConfigUpdateCalls;
+			listenToDirtyChanged = originalListenToDirtyChanged;
+			setConfigDirty(false); // since a new config has been applied, the dirty is false
 		}
 	}
 	
@@ -411,6 +451,9 @@ public class UserConfigHandler {
 	public void applyPublicConfig(IUserViewConfiguration userConfig) {
 		transferDataToMainConfig(userConfig, false);
 		applyConfig(mainConfig);
+		
+		// a public config must always set the dirty flag
+		setConfigDirty(true);
 	}
 	
 	/**
@@ -467,7 +510,7 @@ public class UserConfigHandler {
 			userConfigDao.update(mainConfig);
 		}
 		
-		model.fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
+ 		model.fireEvent(EventType.USER_CONFIGURATION_DIRTY_CHANGED, new EntityTableEvent(this));
 	}
 
 	/**
@@ -483,6 +526,7 @@ public class UserConfigHandler {
 	public void setNewMaxRows(int newMaxRows) {
 		this.newMaxRows = newMaxRows;
 		setConfigDirty(true);
+		saveCurrentDataToMainConfig();
 	}
 	
 	/**

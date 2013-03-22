@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,6 +61,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	protected PropertyEditor propertyEditor = null;
 	protected int dataIdx = 0;
 
+	private TimeZone timeZone = null;
 	protected Locale locale = null;
 	
 	protected String myProperty = null;
@@ -70,16 +72,21 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	protected DateFormat dateFormat;
 
 	private Class<? extends IEntity> entityClass;
-	
+
+	/**
+	 * 
+	 */
 	public DefaultColumnLabelProvider() {
+		timeZone = TimeZone.getDefault();
 		locale = Locale.getDefault();
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#initialize(java.util.Locale, de.xwic.appkit.webbase.table.Column)
+	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#initialize(java.util.TimeZone, java.util.Locale, de.xwic.appkit.webbase.table.Column)
 	 */
 	@Override
-	public void initialize(Locale locale, Column col) {
+	public void initialize(TimeZone timeZone, Locale locale, Column col) {
+		this.timeZone = timeZone;
 		this.locale = locale;
 		this.column = col.getListColumn();
 		this.entityClass = col.getEntityClass();
@@ -91,15 +98,19 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		case Property.DATETYPE_DATETIME:
 			if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
 				dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+				dateFormat.setTimeZone(timeZone);
 			}else {
 				dateFormat = new SimpleDateFormat("dd-MMM-yyyy hh:mm a", locale);
+				dateFormat.setTimeZone(timeZone);
 			}
 			break;
 		case Property.DATETYPE_TIME:
 			if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
 				dateFormat = new SimpleDateFormat("HH:mm");
+				dateFormat.setTimeZone(timeZone);
 			}else {
 				dateFormat = new SimpleDateFormat("hh:mm a");
+				dateFormat.setTimeZone(timeZone);
 			}
 			break;
 		default:

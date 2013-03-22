@@ -60,24 +60,26 @@ public class HttpTraceFilter implements Filter {
 		} else {
 			
 			ITraceContext traceCtx = Trace.startTrace();
-			traceCtx.setAttribute(ATTR_REMOTE_ADDR, req.getRemoteAddr());
-			if (req instanceof HttpServletRequest) {
-				HttpServletRequest hReq = (HttpServletRequest)req;
-				traceCtx.setAttribute(ATTR_QUERY_STRING, hReq.getQueryString());
-				traceCtx.setAttribute(ATTR_METHOD, hReq.getMethod());
-				traceCtx.setAttribute(ATTR_REQUEST_URI, hReq.getRequestURI());
-				traceCtx.setAttribute(ATTR_REMOTE_USER, hReq.getRemoteUser());
-				String s = hReq.getParameter("__action");
-				if (s != null) {
-					traceCtx.setAttribute(ATTR_JWIC_ACTION, s);
-				}
-				s = hReq.getParameter("__ctrlid");
-				if (s != null) {
-					traceCtx.setAttribute(ATTR_JWIC_CONTROL, s);
-				}
-
-			}
 			try {
+				
+				traceCtx.setAttribute(ATTR_REMOTE_ADDR, req.getRemoteAddr());
+				if (req instanceof HttpServletRequest) {
+					HttpServletRequest hReq = (HttpServletRequest)req;
+					traceCtx.setAttribute(ATTR_QUERY_STRING, hReq.getQueryString());
+					traceCtx.setAttribute(ATTR_METHOD, hReq.getMethod());
+					traceCtx.setAttribute(ATTR_REQUEST_URI, hReq.getRequestURI());
+					traceCtx.setAttribute(ATTR_REMOTE_USER, hReq.getRemoteUser());
+					String s = hReq.getParameter("__action");
+					if (s != null) {
+						traceCtx.setAttribute(ATTR_JWIC_ACTION, s);
+					}
+					s = hReq.getParameter("__ctrlid");
+					if (s != null) {
+						traceCtx.setAttribute(ATTR_JWIC_CONTROL, s);
+					}
+
+				}
+				
 				chain.doFilter(req, res);
 				if (req instanceof HttpServletRequest) {
 					HttpServletRequest hReq = (HttpServletRequest)req;

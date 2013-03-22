@@ -5,18 +5,27 @@
 
 package de.xwic.appkit.webbase.table.filter;
 
+import java.util.List;
+
 import de.jwic.base.ControlContainer;
 import de.jwic.base.Event;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.JavaScriptSupport;
 import de.jwic.controls.Button;
 import de.jwic.controls.LabelControl;
+import de.jwic.controls.RadioGroupControl;
 import de.jwic.ecolib.controls.StackedContainer;
 import de.jwic.ecolib.tableviewer.TableColumn;
 import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.events.ElementSelectedEvent;
+import de.jwic.events.ElementSelectedListener;
+import de.jwic.events.KeyEvent;
+import de.jwic.events.KeyListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
+import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.webbase.table.Column;
 import de.xwic.appkit.webbase.table.EntityTableExtensionHelper;
 import de.xwic.appkit.webbase.table.EntityTableModel;
@@ -40,14 +49,19 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	private DefaultFilter defFilter = null;
 	private PicklistFilter plFilter = null;
 	private DateFilter dateFilter = null;
+	private NumberFilter numFilter = null;
 	private LabelControl lblNoFilter = null;
 	private AbstractFilterControl currentFilter = null;
 	private BooleanFilter bolFilter = null;
 	private AbstractFilterControl customFilter = null;
 	private IFilterControlCreator customFilterCreator = null;
 	private ColumnAction btFilterClear;
-	private ColumnAction btSortUp;
-	private ColumnAction btSortDown;
+	// make these protected so we can  hide them when we want from the custom filter
+	protected ColumnAction btSortUp;
+	protected ColumnAction btSortDown;
+
+	private RadioGroupControl rdToogleBlanks;
+	
 	
 	/**
 	 * @param container
@@ -80,6 +94,15 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		dateFilter.addListener(this);
 		bolFilter = new BooleanFilter(filterStack, "bolFilter");
 		bolFilter.addListener(this);
+		numFilter = new NumberFilter(filterStack, "numFilter");
+		numFilter.addListener(this);
+		numFilter.addKeyPressedListener(new KeyListener() {
+			
+			@Override
+			public void keyPressed(KeyEvent event) {
+				actionOk();
+			}
+		});
 	}
 
 	/**
@@ -91,12 +114,24 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		int height = 40; // base height
 		if (btSortDown.isVisible()) height += 26;
 		if (btSortUp.isVisible()) height += 26;
+		if (rdToogleBlanks.isVisible()) height += 28;
 		if (btFilterClear.isVisible()) height += 26;
 		
 		height += getFilterHeight();
 		
 		return height;
 		
+	}
+	
+	/**
+	 * Returns the width of the filter control
+	 * @return
+	 */
+	public int getWidth() {
+		if (currentFilter != null) {
+			return currentFilter.getPreferredWidth() + 40;
+		}
+		return 300;
 	}
 
 	/**
@@ -109,6 +144,17 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		} else {
 			return currentFilter.getPreferredHeight();
 		}
+	}
+	
+	/**
+	 * Returns the width of the filter
+	 * @return
+	 */
+	public int getFilterWidth() {
+		if (currentFilter != null) {
+			return currentFilter.getPreferredWidth();
+		}
+		return 264;
 	}
 	
 	/**
@@ -150,7 +196,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		});
 		
 		btSortUp = new ColumnAction(this, "btSortUp");
-		btSortUp.setTitle("Sort A to Z");
+		btSortUp.setTitle("Sort A to Z, 0-9");
 		btSortUp.setImage(ImageLibrary.ICON_SORT_AZ);
 		btSortUp.addSelectionListener(new SelectionListener() {
 			@Override
@@ -160,7 +206,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		});
 
 		btSortDown = new ColumnAction(this, "btSortDown");
-		btSortDown.setTitle("Sort Z to A");
+		btSortDown.setTitle("Sort Z to A, 9-0");
 		btSortDown.setImage(ImageLibrary.ICON_SORT_ZA);
 		btSortDown.addSelectionListener(new SelectionListener() {
 			@Override
@@ -178,8 +224,28 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 				actionClearFilter();
 			}
 		});
-
 		
+		rdToogleBlanks = new RadioGroupControl(this, "rdToogleBlanks");
+		rdToogleBlanks.addElement("Is Not Empty", "notNull");
+		rdToogleBlanks.addElement("Is Empty", "null");
+		rdToogleBlanks.addElement("All", "all");
+		rdToogleBlanks.setSelectedKey("all");
+		rdToogleBlanks.setChangeNotification(true);
+		rdToogleBlanks.setCssClass(".radioButton");
+		rdToogleBlanks.addElementSelectedListener(new ElementSelectedListener() {
+			
+			@Override
+			public void elementSelected(ElementSelectedEvent event) {
+				String key = rdToogleBlanks.getSelectedKey();
+				if (key.equals("null")) {
+					actionToogleNull(true);
+				} else if (key.equals("notNull")) {
+					actionToogleNull(false);
+				} else {
+					actionClearFilter();
+				}
+			}
+		});
 	}
 
 	/**
@@ -240,6 +306,22 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		hide();
 		
 	}
+	
+	/**
+	 * @param isNull
+	 */
+	protected void actionToogleNull(boolean isNull) {
+		PropertyQuery query = new PropertyQuery();
+		String property = column.getListColumn().getPropertyId();
+		if (isNull) {
+			query.addEquals(property, null);
+		} else {
+			query.addNotEquals(property, null);
+		}
+		QueryElement qe = new QueryElement(QueryElement.AND, query);
+		model.updateFilter(column, qe);
+		hide();
+	}
 
 	/**
 	 * Returns the title of the column.
@@ -269,9 +351,12 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		
 		btSortUp.setVisible(true);
 		btSortDown.setVisible(true);
-
+		
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
+		
+		rdToogleBlanks.setVisible(!column.getListColumn().getFinalProperty().isCollection());
+		initializeRadio();
 		
 		// choose the right filter
 		currentFilter = null;
@@ -289,8 +374,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 			fcc = EntityTableExtensionHelper.getFieldColumnFilterControl(fieldName);
 			
 			// if not found and the property is an entity, look for a custom filter control for the entity type
+			String entityType = finalProperty.getEntityType();
 			if (fcc == null && finalProperty.isEntity()) {
-				fcc = EntityTableExtensionHelper.getEntityColumnFilterControl(finalProperty.getEntityType());
+				fcc = EntityTableExtensionHelper.getEntityColumnFilterControl(entityType);
 			}
 
 			if(fcc != null){
@@ -316,16 +402,24 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					} else {
 						currentFilter = defFilter;
 					}
-					btSortUp.setTitle("Sort A-Z");
-					btSortDown.setTitle("Sort Z-A");
-				} else if ("java.util.Date".equals(finalProperty.getEntityType())) {
+					btSortUp.setTitle("Sort A-Z, 0-9");
+					btSortDown.setTitle("Sort Z-A, 9-0");
+				} else if ("java.util.Date".equals(entityType)) {
 					currentFilter = dateFilter;
 					btSortUp.setTitle("Sort Oldest to Newest");
 					btSortDown.setTitle("Sort Newest to Oldest");
-				} else if ("java.lang.Boolean".equals(finalProperty.getEntityType()) || "boolean".equals(finalProperty.getEntityType())) {
+				} else if ("java.lang.Boolean".equals(entityType) || "boolean".equals(entityType)) {
 					currentFilter = bolFilter;
 					btSortUp.setTitle("Sort False to True ");
 					btSortDown.setTitle("Sort True to False");
+					rdToogleBlanks.setVisible(false);
+				} else if ("int".equals(entityType) || "java.lang.Integer".equals(entityType) ||
+						"long".equals(entityType) || "java.lang.Long".equals(entityType) ||
+						"double".equals(entityType) || "java.lang.Double".equals(entityType)) {
+					currentFilter = numFilter;
+				
+					btSortUp.setTitle("Sort 0-9");
+					btSortDown.setTitle("Sort 9-0");
 				} else if (finalProperty.isCollection()) {
 					btSortUp.setVisible(false);
 					btSortDown.setVisible(false);
@@ -334,8 +428,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					}
 				} else {
 					currentFilter = defFilter;
-					btSortUp.setTitle("Sort A-Z");
-					btSortDown.setTitle("Sort Z-A");
+					btSortUp.setTitle("Sort A-Z, 0-9");
+					btSortDown.setTitle("Sort Z-A, 9-0");
 				}
 			}
 		//}
@@ -353,6 +447,27 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		
 	}
 
+	/**
+	 * Initialize the radio button control to reflect the current filters
+	 */
+	protected void initializeRadio() {
+		QueryElement qe = column.getFilter();
+		rdToogleBlanks.setSelectedKey("all");
+		if (qe != null && qe.getSubQuery() != null) {
+			List<QueryElement> elements = qe.getSubQuery().getElements();
+			for (QueryElement elem : elements) {
+				if (QueryElement.NOT_EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+					rdToogleBlanks.setSelectedKey("notNull");
+					break;
+				}
+				if (QueryElement.EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+					rdToogleBlanks.setSelectedKey("null");
+					break;
+				}
+			}
+		}
+	}
+	
 	/**
 	 * @return the positionIdx
 	 */
@@ -384,4 +499,11 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		actionOk();
 	}
 	
+	/**
+	 * Used in vtl
+	 * @return
+	 */
+	public boolean canToogleBlanks() {
+		return rdToogleBlanks.isVisible();
+	}
 }

@@ -53,6 +53,14 @@ public abstract class AbstractFilterControl extends ControlContainer {
 	}
 	
 	/**
+	 * Returns the preferred width for this filter
+	 * @return
+	 */
+	public int getPreferredWidth() {
+		return 264;
+	}
+	
+	/**
 	 * @param listener
 	 */
 	public void addListener(IFilterControlListener listener) {

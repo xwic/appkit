@@ -30,6 +30,7 @@ import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
+import de.xwic.appkit.core.util.Equals;
 import de.xwic.appkit.webbase.entityviewer.config.UserConfigHandler;
 import de.xwic.appkit.webbase.table.Column.Sort;
 
@@ -44,7 +45,6 @@ public class EntityTableModel {
 		COLUMN_FILTER_CHANGE,
 		COLUMN_REORDER,
 		USER_CONFIGURATION_CHANGED,
-		NEW_USER_CONFIGURATION_CREATED,
 		USER_CONFIGURATION_DIRTY_CHANGED,		
 		USER_CONFIGURATION_DELETED
 	}
@@ -105,7 +105,7 @@ public class EntityTableModel {
 		int c = 0;
 		
 		for (ListColumn lc : listSetup.getColumns()) {
-			Column col = new Column(entityTableConfiguration.getLocale(), lc, entityClazz);
+			Column col = new Column(entityTableConfiguration.getTimeZone(), entityTableConfiguration.getLocale(), lc, entityClazz);
 			col.setColumnOrder(c++);
 			columns.add(col);
 			idMapColumns.put(col.getId(), col);
@@ -223,28 +223,33 @@ public class EntityTableModel {
 		
 		IEntityTableListener[] lst = new IEntityTableListener[listeners.size()];
 		lst = listeners.toArray(lst);
+
+		if (type == EventType.COLUMN_SORT_CHANGE || type == EventType.COLUMN_REORDER) {
+			userConfigHandler.setConfigDirty(true);
+			userConfigHandler.saveCurrentDataToMainConfig();
+		}
+		
+		// if column is null, means the event came from a quickfilter, in which case we don't update the config
+		if (type == EventType.COLUMN_FILTER_CHANGE && 
+				(event.getColumn() != null || event.isClearedFilters() || event.isColumnFilterSetFromQuickFilter())) {
+			userConfigHandler.setConfigDirty(true);
+			userConfigHandler.saveCurrentDataToMainConfig();
+		}
 		
 		for (IEntityTableListener listener : lst) {
 			
 			switch (type) {
 			case COLUMN_SORT_CHANGE:
 				listener.columnSorted(event);
-				userConfigHandler.setConfigDirty(true);
 				break;
 			case COLUMN_FILTER_CHANGE:
 				listener.columnFiltered(event);
-				userConfigHandler.setConfigDirty(true);
 				break;
 			case COLUMN_REORDER:
 				listener.columnsReordered(event);
-				userConfigHandler.setConfigDirty(true);
 				break;
 			case USER_CONFIGURATION_CHANGED:
 				listener.userConfigurationChanged(event);
-				break;
-			case NEW_USER_CONFIGURATION_CREATED:
-				listener.newUserConfigurationCreated(event);
-				userConfigHandler.setConfigDirty(true);
 				break;
 			case USER_CONFIGURATION_DIRTY_CHANGED:
 				listener.userConfigurationDirtyChanged(event);
@@ -465,12 +470,25 @@ public class EntityTableModel {
 	 * 
 	 */
 	public void clearFilters() {
+		
+		boolean rebuild = false;
+		
 		for (Column col : columns) {
-			col.setFilter(null);
-			customQuickFilter = null;
+			if (col.getFilter() != null) {
+				col.setFilter(null);
+				rebuild = true;
+			}
 		}
-		buildQuery();
-		fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(this, null));
+
+		if (customQuickFilter != null) {
+			customQuickFilter = null;
+			rebuild = true;
+		}
+		
+		if (rebuild) {
+			buildQuery();		
+			fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(this, true, false));
+		}
 	}
 
 	/**
@@ -480,13 +498,19 @@ public class EntityTableModel {
 		// here we will add all filters that don't specify a column
 		PropertyQuery customQuickFilter = new PropertyQuery();
 		
+		boolean columnFilterSetFromQuickFilter = false;
+		
 		for (Entry<String, QueryElement> entry : filtersMap.entrySet()) {
 			String columnId = entry.getKey();
 			QueryElement queryElement  = entry.getValue();
 				
 			if (columnId != null && idMapColumns.containsKey(columnId)) {
 				Column col = idMapColumns.get(columnId);
-				col.setFilter(queryElement);
+				
+				if (!Equals.equal(col.getFilter(), queryElement)) {
+					col.setFilter(queryElement);
+					columnFilterSetFromQuickFilter = true;
+				}
 			} else {
 				// Note FLI: Not every queryElement has a subQuery - so add the whole element...
 				if (queryElement != null) {
@@ -498,7 +522,7 @@ public class EntityTableModel {
 		this.customQuickFilter = customQuickFilter;
 		
 		buildQuery();
-		fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(this, null));
+		fireEvent(EventType.COLUMN_FILTER_CHANGE, new EntityTableEvent(this, false, columnFilterSetFromQuickFilter));
 	}
 	
 	/**
