@@ -22,8 +22,6 @@
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/jtds-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/jtds-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/jwic_compatibility.jar"/>
-	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/jwic-4.0.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/jwic-ecolib.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/log4j-1.2.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/lucene-1.4-final.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/lucene-demos-1.4-final.jar"/>
