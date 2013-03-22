@@ -10,7 +10,6 @@ import java.util.Date;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.LabelControl;
 import de.jwic.controls.combo.DropDown;
-import de.jwic.controls.tmp.DateInputBoxControl;
 import de.jwic.ecolib.controls.datepicker.DatePickerControl;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
