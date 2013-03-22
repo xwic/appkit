@@ -1,4 +1,4 @@
-{
+{//StackedContainer.js
 	afterUpdate: function(element) {
 		#if($control.scrollTop != -1)
 		window.scrollTo($control.scrollLeft, $control.scrollTop)

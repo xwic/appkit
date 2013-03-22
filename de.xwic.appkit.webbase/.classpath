@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.appkit.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/de.xwic.libs.common"/>
+	<classpathentry kind="lib" path="/jWic/_dist/jwic_compatibility.jar"/>
+	<classpathentry kind="lib" path="/jWic/_dist/jwic-5.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

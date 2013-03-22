@@ -11,9 +11,9 @@ import java.util.Map;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.CheckboxControl;
-import de.jwic.controls.DateInputBoxControl;
 import de.jwic.controls.IHTMLElement;
 import de.jwic.controls.InputBoxControl;
+import de.jwic.ecolib.controls.datepicker.DatePickerControl;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitCheckBoxControl;
@@ -51,7 +51,7 @@ public class EditorToolkit {
 	
 	
 	static {
-		allControls.put(DateInputBoxControl.class, new ToolkitDateInputControl());
+		allControls.put(DatePickerControl.class, new ToolkitDateInputControl());
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
 		allControls.put(InputBoxControl.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
