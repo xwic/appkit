@@ -10,7 +10,7 @@
 	 
 	afterUpdate: function(element) {
 		//var win = jQuery('#'+JQryEscape('win_${control.controlID}_div'));	
-		var dialogWidth = 300;
+		var dialogWidth = $control.width;
 		//dialogWidth += dialogWidth*10/100;
 		var dialogHeight= $control.height;
 		console.log(dialogHeight);
