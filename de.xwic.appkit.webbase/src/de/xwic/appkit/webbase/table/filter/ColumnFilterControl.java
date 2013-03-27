@@ -131,7 +131,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		if (currentFilter != null) {
 			return currentFilter.getPreferredWidth() + 40;
 		}
-		return 300;
+		return 325;
 	}
 
 	/**
