@@ -1,5 +1,7 @@
 {
-		
+	/**
+	 * ColumnFilterControl.js
+	 */	
 	doUpdate: function(){		
 		return false;
 	},
@@ -29,7 +31,7 @@
 			draggable:false,
 			resizable : false,
 			modal: false,
-			cache:false,
+			cache:false
 					
 		});
 		
