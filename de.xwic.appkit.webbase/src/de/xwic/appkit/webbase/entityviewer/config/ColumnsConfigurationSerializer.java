@@ -170,7 +170,7 @@ public class ColumnsConfigurationSerializer {
 				
 				sb.append("<").append(COLLECTION_ELEM).append(">").append(queryElement.isCollectionElement() ? "y" : "n").append("</").append(COLLECTION_ELEM).append(">");
 				sb.append("<").append(PROPERTY).append(">").append(queryElement.getPropertyName()).append("</").append(PROPERTY).append(">");
-				sb.append("<").append(OPERATION).append(">").append(escapeOperation(queryElement.getOperation())).append("</").append(OPERATION).append(">");
+				sb.append("<").append(OPERATION).append(">").append(escapeMe(queryElement.getOperation())).append("</").append(OPERATION).append(">");
 				sb.append("<").append(VALUE).append(">").append(serializeValue(queryElement)).append("</").append(VALUE).append(">");
 				
 			}
@@ -213,7 +213,7 @@ public class ColumnsConfigurationSerializer {
 		if (value == null) {
 			return NULL;
 		} else if (value instanceof String) {
-			return STRING + value;
+			return STRING + escapeMe((String)value);
 		} else if (value instanceof Integer) {
 			return INT + String.valueOf(value);
 		} else if (value instanceof Long) { 
@@ -236,8 +236,8 @@ public class ColumnsConfigurationSerializer {
 	}
 	
 	
-	private String escapeOperation(String op) {
-		return op.replace("<", "&lt;").replace(">", "&gt;");
+	private String escapeMe(String op) {
+		return op.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 	}
 	/**
 	 * @return the columns
