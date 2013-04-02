@@ -235,10 +235,6 @@ public class ColumnsConfigurationSerializer {
 		}
 	}
 	
-	
-	private String escapeMe(String op) {
-		return op.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
-	}
 	/**
 	 * @param op
 	 * @return
