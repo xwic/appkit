@@ -240,6 +240,14 @@ public class ColumnsConfigurationSerializer {
 		return op.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
 	}
 	/**
+	 * @param op
+	 * @return
+	 */
+	private String escapeMe(String op) {
+		return op.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+	}
+	
+	/**
 	 * @return the columns
 	 */
 	public String getColumns() {
