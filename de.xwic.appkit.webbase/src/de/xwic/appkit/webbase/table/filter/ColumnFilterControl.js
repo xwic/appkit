@@ -15,9 +15,7 @@
 		var dialogWidth = $control.width;
 		//dialogWidth += dialogWidth*10/100;
 		var dialogHeight= $control.height;
-		console.log(dialogHeight);
 		dialogHeight+= dialogHeight*10/100;
-		console.log(dialogHeight);
 		
 		var win = jQuery('#'+JQryEscape('filter_${control.controlID}_div')).dialog({
 			autoOpen: false,
