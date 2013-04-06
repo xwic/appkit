@@ -85,11 +85,9 @@ public class UserViewConfigurationControl extends ControlContainer {
 		ibDescription.setHeight(50);
 
 		rbtnYes = new RadioButton(this, "rbtnYes");
-		rbtnYes.setCssClass("radioButton");
 		rbtnYes.setTitle("Yes");
 
 		rbtnNo = new RadioButton(this, "rbtnNo", rbtnYes);
-		rbtnNo.setCssClass("radioButton");
 		rbtnNo.setTitle("No");
 
 		updateFieldsValues();
