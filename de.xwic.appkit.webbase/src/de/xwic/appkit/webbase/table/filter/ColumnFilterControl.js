@@ -33,7 +33,10 @@
 					
 		});
 		
+		
 		win.parent().appendTo(jQuery("#jwicform"));		
+		win.parent().removeClass('ui-widget-content');
+		win.parent().addClass('whiteBg');
 		win.dialog('open');	
 		
 		
