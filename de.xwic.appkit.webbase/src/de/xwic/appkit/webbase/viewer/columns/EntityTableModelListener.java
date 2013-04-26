@@ -7,10 +7,10 @@
  */
 package de.xwic.appkit.webbase.viewer.columns;
 
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableModelAdapter;
-import de.jwic.ecolib.tableviewer.TableModelEvent;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableModelAdapter;
+import de.jwic.controls.tableviewer.TableModelEvent;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
 import de.xwic.appkit.webbase.viewer.EntityTableViewer;
 

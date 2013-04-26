@@ -15,8 +15,8 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.jwic.base.IControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.TabControl;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Tab;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
@@ -71,7 +71,7 @@ public class EditorContext implements IBuilderContext {
 //	private CheckboxPropertyMapper checkMapper;
 
 	// properties - page assignment
-	private TabControl currPage = null;
+	private Tab currPage = null;
 	private Map propertyPageMap = new HashMap();
 	private Map widgetMap = new HashMap();
 	private List pages = new ArrayList();
@@ -206,7 +206,7 @@ public class EditorContext implements IBuilderContext {
 			mappers.add(customMapper);
 			mapper = customMapper;
 		} else {
-			if (widget instanceof InputBoxControl) {
+			if (widget instanceof InputBox) {
 				mapper = textMapper;
 //			} else if (widget instanceof PicklistEntryCombo) {
 //				mapper = plComboMapper;
@@ -399,10 +399,10 @@ public class EditorContext implements IBuilderContext {
 		// clear all warnings
 		//TODO
 //		for (Iterator it = pages.iterator(); it.hasNext();) {
-//			TabControl page = (TabControl) it.next();
+//			Tab page = (Tab) it.next();
 //			page.resetMessages();
 //		}
-//		TabControl mainPage = (TabControl) pages.get(0);
+//		Tab mainPage = (Tab) pages.get(0);
 
 		// assign warnings
 //		Map warnings = result.getWarningMap();
@@ -410,7 +410,7 @@ public class EditorContext implements IBuilderContext {
 //		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
 //			String prop = (String) it.next();
 //			String msg = (String) warnings.get(prop);
-//			TabControl page = (TabControl) propertyPageMap.get(prop);
+//			Tab page = (Tab) propertyPageMap.get(prop);
 //			String title;
 //			if (prop.startsWith("#")) {
 //				title = bundle.getString(prop.substring(1));
@@ -514,7 +514,7 @@ public class EditorContext implements IBuilderContext {
 	 * @param currPage
 	 *            the currPage to set
 	 */
-	public void setCurrPage(TabControl currPage) {
+	public void setCurrPage(Tab currPage) {
 		if (this.currPage != null && currPage != null) {
 			throw new IllegalStateException("Another process is still creating properties on a page.");
 		}

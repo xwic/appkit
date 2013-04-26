@@ -6,7 +6,7 @@
 package de.xwic.appkit.webbase.table.filter;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
+import de.jwic.controls.InputBox;
 import de.jwic.controls.combo.DropDown;
 import de.jwic.events.KeyEvent;
 import de.jwic.events.KeyListener;
@@ -20,7 +20,7 @@ import de.xwic.appkit.webbase.table.Column;
 public class DefaultFilter extends AbstractFilterControl {
 
 	private DropDown ddLogic;
-	private InputBoxControl inpText;
+	private InputBox inpText;
 	
 	/**
 	 * @param container
@@ -39,7 +39,7 @@ public class DefaultFilter extends AbstractFilterControl {
 		
 		ddLogic.selectedByKey("sw");
 		
-		inpText = new InputBoxControl(this, "inpText");
+		inpText = new InputBox(this, "inpText");
 		inpText.setEmptyInfoText("Enter Search Term");
 		inpText.setWidth(225);
 		

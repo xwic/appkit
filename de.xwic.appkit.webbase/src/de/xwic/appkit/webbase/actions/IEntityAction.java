@@ -3,7 +3,7 @@
  */
 package de.xwic.appkit.webbase.actions;
 
-import de.jwic.ecolib.actions.IAction;
+import de.jwic.controls.actions.IAction;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.toolkit.app.Site;

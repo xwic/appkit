@@ -6,7 +6,7 @@
 package de.xwic.appkit.webbase.table.filter;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.RadioGroupControl;
+import de.jwic.controls.RadioGroup;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.appkit.core.model.queries.QueryElement;
@@ -17,7 +17,7 @@ import de.xwic.appkit.webbase.table.Column;
  */
 public class BooleanFilter extends AbstractFilterControl {
 
-	private RadioGroupControl rgFilter;
+	private RadioGroup rgFilter;
 	private ElementSelectedListener listener;
 	
 	/**
@@ -34,7 +34,7 @@ public class BooleanFilter extends AbstractFilterControl {
 			}
 		};
 		
-		rgFilter = new RadioGroupControl(this, "filter");
+		rgFilter = new RadioGroup(this, "filter");
 		rgFilter.addElement("<i>All</i>", "all");
 		rgFilter.addElement("True", "true");
 		rgFilter.addElement("False", "false");

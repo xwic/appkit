@@ -10,8 +10,8 @@ package de.xwic.appkit.webbase.history.wizard;
 import java.util.Set;
 
 import de.jwic.base.SessionContext;
-import de.jwic.ecolib.wizard.Wizard;
-import de.jwic.ecolib.wizard.WizardPage;
+import de.jwic.controls.wizard.Wizard;
+import de.jwic.controls.wizard.WizardPage;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;
 
@@ -36,8 +36,8 @@ public class HistorySelectionWizard extends Wizard {
 
 		setTitle(model.getResourceString("historySelWiz.title"));
 		
-		setHeightHint("400");
-		setWidthHint("950");
+		setHeight(400);
+		setWidthHint(950);
 	}
 	
 	@Override

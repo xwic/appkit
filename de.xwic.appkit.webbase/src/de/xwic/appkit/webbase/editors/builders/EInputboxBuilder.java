@@ -9,14 +9,14 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
+import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.editor.EText;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
 /**
- * Defines the InputBoxControl builder class.
+ * Defines the InputBox builder class.
  * 
  * @author Aron Cotrau
  */
@@ -31,7 +31,7 @@ public class EInputboxBuilder extends Builder {
 	 */
 	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
 		EText text = (EText) element;
-		InputBoxControl inputBox = new InputBoxControl(parent);
+		InputBox inputBox = new InputBox(parent);
 
 		inputBox.setReadonly(text.isReadonly());
 		inputBox.setMultiLine(text.isMultiline());

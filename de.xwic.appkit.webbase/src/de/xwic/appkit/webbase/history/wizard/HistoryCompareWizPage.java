@@ -14,10 +14,10 @@ import java.util.List;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
-import de.jwic.ecolib.wizard.WizardPage;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
+import de.jwic.controls.wizard.WizardPage;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;

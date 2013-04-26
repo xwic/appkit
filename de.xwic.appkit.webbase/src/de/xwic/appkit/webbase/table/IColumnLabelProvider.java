@@ -8,7 +8,7 @@ package de.xwic.appkit.webbase.table;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import de.jwic.ecolib.tableviewer.CellLabel;
+import de.jwic.controls.tableviewer.CellLabel;
 import de.xwic.appkit.core.config.list.ListColumn;
 
 /**

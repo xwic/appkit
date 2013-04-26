@@ -5,7 +5,7 @@ package de.xwic.appkit.webbase.toolkit.components;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
-import de.jwic.ecolib.toolbar.ToolbarGroup;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.SerObserver;
@@ -64,7 +64,7 @@ public abstract class AbstractListContainer extends BaseView implements SerObser
 	protected void setupActionBar() {
 		Bundle bundle = BundleAccessor.getDomainBundle(this, ExtendedApplication.CORE_DOMAIN_ID);
 		
-		ToolbarGroup tg = toolbar.addGroup();
+		ToolBarGroup tg = toolbar.addGroup();
 		
 		btNew = tg.addButton();
 		btNew.setTitle(bundle.getString("baselist.action.new.title"));

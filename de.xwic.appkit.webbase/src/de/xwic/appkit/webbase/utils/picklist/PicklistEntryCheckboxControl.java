@@ -1,7 +1,7 @@
 /*
  * (c) Copyright 2005, 2006 by pol GmbH 
  * 
- * de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckboxControl
+ * de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckBox
  * Created on Jan 26, 2009 by Aron Cotrau
  *
  */
@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckboxControl;
+import de.jwic.controls.CheckBox;
+import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
@@ -27,7 +28,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * 
  * @author Aron Cotrau
  */
-public class PicklistEntryCheckboxControl extends CheckboxControl {
+public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 
 	private String lang = "DE";
 
@@ -67,7 +68,7 @@ public class PicklistEntryCheckboxControl extends CheckboxControl {
 		super(container, name);
 
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
-		setTemplateName(CheckboxControl.class.getName());
+		setTemplateName(CheckBox.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 

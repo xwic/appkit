@@ -12,11 +12,11 @@ import de.jwic.base.Event;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.JavaScriptSupport;
 import de.jwic.controls.Button;
-import de.jwic.controls.LabelControl;
-import de.jwic.controls.RadioGroupControl;
-import de.jwic.ecolib.controls.StackedContainer;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.Label;
+import de.jwic.controls.RadioGroup;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableViewer;
+import de.jwic.controls.StackedContainer;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.KeyEvent;
@@ -50,7 +50,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	private PicklistFilter plFilter = null;
 	private DateFilter dateFilter = null;
 	private NumberFilter numFilter = null;
-	private LabelControl lblNoFilter = null;
+	private Label lblNoFilter = null;
 	private AbstractFilterControl currentFilter = null;
 	private BooleanFilter bolFilter = null;
 	private AbstractFilterControl customFilter = null;
@@ -60,7 +60,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	protected ColumnAction btSortUp;
 	protected ColumnAction btSortDown;
 
-	private RadioGroupControl rdToogleBlanks;
+	private RadioGroup rdToogleBlanks;
 	
 	
 	/**
@@ -83,7 +83,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	private void createFilters() {
 		
 		filterStack = new StackedContainer(this, "filters");
-		lblNoFilter = new LabelControl(filterStack, "noFilter");
+		lblNoFilter = new Label(filterStack, "noFilter");
 		lblNoFilter.setText("No filter options available");
 		
 		defFilter = new DefaultFilter(filterStack, "default");
@@ -225,7 +225,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 			}
 		});
 		
-		rdToogleBlanks = new RadioGroupControl(this, "rdToogleBlanks");
+		rdToogleBlanks = new RadioGroup(this, "rdToogleBlanks");
 		rdToogleBlanks.addElement("Is Not Empty", "notNull");
 		rdToogleBlanks.addElement("Is Empty", "null");
 		rdToogleBlanks.addElement("All", "all");

@@ -11,10 +11,10 @@ import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IOuterLayout;
-import de.jwic.ecolib.controls.ErrorWarningControl;
-import de.jwic.ecolib.toolbar.Toolbar;
-import de.jwic.ecolib.toolbar.ToolbarGroup;
-import de.jwic.ecolib.toolbar.ToolbarSpacer;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.ToolBarSpacer;
 import de.xwic.appkit.core.config.Bundle;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
@@ -35,9 +35,9 @@ public class BaseView extends ControlContainer implements IOuterLayout {
     private boolean isBottomView = false;
     private boolean isLeftView = false;
     /** the action bar */
-    protected Toolbar toolbar;
+    protected ToolBar toolbar;
     /** the error warning control*/
-    protected ErrorWarningControl errorWarning;
+    protected ErrorWarning errorWarning;
 
     /**
 	 * The main content views should extend this class. This is
@@ -49,8 +49,8 @@ public class BaseView extends ControlContainer implements IOuterLayout {
     public BaseView(IControlContainer container, String name) {
     	super(container, name);
         setRendererId(DEFAULT_OUTER_RENDERER);
-        toolbar = new Toolbar(this, "toolbar");
-        errorWarning = new ErrorWarningControl(this, "errorWarning");
+        toolbar = new ToolBar(this, "toolbar");
+        errorWarning = new ErrorWarning(this, "errorWarning");
         errorWarning.setAutoClose(true);
         errorWarning.setShowStackTrace(false);
     }
@@ -294,12 +294,12 @@ public class BaseView extends ControlContainer implements IOuterLayout {
     	
 		for (Iterator<Control> it = toolbar.getControls(); it.hasNext();) {
 			Control c = it.next();
-			if (c instanceof ToolbarGroup) {
-				if (((ToolbarGroup) c).getControls().hasNext()) {
+			if (c instanceof ToolBarGroup) {
+				if (((ToolBarGroup) c).getControls().hasNext()) {
 					// if it has any controls, return true
 					return true;
 				}
-			} else if (!(c instanceof ToolbarSpacer)) {
+			} else if (!(c instanceof ToolBarSpacer)) {
 				return true;
 			}
 		}
@@ -327,7 +327,7 @@ public class BaseView extends ControlContainer implements IOuterLayout {
 	/**
 	 * @return the actionBar
 	 */
-	public Toolbar getToolbar() {
+	public ToolBar getToolbar() {
 		return toolbar;
 	}
 

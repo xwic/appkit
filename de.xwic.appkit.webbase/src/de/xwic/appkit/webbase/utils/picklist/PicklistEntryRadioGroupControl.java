@@ -1,7 +1,7 @@
 /*
  * (c) Copyright 2005, 2006 by pol GmbH 
  * 
- * de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl
+ * de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroup
  * Created on Sep 9, 2008 by Aron Cotrau
  *
  */
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.RadioGroupControl;
+import de.jwic.controls.RadioGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
@@ -25,7 +25,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * 
  * @author Aron Cotrau
  */
-public class PicklistEntryRadioGroupControl extends RadioGroupControl {
+public class PicklistEntryRadioGroupControl extends RadioGroup {
 
 	private String lang = "DE";
 
@@ -56,7 +56,7 @@ public class PicklistEntryRadioGroupControl extends RadioGroupControl {
 
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
 		this.picklistKey = picklistKey;
-		setTemplateName(RadioGroupControl.class.getName());
+		setTemplateName(RadioGroup.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 		setupEntries(picklistKey);

@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.Limit;
@@ -88,6 +88,13 @@ public class EntityContentProvider implements IContentProvider<RowData> {
 	@Override
 	public boolean hasChildren(RowData object) {
 		return false;
+	}
+
+
+
+	@Override
+	public RowData getObjectFromKey(String uniqueKey) {
+		return null;
 	}
 
 }

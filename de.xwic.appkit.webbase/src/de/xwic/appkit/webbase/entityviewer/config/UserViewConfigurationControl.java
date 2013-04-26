@@ -10,8 +10,8 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.Event;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
 import de.jwic.controls.RadioButton;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
 import de.xwic.appkit.webbase.table.EntityTableModel;
@@ -25,12 +25,12 @@ public class UserViewConfigurationControl extends ControlContainer {
 	private final static int EVENT_TYPE_APPLY = 1;
 	private final static int EVENT_TYPE_UPDATE = 2;
 
-	private LabelControl lblName;
-	private LabelControl lblDescription;
-	private LabelControl lblDate;
-	private LabelControl lblOwner;
-	private InputBoxControl ibName;
-	private InputBoxControl ibDescription;
+	private Label lblName;
+	private Label lblDescription;
+	private Label lblDate;
+	private Label lblOwner;
+	private InputBox ibName;
+	private InputBox ibDescription;
 	private RadioButton rbtnYes;
 	private RadioButton rbtnNo;
 
@@ -67,18 +67,18 @@ public class UserViewConfigurationControl extends ControlContainer {
 	 * 
 	 */
 	private void createControls() {
-		lblName = new LabelControl(this, "lblName");
+		lblName = new Label(this, "lblName");
 
-		lblDescription = new LabelControl(this, "lblDescription");
+		lblDescription = new Label(this, "lblDescription");
 
-		lblDate = new LabelControl(this, "lblDate");
+		lblDate = new Label(this, "lblDate");
 		
-		lblOwner = new LabelControl(this, "lblOwner");
+		lblOwner = new Label(this, "lblOwner");
 		
-		ibName = new InputBoxControl(this, "ibName");
+		ibName = new InputBox(this, "ibName");
 		ibName.setWidth(340);
 
-		ibDescription = new InputBoxControl(this, "ibDescription");
+		ibDescription = new InputBox(this, "ibDescription");
 		ibDescription.setEmptyInfoText("Enter a description of this list profile");
 		ibDescription.setMultiLine(true);
 		ibDescription.setWidth(340);

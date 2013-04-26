@@ -25,8 +25,8 @@ import java.util.List;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.ecolib.dialogs.DialogEvent;
-import de.jwic.ecolib.dialogs.DialogListener;
+import de.jwic.controls.dialogs.DialogEvent;
+import de.jwic.controls.dialogs.DialogListener;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**

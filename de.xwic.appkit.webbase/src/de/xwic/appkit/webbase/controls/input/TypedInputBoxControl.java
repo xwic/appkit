@@ -20,7 +20,7 @@
 package de.xwic.appkit.webbase.controls.input;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
+import de.jwic.controls.InputBox;
 import de.jwic.events.ValueChangedEvent;
 import de.jwic.events.ValueChangedListener;
 
@@ -28,7 +28,7 @@ import de.jwic.events.ValueChangedListener;
  * An input box control that returns a typed value
  * @author Martin Weinand
  */
-public abstract class TypedInputBoxControl<T> extends InputBoxControl{
+public abstract class TypedInputBoxControl<T> extends InputBox{
 	
 	private static final long serialVersionUID = -3523158047520993885L;
 	
@@ -52,7 +52,7 @@ public abstract class TypedInputBoxControl<T> extends InputBoxControl{
 	}
 	
 	private void init(){
-		this.setTemplateName(InputBoxControl.class.getName());
+		this.setTemplateName(InputBox.class.getName());
 		
 		this.addValueChangedListener(new ValueChangedListener() {
 			private static final long serialVersionUID = -6528603430817190321L;

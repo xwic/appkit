@@ -16,10 +16,10 @@ import java.util.Locale;
 import java.util.Set;
 
 import de.jwic.base.ImageRef;
-import de.jwic.ecolib.tableviewer.CellLabel;
-import de.jwic.ecolib.tableviewer.ITableLabelProvider;
-import de.jwic.ecolib.tableviewer.RowContext;
-import de.jwic.ecolib.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.CellLabel;
+import de.jwic.controls.tableviewer.ITableLabelProvider;
+import de.jwic.controls.tableviewer.RowContext;
+import de.jwic.controls.tableviewer.TableColumn;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.model.EntityDescriptor;

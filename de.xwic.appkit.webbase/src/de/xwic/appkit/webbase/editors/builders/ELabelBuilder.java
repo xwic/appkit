@@ -9,13 +9,13 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.ELabel;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
 /**
- * The Builder for the LabelControl.
+ * The Builder for the Label.
  * 
  * @author Aron Cotrau
  */
@@ -37,8 +37,8 @@ public class ELabelBuilder extends Builder {
 			text = context.getResString(eLabel.getFinalProperty().getName());
 		}
 
-		LabelControl label = null;
-		label = new LabelControl(parent);
+		Label label = null;
+		label = new Label(parent);
 		label.setText(text);
 
 		return label;

@@ -14,8 +14,8 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
-import de.jwic.controls.LabelControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.Label;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.webbase.core.Platform;
@@ -34,7 +34,7 @@ public class Site extends Page {
     protected StackedContainerWithEvent controlStack;
     protected ControlContainer dialogContainer;
     protected BreadCrumbControl breadCrumb;
-    protected ErrorWarningControl globalErrorControl;
+    protected ErrorWarning globalErrorControl;
     protected LogoutControl btLogout;
 
     protected String activeModuleKey = "";
@@ -49,7 +49,7 @@ public class Site extends Page {
      */
     public Site(IControlContainer container) {
         super(container);
-        LabelControl lbUsername = new LabelControl(this, "lbUsername");
+        Label lbUsername = new Label(this, "lbUsername");
         IUser user = DAOSystem.getSecurityManager().getCurrentUser();
 
         if (user != null) {
@@ -66,7 +66,7 @@ public class Site extends Page {
 
 
         
-        LabelControl lbRole = new LabelControl(this, "lbRole");
+        Label lbRole = new Label(this, "lbRole");
         lbRole.setText("");
 
         controlStack = new StackedContainerWithEvent(this, "content");
@@ -79,7 +79,7 @@ public class Site extends Page {
         btLogout = new LogoutControl(this, "btLogout");
         btLogout.setTitle("Logout");
         
-        globalErrorControl = new ErrorWarningControl(this, "errorWarning");
+        globalErrorControl = new ErrorWarning(this, "errorWarning");
         globalErrorControl.setAutoClose(true);
         globalErrorControl.setShowStackTrace(false);
         
@@ -393,7 +393,7 @@ public class Site extends Page {
     }
 
     /**
-     * Show the ErrorWarningControl with an Error.
+     * Show the ErrorWarning with an Error.
      * 
      * @param message
      */
@@ -403,7 +403,7 @@ public class Site extends Page {
     }
 
     /**
-     * Show the ErrorWarningControl as warning with yellow background or specified with given css.
+     * Show the ErrorWarning as warning with yellow background or specified with given css.
      * 
      * @param message
      * @param cssClass
@@ -414,7 +414,7 @@ public class Site extends Page {
     }
 
     /**
-     * Show the ErrorWarningControl as warning with yellow background.
+     * Show the ErrorWarning as warning with yellow background.
      * 
      * @param message
      */
@@ -425,7 +425,7 @@ public class Site extends Page {
 
 
     /**
-     * Show the ErrorWarningControl with an exception.
+     * Show the ErrorWarning with an exception.
      * 
      * @param e
      */

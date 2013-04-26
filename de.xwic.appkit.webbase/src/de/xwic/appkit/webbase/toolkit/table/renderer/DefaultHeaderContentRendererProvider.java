@@ -3,7 +3,8 @@
  */
 package de.xwic.appkit.webbase.toolkit.table.renderer;
 
-import de.jwic.ecolib.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableColumn;
+
 
 /**
  * @author Oleksiy Samokhvalov

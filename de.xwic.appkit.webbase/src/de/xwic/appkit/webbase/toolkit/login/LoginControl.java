@@ -9,10 +9,10 @@ package de.xwic.appkit.webbase.toolkit.login;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
 import de.jwic.events.KeyEvent;
 import de.jwic.events.KeyListener;
 import de.jwic.events.SelectionEvent;
@@ -28,9 +28,9 @@ import de.xwic.appkit.webbase.toolkit.util.BundleAccessor;
  */
 public class LoginControl extends ControlContainer {
 
-	private InputBoxControl inpUsername;
-	private InputBoxControl inpPassword;
-	private ErrorWarningControl errorInfo;
+	private InputBox inpUsername;
+	private InputBox inpPassword;
+	private ErrorWarning errorInfo;
 
 	private LoginModel model;
 
@@ -43,14 +43,14 @@ public class LoginControl extends ControlContainer {
 
 		this.model = model;
 
-		inpUsername = new InputBoxControl(this, "inpUsername");
+		inpUsername = new InputBox(this, "inpUsername");
 		inpUsername.setText("");
 		//inpUsername.setFillWidth(true);
 		
 		inpUsername.forceFocus();
 
 		
-		inpPassword = new InputBoxControl(this, "inpPassword");
+		inpPassword = new InputBox(this, "inpPassword");
 		inpPassword.setPassword(true);
 		//inpPassword.setFillWidth(true);
 		inpPassword.setListenKeyCode(13); // listen to ENTER key
@@ -61,11 +61,11 @@ public class LoginControl extends ControlContainer {
 			}
 		});
 
-		errorInfo = new ErrorWarningControl(this, "errorInfo");
+		errorInfo = new ErrorWarning(this, "errorInfo");
 
 		Bundle bundle = BundleAccessor.getDomainBundle(this, ExtendedApplication.CORE_DOMAIN_ID);
 		
-		ButtonControl btSubmit = new ButtonControl(this, "btSubmit");
+		Button btSubmit = new Button(this, "btSubmit");
 		btSubmit.setTitle(bundle.getString("login.btn.title"));
 		btSubmit.addSelectionListener(new SelectionListener() {
 
@@ -74,7 +74,7 @@ public class LoginControl extends ControlContainer {
 			}
 		});
 
-		LabelControl loginTitle = new LabelControl(this, "title");
+		Label loginTitle = new Label(this, "title");
 		loginTitle.setText(bundle.getString("login.title"));
 	}
 

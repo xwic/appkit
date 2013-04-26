@@ -23,16 +23,16 @@ import de.jwic.base.ImageRef;
 import de.jwic.base.Page;
 import de.jwic.base.RenderContext;
 import de.jwic.base.UserAgentInfo;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
-import de.jwic.ecolib.tableviewer.ITableLabelProvider;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableModelAdapter;
-import de.jwic.ecolib.tableviewer.TableModelEvent;
-import de.jwic.ecolib.tableviewer.TableViewer;
-import de.jwic.ecolib.tableviewer.export.ExcelExportControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.tableviewer.DefaultTableRenderer;
+import de.jwic.controls.tableviewer.ITableLabelProvider;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableModelAdapter;
+import de.jwic.controls.tableviewer.TableModelEvent;
+import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
@@ -52,17 +52,18 @@ import de.xwic.appkit.core.model.entities.IUserListProfile;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.trace.ITraceOperation;
 import de.xwic.appkit.core.trace.Trace;
+import de.xwic.appkit.webbase.controls.export.ExcelExportControl;
 import de.xwic.appkit.webbase.utils.UserConfigXmlReader;
 import de.xwic.appkit.webbase.utils.UserListUtil;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
 import de.xwic.appkit.webbase.viewer.base.DAOContentProvider;
 import de.xwic.appkit.webbase.viewer.base.PropertyLabelProvider;
 import de.xwic.appkit.webbase.viewer.columns.ColumnSelector;
+import de.xwic.appkit.webbase.viewer.columns.ColumnSelector.IColumnSelectorListener;
 import de.xwic.appkit.webbase.viewer.columns.EntityTableModelListener;
 import de.xwic.appkit.webbase.viewer.columns.TableColumnInfo;
 import de.xwic.appkit.webbase.viewer.columns.UserListColumn;
 import de.xwic.appkit.webbase.viewer.columns.UserListSetup;
-import de.xwic.appkit.webbase.viewer.columns.ColumnSelector.IColumnSelectorListener;
 import de.xwic.appkit.webbase.views.BaseBrowserView;
 
 /**
@@ -84,7 +85,7 @@ public class EntityTableViewer extends ControlContainer {
 
 	private TableViewer tableViewer = null;
 	private ExcelExportControl excelExport = null;
-	private ActionBarControl actionBar = null;
+	private ToolBar toolBar = null;
 
 	private int widthDecrease = 26;
 	private int heightDecrease = 290;
@@ -215,10 +216,10 @@ public class EntityTableViewer extends ControlContainer {
 	 * @param container
 	 */
 	private void initTableViewer(IControlContainer container) {
-		actionBar = new ActionBarControl(container, "abar");
-
-		ButtonControl buttonColumnSelection = new ButtonControl(actionBar);
-		buttonColumnSelection.setTemplateName(ButtonControl.class.getName() + "_Action");
+		toolBar = new ToolBar(container, "abar");
+		ToolBarGroup tbg = toolBar.addGroup();
+		Button buttonColumnSelection = tbg.addButton();
+		buttonColumnSelection.setTemplateName(Button.class.getName() + "_Action");
 		buttonColumnSelection.setTitle("Select Columns");
 		ImageRef selectorIcon = new ImageRef(getClass().getPackage(), "colselect.gif");
 		buttonColumnSelection.setIconEnabled(selectorIcon);
@@ -228,7 +229,7 @@ public class EntityTableViewer extends ControlContainer {
 			}
 		});
 		
-		actionBar.setPosition(buttonColumnSelection, ActionBarControl.Align.RIGHT);
+		//toolBar.setPosition(buttonColumnSelection, ToolBar.Align.RIGHT);
 
 		columnSelector = new ColumnSelector();
 		columnSelector.init(container, "columnSelector");
@@ -263,7 +264,9 @@ public class EntityTableViewer extends ControlContainer {
 			}
 		});
 		
-		excelExport = new ExcelExportControl(actionBar, "excel", tableViewer);
+		tbg = toolBar.addRightGroup();
+		excelExport = new ExcelExportControl(tbg, "excel", tableViewer);
+		excelExport.setCssClass("j-button-h j-btn-small");
 		excelExport.setTitle("Excel");
 		ImageRef imgDef = new ImageRef(BaseBrowserView.class.getPackage(), "excel.gif");
 		excelExport.setIconEnabled(imgDef);
@@ -289,7 +292,7 @@ public class EntityTableViewer extends ControlContainer {
 
 		updateTableViewerSize();
 
-		actionBar.setVisible(false);
+		toolBar.setVisible(false);
 	}
 
 	/**
@@ -642,16 +645,16 @@ public class EntityTableViewer extends ControlContainer {
 	/**
 	 * @return the actionBar
 	 */
-	public ActionBarControl getActionBar() {
-		return actionBar;
+	public ToolBar getToolBar() {
+		return toolBar;
 	}
 
 	/**
 	 * @param actionBar
 	 *            the actionBar to set
 	 */
-	public void setActionBar(ActionBarControl actionBar) {
-		this.actionBar = actionBar;
+	public void setToolBar(ToolBar actionBar) {
+		this.toolBar = actionBar;
 	}
 
 	/**

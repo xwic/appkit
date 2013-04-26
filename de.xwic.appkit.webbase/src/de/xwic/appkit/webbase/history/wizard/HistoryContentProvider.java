@@ -10,8 +10,8 @@ package de.xwic.appkit.webbase.history.wizard;
 import java.util.Iterator;
 import java.util.List;
 
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;
 
@@ -70,6 +70,14 @@ public class HistoryContentProvider implements IContentProvider {
 	 */
 	public boolean hasChildren(Object object) {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.jwic.data.IContentProvider#getObjectFromKey(java.lang.String)
+	 */
+	@Override
+	public Object getObjectFromKey(String uniqueKey) {
+		return null;
 	}
 
 }

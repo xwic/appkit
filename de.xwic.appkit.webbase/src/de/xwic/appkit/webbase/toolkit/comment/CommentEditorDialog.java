@@ -4,11 +4,11 @@
 package de.xwic.appkit.webbase.toolkit.comment;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
-import de.jwic.controls.WindowControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
+import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.model.entities.IEntityComment;
@@ -30,25 +30,24 @@ public class CommentEditorDialog extends Dialog {
 
 	@Override
 	public void createControls(IControlContainer container) {
-		WindowControl win = new WindowControl(container, "scrollcontainer");
-		final ErrorWarningControl errorControl = new ErrorWarningControl(win, "error");
+		Window win = new Window(container, "scrollcontainer");
+		final ErrorWarning errorControl = new ErrorWarning(win, "error");
 		errorControl.setShowStackTrace(false);
 		
 		win.setTemplateName(getClass().getName());
-		win.setWidth("480");
-		win.setAlign("center");
+		win.setWidth(480);
 		win.setTitle("Enter Comment for selected Entity");
 		
 		
-		LabelControl lblComment = new LabelControl(win, "lblComment");
+		Label lblComment = new Label(win, "lblComment");
 		lblComment.setText("Comment");
 		
-		final InputBoxControl commentControl = new InputBoxControl(win, "comment");
+		final InputBox commentControl = new InputBox(win, "comment");
 		commentControl.setMultiLine(true);
 		commentControl.setRows(10);
 		commentControl.setWidth(400);
 		
-		ButtonControl btFinish = new ButtonControl(win, "Finish");
+		Button btFinish = new Button(win, "Finish");
 		btFinish.setTitle("Finish");
 		btFinish.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
@@ -67,7 +66,7 @@ public class CommentEditorDialog extends Dialog {
 			}
 		});
 	
-		ButtonControl btAbort = new ButtonControl(win, "Abort");
+		Button btAbort = new Button(win, "Abort");
 		btAbort.setTitle("Abort");
 		btAbort.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {

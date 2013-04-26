@@ -7,7 +7,7 @@ package de.xwic.appkit.webbase.table.filterinfo;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.Label;
 import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.webbase.table.Column;
 import de.xwic.appkit.webbase.table.EntityTableAdapter;
@@ -22,7 +22,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class FilterInfoControl extends ControlContainer {
 
-	private LabelControl lblFilterInfo;
+	private Label lblFilterInfo;
 	private final EntityTableModel model;
 
 	/**
@@ -33,7 +33,7 @@ public class FilterInfoControl extends ControlContainer {
 		super(container, name);
 		this.model = model;
 		
-		lblFilterInfo = new LabelControl(this, "lblInfo");
+		lblFilterInfo = new Label(this, "lblInfo");
 		
 		model.addEntityTableListener(new EntityTableAdapter() {
 			@Override

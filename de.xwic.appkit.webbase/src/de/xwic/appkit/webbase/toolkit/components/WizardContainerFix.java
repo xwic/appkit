@@ -14,16 +14,16 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.Page;
 import de.jwic.base.SessionContext;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.LabelControl;
-import de.jwic.controls.WindowControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
-import de.jwic.ecolib.controls.StackedContainer;
-import de.jwic.ecolib.dialogs.DialogEvent;
-import de.jwic.ecolib.dialogs.DialogListener;
-import de.jwic.ecolib.util.ValidationException;
-import de.jwic.ecolib.wizard.Wizard;
-import de.jwic.ecolib.wizard.WizardPage;
+import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.Label;
+import de.jwic.controls.Window;
+import de.jwic.controls.dialogs.DialogEvent;
+import de.jwic.controls.dialogs.DialogListener;
+import de.jwic.controls.wizard.ValidationException;
+import de.jwic.controls.wizard.Wizard;
+import de.jwic.controls.wizard.WizardPage;
+import de.jwic.controls.StackedContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.Messages;
@@ -40,15 +40,15 @@ public class WizardContainerFix {
 	private ControlContainer container;
 	private List listeners = null;
 	
-	private ButtonControl btBack = null;
-	private ButtonControl btNext = null;
-	private ButtonControl btFinish = null;
-	private ButtonControl btAbort = null;
+	private Button btBack = null;
+	private Button btNext = null;
+	private Button btFinish = null;
+	private Button btAbort = null;
 	
-	private LabelControl lblPageTitle = null;
-	private LabelControl lblPageSubTitle = null;
+	private Label lblPageTitle = null;
+	private Label lblPageSubTitle = null;
 	
-	private ErrorWarningControl errorWarning = null;
+	private ErrorWarning errorWarning = null;
 	
 	private StackedContainer pages = null;
 	
@@ -158,40 +158,38 @@ public class WizardContainerFix {
 
 		Messages messages = new Messages(container.getSessionContext().getLocale(), "de.jwic.ecolib.wizard.messages");
 		
-		WindowControl win = new WindowControl(container);
-		win.setAlign("center");
+		Window win = new Window(container);		
 		win.setTitle(wizard.getTitle());
 		win.setTemplateName(getClass().getName());
-		win.setWidth("");
 		
-		lblPageTitle = new LabelControl(win, "lblPageTitle");
+		lblPageTitle = new Label(win, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
-		lblPageSubTitle = new LabelControl(win, "lblPageSubTitle");
+		lblPageSubTitle = new Label(win, "lblPageSubTitle");
 		lblPageSubTitle.setCssClass("subtitle");
 		
-		errorWarning = new ErrorWarningControl(win, "errorWarning");
+		errorWarning = new ErrorWarning(win, "errorWarning");
 		errorWarning.setAutoClose(true);
 		
 		pages = new StackedContainer(win, "pages");
-		pages.setWidthHint(wizard.getWidthHint());
-		pages.setHeightHint(wizard.getHeightHint());
+		pages.setWidth(wizard.getWidth());
+		pages.setHeight(wizard.getHeight());
 		
 		
 		NavigationController navContr = new NavigationController();
 		
-		btBack = new ButtonControl(win, "btBack");
+		btBack = new Button(win, "btBack");
 		btBack.setTitle("Back"); // messages.getString("wizard.button.back"));
 		btBack.addSelectionListener(navContr);
 		
-		btNext = new ButtonControl(win, "btNext");
+		btNext = new Button(win, "btNext");
 		btNext.setTitle("Next"); // messages.getString("wizard.button.next"));
 		btNext.addSelectionListener(navContr);
 
-		btFinish = new ButtonControl(win, "btFinish");
+		btFinish = new Button(win, "btFinish");
 		btFinish.setTitle("Finish"); // messages.getString("wizard.button.finish"));
 		btFinish.addSelectionListener(navContr);
 
-		btAbort = new ButtonControl(win, "btAbort");
+		btAbort = new Button(win, "btAbort");
 		btAbort.setTitle("Close"); // messages.getString("wizard.button.abort"));
 		btAbort.addSelectionListener(navContr);
 
@@ -353,28 +351,28 @@ public class WizardContainerFix {
 	/**
 	 * @return the btBack
 	 */
-	public ButtonControl getBtBack() {
+	public Button getBtBack() {
 		return btBack;
 	}
 
 	/**
 	 * @return the btNext
 	 */
-	public ButtonControl getBtNext() {
+	public Button getBtNext() {
 		return btNext;
 	}
 
 	/**
 	 * @return the btFinish
 	 */
-	public ButtonControl getBtFinish() {
+	public Button getBtFinish() {
 		return btFinish;
 	}
 
 	/**
 	 * @return the btAbort
 	 */
-	public ButtonControl getBtAbort() {
+	public Button getBtAbort() {
 		return btAbort;
 	}
 }

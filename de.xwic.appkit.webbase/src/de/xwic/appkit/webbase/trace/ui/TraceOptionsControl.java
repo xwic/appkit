@@ -7,15 +7,15 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.CheckBox;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
 import de.jwic.controls.combo.DropDown;
-import de.jwic.ecolib.controls.ErrorWarningControl;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.trace.ITraceDataManager;
-import de.xwic.appkit.core.trace.Trace;
 import de.xwic.appkit.core.trace.ITraceDataManager.TraceLevel;
+import de.xwic.appkit.core.trace.Trace;
 
 /**
  * Control the Trace facility and view trace statistics.
@@ -24,14 +24,14 @@ import de.xwic.appkit.core.trace.ITraceDataManager.TraceLevel;
  */
 public class TraceOptionsControl extends ControlContainer {
 
-	private ErrorWarningControl errorWarning;
+	private ErrorWarning errorWarning;
 	
-	private LabelControl lbTraceStatus;
+	private Label lbTraceStatus;
 	private Button btOnOff;
 	private DropDown ddTraceLevel;
-	private InputBoxControl inpLogFile;
-	private InputBoxControl inpLogThreshold;
-	private InputBoxControl inpMaxHistory;
+	private InputBox inpLogFile;
+	private InputBox inpLogThreshold;
+	private InputBox inpMaxHistory;
 	private CheckBox chkLogEnabled;
 	private CheckBox chkHistoryEnabled;
 	private Button btUpdate;
@@ -86,9 +86,9 @@ public class TraceOptionsControl extends ControlContainer {
 	 */
 	private void createControls() {
 	
-		errorWarning = new ErrorWarningControl(this, "errorWarning");
+		errorWarning = new ErrorWarning(this, "errorWarning");
 		
-		lbTraceStatus = new LabelControl(this, "lbTraceStatus");
+		lbTraceStatus = new Label(this, "lbTraceStatus");
 		lbTraceStatus.setText("Unknown");
 		
 		btOnOff = new Button(this, "btOnOff");
@@ -108,17 +108,17 @@ public class TraceOptionsControl extends ControlContainer {
 		}
 		ddTraceLevel.setWidth(250);
 		
-		inpLogFile = new InputBoxControl(this, "inpLogFile");
+		inpLogFile = new InputBox(this, "inpLogFile");
 		inpLogFile.setReadonly(true);
 		inpLogFile.setWidth(250);
 		
-		inpLogThreshold = new InputBoxControl(this, "inpLogThreshold");
+		inpLogThreshold = new InputBox(this, "inpLogThreshold");
 		inpLogThreshold.setWidth(250);
 		
 		chkLogEnabled = new CheckBox(this, "chkLogEnabled");
 		chkLogEnabled.setLabel("Enabled");
 		
-		inpMaxHistory = new InputBoxControl(this, "inpMaxHistory");
+		inpMaxHistory = new InputBox(this, "inpMaxHistory");
 		inpMaxHistory.setWidth(250);
 		
 		chkHistoryEnabled = new CheckBox(this, "chkHistoryEnabled");

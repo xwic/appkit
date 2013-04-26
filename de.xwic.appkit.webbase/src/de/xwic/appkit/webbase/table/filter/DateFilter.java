@@ -8,9 +8,9 @@ package de.xwic.appkit.webbase.table.filter;
 import java.util.Date;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.DatePicker;
+import de.jwic.controls.Label;
 import de.jwic.controls.combo.DropDown;
-import de.jwic.ecolib.controls.datepicker.DatePickerControl;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
@@ -24,9 +24,9 @@ import de.xwic.appkit.webbase.table.Column;
 public class DateFilter extends AbstractFilterControl {
 
 	private DropDown ddLogic;
-	private DatePickerControl inpDateFrom;
-	private DatePickerControl inpDateTo;
-	private LabelControl lblTo;
+	private DatePicker inpDateFrom;
+	private DatePicker inpDateTo;
+	private Label lblTo;
 	
 	/**
 	 * @param container
@@ -50,10 +50,10 @@ public class DateFilter extends AbstractFilterControl {
 			}
 		});
 
-		inpDateFrom = new DatePickerControl(this, "inpDateFrom");
-		inpDateTo = new DatePickerControl(this, "inpDateTo");
+		inpDateFrom = new DatePicker(this, "inpDateFrom");
+		inpDateTo = new DatePicker(this, "inpDateTo");
 		
-		lblTo = new LabelControl(this, "lblTo");
+		lblTo = new Label(this, "lblTo");
 		lblTo.setText("till");
 		
 		onLogicUpdate();

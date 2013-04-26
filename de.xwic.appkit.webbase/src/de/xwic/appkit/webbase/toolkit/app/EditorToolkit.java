@@ -10,10 +10,10 @@ import java.util.Map;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckboxControl;
-import de.jwic.controls.IHTMLElement;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.ecolib.controls.datepicker.DatePickerControl;
+import de.jwic.controls.CheckBox;
+import de.jwic.controls.DatePicker;
+import de.jwic.controls.InputBox;
+import de.jwic.util.IHTMLElement;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitCheckBoxControl;
@@ -51,11 +51,11 @@ public class EditorToolkit {
 	
 	
 	static {
-		allControls.put(DatePickerControl.class, new ToolkitDateInputControl());
+		allControls.put(DatePicker.class, new ToolkitDateInputControl());
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
-		allControls.put(InputBoxControl.class, new ToolkitInputBoxControl());
+		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
-		allControls.put(CheckboxControl.class, new ToolkitCheckBoxControl());
+		allControls.put(CheckBox.class, new ToolkitCheckBoxControl());
 		allControls.put(SingleAttachmentControl.class, new ToolkitSingleAttachmentControl());
 		allControls.put(SingleCommentEditorControl.class, new ToolkitMultiAttachmentControl());
 	}
@@ -78,7 +78,7 @@ public class EditorToolkit {
 	}
 	
 	/**
-	 * Create a control by given control type like InputBoxControl.class
+	 * Create a control by given control type like InputBox.class
 	 * 
 	 * @param controlType the class type
 	 * @param container parent
@@ -197,9 +197,9 @@ public class EditorToolkit {
 			
 			helper.loadContent(control, value);
 			
-//			if (control instanceof DateInputBoxControl) {
+//			if (control instanceof DateInputBox) {
 //				if (null != value) {
-//					((DateInputBoxControl) control).setDate((Date) value);
+//					((DateInputBox) control).setDate((Date) value);
 //				}
 ////			} else if (control instanceof PicklistEntryControl) {
 ////				PicklistEntryControl plcombo = (PicklistEntryControl) control;
@@ -230,11 +230,11 @@ public class EditorToolkit {
 //			} else if (control instanceof SingleAttachmentControl) {
 //				SingleAttachmentControl sac = (SingleAttachmentControl) control;
 //				sac.loadAttachment((IAttachment) value);
-//			} else if (control instanceof InputBoxControl) {
-//				InputBoxControl inp = (InputBoxControl) control;
+//			} else if (control instanceof InputBox) {
+//				InputBox inp = (InputBox) control;
 //				inp.setText(value != null ? value.toString() : "");
-//			} else if (control instanceof CheckboxControl) {
-//				CheckboxControl inp = (CheckboxControl) control;
+//			} else if (control instanceof CheckBox) {
+//				CheckBox inp = (CheckBox) control;
 //				boolean boolVal = ((Boolean) value).booleanValue();
 //				if (boolVal) {
 //					inp.setSelectedKey(propName);
@@ -303,22 +303,22 @@ public class EditorToolkit {
 			value = helper.getContent(control);
 			
 			//yet, no extra "converter" classes
-//			if (control instanceof DateInputBoxControl) {
-//				value = ((DateInputBoxControl) control).getDate();
+//			if (control instanceof DateInputBox) {
+//				value = ((DateInputBox) control).getDate();
 //			} else if (control instanceof PicklistEntryControl) {
 //				PicklistEntryControl plcombo = (PicklistEntryControl) control;
 //				value = plcombo.getSelectionEntry();
 //			}else if (control instanceof ExpertiseControl) {
 //				ExpertiseControl plcombo = (ExpertiseControl) control;
 //				value = plcombo.getSelectedEntries();
-//			} else if (control instanceof InputBoxControl) {
-//				InputBoxControl inp = (InputBoxControl) control;
+//			} else if (control instanceof InputBox) {
+//				InputBox inp = (InputBox) control;
 //				value = inp.getText();
 //			} else if (control instanceof PicklistEntryCheckControl) {
 //				PicklistEntryCheckControl checkCon = (PicklistEntryCheckControl) control;
 //				value = checkCon.getSelectionEntrySet();
-//			} else if (control instanceof CheckboxControl) {
-//				CheckboxControl inp = (CheckboxControl) control;
+//			} else if (control instanceof CheckBox) {
+//				CheckBox inp = (CheckBox) control;
 //				value = Boolean.valueOf(propName.equals(inp.getSelectedKey()));
 //			} else if (control instanceof IEntityListBoxControl) {
 //				IEntityListBoxControl entityCon = (IEntityListBoxControl) control;

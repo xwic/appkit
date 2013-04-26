@@ -13,9 +13,8 @@ import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.JWicException;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.Label;
 
 /**
  * Special actionbar control showing entity related information like
@@ -33,7 +32,12 @@ public class EntityInformationActionBarControl extends ControlContainer {
 
 	private boolean showInformation = false;
 	
-	private LabelControl lastModi, lastModiAt, createdFrom, createdAt;
+	private Label lastModi, lastModiAt, createdFrom, createdAt;
+	
+	public enum Align {
+		LEFT,
+		RIGHT
+	}
 	
 	/**
 	 * @param container
@@ -48,10 +52,10 @@ public class EntityInformationActionBarControl extends ControlContainer {
 	public EntityInformationActionBarControl(IControlContainer container, String name) {
 		super(container, name);
 		
-		lastModi = new LabelControl(this, "lastModifiedFrom");
-		lastModiAt = new LabelControl(this, "lastModifiedAt");
-		createdFrom = new LabelControl(this, "createdFrom");
-		createdAt = new LabelControl(this, "createdAt");
+		lastModi = new Label(this, "lastModifiedFrom");
+		lastModiAt = new Label(this, "lastModifiedAt");
+		createdFrom = new Label(this, "createdFrom");
+		createdAt = new Label(this, "createdAt");
 
 	}
 	
@@ -61,11 +65,11 @@ public class EntityInformationActionBarControl extends ControlContainer {
 	public void registerControl(Control control, String name) throws JWicException {
 		super.registerControl(control, name);
 
-		if (control instanceof ButtonControl) {
+		if (control instanceof Button) {
 			elements.add(control);
 			control.setTemplateName(control.getTemplateName() + "_Action");
 		}
-		else if (!(control instanceof LabelControl)) {
+		else if (!(control instanceof Label)) {
 			elements.add(control);
 		}
 	}
@@ -99,15 +103,15 @@ public class EntityInformationActionBarControl extends ControlContainer {
 	 * @param control
 	 * @param align
 	 */
-	public void setPosition(Control control, ActionBarControl.Align align) {
+	public void setPosition(Control control, Align align) {
 		
 		// move the element between lists
 		if (!(elements.contains(control) || rightElements.contains(control))) {
 			throw new IllegalArgumentException("The specified control is not a member of this action bar.");
 		}
 		
-		List<Control> a = (align == ActionBarControl.Align.LEFT ? rightElements : elements);
-		List<Control> b = (align == ActionBarControl.Align.LEFT ? elements : rightElements);
+		List<Control> a = (align == Align.LEFT ? rightElements : elements);
+		List<Control> b = (align == Align.LEFT ? elements : rightElements);
 		
 		if (a.contains(control)) { // only move if it is not already there...
 			a.remove(control);

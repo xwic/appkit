@@ -13,8 +13,8 @@ import java.util.Map;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.SerObservable;
@@ -40,9 +40,9 @@ public class CommentEditorControl extends ControlContainer implements IEditorMod
     private IEntityCommentDAO commentDAO;
 
     private EntityInformationActionBarControl actionBar = null;
-    private ButtonControl btNew = null;
+    private Button btNew = null;
 	
-    private ErrorWarningControl errorControl = null;
+    private ErrorWarning errorControl = null;
     
 	public CommentEditorControl(IControlContainer container, String name, EditorModel model) {
 		super(container, name);
@@ -58,12 +58,12 @@ public class CommentEditorControl extends ControlContainer implements IEditorMod
 	
 	private void createControls() {
 		actionBar = new EntityInformationActionBarControl(this, "actionbar");
-		errorControl = new ErrorWarningControl(this, "errorControl");
+		errorControl = new ErrorWarning(this, "errorControl");
 		errorControl.setAutoClose(true);
 		errorControl.setShowStackTrace(false);
 		
 		
-		btNew = new ButtonControl(actionBar);
+		btNew = new Button(actionBar);
 		btNew.setTitle("New Comment");
 		btNew.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
@@ -167,7 +167,7 @@ public class CommentEditorControl extends ControlContainer implements IEditorMod
 	/**
 	 * @return the errorControl
 	 */
-	public ErrorWarningControl getErrorControl() {
+	public ErrorWarning getErrorControl() {
 		return errorControl;
 	}
 }

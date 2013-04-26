@@ -16,11 +16,12 @@ import org.apache.commons.logging.LogFactory;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
-import de.jwic.controls.ActionBarControl;
-import de.jwic.controls.ButtonControl;
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.Button;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
+import de.jwic.data.IContentProvider;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -33,7 +34,6 @@ import de.xwic.appkit.core.config.list.ListSetup;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.webbase.utils.UserConfigXmlReader;
 import de.xwic.appkit.webbase.utils.UserListUtil;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
 import de.xwic.appkit.webbase.viewer.EntityTableViewer;
@@ -88,10 +88,10 @@ public abstract class BaseBrowserView extends ControlContainer {
 			}
 		});
 
-		ActionBarControl aBar = entityTableViewer.getActionBar();
-
+		ToolBar aBar = entityTableViewer.getToolBar();
+		ToolBarGroup tbg = aBar.addGroup();
 		if (getListSetup().isActionEnabled(ListSetup.ACTION_EDIT)) {
-			ButtonControl buttonEdit = new ButtonControl(aBar);
+			Button buttonEdit = tbg.addButton();
 			buttonEdit.setTitle("Edit");
 			ImageRef imgDef = new ImageRef(BaseBrowserView.class.getPackage(), "editor.gif");
 			buttonEdit.setIconEnabled(imgDef);
@@ -103,7 +103,7 @@ public abstract class BaseBrowserView extends ControlContainer {
 		}
 
 		if (getListSetup().isActionEnabled(ListSetup.ACTION_CREATE)) {
-			ButtonControl buttonAdd = new ButtonControl(aBar);
+			Button buttonAdd = tbg.addButton();
 			buttonAdd.setTitle("New");
 			ImageRef imgDef = new ImageRef(BaseBrowserView.class.getPackage(), "newfile_wiz.gif");
 			buttonAdd.setIconEnabled(imgDef);
@@ -115,7 +115,7 @@ public abstract class BaseBrowserView extends ControlContainer {
 		}
 
 		if (getListSetup().isActionEnabled(ListSetup.ACTION_DELETE)) {
-			ButtonControl buttonDelete = new ButtonControl(aBar);
+			Button buttonDelete = tbg.addButton();
 			buttonDelete.setTitle("Delete");
 			ImageRef imgDef = new ImageRef(BaseBrowserView.class.getPackage(), "remove.gif");
 			buttonDelete.setIconEnabled(imgDef);

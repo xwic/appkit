@@ -15,11 +15,10 @@ import de.jwic.base.IControlContainer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.Page;
 import de.jwic.controls.Button;
-import de.jwic.controls.ListBoxControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
-import de.jwic.ecolib.tableviewer.export.ExcelExportControl;
-import de.jwic.ecolib.toolbar.Toolbar;
-import de.jwic.ecolib.toolbar.ToolbarGroup;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.ListBox;
+import de.jwic.controls.ToolBar;
+import de.jwic.controls.ToolBarGroup;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -42,6 +41,7 @@ import de.xwic.appkit.webbase.actions.EntityActionNew;
 import de.xwic.appkit.webbase.actions.EntityActionsHelper;
 import de.xwic.appkit.webbase.actions.IEntityAction;
 import de.xwic.appkit.webbase.actions.IEntityProvider;
+import de.xwic.appkit.webbase.controls.export.ExcelExportControl;
 import de.xwic.appkit.webbase.dialog.DialogEvent;
 import de.xwic.appkit.webbase.dialog.DialogWindowAdapter;
 import de.xwic.appkit.webbase.entityviewer.config.UserConfigurationWindow;
@@ -67,7 +67,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	private AbstractQuickFilterPanel quickFilterPanel;
 	
 	protected EntityTable entityTable;
-	protected Toolbar toolbar;
+	protected ToolBar toolbar;
 
 	protected int widthDecrease = 50;
 	protected int heightDecrease = 230;
@@ -78,7 +78,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected List<IEntityAction> standardActions;
 	protected List<IEntityAction> extensionActions;
 
-	protected ErrorWarningControl errorWarning;
+	protected ErrorWarning errorWarning;
 
 	private DAO dao;
 	
@@ -149,9 +149,9 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		// add the entity class to the viewId, just to be sure
 		configuration.setViewId(configuration.getEntityClass().getName() + "-" + configuration.getViewId());
 		
-		toolbar = new Toolbar(this, "toolbar");
+		toolbar = new ToolBar(this, "toolbar");
 		
-		errorWarning = new ErrorWarningControl(this, "errorWarning");
+		errorWarning = new ErrorWarning(this, "errorWarning");
         errorWarning.setAutoClose(true);
         errorWarning.setShowStackTrace(false);
 		
@@ -159,7 +159,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		entityTable = new EntityTable(this, "entityTable", configuration, false);
 
 		// remove the - All - selection and add 200 and 500 
-		ListBoxControl lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
+		ListBox lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
 		lbMaxLines.clear();
 		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
 		String msg = "%s rows per page";
@@ -179,7 +179,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		entityTable.getModel().getUserConfigHandler().initUserConfig();
 		entityTable.getTableViewer().getModel().setMaxLines(entityTable.getModel().getUserConfigHandler().getMaxRows());
 		
-		ToolbarGroup grpRight = toolbar.addRightGroup();
+		ToolBarGroup grpRight = toolbar.addRightGroup();
 
 		if (showClearFilters()) {
 			ClearFiltersButton clearFilters = new ClearFiltersButton(grpRight, null, entityTable.getModel());
@@ -255,7 +255,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * Add the New, Edit, Delete actions
 	 */
 	protected void addStandardActions() {
-		ToolbarGroup tg = toolbar.addGroup();
+		ToolBarGroup tg = toolbar.addGroup();
 
 		Site site = ExtendedApplication.getInstance(this).getSite();
 
@@ -313,7 +313,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * 
 	 */
 	protected void loadActionsFromExtensions() {
-		ToolbarGroup tg = toolbar.addGroup();
+		ToolBarGroup tg = toolbar.addGroup();
 		Site site = ExtendedApplication.getInstance(this).getSite();
 		
 		Map<String, List<IEntityAction>> actionsInGroups = EntityActionsHelper.getEntityActionsInGroups(site, this, getClass().getName(), configuration.getEntityClass());
@@ -341,7 +341,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		}
 		
 		userConfigWindow = new UserConfigurationWindow(ExtendedApplication.getInstance(this).getSite(), entityTable.getModel());
-		userConfigWindow.setClosable(false);
+		userConfigWindow.setCloseable(false);
 		userConfigWindow.addDialogWindowListener(new DialogWindowAdapter() {
 			@Override
 			public void onDialogAborted(DialogEvent event) {
@@ -392,7 +392,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	/**
 	 * @return
 	 */
-	public Toolbar getToolbar() {
+	public ToolBar getToolbar() {
 		return toolbar;
 	}
 
@@ -474,7 +474,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	}
 	
 	 /**
-     * Show the ErrorWarningControl as error with red background
+     * Show the ErrorWarning as error with red background
      * 
      * @param message
      */
@@ -484,7 +484,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
     }
 
     /**
-     * Show the ErrorWarningControl with an exception.
+     * Show the ErrorWarning with an exception.
      * 
      * @param e
      */

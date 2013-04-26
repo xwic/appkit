@@ -10,7 +10,8 @@ import java.util.List;
 import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.WindowControl;
+import de.jwic.controls.Window;
+import de.jwic.controls.Window;
 import de.xwic.appkit.webbase.toolkit.util.BundleAccessor;
 
 /**
@@ -83,8 +84,8 @@ public class BreadCrumbControl extends Control implements IStackChangedListener 
         if (control instanceof IPageControl) {
             IPageControl page = (IPageControl) control;
             return page.getTitle();
-        } else if (control instanceof WindowControl) {
-            WindowControl win = (WindowControl) control;
+        } else if (control instanceof Window) {
+            Window win = (Window) control;
             return win.getTitle();
         } else if (control instanceof ControlContainer) {
             // controlContainer has no title -> look for usefull content...

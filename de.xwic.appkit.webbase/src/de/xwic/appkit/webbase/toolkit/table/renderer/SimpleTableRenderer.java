@@ -18,14 +18,14 @@ import de.jwic.base.IControlRenderer;
 import de.jwic.base.ImageRef;
 import de.jwic.base.JWicRuntime;
 import de.jwic.base.RenderContext;
-import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.ITableLabelProvider;
-import de.jwic.ecolib.tableviewer.ITableRenderer;
-import de.jwic.ecolib.tableviewer.RowContext;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableModel;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.tableviewer.DefaultTableRenderer;
+import de.jwic.controls.tableviewer.ITableLabelProvider;
+import de.jwic.controls.tableviewer.ITableRenderer;
+import de.jwic.controls.tableviewer.RowContext;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.TableViewer;
+import de.jwic.data.IContentProvider;
 
 /**
  * Provides more generic interface to the cell rendering.

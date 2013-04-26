@@ -16,8 +16,8 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.CheckBox;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.ListBox;
 import de.jwic.controls.ListEntry;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -49,9 +49,9 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	private List<String> existingItems = null;
 	private List<String> availableItems = null;
 
-	private ListBoxControl listExistingColumns = null;
-	private ListBoxControl listAvailableColumns = null;
-	private InputBoxControl ibName;
+	private ListBox listExistingColumns = null;
+	private ListBox listAvailableColumns = null;
+	private InputBox ibName;
 	private CheckBox chkPublic;
 
 	private ListSetup ls;
@@ -84,10 +84,10 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	}
 
 	private void createContents() {
-		listExistingColumns = new ListBoxControl(this, "listExisting");
+		listExistingColumns = new ListBox(this, "listExisting");
 		listExistingColumns.setFillWidth(true);
 		listExistingColumns.setSize(20);
-		listExistingColumns.setMultiple(true);
+		listExistingColumns.setMultiSelect(true);
 		// add double click listener
 		listExistingColumns.setChangeNotification(true);
 		listExistingColumns.addElementSelectedListener(new ElementSelectedListener() {
@@ -100,10 +100,10 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 			}
 		});
 		
-		listAvailableColumns = new ListBoxControl(this, "listAvailable");
+		listAvailableColumns = new ListBox(this, "listAvailable");
 		listAvailableColumns.setFillWidth(true);
 		listAvailableColumns.setSize(20);
-		listAvailableColumns.setMultiple(true);
+		listAvailableColumns.setMultiSelect(true);
 		listAvailableColumns.setChangeNotification(true);
 		// add double click listener
 		listAvailableColumns.addElementSelectedListener(new ElementSelectedListener() {
@@ -117,7 +117,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 		});
 		
 
-		ibName = new InputBoxControl(this, "ibName");
+		ibName = new InputBox(this, "ibName");
 		ibName.setFillWidth(true);
 		
 		chkPublic = new CheckBox(this, "chkPublic");
@@ -318,7 +318,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	 * @return the selected elements
 	 */
 	public Collection<ListEntry> getSelectedColumns() {
-		return listExistingColumns.getElements();
+		return listExistingColumns.buildEntryList();
 	}
 
 	private void addSourceElements(String elements[]) {
@@ -338,7 +338,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	}
 
 	public void handleAddAll() {
-		Collection<ListEntry> allExisting = listAvailableColumns.getElements();
+		Collection<ListEntry> allExisting = listAvailableColumns.buildEntryList();
 		String[] titles = new String[allExisting.size()];
 
 		int i = 0;
@@ -358,7 +358,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 		for (int i = 0; i < selections.length; i++) {
 			if (!"".equals(selections[i])) {
 				toAdd[i] = getElements(listAvailableColumns, selections[i])[0];
-				listAvailableColumns.removeElement(selections[i]);
+				listAvailableColumns.removeElementByKey(selections[i]);
 			}
 		}
 
@@ -367,7 +367,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 
 	public void handleDown() {
 		String[] selectedKeys = listExistingColumns.getSelectedKeys();
-		Collection<ListEntry> allItems = listExistingColumns.getElements();
+		Collection<ListEntry> allItems = listExistingColumns.buildEntryList();
 
 		LinkedList<ListEntry> entries = new LinkedList<ListEntry>();
 		entries.addAll(allItems);
@@ -415,7 +415,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 		for (int i = 0; i < selections.length; i++) {
 			if (!"".equals(selections[i])) {
 				toRemove[i] = getElements(listExistingColumns, selections[i])[0];
-				listExistingColumns.removeElement(selections[i]);
+				listExistingColumns.removeElementByKey(selections[i]);
 			}
 		}
 
@@ -423,7 +423,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	}
 
 	public void handleRemoveAll() {
-		Collection<ListEntry> allExisting = listExistingColumns.getElements();
+		Collection<ListEntry> allExisting = listExistingColumns.buildEntryList();
 		String[] titles = new String[allExisting.size()];
 
 		int i = 0;
@@ -440,9 +440,9 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	 * @param key
 	 * @return the elements with the given key from the list as a String[]
 	 */
-	private String[] getElements(ListBoxControl sourceList, String key) {
+	private String[] getElements(ListBox sourceList, String key) {
 		List<String> list = new ArrayList<String>();
-		for (Iterator<ListEntry> it = sourceList.getElements().iterator(); it.hasNext();) {
+		for (Iterator<ListEntry> it = sourceList.buildEntryList().iterator(); it.hasNext();) {
 			ListEntry listEntry = (ListEntry) it.next();
 			if (listEntry.key.equals(key)) {
 				list.add(listEntry.title);
@@ -454,7 +454,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 
 	public void handleUp() {
 		String[] selectedKeys = listExistingColumns.getSelectedKeys();
-		Collection<ListEntry> allItems = listExistingColumns.getElements();
+		Collection<ListEntry> allItems = listExistingColumns.buildEntryList();
 
 		LinkedList<ListEntry> entries = new LinkedList<ListEntry>();
 		entries.addAll(allItems);

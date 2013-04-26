@@ -6,7 +6,7 @@ package de.xwic.appkit.webbase.actions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.jwic.ecolib.actions.Action;
+import de.jwic.controls.actions.Action;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.toolkit.app.Site;

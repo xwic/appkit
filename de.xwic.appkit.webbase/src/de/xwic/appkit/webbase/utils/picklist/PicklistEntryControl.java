@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.ListBox;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
@@ -30,7 +30,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * Created on 19.02.2008
  * @author Ronny Pfretzschner
  */
-public class PicklistEntryControl extends ListBoxControl implements IPicklistEntryControl {
+public class PicklistEntryControl extends ListBox implements IPicklistEntryControl {
 
 	String lang = "DE";
 	private boolean allowEmptySelection = true;
@@ -52,7 +52,7 @@ public class PicklistEntryControl extends ListBoxControl implements IPicklistEnt
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
 		this.picklistKey = picklistKey;
 		this.allowEmptySelection = allowEmptySelection;
-		setTemplateName(ListBoxControl.class.getName());
+		setTemplateName(ListBox.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 		setupEntries(lang, picklistKey);
@@ -62,7 +62,7 @@ public class PicklistEntryControl extends ListBoxControl implements IPicklistEnt
 		super(container, name);
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
 		this.allowEmptySelection = allowEmptySelection;
-		setTemplateName(ListBoxControl.class.getName());
+		setTemplateName(ListBox.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = new PicklistEntryComparator(lang);
 		setupEntries(lang, entryList);

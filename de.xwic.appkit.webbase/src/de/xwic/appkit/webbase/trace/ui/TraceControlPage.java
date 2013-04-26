@@ -4,8 +4,8 @@
 package de.xwic.appkit.webbase.trace.ui;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.TabControl;
-import de.jwic.controls.TabStripControl;
+import de.jwic.controls.Tab;
+import de.jwic.controls.TabStrip;
 import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 
 /**
@@ -25,9 +25,9 @@ public class TraceControlPage extends InnerPage {
 		setTitle("Trace Control");
 		setSubtitle("Manage the trace functionality and view statistics.");
 
-		TabStripControl tabStrip = new TabStripControl(this, "tabStrip");
+		TabStrip tabStrip = new TabStrip(this, "tabStrip");
 		
-		TabControl tab = tabStrip.addTab("Options");
+		Tab tab = tabStrip.addTab("Options");
 		new TraceOptionsControl(tab, null);
 		
 		tab = tabStrip.addTab("Statistic");

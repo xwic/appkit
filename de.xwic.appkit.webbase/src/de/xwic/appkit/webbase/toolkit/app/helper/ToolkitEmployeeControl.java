@@ -5,7 +5,7 @@ package de.xwic.appkit.webbase.toolkit.app.helper;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
+import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.toolkit.app.IToolkitControlHelper;
 import de.xwic.appkit.webbase.toolkit.components.EmployeeSelectionCombo;
@@ -54,7 +54,7 @@ public class ToolkitEmployeeControl implements IToolkitControlHelper {
 	 * @see de.xwic.appkit.webbase.toolkit.app.IToolkitControlHelper#markField(de.jwic.base.IControl, java.lang.String)
 	 */
 	public void markField(IControl control, String cssClass) {
-		if (control instanceof InputBoxControl) {
+		if (control instanceof InputBox) {
 			EmployeeSelectionCombo ibcCon = (EmployeeSelectionCombo) control;
 			ibcCon.setCssClass(cssClass);
 		}

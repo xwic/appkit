@@ -27,7 +27,7 @@ import java.util.TimeZone;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.jwic.ecolib.tableviewer.CellLabel;
+import de.jwic.controls.tableviewer.CellLabel;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.list.ListColumn;

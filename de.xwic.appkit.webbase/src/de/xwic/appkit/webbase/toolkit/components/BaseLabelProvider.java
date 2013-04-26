@@ -3,9 +3,9 @@
  */
 package de.xwic.appkit.webbase.toolkit.components;
 
-import de.jwic.ecolib.tableviewer.CellLabel;
-import de.jwic.ecolib.tableviewer.RowContext;
-import de.jwic.ecolib.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.CellLabel;
+import de.jwic.controls.tableviewer.RowContext;
+import de.jwic.controls.tableviewer.TableColumn;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 import de.xwic.appkit.webbase.viewer.base.PropertyLabelProvider;

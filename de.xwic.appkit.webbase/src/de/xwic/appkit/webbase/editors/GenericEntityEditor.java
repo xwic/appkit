@@ -9,7 +9,7 @@ package de.xwic.appkit.webbase.editors;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.TabControl;
+import de.jwic.controls.Tab;
 import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.webbase.editors.builders.Builder;
@@ -57,7 +57,7 @@ public class GenericEntityEditor extends ControlContainer {
 //			
 //			for (Iterator it = tabs.iterator(); it.hasNext();) {
 //				ETab eTab = (ETab) it.next();
-//				TabControl tab = mainTabs.addTab(eTab.getTitle());
+//				Tab tab = mainTabs.addTab(eTab.getTitle());
 //				
 //				createPage(tab, eTab);
 //			}
@@ -72,7 +72,7 @@ public class GenericEntityEditor extends ControlContainer {
 	 * @param tab
 	 * @param eTab
 	 */
-	private void createPage(TabControl tab, ETab eTab) {
+	private void createPage(Tab tab, ETab eTab) {
 		Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
 		builder.buildComponents(eTab, tab, context);
 	}

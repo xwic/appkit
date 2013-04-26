@@ -4,7 +4,6 @@
 package de.xwic.appkit.webbase.dialog;
 
 import de.jwic.controls.Window;
-import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**

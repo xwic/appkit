@@ -1,10 +1,10 @@
 package de.xwic.appkit.webbase.async;
 
+import de.jwic.async.IAsyncProcess;
+import de.jwic.async.IProcessListener;
+import de.jwic.async.ProcessEvent;
+import de.jwic.async.ProcessInfo;
 import de.jwic.base.JavaScriptSupport;
-import de.jwic.ecolib.async.IAsyncProcess;
-import de.jwic.ecolib.async.IProcessListener;
-import de.jwic.ecolib.async.ProcessEvent;
-import de.jwic.ecolib.async.ProcessInfo;
 import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;

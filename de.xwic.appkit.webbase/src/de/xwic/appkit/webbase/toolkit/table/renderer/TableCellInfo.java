@@ -3,9 +3,9 @@
  */
 package de.xwic.appkit.webbase.toolkit.table.renderer;
 
-import de.jwic.ecolib.tableviewer.CellLabel;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.tableviewer.CellLabel;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableViewer;
 
 /**
  * @author Oleksiy Samokhvalov

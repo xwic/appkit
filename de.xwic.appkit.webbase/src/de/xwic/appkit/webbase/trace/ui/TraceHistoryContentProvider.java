@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.xwic.appkit.core.trace.ITraceContext;
 import de.xwic.appkit.core.trace.ITraceDataManager;
 import de.xwic.appkit.core.trace.Trace;
@@ -92,6 +92,11 @@ public class TraceHistoryContentProvider implements IContentProvider<ITraceConte
 	public void setMinDuration(int minDuration) {
 		this.minDuration = minDuration;
 		
+	}
+
+	@Override
+	public ITraceContext getObjectFromKey(String uniqueKey) {
+		return null;
 	}
 
 	

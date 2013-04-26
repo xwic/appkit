@@ -14,8 +14,8 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.CheckBox;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.ListBox;
 import de.jwic.controls.combo.DropDown;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -85,10 +85,10 @@ public abstract class AbstractQuickFilterPanel extends ControlContainer {
 					if (!dd.isMultiSelect()) {
 						dd.addElementSelectedListener(getElementSelectedListener());
 					}
-				} else if (control instanceof ListBoxControl) {
-					((ListBoxControl) control).addElementSelectedListener(getElementSelectedListener());
-				} else if (control instanceof InputBoxControl) {
-					((InputBoxControl) control).addKeyListener(getKeyListener());
+				} else if (control instanceof ListBox) {
+					((ListBox) control).addElementSelectedListener(getElementSelectedListener());
+				} else if (control instanceof InputBox) {
+					((InputBox) control).addKeyListener(getKeyListener());
 				} else if (control instanceof CheckBox) {
 					((CheckBox) control).addValueChangedListener(getValueChangedListener());
 				}

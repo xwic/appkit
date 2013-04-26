@@ -4,7 +4,7 @@
 package de.xwic.appkit.webbase.toolkit.app;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.AnchorLinkControl;
+import de.jwic.controls.AnchorLink;
 import de.xwic.appkit.core.dao.DAOSystem;
 
 /**
@@ -13,7 +13,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
  * @author Ronny Pfretzschner
  *
  */
-public class LogoutControl extends AnchorLinkControl {
+public class LogoutControl extends AnchorLink {
     
 	private String confirmMessage;
 

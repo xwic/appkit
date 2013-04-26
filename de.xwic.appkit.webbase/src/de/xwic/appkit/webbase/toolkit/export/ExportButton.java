@@ -10,14 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
-import de.jwic.controls.ButtonControl;
+import de.jwic.controls.Button;
 
 /**
  * @author Oleksiy Samokhvalov
  *
  */
 @SuppressWarnings("serial")
-public class ExportButton  extends ButtonControl implements IResourceControl {
+public class ExportButton  extends Button implements IResourceControl {
 
 	private IExportContentProvider contentProvider;
 	

@@ -12,7 +12,7 @@
 package de.xwic.appkit.webbase.toolkit.components;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ListBoxControl;
+import de.jwic.controls.ListBox;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.IEntity;
 
@@ -20,7 +20,7 @@ import de.xwic.appkit.core.dao.IEntity;
  * Created on 01.04.2008
  * @author Ronny Pfretzschner
  */
-public abstract class AbstractEntityComboControl extends ListBoxControl implements
+public abstract class AbstractEntityComboControl extends ListBox implements
 		IEntityListBoxControl {
 
 	protected boolean allowEmptySelection = true;
@@ -28,7 +28,7 @@ public abstract class AbstractEntityComboControl extends ListBoxControl implemen
 	
 	public AbstractEntityComboControl(IControlContainer container, String name) {
 		super(container, name);
-		setTemplateName(ListBoxControl.class.getName());
+		setTemplateName(ListBox.class.getName());
 	}
 
 	

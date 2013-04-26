@@ -16,10 +16,10 @@ import java.io.InputStream;
 import java.text.NumberFormat;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.FileUploadControl;
-import de.jwic.controls.WindowControl;
-import de.jwic.ecolib.controls.ErrorWarningControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.FileUpload;
+import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.webbase.toolkit.app.Site;
@@ -44,11 +44,11 @@ public class AddAttachmentDialog extends  Dialog {
 	
 	private int maxFileSize = MAX_FILE_SIZE;
 
-	protected ErrorWarningControl error = null;
-	protected FileUploadControl fileUpload;
-	protected WindowControl win;
-	protected ButtonControl btFinish;
-	protected ButtonControl btAbort;
+	protected ErrorWarning error = null;
+	protected FileUpload fileUpload;
+	protected Window win;
+	protected Button btFinish;
+	protected Button btAbort;
 	
 	/**
 	 * Creates small dialog for uploading a file from local (client side) file system.
@@ -63,22 +63,21 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @see de.jwic.wap.core.Dialog#createControls(de.jwic.base.IControlContainer)
 	 */
 	public void createControls(IControlContainer container) {
-		win = new WindowControl(container, "scrollcontainer");
+		win = new Window(container, "scrollcontainer");
 		win.setTemplateName(getClass().getName());
-		win.setWidth("450");
-		win.setAlign("center");
+		win.setWidth(450);
 		win.setTitle("File Upload");
 	
-		error = new ErrorWarningControl(win, "error");
+		error = new ErrorWarning(win, "error");
 		
-        fileUpload = new FileUploadControl(win, "fileUpload");
-        fileUpload.setSize("53");
+        fileUpload = new FileUpload(win, "fileUpload");
+        fileUpload.setWidth(53);
         
-		btFinish = new ButtonControl(win, "Finish");
+		btFinish = new Button(win, "Finish");
 		btFinish.setTitle("Upload");
 		btFinish.setIconEnabled(ImageLibrary.ICON_SAVECLOSE_ACTIVE);
 		btFinish.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
-		btFinish.setSubmitButton(true);
+//		btFinish.setSubmitButton(true);
 		btFinish.addSelectionListener(new SelectionListener() {
 			public void objectSelected(SelectionEvent event) {
 				boolean erg = validate();
@@ -88,7 +87,7 @@ public class AddAttachmentDialog extends  Dialog {
 			}
 		});
 	
-		btAbort = new ButtonControl(win, "Abort");
+		btAbort = new Button(win, "Abort");
 		btAbort.setTitle("Cancel");
 		btAbort.setIconDisabled(ImageLibrary.ICON_ABORT_INACTIVE);
 		btAbort.setIconEnabled(ImageLibrary.ICON_ABORT_ACTIVE);
@@ -185,14 +184,14 @@ public class AddAttachmentDialog extends  Dialog {
 	/**
 	 * @return the btFinish
 	 */
-	public ButtonControl getBtFinish() {
+	public Button getBtFinish() {
 		return btFinish;
 	}
 
 	/**
 	 * @return the btAbort
 	 */
-	public ButtonControl getBtAbort() {
+	public Button getBtAbort() {
 		return btAbort;
 	}
 	

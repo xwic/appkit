@@ -5,9 +5,9 @@ package de.xwic.appkit.webbase.toolkit.table.renderer;
 
 import java.io.PrintWriter;
 
-import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.TableModel;
+import de.jwic.controls.tableviewer.DefaultTableRenderer;
+import de.jwic.controls.tableviewer.TableModel;
+import de.jwic.data.IContentProvider;
 
 /**
  * @author Oleksiy Samokhvalov

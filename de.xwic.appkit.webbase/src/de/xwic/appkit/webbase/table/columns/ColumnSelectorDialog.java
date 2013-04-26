@@ -7,9 +7,8 @@ package de.xwic.appkit.webbase.table.columns;
 
 import de.jwic.base.Dimension;
 import de.jwic.base.Page;
-import de.jwic.base.UserAgentInfo;
-import de.jwic.ecolib.controls.coledit.ColumnSelector;
-import de.jwic.ecolib.controls.coledit.ColumnStub;
+import de.jwic.controls.coledit.ColumnSelector;
+import de.jwic.controls.coledit.ColumnStub;
 import de.xwic.appkit.core.config.Bundle;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;

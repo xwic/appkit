@@ -6,7 +6,7 @@ package de.xwic.appkit.webbase.async;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.jwic.ecolib.async.IAsyncProcess;
+import de.jwic.async.IAsyncProcess;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 
 /**

@@ -6,8 +6,8 @@ package de.xwic.appkit.webbase.viewer.base;
 
 import java.util.Iterator;
 
-import de.jwic.ecolib.tableviewer.IContentProvider;
-import de.jwic.ecolib.tableviewer.Range;
+import de.jwic.data.IContentProvider;
+import de.jwic.data.Range;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
@@ -108,6 +108,11 @@ public class DAOContentProvider implements IContentProvider {
 
 	public boolean hasChildren(Object object) {
 		return false;
+	}
+
+	@Override
+	public Object getObjectFromKey(String uniqueKey) {		
+		return null;
 	}
 
 }

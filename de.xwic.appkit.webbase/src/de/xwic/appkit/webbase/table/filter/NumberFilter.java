@@ -7,8 +7,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
 import de.jwic.controls.combo.DropDown;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -24,9 +24,9 @@ import de.xwic.appkit.webbase.table.Column;
 public class NumberFilter extends AbstractFilterControl {
 
 	private final DropDown ddLogic;
-	private final InputBoxControl inpNumberFrom;
-	private final InputBoxControl inpNumberTo;
-	private final LabelControl lblTo;
+	private final InputBox inpNumberFrom;
+	private final InputBox inpNumberTo;
+	private final Label lblTo;
 	private final Log log = LogFactory.getLog(getClass());
 	
 	
@@ -54,13 +54,13 @@ public class NumberFilter extends AbstractFilterControl {
 			}
 		});
 
-		inpNumberFrom = new InputBoxControl(this, "inpNumberFrom");
+		inpNumberFrom = new InputBox(this, "inpNumberFrom");
 		inpNumberFrom.setWidth(70);
 		
-		inpNumberTo = new InputBoxControl(this, "inpNumberTo");
+		inpNumberTo = new InputBox(this, "inpNumberTo");
 		inpNumberTo.setWidth(70);
 		
-		lblTo = new LabelControl(this, "lblTo");
+		lblTo = new Label(this, "lblTo");
 		lblTo.setText("and");
 		
 		onLogicUpdate();

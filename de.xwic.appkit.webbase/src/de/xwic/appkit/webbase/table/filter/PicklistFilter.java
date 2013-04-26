@@ -10,7 +10,7 @@ import java.util.List;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
-import de.jwic.controls.CheckboxControl;
+import de.jwic.controls.CheckBoxGroup;
 import de.jwic.controls.ListEntry;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
@@ -29,7 +29,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryComparator;
  */
 public class PicklistFilter extends AbstractFilterControl {
 
-	private CheckboxControl chkGroup;
+	private CheckBoxGroup chkGroup;
 	
 	/**
 	 * @param container
@@ -38,7 +38,7 @@ public class PicklistFilter extends AbstractFilterControl {
 	public PicklistFilter(IControlContainer container, String name) {
 		super(container, name);
 
-		chkGroup = new CheckboxControl(this, "chkGroup");
+		chkGroup = new CheckBoxGroup(this, "chkGroup");
 		chkGroup.setColumns(1);
 		
 		Button btAll = new Button(this, "btAll");
@@ -75,7 +75,7 @@ public class PicklistFilter extends AbstractFilterControl {
 	protected void touchAll(boolean selAll) {
 		StringBuilder sbKey = new StringBuilder();
 		if (selAll) {
-			for (ListEntry le : chkGroup.getElements()) {
+			for (ListEntry le : chkGroup.buildEntryList()) {
 				sbKey.append(le.key).append(";");
 			}
 		}
@@ -131,7 +131,7 @@ public class PicklistFilter extends AbstractFilterControl {
 	@Override
 	public int getPreferredHeight() {
 					// base height + button heigh + (20 per line)
-		int height = 4 + 24 + (chkGroup.getElements().size() * 20);
+		int height = 4 + 24 + (chkGroup.buildEntryList().size() * 20);
 		if (height > 200) {
 			height = 200;
 		} else if (height < 30) {
@@ -200,7 +200,7 @@ public class PicklistFilter extends AbstractFilterControl {
 				key = ((Integer)queryElement.getValue()).toString();
 			}
 			
-			if (key != null && chkGroup.getElementsKeys().contains(key)) {
+			if (key != null && chkGroup.getContentProvider().getObjectFromKey(key) != null) {
 				if (sbKeys.length() != 0) {
 					sbKeys.append(";");
 				}

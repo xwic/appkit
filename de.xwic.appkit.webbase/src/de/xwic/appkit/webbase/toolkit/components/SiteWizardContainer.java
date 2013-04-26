@@ -5,7 +5,7 @@ package de.xwic.appkit.webbase.toolkit.components;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.ecolib.wizard.Wizard;
+import de.jwic.controls.wizard.Wizard;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**

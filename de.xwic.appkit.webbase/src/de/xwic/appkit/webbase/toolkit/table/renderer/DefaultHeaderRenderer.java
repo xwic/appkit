@@ -7,9 +7,9 @@ import java.io.PrintWriter;
 
 import de.jwic.base.ImageRef;
 import de.jwic.base.JWicRuntime;
-import de.jwic.ecolib.tableviewer.DefaultTableRenderer;
-import de.jwic.ecolib.tableviewer.TableColumn;
-import de.jwic.ecolib.tableviewer.TableViewer;
+import de.jwic.controls.tableviewer.DefaultTableRenderer;
+import de.jwic.controls.tableviewer.TableColumn;
+import de.jwic.controls.tableviewer.TableViewer;
 
 /**
  * @author Oleksiy Samokhvalov

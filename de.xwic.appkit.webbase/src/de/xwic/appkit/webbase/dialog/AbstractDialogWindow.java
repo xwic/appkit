@@ -42,7 +42,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		super(site);
 		setTemplateName(Window.class.getName());
 		setVisible(false);
-		setClosable(false);
+		setCloseable(false);
 		setResizable(false);
 		setMinimizable(false);
 		setMaximizable(false);

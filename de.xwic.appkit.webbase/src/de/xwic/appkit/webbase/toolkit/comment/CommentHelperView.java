@@ -5,9 +5,9 @@ package de.xwic.appkit.webbase.toolkit.comment;
 
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.ButtonControl;
-import de.jwic.controls.InputBoxControl;
-import de.jwic.controls.LabelControl;
+import de.jwic.controls.Button;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.Label;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.model.entities.IEntityComment;
@@ -25,14 +25,14 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class CommentHelperView extends ControlContainer implements IEditorModelListener {
 
-    private LabelControl lbComment, lbAuthor, lbDate;
-    private InputBoxControl inpComment;
-    private LabelControl fldAuthor, fldDate;
+    private Label lbComment, lbAuthor, lbDate;
+    private InputBox inpComment;
+    private Label fldAuthor, fldDate;
     private MultiAttachmentControl attachments;
     private IEntityComment comment;
     private EditorModel model;
-    private ButtonControl btEditComment;
-    private ButtonControl btAddAttachment;
+    private Button btEditComment;
+    private Button btAddAttachment;
     private boolean isSingleComment;
     private boolean readonlyView = false;
     private boolean attachmentsOnly;
@@ -62,9 +62,9 @@ public class CommentHelperView extends ControlContainer implements IEditorModelL
 
 
 	private void createControls() {
-        lbComment = new LabelControl(this, "lbComment");
+        lbComment = new Label(this, "lbComment");
         lbComment.setText("Comment");
-        inpComment = new InputBoxControl(this, "inpComment");
+        inpComment = new InputBox(this, "inpComment");
         inpComment.setRows(2);
         inpComment.setCols(90);
         inpComment.setCssClass("readonly");
@@ -72,19 +72,19 @@ public class CommentHelperView extends ControlContainer implements IEditorModelL
         inpComment.setReadonly(true);
         inpComment.setWidth(500);
 
-        lbDate = new LabelControl(this, "lbDate");
+        lbDate = new Label(this, "lbDate");
         lbDate.setText("Date");
 
-        lbAuthor = new LabelControl(this, "lbAuthor");
+        lbAuthor = new Label(this, "lbAuthor");
         lbAuthor.setText("Author");
 
-        fldAuthor = new LabelControl(this, "fldAuthor");
-        fldDate = new LabelControl(this, "fldDate");
+        fldAuthor = new Label(this, "fldAuthor");
+        fldDate = new Label(this, "fldDate");
 
         attachments = new MultiAttachmentControl(this, "ctlAttachments", model);
         
-        btEditComment = new ButtonControl(this, "btEditComment");
-        //btEditComment.setTemplateName(ButtonControl.class.getName() + "_Action");
+        btEditComment = new Button(this, "btEditComment");
+        //btEditComment.setTemplateName(Button.class.getName() + "_Action");
         btEditComment.setTitle("Edit Comment");
         btEditComment.setIconEnabled(ImageLibrary.ICON_EDIT_ACTIVE);
         btEditComment.addSelectionListener(new SelectionListener() {
@@ -98,8 +98,8 @@ public class CommentHelperView extends ControlContainer implements IEditorModelL
         	}
         });
 
-        btAddAttachment = new ButtonControl(this, "btAddAttachment");
-        //btAddAttachment.setTemplateName(ButtonControl.class.getName() + "_Action");
+        btAddAttachment = new Button(this, "btAddAttachment");
+        //btAddAttachment.setTemplateName(Button.class.getName() + "_Action");
         btAddAttachment.setTitle("Add File");
         btAddAttachment.setIconEnabled(ImageLibrary.ICON_NEW_ACTIVE);
         btAddAttachment.setIconDisabled(ImageLibrary.ICON_NEW_INACTIVE);
