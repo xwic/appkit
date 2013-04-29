@@ -26,9 +26,9 @@
 	afterUpdate: function(element) {
 		
 		
-		var elm = jQuery("#"+JQryEscape("${control.controlID}_graph"));
-		var elmScale = jQuery("#"+JQryEscape("${control.controlID}_scale"));
-		var elmScaleH = jQuery("#"+JQryEscape("${control.controlID}_hScale"));
+		var elm = jQuery("#"+JWic.util.JQryEscape("${control.controlID}_graph"));
+		var elmScale = jQuery("#"+JWic.util.JQryEscape("${control.controlID}_scale"));
+		var elmScaleH = jQuery("#"+JWic.util.JQryEscape("${control.controlID}_hScale"));
 		if (elm) {
 			#if(!$control.hasData)
 				elm.html("No data available.");

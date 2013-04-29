@@ -11,6 +11,7 @@ import java.util.Map;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.CheckBox;
+import de.jwic.controls.CheckBoxGroup;
 import de.jwic.controls.DatePicker;
 import de.jwic.controls.InputBox;
 import de.jwic.util.IHTMLElement;
@@ -55,7 +56,7 @@ public class EditorToolkit {
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
 		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
-		allControls.put(CheckBox.class, new ToolkitCheckBoxControl());
+		allControls.put(CheckBoxGroup.class, new ToolkitCheckBoxControl());
 		allControls.put(SingleAttachmentControl.class, new ToolkitSingleAttachmentControl());
 		allControls.put(SingleCommentEditorControl.class, new ToolkitMultiAttachmentControl());
 	}

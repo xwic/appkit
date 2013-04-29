@@ -11,13 +11,13 @@
 	 */
 	 
 	afterUpdate: function(element) {
-		//var win = jQuery('#'+JQryEscape('win_${control.controlID}_div'));	
+		
 		var dialogWidth = $control.width;
 		//dialogWidth += dialogWidth*10/100;
 		var dialogHeight= $control.height;
 		dialogHeight+= dialogHeight*10/100;
 		
-		var win = jQuery('#'+JQryEscape('filter_${control.controlID}_div')).dialog({
+		var win = jQuery('#'+JWic.util.JQryEscape('filter_${control.controlID}_div')).dialog({
 			autoOpen: false,
 			width : dialogWidth,
 			//height : dialogHeight,
@@ -40,7 +40,7 @@
 		win.dialog('open');	
 		
 		
-		var header = jQuery('#'+JQryEscape('tblViewData_${control.tableViewerId}'));
+		var header = jQuery('#'+JWic.util.JQryEscape('tblViewData_${control.tableViewerId}'));
 		if(header){
 			var column = jQuery(jQuery('table.tbvColHeader',header)[$control.positionIdx]);
 			var offset = column.offset();
@@ -54,7 +54,7 @@
 	 * Destroy the window if it still exists.
 	 */
 	destroy : function(element) {
-		var win = jQuery('#'+JQryEscape('filter_${control.controlID}_div'));	
+		var win = jQuery('#'+JWic.util.JQryEscape('filter_${control.controlID}_div'));	
 		win.dialog('destroy').remove();
 		
 	}
