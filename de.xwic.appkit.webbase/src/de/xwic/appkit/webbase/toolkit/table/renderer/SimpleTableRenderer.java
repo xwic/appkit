@@ -229,7 +229,7 @@ public class SimpleTableRenderer implements ITableRenderer, Serializable{
 			writer.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" + fldTop.getId() + "\" VALUE=\"" + fldTop.getValue() + "\">");
 
 			writer.println("<script language=\"javascript\">");
-			writer.println("window.setTimeout(\"jWic().fixScrolling('" + viewer.getControlID() + "', 'tblViewDataLayer_" + viewer.getControlID() + "');\", 0);");
+			writer.println("window.setTimeout(\"JWic.fixScrolling('" + viewer.getControlID() + "', 'tblViewDataLayer_" + viewer.getControlID() + "');\", 0);");
 			writer.println("</script>");
 		}
 		

@@ -71,7 +71,7 @@ public class DefaultHeaderRenderer implements IHtmlContentRenderer {
 		writer.print("<TABLE class=\"tbvColHeader\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><TR>");
 		writer.print("<TD class=\"tbvColHeadCell\" width=\"" + innerWidth + "\"");
 		if (isColSelectable) {
-			writer.print(" onClick=\"jWic().fireAction('" + viewer.getControlID() + "', 'columnSelection', '" + column.getIndex() + "')\"");
+			writer.print(" onClick=\"JWic.fireAction('" + viewer.getControlID() + "', 'columnSelection', '" + column.getIndex() + "')\"");
 			writer.print(" onMouseDown=\"tblViewer_pushColumn(" + column.getIndex() + ", '" + viewer.getControlID() + "')\"");
 			writer.print(" onMouseUp=\"tblViewer_releaseColumn()\"");
 			writer.print(" onMouseOut=\"tblViewer_releaseColumn()\"");

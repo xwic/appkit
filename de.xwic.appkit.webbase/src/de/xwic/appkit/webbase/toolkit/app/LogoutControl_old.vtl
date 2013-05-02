@@ -3,7 +3,7 @@
 	#if($control.infoMessage)title="$control.infoMessage"#end 
 	onmouseover="window.status='#if($control.infoMessage)$control.infoMessage#else$control.title#end'; return true;" 
 	onmouseout="window.status=''" 
-	href="#" onClick="jWic().fireAction('$control.controlID', 'click', '')" 
+	href="#" onClick="JWic.fireAction('$control.controlID', 'click', '')" 
 	$jwic.generateCssProperty($control)><img src="images/exit_btn_n.png" 
 	alt="" 
 	id="exit_img" 
