@@ -51,7 +51,9 @@ public class DateFilter extends AbstractFilterControl {
 		});
 
 		inpDateFrom = new DatePicker(this, "inpDateFrom");
+		inpDateFrom.setWidth(120);
 		inpDateTo = new DatePicker(this, "inpDateTo");
+		inpDateTo.setWidth(120);
 		
 		lblTo = new Label(this, "lblTo");
 		lblTo.setText("till");
