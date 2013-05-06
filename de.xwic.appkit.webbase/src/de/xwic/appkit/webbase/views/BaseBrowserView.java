@@ -228,18 +228,6 @@ public abstract class BaseBrowserView extends ControlContainer {
 		return null;
 	}
 
-	private String getUserFileLocation() {
-		String str = "";
-		String lsId = getListSetupId();
-
-		if (null == lsId || "".equals(lsId)) {
-			lsId = Setup.ID_DEFAULT;
-		}
-		str = getEntityClassName() + "_" + lsId + "_" + ID_USER + ".xml";
-
-		return str;
-	}
-
 	/**
 	 * @return the EntityDescriptor for the current entity type
 	 */
