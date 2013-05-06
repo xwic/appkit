@@ -355,7 +355,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
 		
-		rdToogleBlanks.setVisible(!column.getListColumn().getFinalProperty().isCollection());
+		rdToogleBlanks.setVisible((column.getListColumn().getFinalProperty() != null && !column.getListColumn().getFinalProperty().isCollection() ? true : false));
 		initializeRadio();
 		
 		// choose the right filter
