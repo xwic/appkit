@@ -240,7 +240,7 @@ public class ColumnsConfigurationSerializer {
 	 * @return
 	 */
 	private String escapeMe(String op) {
-		return op.replace("<", "&lt;").replace(">", "&gt;").replace("&", "&amp;");
+		return op.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 	}
 	
 	/**
