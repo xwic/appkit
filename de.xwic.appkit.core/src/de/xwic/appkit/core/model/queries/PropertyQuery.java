@@ -573,6 +573,13 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		addInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
 	}
 
+	/**
+	 * @param property
+	 * @param values
+	 * @param linkTypeSubQuery
+	 * @param linkTypeElement
+	 * @param operation
+	 */
 	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
 		values = processCollection(values);
 		Set<Set> sets = new HashSet<Set>();
