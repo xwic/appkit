@@ -263,6 +263,11 @@ public class PropertyQueryResolver extends QueryResolver {
 						  .append(aliasPrefix)
 						  .append(qe.getPropertyName())
 						  .append(")");
+					} else if (QueryElement.NOT_EQUALS.equals(qe.getOperation()) && qe.isCollectionElement()) {
+						sb.append("? NOT IN ELEMENTS(")
+						  .append(aliasPrefix)
+						  .append(qe.getPropertyName())
+						  .append(")");
 					}else{
 						sb.append(aliasPrefix)
 						  .append(qe.getPropertyName())
