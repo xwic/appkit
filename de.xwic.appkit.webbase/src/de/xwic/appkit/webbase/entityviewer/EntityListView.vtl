@@ -1,6 +1,16 @@
-$insert.control("toolbar")
-$insert.control("errorWarning")
-#if($control.getQuickFilterPanelName() != "")
-$insert.control($control.getQuickFilterPanelName())
-#end
-$insert.control("entityTable")
+<div class="contentPanel spaceTop">
+	<div class="panelHeader roundTop">
+		$insert.control("toolbar")
+		$insert.control("errorWarning")
+	</div>
+	<div class="panelBody roundBottom">
+		#if($control.getQuickFilterPanelName() != "")
+		<div class="panelFilter">
+			$insert.control($control.getQuickFilterPanelName())
+		</div>
+		#end
+		<div class="panelSection">
+			$insert.control("entityTable")
+		</div>
+	</div>
+</div>
