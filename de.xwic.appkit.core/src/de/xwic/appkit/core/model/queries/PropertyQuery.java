@@ -8,10 +8,13 @@
 package de.xwic.appkit.core.model.queries;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
@@ -539,6 +542,98 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	}
 
 	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addIn(java.lang.String, java.util.Collection)
+	 */
+	@Override
+	public void addIn(String property, Collection<?> values) {
+		addInAux(property, values, QueryElement.AND, QueryElement.OR, QueryElement.IN);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotIn(java.lang.String, java.util.Collection)
+	 */
+	@Override
+	public void addNotIn(String property, Collection<?> values) {
+		addInAux(property, values, QueryElement.AND, QueryElement.AND, QueryElement.NOT_IN);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrIn(java.lang.String, java.util.Collection)
+	 */
+	@Override
+	public void addOrIn(String property, Collection<?> values) {
+		addInAux(property, values, QueryElement.OR, QueryElement.OR, QueryElement.IN);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrNotIn(java.lang.String, java.util.Collection)
+	 */
+	@Override
+	public void addOrNotIn(String property, Collection<?> values) {
+		addInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
+	}
+
+	/**
+	 * @param property
+	 * @param values
+	 * @param linkTypeSubQuery
+	 * @param linkTypeElement
+	 * @param operation
+	 */
+	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
+		values = processCollection(values);
+		Set<Set> sets = new HashSet<Set>();
+		Set set = new HashSet();
+		Iterator iterator = values.iterator();
+		while (iterator.hasNext()) {
+			if (set.size() == 1000) {
+				sets.add(set);
+				set = new HashSet<Integer>();
+			}
+			set.add(iterator.next());
+		}
+		if (!set.isEmpty()) {
+			sets.add(set);
+		}
+		PropertyQuery subQuery = new PropertyQuery();
+		for (Set ids : sets) {
+			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
+		}
+		if (sets.isEmpty()) {
+			addEquals("id", null);
+		} else {
+			addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+		}
+	}
+
+	/**
+	 * @param collection
+	 * @return
+	 */
+	private static Collection<?> processCollection(Collection<?> collection) {
+		if (collection == null) {
+			collection = new ArrayList<Integer>();
+		} else if (!collection.isEmpty()) {
+			if (collection.iterator().next() instanceof IEntity) {
+				collection = getIds((Collection<IEntity>) collection);
+			}
+		}
+		return collection;
+	}
+
+	/**
+	 * @param collection
+	 * @return
+	 */
+	private static Collection<?> getIds(Collection<IEntity> collection) {
+		Set<Integer> ids = new HashSet<Integer>();
+		for (IEntity iEntity : collection) {
+			ids.add(iEntity.getId());
+		}
+		return ids;
+	}
+
+	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -573,7 +668,5 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			return false;
 		return true;
 	}
-	
-	
-	
+
 }

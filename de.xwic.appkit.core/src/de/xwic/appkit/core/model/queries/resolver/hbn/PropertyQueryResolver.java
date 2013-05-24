@@ -263,12 +263,17 @@ public class PropertyQueryResolver extends QueryResolver {
 						  .append(aliasPrefix)
 						  .append(qe.getPropertyName())
 						  .append(")");
+					} else if (QueryElement.NOT_EQUALS.equals(qe.getOperation()) && qe.isCollectionElement()) {
+						sb.append("? NOT IN ELEMENTS(")
+						  .append(aliasPrefix)
+						  .append(qe.getPropertyName())
+						  .append(")");
 					}else{
 						sb.append(aliasPrefix)
 						  .append(qe.getPropertyName())
 						  .append(" ")
 						  .append(qe.getOperation());
-						if (qe.getOperation().equals(QueryElement.IN)) {
+						if (qe.getOperation().equals(QueryElement.IN) || qe.getOperation().equals(QueryElement.NOT_IN)) {
 							// get array/collection size
 							int size = 1;
 							if (qe.getValue().getClass().isArray()) {
@@ -346,7 +351,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 		} else if (value instanceof IEntity) { // Entity
 			q.setEntity(index, value);
-		} else if (element.getOperation().equals(QueryElement.IN)) { 
+		} else if (element.getOperation().equals(QueryElement.IN) || element.getOperation().equals(QueryElement.NOT_IN)) { 
 			if (value.getClass().isArray()) { // array
 				i--;
 				for (Object v : (Object[])value) {

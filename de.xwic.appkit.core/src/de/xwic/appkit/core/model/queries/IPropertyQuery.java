@@ -1,5 +1,7 @@
 package de.xwic.appkit.core.model.queries;
 
+import java.util.Collection;
+
 
 /**
  * Interface for the generic PropertyQuery.
@@ -122,5 +124,28 @@ public interface IPropertyQuery {
 	 * @param value
 	 */
 	public void addOrLikeWithWildcardSetting(String property, String value);
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void addIn(String property, Collection<?> values);
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void addNotIn(String property, Collection<?> values);
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void addOrIn(String property, Collection<?> values);
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void addOrNotIn(String property, Collection<?> values);
 
 }
