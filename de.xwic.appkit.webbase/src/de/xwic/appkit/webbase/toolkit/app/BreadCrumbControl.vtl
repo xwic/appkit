@@ -3,7 +3,7 @@
 	#if ($first == "1")
 		#set($first = "0")
 		#* $control.getPathTitle() *#
-	#else <img src="images/menu_arrow_1.jpg" width="6" height="10" align="absMiddle"> #end
+	#else &raquo; #end
 	<a href="$control.createActionURL("navigate", $crumb)">$control.getCrumbTitle($crumb)</a>
 #end
 
