@@ -152,13 +152,14 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 		List<IPicklistEntry> selectedEntries = new ArrayList<IPicklistEntry>();
 		String[] keys = getSelectedKeys();
 
-		for (String key : keys) {
-			IPicklistEntry entry = entries.get(key);
-			if (null != entry) {
-				selectedEntries.add(entry);
+		if (keys != null) {
+			for (String key : keys) {
+				IPicklistEntry entry = entries.get(key);
+				if (null != entry) {
+					selectedEntries.add(entry);
+				}
 			}
 		}
-
 		return selectedEntries;
 	}
 
