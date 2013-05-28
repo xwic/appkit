@@ -17,7 +17,7 @@ public class TraceTrapAgent implements Runnable {
 	private final static int MIN_DURATION_TRESHHOLD = 7000; // 7 seconds
 	private final static int WAIT_TIME_DEFAULT = 2000; // every 2 seconds
 	
-	private static final Log log = LogFactory.getLog(SystemTraceStatisticAgent.class);
+	private static final Log log = LogFactory.getLog(TraceTrapAgent.class);
 	
 	private static TraceTrapAgent self = null;
 	private static Thread myThread = null;
