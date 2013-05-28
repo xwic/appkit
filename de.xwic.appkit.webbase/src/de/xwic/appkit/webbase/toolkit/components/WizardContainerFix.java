@@ -163,9 +163,10 @@ public class WizardContainerFix {
 		Window win = new Window(container);
 		win.setTitle(wizard.getTitle());
 		win.setCloseable(false);
-		win.setMaximizable(true);
+		win.setMaximizable(false);
 		win.setMinimizable(false);
-		win.setPopup(true);
+		win.setModal(false);
+		win.setTop(100);
 		if(wizard.getWidth() > 0){
 			win.setWidth(wizard.getWidth());
 		}else {
