@@ -16,6 +16,8 @@ import de.jwic.base.Page;
 import de.jwic.base.SessionContext;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
+import de.jwic.controls.GroupControl;
+import de.jwic.controls.GroupControl.GroupControlLayout;
 import de.jwic.controls.Label;
 import de.jwic.controls.Window;
 import de.jwic.controls.dialogs.DialogEvent;
@@ -158,38 +160,50 @@ public class WizardContainerFix {
 
 		Messages messages = new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
 		
-		Window win = new Window(container);		
+		Window win = new Window(container);
 		win.setTitle(wizard.getTitle());
-		win.setTemplateName(getClass().getName());
+		win.setCloseable(false);
+		win.setMaximizable(true);
+		win.setMinimizable(false);
+		win.setPopup(true);
+		if(wizard.getWidth() > 0){
+			win.setWidth(wizard.getWidth());
+		}else {
+			// default width
+			win.setWidth(900);
+		}
 		
-		lblPageTitle = new Label(win, "lblPageTitle");
+		ControlContainer winContainer = new ControlContainer(win);
+		winContainer.setTemplateName(getClass().getName());
+		
+		lblPageTitle = new Label(winContainer, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
-		lblPageSubTitle = new Label(win, "lblPageSubTitle");
+		lblPageSubTitle = new Label(winContainer, "lblPageSubTitle");
 		lblPageSubTitle.setCssClass("subtitle");
 		
-		errorWarning = new ErrorWarning(win, "errorWarning");
+		errorWarning = new ErrorWarning(winContainer, "errorWarning");
 		errorWarning.setAutoClose(true);
 		
-		pages = new StackedContainer(win, "pages");
+		pages = new StackedContainer(winContainer, "pages");
 		pages.setWidth(wizard.getWidth());
 		pages.setHeight(wizard.getHeight());
 		
 		
 		NavigationController navContr = new NavigationController();
 		
-		btBack = new Button(win, "btBack");
+		btBack = new Button(winContainer, "btBack");
 		btBack.setTitle("Back"); // messages.getString("wizard.button.back"));
 		btBack.addSelectionListener(navContr);
 		
-		btNext = new Button(win, "btNext");
+		btNext = new Button(winContainer, "btNext");
 		btNext.setTitle("Next"); // messages.getString("wizard.button.next"));
 		btNext.addSelectionListener(navContr);
 
-		btFinish = new Button(win, "btFinish");
+		btFinish = new Button(winContainer, "btFinish");
 		btFinish.setTitle("Finish"); // messages.getString("wizard.button.finish"));
 		btFinish.addSelectionListener(navContr);
 
-		btAbort = new Button(win, "btAbort");
+		btAbort = new Button(winContainer, "btAbort");
 		btAbort.setTitle("Close"); // messages.getString("wizard.button.abort"));
 		btAbort.addSelectionListener(navContr);
 
