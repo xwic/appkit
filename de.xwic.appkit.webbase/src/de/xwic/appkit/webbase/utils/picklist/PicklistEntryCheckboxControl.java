@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckBox;
 import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;

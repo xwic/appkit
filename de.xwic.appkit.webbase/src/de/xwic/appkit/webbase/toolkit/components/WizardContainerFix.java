@@ -165,6 +165,8 @@ public class WizardContainerFix {
 		win.setCloseable(false);
 		win.setMaximizable(false);
 		win.setMinimizable(false);
+		win.setDraggable(false);
+		win.setResizable(false);
 		win.setModal(false);
 		win.setTop(100);
 		if(wizard.getWidth() > 0){
@@ -175,7 +177,7 @@ public class WizardContainerFix {
 		}
 		
 		ControlContainer winContainer = new ControlContainer(win);
-		winContainer.setTemplateName(getClass().getName());
+		winContainer.setTemplateName(WizardContainerFix.class.getName());
 		
 		lblPageTitle = new Label(winContainer, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
