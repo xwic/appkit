@@ -158,8 +158,6 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 					selectedEntries.add(entry);
 				}
 			}
-
-			System.out.println("Blah");
 		}
 		return selectedEntries;
 	}
