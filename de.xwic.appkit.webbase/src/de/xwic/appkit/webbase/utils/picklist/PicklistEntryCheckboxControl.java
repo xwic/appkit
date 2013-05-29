@@ -68,7 +68,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 		super(container, name);
 
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
-		setTemplateName(CheckBox.class.getName());
+		setTemplateName(CheckBoxGroup.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 
@@ -151,14 +151,16 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	public List<IPicklistEntry> getSelectedEntries() {
 		List<IPicklistEntry> selectedEntries = new ArrayList<IPicklistEntry>();
 		String[] keys = getSelectedKeys();
-
-		for (String key : keys) {
-			IPicklistEntry entry = entries.get(key);
-			if (null != entry) {
-				selectedEntries.add(entry);
+		if (keys != null) {
+			for (String key : keys) {
+				IPicklistEntry entry = entries.get(key);
+				if (null != entry) {
+					selectedEntries.add(entry);
+				}
 			}
-		}
 
+			System.out.println("Blah");
+		}
 		return selectedEntries;
 	}
 
