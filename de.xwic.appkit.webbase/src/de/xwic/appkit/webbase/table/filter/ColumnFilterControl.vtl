@@ -7,6 +7,13 @@
 	$insert.control("btSortUp")
 	$insert.control("btSortDown")
 	$insert.control("btFilterClear")
+	#if ($control.canToogleBlanks())
+		<div style="width: 20px; height: 26px; float: left; border-right: 1px solid #E0E0E0; clear: both;  padding-left: 2px; padding-top: 2px; ">
+		</div>
+		<div style="height: 26px; overflow: auto; margin-left: 6px; float: left;  padding-left: 2px; padding-top: 2px; font-size: 10pt;">
+			$insert.control("rdToogleBlanks")
+		</div>
+	#end
 
 	<div style="width: 20px; height: ${control.filterHeight}px; float: left; border-right: 1px solid #E0E0E0; clear: both;  padding-left: 2px; padding-top: 2px; border-top: 1px dotted #e0e0e0;">
 		<img src="icons/tbl_filter.gif" width="13" height="13">
