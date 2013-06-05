@@ -29,6 +29,7 @@ import de.jwic.controls.StackedContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.Messages;
+import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 
 /**
  * Fix, because the ecolib container did not work...
@@ -160,18 +161,14 @@ public class WizardContainerFix {
 
 		Messages messages = new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
 		
-		Window win = new Window(container);
+		InnerPage win = new InnerPage(container, null);
 		win.setTitle(wizard.getTitle());
-		win.setCloseable(false);
-		win.setMaximizable(false);
-		win.setMinimizable(false);
-		win.setModal(false);
-		win.setTop(100);
+
 		if(wizard.getWidth() > 0){
-			win.setWidth(wizard.getWidth());
+			win.setMaxWidth(wizard.getWidth());
 		}else {
 			// default width
-			win.setWidth(900);
+			win.setMaxWidth(900);
 		}
 		
 		ControlContainer winContainer = new ControlContainer(win);
