@@ -22,6 +22,7 @@ public class ImageLibrary {
     public static ImageRef ICON_REMOVE_ACTIVE = new ImageRef("icons/delete_a.png");
     public static ImageRef ICON_REMOVE_INACTIVE = new ImageRef("icons/delete_i.png");
 
+    public static ImageRef ICON_APPLICATION_CASCADE = new ImageRef("icons/application_cascade.png");
     
     public static ImageRef ICON_SAVE_ACTIVE = new ImageRef("icons/save_a.gif");
     public static ImageRef ICON_SAVE_INACTIVE = new ImageRef("icons/save_i.gif");
