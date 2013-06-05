@@ -658,26 +658,33 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	@Override
 	public IEntity getEntity() {
-		if (!hasEntity()) {
-			return null;
-		}
-		
 		try {
-			String selection = getEntityKey();
-			
-			if (selection.trim().length() > 0) {
-				DAO dao = DAOSystem.findDAOforEntity(configuration.getEntityClass());
-
-				int id = Integer.parseInt(selection);
-				return dao.getEntity(id);
-			}
-			
-			return null;
+			return getEntityThrowingException();
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
 	
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public IEntity getEntityThrowingException() throws Exception {
+		if (!hasEntity()) {
+			return null;
+		}
+
+		String selection = getEntityKey();
+
+		if (selection.trim().length() > 0) {
+			int id = Integer.parseInt(selection);
+			return dao.getEntity(id);
+		}
+
+		return null;
+	}
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.actions.IEntityProvider#getBaseEntity()
 	 */
