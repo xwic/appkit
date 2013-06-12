@@ -50,28 +50,32 @@ public class EntityActionsHelper {
 		DAO dao = DAOSystem.findDAOforEntity(entityClass);
 		List<IExtension> extensions = ExtensionRegistry.getInstance().getExtensions(EXTENSION_POINT_ACTIONS);
 
-		// sort the extensions by group and index
 		Collections.sort(extensions, new Comparator<IExtension>() {
 
 			@Override
 			public int compare(IExtension e0, IExtension e1) {
-				String g0 = e0.getAttribute("group");
-				if (g0 == null) {
-					g0 = "";
-				}
+				// AI 05-Jun-2013: no longer sort by groups alphabetically - keep only the index sorting and 
+				// make sure you define the actions in extensions.xml exactly in the order you want them
+				
+//				String g0 = e0.getAttribute("group");
+//				if (g0 == null) {
+//					g0 = "";
+//				}
+//				
+//				String g1 = e1.getAttribute("group");
+//				if (g1 == null) {
+//					g1 = "";
+//				}
+//				
+//				if (!g0.equals(g1)) {
+//					return g0.compareTo(g1);
+//				}
+				
 				String strIndex0 = e0.getAttribute("index");
 				int i0 = strIndex0 != null ? Integer.parseInt(strIndex0) : 0;
-				
-				String g1 = e1.getAttribute("group");
-				if (g1 == null) {
-					g1 = "";
-				}
+
 				String strIndex1 = e1.getAttribute("index");
 				int i1 = strIndex1 != null ? Integer.parseInt(strIndex1) : 0;
-				
-				if (!g0.equals(g1)) {
-					return g0.compareTo(g1);
-				}
 				
 				return i0 < i1 ? -1 : i0 == i1 ? 0 : 1;
 			}
@@ -87,6 +91,9 @@ public class EntityActionsHelper {
 			if (applies) {
 				IEntityAction action = createEntityAction(site, extension.getId(), dao, entityProvider);
 				if (action != null) {
+					String inDropDown = extension.getAttribute("inDropDown");					
+					action.setInDropDown(inDropDown != null && "true".equalsIgnoreCase(inDropDown));
+					
 					String group = extension.getAttribute("group");
 					if (group == null) {
 						group = "";

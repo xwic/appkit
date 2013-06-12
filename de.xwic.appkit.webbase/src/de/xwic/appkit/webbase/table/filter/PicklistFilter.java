@@ -130,8 +130,8 @@ public class PicklistFilter extends AbstractFilterControl {
 	 */
 	@Override
 	public int getPreferredHeight() {
-					// base height + button heigh + (20 per line)
-		int height = 4 + 24 + (chkGroup.buildEntryList().size() * 20);
+					// base height + button heigh + (22 per line)
+		int height = 4 + 24 + (chkGroup.buildEntryList().size() * 22);
 		if (height > 200) {
 			height = 200;
 		} else if (height < 30) {

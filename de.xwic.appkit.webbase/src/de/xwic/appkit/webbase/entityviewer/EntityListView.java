@@ -19,6 +19,7 @@ import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.ListBox;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.menu.Menu;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -315,17 +316,41 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected void loadActionsFromExtensions() {
 		ToolBarGroup tg = toolbar.addGroup();
 		Site site = ExtendedApplication.getInstance(this).getSite();
-		
+	
 		Map<String, List<IEntityAction>> actionsInGroups = EntityActionsHelper.getEntityActionsInGroups(site, this, getClass().getName(), configuration.getEntityClass());
+
 		for (Entry<String, List<IEntityAction>> entry : actionsInGroups.entrySet()) {
 			List<IEntityAction> actions = entry.getValue();
-			
 			if (actions.size() > 0) {
+				
+				boolean inDropDown = false;
+				// if any action in the group is in a drop down, all actions are
+				for (IEntityAction action : actions) {
+					if (action.isInDropDown()) {
+						inDropDown = true;
+						break;
+					}
+				}
+				
 				tg.addSpacer();
 				
-				for (IEntityAction action : actions) {
-					tg.addAction(action);
-					extensionActions.add(action);
+				if (inDropDown) {
+					Menu menu = new Menu(tg);
+					
+					for (IEntityAction action : actions) {
+						menu.addMenuItem(action);
+						extensionActions.add(action);
+					}
+					
+					Button btActions = tg.addButton();
+					btActions.setIconEnabled(ImageLibrary.ICON_APPLICATION_CASCADE);
+					btActions.setTitle(entry.getKey());
+					btActions.setMenu(menu);					
+				} else {
+					for (IEntityAction action : actions) {
+						tg.addAction(action);
+						extensionActions.add(action);
+					}
 				}
 			}
 		}
@@ -636,7 +661,26 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		closeUserConfigWindow();		
 		super.destroy();
 	}
-	
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public IEntity getEntityThrowingException() throws Exception {
+		if (!hasEntity()) {
+			return null;
+		}
+
+		String selection = getEntityKey();
+
+		if (selection.trim().length() > 0) {
+			int id = Integer.parseInt(selection);
+			return dao.getEntity(id);
+		}
+
+		return null;
+	}
+
 	/**
 	 * @param listener
 	 */
@@ -660,22 +704,10 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 */
 	@Override
 	public IEntity getEntity() {
-		if (!hasEntity()) {
-			return null;
-		}
-		
 		try {
-			String selection = getEntityKey();
-			
-			if (selection.trim().length() > 0) {
-				DAO dao = DAOSystem.findDAOforEntity(configuration.getEntityClass());
-
-				int id = Integer.parseInt(selection);
-				return dao.getEntity(id);
-			}
-			
-			return null;
+			return getEntityThrowingException();
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}

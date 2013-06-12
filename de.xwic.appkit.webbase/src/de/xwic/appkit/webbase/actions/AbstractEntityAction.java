@@ -22,6 +22,7 @@ public abstract class AbstractEntityAction extends Action implements IEntityActi
 	protected DAO entityDao;
 	protected IEntityProvider entityProvider;
 	protected Site site;
+	protected boolean inDropDown;
 
 	/*
 	 * (non-Javadoc)
@@ -69,5 +70,21 @@ public abstract class AbstractEntityAction extends Action implements IEntityActi
 	@Override
 	public void updateState(IEntity entity) {
 		setEnabled(entityProvider.hasEntity());
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.actions.IEntityAction#isInDropDown()
+	 */
+	@Override
+	public boolean isInDropDown() {
+		return inDropDown;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.actions.IEntityAction#setInDropDown(boolean)
+	 */
+	@Override
+	public void setInDropDown(boolean inDropDown) {
+		this.inDropDown = inDropDown;
 	}
 }

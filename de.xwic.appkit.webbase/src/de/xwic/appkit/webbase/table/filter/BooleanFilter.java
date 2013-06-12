@@ -38,8 +38,8 @@ public class BooleanFilter extends AbstractFilterControl {
 		rgFilter.addElement("<i>All</i>", "all");
 		rgFilter.addElement("True", "true");
 		rgFilter.addElement("False", "false");
-		rgFilter.setColumns(1);
-		
+		rgFilter.setColumns(3);
+
 		rgFilter.setChangeNotification(true);
 		rgFilter.addElementSelectedListener(listener);
 	}
@@ -49,7 +49,16 @@ public class BooleanFilter extends AbstractFilterControl {
 	 */
 	@Override
 	public int getPreferredHeight() {
-		return super.getPreferredHeight();
+		return 40;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredWidth()
+	 */
+	@Override
+	public int getPreferredWidth() {
+		
+		return 220;
 	}
 	
 	/* (non-Javadoc)
