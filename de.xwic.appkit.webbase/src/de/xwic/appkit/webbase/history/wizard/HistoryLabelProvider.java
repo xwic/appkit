@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import de.jwic.base.SessionContext;
 import de.jwic.controls.tableviewer.CellLabel;
 import de.jwic.controls.tableviewer.ITableLabelProvider;
 import de.jwic.controls.tableviewer.RowContext;
@@ -27,12 +28,14 @@ import de.xwic.appkit.webbase.history.HistorySelectionModel;
 public class HistoryLabelProvider implements ITableLabelProvider {
 
 	private HistorySelectionModel model;
+	private SessionContext sessionContext;
 
 	/**
 	 * @param bundle
 	 */
-	public HistoryLabelProvider(HistorySelectionModel bundle) {
+	public HistoryLabelProvider(HistorySelectionModel bundle, SessionContext sessionContext) {
 		this.model = bundle;
+		this.sessionContext = sessionContext;
 	}
 
 	public CellLabel getCellLabel(Object row, TableColumn column, RowContext rowContext) {
@@ -43,7 +46,8 @@ public class HistoryLabelProvider implements ITableLabelProvider {
 		switch (index) {
 		case 0: {
 			Date date = entity.getLastModifiedAt();
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm", sessionContext.getLocale());
+			System.out.println(sessionContext.getLocale());
 			return new CellLabel(df.format(date));
 		}
 		case 1: {

@@ -67,7 +67,7 @@ public class HistorySelWizPage extends WizardPage {
 		createColumns();
 
 		tableViewer.setContentProvider(new HistoryContentProvider(model));
-		tableViewer.setTableLabelProvider(new HistoryLabelProvider(model));
+		tableViewer.setTableLabelProvider(new HistoryLabelProvider(model, container.getSessionContext()));
 	}
 
 	private void createColumns() {
