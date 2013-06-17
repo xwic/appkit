@@ -8,6 +8,7 @@ import java.util.List;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.RenderContext;
+import de.jwic.base.SessionContext;
 import de.jwic.controls.tableviewer.DefaultTableRenderer;
 import de.jwic.controls.tableviewer.ITableLabelProvider;
 import de.jwic.controls.tableviewer.TableColumn;
@@ -58,8 +59,11 @@ public class EntityTable extends ControlContainer {
 	public EntityTable(IControlContainer container, String name, EntityTableConfiguration configuration, boolean initUserConfig) throws ConfigurationException {
 		super(container, name);
 		
-		configuration.setLocale(container.getSessionContext().getLocale());
-		configuration.setTimeZone(container.getSessionContext().getTimeZone());
+		SessionContext sc = container.getSessionContext();
+		configuration.setLocale(sc.getLocale());
+		configuration.setTimeZone(sc.getTimeZone());
+		configuration.setDateFormat(sc.getDateFormat());
+		configuration.setTimeFormat(sc.getTimeFormat());
 		
 		model = new EntityTableModel(configuration);
 		

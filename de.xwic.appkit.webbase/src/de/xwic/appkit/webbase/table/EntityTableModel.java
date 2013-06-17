@@ -105,7 +105,7 @@ public class EntityTableModel {
 		int c = 0;
 		
 		for (ListColumn lc : listSetup.getColumns()) {
-			Column col = new Column(entityTableConfiguration.getTimeZone(), entityTableConfiguration.getLocale(), lc, entityClazz);
+			Column col = new Column(entityTableConfiguration.getTimeZone(), entityTableConfiguration.getLocale(), entityTableConfiguration.getDateFormat(), entityTableConfiguration.getTimeFormat(), lc, entityClazz);
 			col.setColumnOrder(c++);
 			columns.add(col);
 			idMapColumns.put(col.getId(), col);
