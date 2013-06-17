@@ -53,7 +53,7 @@ public class ColumnSelectorDialog extends AbstractDialogWindow {
 		ColumnSelectorContent csContent = new ColumnSelectorContent(content, "csContent");
 		selector = new ColumnSelector(csContent, "selector");
 		
-		selector.setWidth(getWidth() - 22);
+		selector.setWidth(getWidth() - 10);
 		selector.setHeight(content.getHeight() - 90);
 		
 		Bundle bundle = model.getBundle();
