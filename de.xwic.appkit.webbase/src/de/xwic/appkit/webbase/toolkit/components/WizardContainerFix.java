@@ -16,16 +16,13 @@ import de.jwic.base.Page;
 import de.jwic.base.SessionContext;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
-import de.jwic.controls.GroupControl;
-import de.jwic.controls.GroupControl.GroupControlLayout;
 import de.jwic.controls.Label;
-import de.jwic.controls.Window;
+import de.jwic.controls.StackedContainer;
 import de.jwic.controls.dialogs.DialogEvent;
 import de.jwic.controls.dialogs.DialogListener;
 import de.jwic.controls.wizard.ValidationException;
 import de.jwic.controls.wizard.Wizard;
 import de.jwic.controls.wizard.WizardPage;
-import de.jwic.controls.StackedContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.Messages;
@@ -172,7 +169,7 @@ public class WizardContainerFix {
 		}
 		
 		ControlContainer winContainer = new ControlContainer(win);
-		winContainer.setTemplateName(getClass().getName());
+		winContainer.setTemplateName(WizardContainerFix.class.getName());
 		
 		lblPageTitle = new Label(winContainer, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
