@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 
 import de.jwic.base.ImageRef;
 import de.jwic.controls.tableviewer.CellLabel;
@@ -39,8 +40,8 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class HistoryCompareTableLabelProvider implements ITableLabelProvider {
 
-	private final static String PATTERN = "dd.MM.yyyy HH:mm:ss";
-	private final static SimpleDateFormat format = new SimpleDateFormat(PATTERN);
+	private final static String PATTERN = "dd-MMM-yyyy HH:mm:ss";
+	private final SimpleDateFormat format = new SimpleDateFormat(PATTERN);
 
 	// private final static Image warning =
 	// UIToolsPlugin.getImageDescriptor("icons/warning.jpg").createImage();
@@ -62,8 +63,9 @@ public class HistoryCompareTableLabelProvider implements ITableLabelProvider {
 	/**
 	 * @param model
 	 */
-	public HistoryCompareTableLabelProvider(HistorySelectionModel model) {
+	public HistoryCompareTableLabelProvider(HistorySelectionModel model, TimeZone timeZone) {
 		this.model = model;
+		format.setTimeZone(timeZone);
 	}
 
 	/*

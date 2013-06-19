@@ -33,7 +33,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	private TableViewer tableViewer = null;
 	private String[] colNames = null;
 
-	private final static String PATTERN = "dd. MMMMMMMMMM yyyy H:m:s";
+	private final static String PATTERN = "dd-MMM-yyyy HH:mm:ss";
 	private final static SimpleDateFormat format = new SimpleDateFormat(PATTERN);
 
 	/**
@@ -74,7 +74,7 @@ public class HistoryCompareWizPage extends WizardPage {
 		generateColumns();
 		
 		tableViewer.setContentProvider(new HistoryCompareTableContentProvider(model));
-		tableViewer.setTableLabelProvider(new HistoryCompareTableLabelProvider(model));
+		tableViewer.setTableLabelProvider(new HistoryCompareTableLabelProvider(model, container.getSessionContext().getTimeZone()));
 		format.setTimeZone(container.getSessionContext().getTimeZone());
 	}
 

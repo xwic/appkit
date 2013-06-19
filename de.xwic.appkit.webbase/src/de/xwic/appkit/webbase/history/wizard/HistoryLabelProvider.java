@@ -47,7 +47,7 @@ public class HistoryLabelProvider implements ITableLabelProvider {
 		case 0: {
 			
 			Date date = entity.getLastModifiedAt();
-			DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+			DateFormat df = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 			df.setTimeZone(sessionContext.getTimeZone());
 			return new CellLabel(df.format(date));
 		}
