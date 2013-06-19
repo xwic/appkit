@@ -75,7 +75,7 @@ public class HistoryCompareWizPage extends WizardPage {
 		
 		tableViewer.setContentProvider(new HistoryCompareTableContentProvider(model));
 		tableViewer.setTableLabelProvider(new HistoryCompareTableLabelProvider(model));
-		
+		format.setTimeZone(container.getSessionContext().getTimeZone());
 	}
 
 	@SuppressWarnings("unchecked")
