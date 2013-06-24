@@ -71,7 +71,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected ToolBar toolbar;
 
 	protected int widthDecrease = 50;
-	protected int heightDecrease = 230;
+	protected int heightDecrease = 260;
 	
 	private UserConfigurationWindow userConfigWindow;
 	private Button btUserConfig;
