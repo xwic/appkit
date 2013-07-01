@@ -19,6 +19,7 @@ import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.ListBox;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.ToolBarSpacer;
 import de.jwic.controls.menu.Menu;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
@@ -332,7 +333,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					}
 				}
 				
-				tg.addSpacer();
+				ToolBarSpacer spacer = tg.addSpacer();
 				
 				if (inDropDown) {
 					Menu menu = new Menu(tg.getContainer());
@@ -347,9 +348,14 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					btActions.setTitle(entry.getKey());
 					btActions.setMenu(menu);					
 				} else {
+					boolean isVisible = false;
 					for (IEntityAction action : actions) {
 						tg.addAction(action);
 						extensionActions.add(action);
+						isVisible = isVisible || action.isVisible();
+					}
+					if(!isVisible){
+						spacer.setVisible(false);
 					}
 				}
 			}
