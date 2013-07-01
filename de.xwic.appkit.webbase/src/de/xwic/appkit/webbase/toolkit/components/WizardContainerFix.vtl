@@ -1,16 +1,18 @@
-<div class="wizardHeader asdasd">
-<div class="wizardHeaderBox">
-$insert.control("lblPageTitle")<br>
-&nbsp;&nbsp;$insert.control("lblPageSubTitle")
+<div class="contentPanel">
+	<div class="panelHeader roundTop">
+		<div class="panelTitle">
+		  <h2>$insert.control("lblPageTitle")</h2>
+		</div>
+	  	<div class="panelSubtitle">$insert.control("lblPageSubTitle")</div>
+	</div>
+	<div class="panelBody roundBottom">
+		$insert.control("errorWarning")
+		$insert.control("pages")
+	</div>
 </div>
-</div>
-<div style="overflow: overlay;">
-$insert.control("errorWarning")
-$insert.control("pages")
-</div>
-<hr>
+
 <div class="wizardButtonBar">
-<div class="wizardButtonBarBox">
-$insert.control("btBack") $insert.control("btNext") &nbsp;&nbsp; $insert.control("btFinish") $insert.control("btAbort")
-</div>
-</div>
+	<div class="wizardButtonBarBox">
+		$insert.control("btBack") $insert.control("btNext") &nbsp;&nbsp; $insert.control("btFinish") $insert.control("btAbort")
+	</div>
+</div>      
