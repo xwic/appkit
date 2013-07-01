@@ -26,10 +26,13 @@ public interface IColumnLabelProvider {
 	
 	/**
 	 * Initialize this column label provider.
+	 * @param timeZone
 	 * @param locale
+	 * @param dateFormat
+	 * @param timeFormat
 	 * @param column
 	 */
-	public void initialize(TimeZone timeZone, Locale locale, Column column);
+	public void initialize(TimeZone timeZone, Locale locale, String dateFormat, String timeFormat, Column column);
 	
 	/**
 	 * Create the cell from the given row data object.

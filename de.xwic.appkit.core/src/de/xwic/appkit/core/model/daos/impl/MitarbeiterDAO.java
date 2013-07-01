@@ -9,7 +9,7 @@ package de.xwic.appkit.core.model.daos.impl;
 
 import java.util.List;
 
-import de.xwic.appkit.core.dao.AbstractDAO;
+import de.xwic.appkit.core.dao.AbstractHistoryDAO;
 import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DAOSystem;
@@ -31,7 +31,7 @@ import de.xwic.appkit.core.model.queries.PropertyQuery;
 /**
  * @author Ronny Pfretzschner
  */
-public class MitarbeiterDAO extends AbstractDAO implements
+public class MitarbeiterDAO extends AbstractHistoryDAO implements
         IMitarbeiterDAO {
 
     /* (non-Javadoc)

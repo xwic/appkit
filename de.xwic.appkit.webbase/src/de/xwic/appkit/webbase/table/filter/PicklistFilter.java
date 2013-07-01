@@ -40,7 +40,7 @@ public class PicklistFilter extends AbstractFilterControl {
 
 		chkGroup = new CheckBoxGroup(this, "chkGroup");
 		chkGroup.setColumns(1);
-		
+				
 		Button btAll = new Button(this, "btAll");
 		btAll.setTitle("All");
 		btAll.setCssClass("j-button j-btn-small");

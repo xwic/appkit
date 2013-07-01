@@ -69,7 +69,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	protected boolean isCollection = false;
 	protected DAO collFetchDAO = null;
 	
-	protected DateFormat dateFormat;
+	protected DateFormat dateFormatter;
 
 	private Class<? extends IEntity> entityClass;
 
@@ -85,7 +85,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#initialize(java.util.TimeZone, java.util.Locale, de.xwic.appkit.webbase.table.Column)
 	 */
 	@Override
-	public void initialize(TimeZone timeZone, Locale locale, Column col) {
+	public void initialize(TimeZone timeZone, Locale locale, String dateFormat, String timeFormat, Column col) {
 		this.timeZone = timeZone;
 		this.locale = locale;
 		this.column = col.getListColumn();
@@ -96,32 +96,35 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 
 		switch (column.getFinalProperty().getDateType()) {
 		case Property.DATETYPE_DATETIME:
-			if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
-				dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-				dateFormat.setTimeZone(timeZone);
+			if(dateFormat != null && timeFormat != null){
+				dateFormatter = new SimpleDateFormat(dateFormat + " " + timeFormat);
+			} else if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
+				dateFormatter = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 			}else {
-				dateFormat = new SimpleDateFormat("dd-MMM-yyyy hh:mm a", locale);
-				dateFormat.setTimeZone(timeZone);
+				dateFormatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm a", locale);
 			}
 			break;
 		case Property.DATETYPE_TIME:
-			if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
-				dateFormat = new SimpleDateFormat("HH:mm");
-				dateFormat.setTimeZone(timeZone);
+			if(timeFormat != null){
+				dateFormatter = new SimpleDateFormat(timeFormat);
+			} else if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
+				dateFormatter = new SimpleDateFormat("HH:mm");
 			}else {
-				dateFormat = new SimpleDateFormat("hh:mm a");
-				dateFormat.setTimeZone(timeZone);
+				dateFormatter = new SimpleDateFormat("hh:mm a");
 			}
 			break;
 		default:
-			if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
-				dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+			if(dateFormat != null){
+				dateFormatter = new SimpleDateFormat(dateFormat);
+			}else if(Locale.GERMAN.getLanguage().equals(locale.getLanguage())) {
+				dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
 			}else {
-				dateFormat = new SimpleDateFormat("dd-MMM-yyyy", locale);
+				dateFormatter = new SimpleDateFormat("dd-MMM-yyyy", locale);
 			}
 			break;
 			
 		}
+		dateFormatter.setTimeZone(timeZone);
 
 	}
 	
@@ -254,10 +257,10 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			text = "";
 		} else if (value instanceof Date) {
 			// special treatment for date objects
-			text = dateFormat.format((Date)value);
+			text = dateFormatter.format((Date)value);
 		} else if (value instanceof Calendar) {
 			Calendar c = (Calendar)value;
-			text = dateFormat.format(c.getTime());
+			text = dateFormatter.format(c.getTime());
 		} else if (value instanceof Long) {
 			NumberFormat nf = NumberFormat.getNumberInstance(locale);
 			text = nf.format(((Long)value).longValue());
