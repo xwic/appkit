@@ -335,7 +335,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 				tg.addSpacer();
 				
 				if (inDropDown) {
-					Menu menu = new Menu(tg);
+					Menu menu = new Menu(tg.getContainer());
 					
 					for (IEntityAction action : actions) {
 						menu.addMenuItem(action);
