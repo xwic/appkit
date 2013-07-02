@@ -6,7 +6,7 @@ import de.jwic.base.IOuterLayout;
 
 /**
  * Container for data blocks
- * @author dotto
+ * @author bogdan
  *
  */
 public class DataColumnSetContainer extends ControlContainer implements IOuterLayout{
@@ -33,5 +33,16 @@ public class DataColumnSetContainer extends ControlContainer implements IOuterLa
 	public String getOuterTemplateName() {
 		return this.getClass().getName() + "_outerLayout";
 	}
+	
+	
+	public DataColumn addDataColumn(){
+		return new DataColumn(this);
+	}
+	
+	public DataColumn addDataColumn(String name){
+		return new DataColumn(this, name);
+	}
+
+	
 
 }
