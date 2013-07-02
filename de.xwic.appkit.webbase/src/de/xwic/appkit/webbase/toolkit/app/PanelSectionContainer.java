@@ -4,21 +4,33 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IOuterLayout;
 
+/**
+ * Section container.
+ * @author dotto
+ *
+ */
 public class PanelSectionContainer extends ControlContainer implements IOuterLayout{
 
+	/**
+	 * @param container
+	 * @param name
+	 */
 	public PanelSectionContainer(IControlContainer container, String name) {
 		super(container, name);
-		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * @param container
+	 */
 	public PanelSectionContainer(IControlContainer container) {
 		super(container);
-		// TODO Auto-generated constructor stub
 	}
 
+	/* (non-Javadoc)
+	 * @see de.jwic.base.IOuterLayout#getOuterTemplateName()
+	 */
 	@Override
 	public String getOuterTemplateName() {
-		// TODO Auto-generated method stub
 		return this.getClass().getName()+"_outerLayout";
 	}
 
