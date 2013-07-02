@@ -18,6 +18,7 @@ import java.util.Set;
 
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.model.util.EntityUtil;
 
 /**
  * Generic query definition based upon entity properties. 
@@ -615,22 +616,10 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			collection = new ArrayList<Integer>();
 		} else if (!collection.isEmpty()) {
 			if (collection.iterator().next() instanceof IEntity) {
-				collection = getIds((Collection<IEntity>) collection);
+				collection = EntityUtil.getIds((Collection<? extends IEntity>) collection);
 			}
 		}
 		return collection;
-	}
-
-	/**
-	 * @param collection
-	 * @return
-	 */
-	private static Collection<?> getIds(Collection<IEntity> collection) {
-		Set<Integer> ids = new HashSet<Integer>();
-		for (IEntity iEntity : collection) {
-			ids.add(iEntity.getId());
-		}
-		return ids;
 	}
 
 	/* (non-Javadoc)
