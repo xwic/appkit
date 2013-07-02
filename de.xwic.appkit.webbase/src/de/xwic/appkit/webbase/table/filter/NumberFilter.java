@@ -141,42 +141,14 @@ public class NumberFilter extends AbstractFilterControl {
 	@Override
 	public QueryElement getQueryElement() {
 		QueryElement qe = null;
-		Object from = null;
-		Object to = null;
 		String property = column.getListColumn().getPropertyId();
 		String type = column.getListColumn().getFinalProperty().getEntityType();
 		String fromText = inpNumberFrom.getText();
 		String toText = inpNumberTo.getText();
 		String logic = ddLogic.getSelectedKey();
 		
-		if (fromText != null && !fromText.isEmpty()) {
-			try {
-				if ("java.lang.Integer".equals(type) || "int".equals(type)) {
-					from = Integer.parseInt(fromText);
-				} else if ("java.lang.Double".equals(type) || "double".equals(type)) {
-					from = Double.parseDouble(fromText);
-				} else if ("java.lang.Long".equals(type) || "long".equals(type)) {
-					from = Long.parseLong(fromText);
-				}
-			} catch(NumberFormatException e) {
-				log.error("Error while getting the number " + e.getMessage(), e);
-			}
-		}
-
-		if (toText != null && !toText.isEmpty()) {
-			try {
-				if ("java.lang.Integer".equals(type) || "int".equals(type)) {
-					to = Integer.parseInt(toText);
-				} else if ("java.lang.Double".equals(type) || "double".equals(type)) {
-					to = Double.parseDouble(toText);
-				} else if ("java.lang.Long".equals(type) || "long".equals(type)) {
-					to = Long.parseLong(toText);
-				}
-			} catch(NumberFormatException e) {
-				log.error("Error while getting the number " + e.getMessage(), e);
-			}
-		}
-			
+		Object from = getNumber(type, fromText);
+		Object to = getNumber(type, toText);
 		
 		if ("in".equals(logic)) {
 			if (to == null && from != null) {
@@ -210,6 +182,29 @@ public class NumberFilter extends AbstractFilterControl {
 		return qe;
 	}
 	
+	/**
+	 * @param type
+	 * @param fromText
+	 * @return
+	 */
+	private Object getNumber(String type, String fromText) {
+		Object from = null;
+		if (fromText != null && !(fromText = fromText.trim()).isEmpty()) {
+			try {
+				if ("java.lang.Integer".equals(type) || "int".equals(type)) {
+					from = Integer.parseInt(fromText);
+				} else if ("java.lang.Double".equals(type) || "double".equals(type)) {
+					from = Double.parseDouble(fromText);
+				} else if ("java.lang.Long".equals(type) || "long".equals(type)) {
+					from = Long.parseLong(fromText);
+				}
+			} catch(NumberFormatException e) {
+				log.error("Error while getting the number " + e.getMessage(), e);
+			}
+		}
+		return from;
+	}
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredHeight()
 	 */
