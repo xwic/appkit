@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckBox;
 import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
@@ -68,7 +67,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 		super(container, name);
 
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
-		setTemplateName(CheckBox.class.getName());
+		setTemplateName(CheckBoxGroup.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 
@@ -151,14 +150,14 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	public List<IPicklistEntry> getSelectedEntries() {
 		List<IPicklistEntry> selectedEntries = new ArrayList<IPicklistEntry>();
 		String[] keys = getSelectedKeys();
-
-		for (String key : keys) {
-			IPicklistEntry entry = entries.get(key);
-			if (null != entry) {
-				selectedEntries.add(entry);
+		if (keys != null) {
+			for (String key : keys) {
+				IPicklistEntry entry = entries.get(key);
+				if (null != entry) {
+					selectedEntries.add(entry);
+				}
 			}
 		}
-
 		return selectedEntries;
 	}
 

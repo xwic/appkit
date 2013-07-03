@@ -1,9 +1,11 @@
 #set($fixWidth = $control.fixedWidth)
-<div class="contentHeader roundAll">
-	<div class="pageTitle"><h1>$control.title</h1></div>
-	<div class="pageSubtitle">$control.subtitle</div>
-	<div class="pulseLogo"></div>
-</div>
-<div id="contentBody" #if($fixWidth != 0) style="width: ${fixWidth}px; margin: 0 auto;" #end>
-    $content.render()
+<div #if($fixWidth != 0) style="width: ${fixWidth}px; margin: 0 auto;" #end>
+	<div class="contentHeader roundAll">
+		<div class="pageTitle"><h1>$control.title</h1></div>
+		<div class="pageSubtitle">$control.subtitle</div>
+		<div class="pulseLogo"></div>
+	</div>
+	<div class="contentBody">
+	    $content.render()
+	</div>
 </div>

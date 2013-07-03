@@ -77,6 +77,15 @@ public class DateFilter extends AbstractFilterControl {
 		}
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredWidth()
+	 */
+	@Override
+	public int getPreferredWidth() {
+		
+		return 280;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredHeight()

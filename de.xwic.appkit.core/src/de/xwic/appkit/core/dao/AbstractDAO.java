@@ -477,7 +477,7 @@ public abstract class AbstractDAO implements DAO {
 			public Object run(DAOProviderAPI api) {
 				PropertyQuery query = new PropertyQuery();
 				query.addEquals("entityID", new Integer(entity.getId()));
-				query.setSortField("version");
+				query.setSortField("entityVersion");
 				query.setSortDirection(PropertyQuery.SORT_DIRECTION_UP);
 				return api.getEntities(getHistoryImplClass(), null, query);
 			}
