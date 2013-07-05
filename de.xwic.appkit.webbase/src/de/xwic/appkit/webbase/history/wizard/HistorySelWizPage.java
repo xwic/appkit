@@ -62,7 +62,7 @@ public class HistorySelWizPage extends WizardPage {
 		tableViewer.getModel().setSelectionMode(TableModel.SELECTION_MULTI);
 		
 		tableViewer.setHeight(350);
-		tableViewer.setWidth(850);
+		//tableViewer.setWidth(850);
 		
 		createColumns();
 
