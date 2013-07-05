@@ -21,6 +21,7 @@ import de.jwic.controls.wizard.WizardPage;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;
+import de.xwic.appkit.webbase.toolkit.app.PanelSectionContainer;
 
 /**
  * 
@@ -61,7 +62,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	 */
 	public void createControls(IControlContainer container) {
 
-		ControlContainer composite = new ControlContainer(container, "parent");
+		PanelSectionContainer composite = new PanelSectionContainer(container, "parent");
 
 		tableViewer = new TableViewer(composite, "tableViewer");
 		tableViewer.setScrollable(true);
