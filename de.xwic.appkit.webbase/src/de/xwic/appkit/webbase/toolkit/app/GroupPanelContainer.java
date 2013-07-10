@@ -17,6 +17,7 @@ public class GroupPanelContainer extends ControlContainer implements IOuterLayou
 	 */
 	public GroupPanelContainer(IControlContainer container) {
 		super(container);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/**
@@ -25,6 +26,7 @@ public class GroupPanelContainer extends ControlContainer implements IOuterLayou
 	 */
 	public GroupPanelContainer(IControlContainer container, String name) {
 		super(container, name);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/* (non-Javadoc)
@@ -32,7 +34,7 @@ public class GroupPanelContainer extends ControlContainer implements IOuterLayou
 	 */
 	@Override
 	public String getOuterTemplateName() {
-		return this.getClass().getName()+"_outerLayout";
+		return GroupPanelContainer.class.getName()+"_outerLayout";
 	}
 
 	/**

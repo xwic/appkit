@@ -15,6 +15,7 @@ public class DataColumn extends ControlContainer implements IOuterLayout{
 	 */
 	public DataColumn(IControlContainer container) {
 		super(container);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/**
@@ -23,6 +24,7 @@ public class DataColumn extends ControlContainer implements IOuterLayout{
 	 */
 	public DataColumn(IControlContainer container, String name) {
 		super(container, name);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/* (non-Javadoc)
