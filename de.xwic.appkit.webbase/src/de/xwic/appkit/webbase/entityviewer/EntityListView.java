@@ -163,6 +163,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		// remove the - All - selection and add 200 and 500 
 		ListBox lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
 		lbMaxLines.clear();
+		lbMaxLines.addElement("- Auto -", "0");
 		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
 		String msg = "%s rows per page";
 		for (int i = 0; i < choices.length; i++) {
@@ -170,7 +171,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					String.format( msg, choices[i]), 
 					Integer.toString(choices[i]));
 		}
-		lbMaxLines.addElement("- Auto -", "0");
+		
 		
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
