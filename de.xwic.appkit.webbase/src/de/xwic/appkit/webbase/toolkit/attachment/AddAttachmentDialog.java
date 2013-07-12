@@ -22,6 +22,8 @@ import de.jwic.controls.FileUpload;
 import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.appkit.webbase.dialog.CenteredWindow;
+import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.components.Dialog;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
@@ -46,7 +48,6 @@ public class AddAttachmentDialog extends  Dialog {
 
 	protected ErrorWarning error = null;
 	protected FileUpload fileUpload;
-	protected Window win;
 	protected Button btFinish;
 	protected Button btAbort;
 	
@@ -63,17 +64,13 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @see de.jwic.wap.core.Dialog#createControls(de.jwic.base.IControlContainer)
 	 */
 	public void createControls(IControlContainer container) {
-		win = new Window(container, "scrollcontainer");
-		win.setTemplateName(getClass().getName());
-		win.setWidth(450);
-		win.setTitle("File Upload");
-	
-		error = new ErrorWarning(win, "error");
 		
-        fileUpload = new FileUpload(win, "fileUpload");
+		error = new ErrorWarning(container, "error");
+		
+        fileUpload = new FileUpload(container, "fileUpload");
         fileUpload.setWidth(53);
         
-		btFinish = new Button(win, "Finish");
+		btFinish = this.btOk;
 		btFinish.setTitle("Upload");
 		btFinish.setIconEnabled(ImageLibrary.ICON_SAVECLOSE_ACTIVE);
 		btFinish.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
@@ -87,8 +84,9 @@ public class AddAttachmentDialog extends  Dialog {
 			}
 		});
 	
-		btAbort = new Button(win, "Abort");
+		btAbort = this.btCancel;
 		btAbort.setTitle("Cancel");
+		btAbort.setVisible(true);
 		btAbort.setIconDisabled(ImageLibrary.ICON_ABORT_INACTIVE);
 		btAbort.setIconEnabled(ImageLibrary.ICON_ABORT_ACTIVE);
 		
@@ -194,5 +192,6 @@ public class AddAttachmentDialog extends  Dialog {
 	public Button getBtAbort() {
 		return btAbort;
 	}
+
 	
 }

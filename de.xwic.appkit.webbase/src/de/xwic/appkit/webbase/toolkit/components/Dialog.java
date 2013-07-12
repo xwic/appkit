@@ -27,6 +27,9 @@ import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.dialogs.DialogEvent;
 import de.jwic.controls.dialogs.DialogListener;
+import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
+import de.xwic.appkit.webbase.dialog.CenteredWindow;
+import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**
@@ -35,10 +38,9 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
  * @author Florian Lippisch
  * @version $Revision: 1.2 $
  */
-public abstract class Dialog {
+public abstract class Dialog extends AbstractDialogWindow {
 
 	protected Site site;
-	private ControlContainer contentContainer = null;
 	private List<DialogListener> listeners = null;
 	
 	/**
@@ -46,8 +48,9 @@ public abstract class Dialog {
 	 * @param site
 	 */
 	public Dialog(Site site) {
+		super(site);
 		this.site = site;
-		
+//		this.createControls(this.baseContainer);
 	}
 	
 	/**
@@ -76,16 +79,15 @@ public abstract class Dialog {
 	 *
 	 */
 	public final void open() {
-       contentContainer = new ControlContainer(site.getContentContainer());
-       createControls(contentContainer);
-       site.pushPage(contentContainer);
+       this.show();
 	}
 	
 	/**
 	 * Closes the dialog without notification to the DialogListeners.
 	 */
 	public final void close() {
-		site.popPage(contentContainer);
+//		site.popPage(contentContainer);
+		this.setVisible(false);
 		destroy();
 	}
 	
@@ -127,5 +129,10 @@ public abstract class Dialog {
 	 * @param container
 	 */
 	public abstract void createControls(IControlContainer container);
+
+	@Override
+	protected void createContent(DialogContent content) {
+		this.createControls(content);
+	}
 	
 }
