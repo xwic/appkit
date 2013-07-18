@@ -94,7 +94,7 @@ public abstract class AbstractDialogWindow  extends CenteredWindow {
 		btCancel.setWidth(80);
 		
 		content.setHeight(getHeight() - 60);
-		content.setWidth(getWidth() - 10);
+		content.setWidth(getWidth());
 		
 		createContent(content);
 		
