@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
 
+import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
@@ -97,6 +98,13 @@ public class AddAttachmentDialog extends  Dialog {
 		});
 	}
 	
+	@Override
+	protected void createContent(DialogContent content) {
+		ControlContainer wrapper = new ControlContainer(content,"wrapper");
+		wrapper.setTemplateName(AddAttachmentDialog.class.getName()+"_layout");
+		this.createControls(wrapper);
+	}
+	
 	/**
 	 * Validate the selection.
 	 * 
@@ -119,6 +127,7 @@ public class AddAttachmentDialog extends  Dialog {
         
         return true;
 	}
+	
 
 	/*
 	 * (non-Javadoc)
