@@ -69,7 +69,7 @@ public class AddAttachmentDialog extends  Dialog {
 		error = new ErrorWarning(container, "error");
 		
         fileUpload = new FileUpload(container, "fileUpload");
-        fileUpload.setWidth(53);
+//        fileUpload.setWidth(53);
         
 		btFinish = this.btOk;
 		btFinish.setTitle("Upload");
