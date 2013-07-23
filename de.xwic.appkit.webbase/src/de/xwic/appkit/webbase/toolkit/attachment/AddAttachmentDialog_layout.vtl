@@ -1,7 +1,6 @@
-<div class="fileUpload">
-	<div id="$control.controlID" style="width: ${control.container.width}px; height: ${control.container.height}px;">
-		#foreach($ctrl in $control.controls)
-			$insert.control($ctrl.name)
-		#end
-	</div>
+<div id="$control.controlID" style="width: ${control.container.width}px; height: ${control.container.height}px;">
+	#foreach($ctrl in $control.controls)
+		<div class="uploadField">$insert.control($ctrl.name)</div>
+	#end
+	<div class="h-separator"></div>
 </div>
