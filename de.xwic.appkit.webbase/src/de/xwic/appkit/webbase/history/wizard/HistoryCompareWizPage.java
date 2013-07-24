@@ -33,7 +33,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	private TableViewer tableViewer = null;
 	private String[] colNames = null;
 
-	private final static String PATTERN = "dd-MMM-yyyy HH:mm:ss";
+	private final static String PATTERN = "dd-MMM-yyyy hh:mm aa";
 	private final static SimpleDateFormat format = new SimpleDateFormat(PATTERN);
 
 	/**
@@ -131,7 +131,7 @@ public class HistoryCompareWizPage extends WizardPage {
 				IHistory hisObj = (IHistory) historySelection.get(i);
 
 				Date date = entity.getLastModifiedAt();
-				String dateString = "<unbekannt>";
+				String dateString = "<unknown>";
 
 				if (date != null) {
 					dateString = format.format(date);
