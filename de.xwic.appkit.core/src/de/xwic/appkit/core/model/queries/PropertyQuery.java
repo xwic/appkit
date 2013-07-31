@@ -601,10 +601,9 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
 		}
 		if (sets.isEmpty()) {
-			addEquals("id", null);
-		} else {
-			addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+			subQuery.addEquals("id", null);
 		}
+		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
 	}
 
 	/**
