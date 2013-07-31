@@ -589,7 +589,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		while (iterator.hasNext()) {
 			if (set.size() == 1000) {
 				sets.add(set);
-				set = new HashSet<Integer>();
+				set = new HashSet();
 			}
 			set.add(iterator.next());
 		}
@@ -613,13 +613,13 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	private static Collection<?> processCollection(Collection<?> collection) {
 		if (collection == null) {
-			collection = new ArrayList<Integer>();
+			collection = new HashSet();
 		} else if (!collection.isEmpty()) {
 			if (collection.iterator().next() instanceof IEntity) {
 				collection = EntityUtil.getIds((Collection<? extends IEntity>) collection);
 			}
 		}
-		return collection;
+		return collection instanceof HashSet ? collection : new HashSet(collection);
 	}
 
 	/* (non-Javadoc)
