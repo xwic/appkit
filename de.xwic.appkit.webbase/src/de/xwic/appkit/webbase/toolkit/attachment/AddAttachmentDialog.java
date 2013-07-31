@@ -14,15 +14,17 @@ package de.xwic.appkit.webbase.toolkit.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
+import de.jwic.base.Control;
+import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.FileUpload;
-import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
-import de.xwic.appkit.webbase.dialog.CenteredWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.components.Dialog;
@@ -65,10 +67,9 @@ public class AddAttachmentDialog extends  Dialog {
 	 */
 	public void createControls(IControlContainer container) {
 		
-		error = new ErrorWarning(container, "error");
 		
         fileUpload = new FileUpload(container, "fileUpload");
-        fileUpload.setWidth(53);
+//        fileUpload.setWidth(53);
         
 		btFinish = this.btOk;
 		btFinish.setTitle("Upload");
@@ -97,6 +98,14 @@ public class AddAttachmentDialog extends  Dialog {
 		});
 	}
 	
+	@Override
+	protected void createContent(DialogContent content) {
+		error = new ErrorWarning(content, "error");
+		ControlContainer wrapper = new ControlContainer(content,"wrapper");
+		wrapper.setTemplateName(AddAttachmentDialog.class.getName()+"_layout");
+		this.createControls(wrapper);
+	}
+	
 	/**
 	 * Validate the selection.
 	 * 
@@ -119,6 +128,7 @@ public class AddAttachmentDialog extends  Dialog {
         
         return true;
 	}
+	
 
 	/*
 	 * (non-Javadoc)
