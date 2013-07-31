@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import de.xwic.appkit.core.util.InternalEvaluator.EvaluationResult;
+import de.xwic.appkit.core.util.InternalEvaluator.IDupeChecker;
+
 /**
  * @author Alexandru Bledea
  * @since Jul 9, 2013
@@ -31,7 +34,7 @@ public class MapUtil {
 	/**
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
-	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link com.notbed.util.map.DuplicateKeyException}
+	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 */
@@ -43,7 +46,7 @@ public class MapUtil {
 	/**
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
-	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link com.notbed.util.map.DuplicateKeyException}
+	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
 	 * @param skipNullObjects if we want to skip null objects, if we don't skip these objects, we will get a {@link java.lang.NullPointerException}
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
@@ -57,7 +60,7 @@ public class MapUtil {
 	/**
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
-	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link com.notbed.util.map.DuplicateKeyException}
+	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
 	 * @param skipNullObjects if we want to skip null objects, if we don't skip these objects, we will get a {@link java.lang.NullPointerException}
 	 * @param skipNullValues if we want to skip the null values from being added to the map
 	 * @return a map created from the items using the generator
@@ -66,23 +69,15 @@ public class MapUtil {
 	 */
 	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
-		Map<Key, Obj> map = new HashMap<Key, Obj>();
+		EvaluationResult<Key> result = new EvaluationResult<Key>();
+
+		InternalHashMap<Key, Obj> map = new InternalHashMap<Key, Obj>();
+
 		for (Obj t : items) {
-			if (t == null) {
-				if (skipNullObjects) {
-					continue;
-				} else {
-					throw new NullPointerException("Null Value in Collection");
-				}
+			result = InternalEvaluator.evaluate(t, skipNullObjects, generator, skipNullValues, allowDupes, map, result);
+			if (!result.skip()) {
+				map.put(result.getResult(), t);
 			}
-			Key evaluate = generator.evaluate(t);
-			if (evaluate == null && skipNullValues) {
-				continue;
-			}
-			if (!allowDupes && map.containsKey(evaluate)) {
-				throw new DuplicateKeyException(evaluate);
-			}
-			map.put(evaluate, t);
 		}
 		return map;
 	}
@@ -111,6 +106,23 @@ public class MapUtil {
 			return call;
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating new object", e);
+		}
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Jul 31, 2013
+	 * @param <K>
+	 * @param <V>
+	 */
+	private static class InternalHashMap<K, V> extends HashMap<K, V> implements IDupeChecker<K> {
+
+		/* (non-Javadoc)
+		 * @see de.xwic.appkit.core.util.InternalEvaluator.DupeChecker#checkDupe(java.lang.Object)
+		 */
+		@Override
+		public boolean checkIfDupe(K what) {
+			return containsKey(what);
 		}
 	}
 }
