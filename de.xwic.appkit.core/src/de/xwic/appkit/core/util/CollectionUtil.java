@@ -5,6 +5,7 @@ package de.xwic.appkit.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import de.xwic.appkit.core.util.InternalEvaluator.EvaluationResult;
@@ -91,27 +92,37 @@ public class CollectionUtil {
 	}
 
 	/**
-	 * @param objects if you plan on calling it multiple times, it would be best if you would send a list
-	 * @param evaluator
 	 * @param collection
+	 * @param maxElements
+	 * @param clazz
 	 * @return
 	 */
-	public static <O> Collection<O> createCollection(Collection<O> objects, int start, int limit) {
-		Collection<O> result = new ArrayList<O>();
-		int step = start + limit;
-		List<O> collection = getList(objects);
-		int size = collection.size();
-		for (int i = start; i < step && i < size; i++) {
-			result.add(collection.get(i));
+	public static <O, C extends Collection & Cloneable> List<Collection<O>> breakCollection(Collection<O> collection, int maxElements, Class<C> clazz) {
+		List<Collection<O>> result = new ArrayList<Collection<O>>();
+		C step = instantiate(clazz);
+		Iterator<O> iterator = collection.iterator();
+		while (iterator.hasNext()) {
+			if (step.size() == maxElements) {
+				result.add(step);
+				step = instantiate(clazz);
+			}
+			step.add(iterator.next());
+		}
+		if (!step.isEmpty()) {
+			result.add(step);
 		}
 		return result;
 	}
 
 	/**
-	 * @param collection
+	 * @param clazz
 	 * @return
 	 */
-	private static <O> List<O> getList(Collection<O> collection) {
-		return collection instanceof List ? (List<O>) collection : new ArrayList<O>(collection);
+	public static <C extends Collection> C instantiate(Class<C> clazz) {
+		try {
+			return clazz.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException("Illegal implementation class " + clazz.getName());
+		}
 	}
 }
