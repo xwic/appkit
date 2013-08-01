@@ -6,7 +6,7 @@ import de.jwic.base.IOuterLayout;
 
 /**
  * Container for data blocks
- * @author dotto
+ * @author bogdan
  *
  */
 public class DataColumnSetContainer extends ControlContainer implements IOuterLayout{
@@ -16,6 +16,7 @@ public class DataColumnSetContainer extends ControlContainer implements IOuterLa
 	 */
 	public DataColumnSetContainer(IControlContainer container) {
 		super(container);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/**
@@ -24,6 +25,7 @@ public class DataColumnSetContainer extends ControlContainer implements IOuterLa
 	 */
 	public DataColumnSetContainer(IControlContainer container, String name) {
 		super(container, name);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/* (non-Javadoc)
@@ -33,5 +35,16 @@ public class DataColumnSetContainer extends ControlContainer implements IOuterLa
 	public String getOuterTemplateName() {
 		return this.getClass().getName() + "_outerLayout";
 	}
+	
+	
+	public DataColumn addDataColumn(){
+		return new DataColumn(this);
+	}
+	
+	public DataColumn addDataColumn(String name){
+		return new DataColumn(this, name);
+	}
+
+	
 
 }

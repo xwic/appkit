@@ -21,6 +21,7 @@ import de.jwic.controls.wizard.WizardPage;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;
+import de.xwic.appkit.webbase.toolkit.app.PanelSectionContainer;
 
 /**
  * 
@@ -33,7 +34,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	private TableViewer tableViewer = null;
 	private String[] colNames = null;
 
-	private final static String PATTERN = "dd-MMM-yyyy HH:mm:ss";
+	private final static String PATTERN = "dd-MMM-yyyy hh:mm aa";
 	private final static SimpleDateFormat format = new SimpleDateFormat(PATTERN);
 
 	/**
@@ -61,7 +62,7 @@ public class HistoryCompareWizPage extends WizardPage {
 	 */
 	public void createControls(IControlContainer container) {
 
-		ControlContainer composite = new ControlContainer(container, "parent");
+		PanelSectionContainer composite = new PanelSectionContainer(container, "parent");
 
 		tableViewer = new TableViewer(composite, "tableViewer");
 		tableViewer.setScrollable(true);
@@ -131,7 +132,7 @@ public class HistoryCompareWizPage extends WizardPage {
 				IHistory hisObj = (IHistory) historySelection.get(i);
 
 				Date date = entity.getLastModifiedAt();
-				String dateString = "<unbekannt>";
+				String dateString = "<unknown>";
 
 				if (date != null) {
 					dateString = format.format(date);

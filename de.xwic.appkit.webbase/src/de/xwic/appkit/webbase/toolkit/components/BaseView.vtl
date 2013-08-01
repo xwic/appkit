@@ -3,9 +3,9 @@
 		#if($control.hasActions())
 	    $insert.control("toolbar")
 	    #end
-		$insert.control("errorWarning")
 	</div>
 	<div class="panelBody roundBottom">	
+		$insert.control("errorWarning")
 		<div class="panelSection">
 			<div class=#if($control.isBottomView)"bottomView"#elseif($control.isLeftView)"leftView"#else"middleView"#end>
 				#*<div class="viewActions">

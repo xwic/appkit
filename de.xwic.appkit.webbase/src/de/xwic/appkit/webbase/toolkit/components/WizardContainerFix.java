@@ -180,9 +180,9 @@ public class WizardContainerFix {
 		errorWarning.setAutoClose(true);
 		
 		pages = new StackedContainer(winContainer, "pages");
-		pages.setWidth(wizard.getWidth());
-		pages.setHeight(wizard.getHeight());
-		
+//		pages.setWidth(wizard.getWidth());
+//		pages.setHeight(wizard.getHeight());
+//		
 		
 		NavigationController navContr = new NavigationController();
 		
