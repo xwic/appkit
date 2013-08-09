@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.util.CollectionUtil;
+import de.xwic.appkit.core.util.IEvaluator;
 
 /**
  * @author Alexandru Bledea
@@ -15,15 +17,21 @@ import de.xwic.appkit.core.dao.IEntity;
  */
 public class EntityUtil {
 
+	public final static IEvaluator<IEntity, Integer> ENTITY_ID_EVALUATOR = new IEvaluator<IEntity, Integer>() {
+
+		@Override
+		public Integer evaluate(IEntity obj) {
+			return obj.getId();
+		}
+
+	};
+
 	/**
 	 * @param collection
 	 * @return
 	 */
 	public static Set<Integer> getIds(Collection<? extends IEntity> collection) {
-		Set<Integer> ids = new HashSet<Integer>();
-		for (IEntity iEntity : collection) {
-			ids.add(iEntity.getId());
-		}
-		return ids;
+		return CollectionUtil.createCollection(collection, ENTITY_ID_EVALUATOR, new HashSet<Integer>());
+
 	}
 }

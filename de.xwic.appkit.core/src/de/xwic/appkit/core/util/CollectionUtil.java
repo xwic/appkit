@@ -24,7 +24,7 @@ public class CollectionUtil {
 	 * @param collection the collection where the evaluation result will be added
 	 * @return the collection passed as argument filled with the evaluated values, if an object evaluates to null, it is not added to the collection
 	 */
-	public static <C extends Collection<V>, V, O> C createCollection(Collection<O> objects, IEvaluator<O, V> evaluator, C collection) {
+	public static <C extends Collection<V>, V, O> C createCollection(Collection<? extends O> objects, IEvaluator<O, V> evaluator, C collection) {
 		try {
 			return createCollection(objects, evaluator, collection, true);
 		} catch (DuplicateKeyException e) {
@@ -40,7 +40,7 @@ public class CollectionUtil {
 	 * @return the collection passed as argument filled with the evaluated values, if an object evaluates to null, it is not added to the collection
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 */
-	public static <C extends Collection<V>, V, O> C createCollection(Collection<O> objects, IEvaluator<O, V> evaluator, C collection,
+	public static <C extends Collection<V>, V, O> C createCollection(Collection<? extends O> objects, IEvaluator<O, V> evaluator, C collection,
 			boolean allowDupes) throws DuplicateKeyException {
 		return createCollection(objects, evaluator, collection, allowDupes, true);
 	}
@@ -55,7 +55,7 @@ public class CollectionUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <C extends Collection<V>, V, O> C createCollection(Collection<O> objects, IEvaluator<O, V> evaluator, C collection,
+	public static <C extends Collection<V>, V, O> C createCollection(Collection<? extends O> objects, IEvaluator<O, V> evaluator, C collection,
 			boolean allowDupes, boolean skipNullObjects) throws DuplicateKeyException {
 		return createCollection(objects, evaluator, collection, allowDupes, skipNullObjects, true);
 	}
@@ -71,7 +71,7 @@ public class CollectionUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <C extends Collection<V>, V, O> C createCollection(Collection<O> objects, IEvaluator<O, V> evaluator, final C collection,
+	public static <C extends Collection<V>, V, O> C createCollection(Collection<? extends O> objects, IEvaluator<O, V> evaluator, final C collection,
 			boolean allowDupes, boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
 		EvaluationResult<V> result = new EvaluationResult<V>();
 		IDupeChecker<V> dupeChecker = new IDupeChecker<V>() {
