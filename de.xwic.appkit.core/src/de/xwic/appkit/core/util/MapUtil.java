@@ -96,17 +96,21 @@ public class MapUtil {
 	 * @param get or create and add
 	 * @return
 	 */
-	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, Callable<Obj> newObjectCallable) {
+	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, IEvaluator<X, Obj> initializer) {
 		if (map.containsKey(key)) {
 			return map.get(key);
 		}
-		try {
-			Obj call = newObjectCallable.call();
-			map.put(key, call);
-			return call;
-		} catch (Exception e) {
-			throw new RuntimeException("Error creating new object", e);
-		}
+		Obj call = initializer.evaluate(initValue);
+		map.put(key, call);
+		return call;
+	}
+
+	/**
+	 * @param get or create and add
+	 * @return
+	 */
+	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final NewObjectInitializer<Obj> newObjectInitializer) {
+		return get(map, key, null, newObjectInitializer);
 	}
 
 	/**
@@ -123,6 +127,53 @@ public class MapUtil {
 		@Override
 		public boolean checkIfDupe(K what) {
 			return containsKey(what);
+		}
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Aug 12, 2013
+	 * @param <V>
+	 */
+	public abstract static class NewObjectInitializer<V> implements IEvaluator<Void, V>, Callable<V> {
+
+		/* (non-Javadoc)
+		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
+		 */
+		@Override
+		public final V evaluate(Void obj) {
+			try {
+				return call();
+			} catch (Exception e) {
+				throw new RuntimeException("Error creating new object", e);
+			}
+		}
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Aug 12, 2013
+	 * @param <V>
+	 */
+	public static class NewObjectFromCallable<V> extends NewObjectInitializer<V> {
+
+		protected Callable<V> callable;
+
+		/**
+		 * @param callable
+		 */
+		public NewObjectFromCallable(Callable<V> callable) {
+			if ((this.callable = callable) == null) {
+				throw new RuntimeException("Missing initializer");
+			}
+		}
+
+		/**
+		 * only called if we didn't instantiate with a callable
+		 */
+		@Override
+		public final V call() throws Exception {
+			return callable.call();
 		}
 	}
 }
