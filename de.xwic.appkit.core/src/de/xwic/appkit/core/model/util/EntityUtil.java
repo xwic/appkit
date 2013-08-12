@@ -40,7 +40,7 @@ public class EntityUtil {
 	 * @param id
 	 * @return
 	 */
-	public <E extends IEntity> E getEntity(Class<E> entityClass, Integer id) {
+	public static <E extends IEntity> E getEntity(Class<E> entityClass, Integer id) {
 		return id == null ? null : (E) DAOSystem.findDAOforEntity(entityClass).getEntity(id);
 	}
 }
