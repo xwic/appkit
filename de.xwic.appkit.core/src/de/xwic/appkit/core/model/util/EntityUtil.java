@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.util.CollectionUtil;
 import de.xwic.appkit.core.util.IEvaluator;
@@ -32,6 +33,14 @@ public class EntityUtil {
 	 */
 	public static Set<Integer> getIds(Collection<? extends IEntity> collection) {
 		return CollectionUtil.createCollection(collection, ENTITY_ID_EVALUATOR, new HashSet<Integer>());
+	}
 
+	/**
+	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	public <E extends IEntity> E getEntity(Class<E> entityClass, Integer id) {
+		return id == null ? null : (E) DAOSystem.findDAOforEntity(entityClass).getEntity(id);
 	}
 }
