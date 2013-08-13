@@ -43,4 +43,12 @@ public class EntityUtil {
 	public static <E extends IEntity> E getEntity(Class<E> entityClass, Integer id) {
 		return id == null ? null : (E) DAOSystem.findDAOforEntity(entityClass).getEntity(id);
 	}
+
+	/**
+	 * @param entityClass
+	 * @return
+	 */
+	public static <E extends IEntity> E createEntity(Class<E> entityClass) {
+		return (E) DAOSystem.findDAOforEntity(entityClass).createEntity();
+	}
 }
