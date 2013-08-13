@@ -84,7 +84,6 @@ public class EntityUtil {
 
 	/**
 	 * @param entityClass
-	 * @param limit
 	 * @param query
 	 * @return
 	 */
