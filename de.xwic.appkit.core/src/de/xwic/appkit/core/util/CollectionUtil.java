@@ -4,6 +4,7 @@
 package de.xwic.appkit.core.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,23 @@ import de.xwic.appkit.core.util.InternalEvaluator.IDupeChecker;
  * @since Jul 30, 2013
  */
 public class CollectionUtil {
+
+	/**
+	 * @param objects the collection from which we create the collection
+	 * @param evaluator the evaluator
+	 * @param collection the collection where the evaluation result will be added
+	 * @return the collection passed as argument filled with the evaluated values, if an object evaluates to null, it is not added to the collection
+	 */
+	public static <C extends Collection<V>, V, O> C createCollection(O[] objects, IEvaluator<O, V> evaluator, C collection) {
+		if (objects == null) {
+			return collection;
+		}
+		try {
+			return createCollection(Arrays.asList(objects), evaluator, collection, true);
+		} catch (DuplicateKeyException e) {
+			return null; //not going to happen
+		}
+	}
 
 	/**
 	 * @param objects the collection from which we create the collection
