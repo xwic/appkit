@@ -29,11 +29,7 @@ public class CollectionUtil {
 		if (objects == null) {
 			return collection;
 		}
-		try {
-			return createCollection(Arrays.asList(objects), evaluator, collection, true);
-		} catch (DuplicateKeyException e) {
-			return null; //not going to happen
-		}
+		return createCollection(Arrays.asList(objects), evaluator, collection);
 	}
 
 	/**
