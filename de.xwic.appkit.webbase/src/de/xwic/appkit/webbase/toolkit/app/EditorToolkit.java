@@ -90,11 +90,11 @@ public class EditorToolkit {
 	 * @param optionalParam 
 	 * @return a control
 	 */
-	public IControl createControl(Class<? extends IControl> controlType, IControlContainer container, String propertyName, Object optionalParam) {
-		IToolkitControlHelper implclass = allControls.get(controlType);
+	public <C extends IControl> C createControl(Class<C> controlType, IControlContainer container, String propertyName, Object optionalParam) {
+		IToolkitControlHelper<C> implclass = allControls.get(controlType);
 		
 		if (implclass != null) {
-			IControl con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
+			C con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
 			
 			if (con != null) {
 				registeredControls.put(propertyName, con);
