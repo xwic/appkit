@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.xwic.appkit.core.ApplicationData;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
@@ -99,6 +100,39 @@ public class EntityUtil {
 	 */
 	public static <E extends IEntity> List<E> getEntities(Class<E> entityClass, Limit limit, PropertyQuery query) {
 		return findDAO(entityClass).getEntities(limit, query);
+	}
+
+	/**
+	 * @param entityClass
+	 * @param action
+	 * @return
+	 */
+	public static <E extends IEntity> boolean hasRight(Class<E> entityClass, String action) {
+		return DAOSystem.getSecurityManager().hasRight(entityClass.getName(), action);
+	}
+
+	/**
+	 * @param entityClass
+	 * @return
+	 */
+	public static <E extends IEntity> boolean canRead(Class<E> entityClass) {
+		return hasRight(entityClass, ApplicationData.SECURITY_ACTION_READ);
+	}
+
+	/**
+	 * @param entityClass
+	 * @return
+	 */
+	public static <E extends IEntity> boolean canUpdate(Class<E> entityClass) {
+		return hasRight(entityClass, ApplicationData.SECURITY_ACTION_UPDATE);
+	}
+
+	/**
+	 * @param entityClass
+	 * @return
+	 */
+	public static <E extends IEntity> boolean canDelete(Class<E> entityClass) {
+		return hasRight(entityClass, ApplicationData.SECURITY_ACTION_DELETE);
 	}
 
 }
