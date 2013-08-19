@@ -24,11 +24,13 @@ import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitInputBoxControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitMultiAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitSingleAttachmentControl;
+import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionMultiControl;
 import de.xwic.appkit.webbase.toolkit.attachment.SingleAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.comment.SingleCommentEditorControl;
 import de.xwic.appkit.webbase.toolkit.components.EmployeeSelectionCombo;
 import de.xwic.appkit.webbase.toolkit.editor.EditorModel;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
+import de.xwic.appkit.webbase.utils.picklist.PicklistEntryMultiSelectControl;
 
 /**
  * Editortoolkit to create controls for editors.
@@ -56,6 +58,7 @@ public class EditorToolkit {
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
 		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
+		allControls.put(PicklistEntryMultiSelectControl.class, new ToolkitPicklistSelectionMultiControl());
 		allControls.put(CheckBoxGroup.class, new ToolkitCheckBoxControl());
 		allControls.put(SingleAttachmentControl.class, new ToolkitSingleAttachmentControl());
 		allControls.put(SingleCommentEditorControl.class, new ToolkitMultiAttachmentControl());
