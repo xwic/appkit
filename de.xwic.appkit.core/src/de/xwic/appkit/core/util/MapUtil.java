@@ -23,7 +23,7 @@ public class MapUtil {
 	 * @param generator the key generator
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<Obj> items, IEvaluator<Obj, Key> generator) {
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator) {
 		try {
 			return generateMap(items, generator, true);
 		} catch (DuplicateKeyException e) {
@@ -38,7 +38,7 @@ public class MapUtil {
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes)
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes)
 			throws DuplicateKeyException {
 		return generateMap(items, generator, allowDupes, true);
 	}
@@ -52,7 +52,7 @@ public class MapUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects) throws DuplicateKeyException {
 		return generateMap(items, generator, allowDupes, skipNullObjects, true);
 	}
@@ -67,7 +67,7 @@ public class MapUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
 		EvaluationResult<Key> result = new EvaluationResult<Key>();
 
@@ -96,17 +96,21 @@ public class MapUtil {
 	 * @param get or create and add
 	 * @return
 	 */
-	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, Callable<Obj> newObjectCallable) {
+	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, IEvaluator<X, Obj> initializer) {
 		if (map.containsKey(key)) {
 			return map.get(key);
 		}
-		try {
-			Obj call = newObjectCallable.call();
-			map.put(key, call);
-			return call;
-		} catch (Exception e) {
-			throw new RuntimeException("Error creating new object", e);
-		}
+		Obj call = initializer.evaluate(initValue);
+		map.put(key, call);
+		return call;
+	}
+
+	/**
+	 * @param get or create and add
+	 * @return
+	 */
+	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final NewObjectInitializer<Obj> newObjectInitializer) {
+		return get(map, key, null, newObjectInitializer);
 	}
 
 	/**
@@ -123,6 +127,53 @@ public class MapUtil {
 		@Override
 		public boolean checkIfDupe(K what) {
 			return containsKey(what);
+		}
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Aug 12, 2013
+	 * @param <V>
+	 */
+	public abstract static class NewObjectInitializer<V> implements IEvaluator<Void, V>, Callable<V> {
+
+		/* (non-Javadoc)
+		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
+		 */
+		@Override
+		public final V evaluate(Void obj) {
+			try {
+				return call();
+			} catch (Exception e) {
+				throw new RuntimeException("Error creating new object", e);
+			}
+		}
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Aug 12, 2013
+	 * @param <V>
+	 */
+	public static class NewObjectFromCallable<V> extends NewObjectInitializer<V> {
+
+		protected Callable<V> callable;
+
+		/**
+		 * @param callable
+		 */
+		public NewObjectFromCallable(Callable<V> callable) {
+			if ((this.callable = callable) == null) {
+				throw new RuntimeException("Missing initializer");
+			}
+		}
+
+		/**
+		 * only called if we didn't instantiate with a callable
+		 */
+		@Override
+		public final V call() throws Exception {
+			return callable.call();
 		}
 	}
 }

@@ -169,11 +169,19 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 	 * @return the id of the selected entry
 	 */
 	public IPicklistEntry getSelectionEntry(){
-		if (getSelectedKey() == null || getSelectedKey().length() < 1) {
+		return getEntry(getSelectedKey());
+	}
+
+	/**
+	 * @param idString
+	 * @return
+	 */
+	protected IPicklistEntry getEntry(String idString){
+		if (idString == null || idString.length() < 1) {
 			return null;
 		}
 		
-		int i = Integer.parseInt(getSelectedKey());
+		int i = Integer.parseInt(idString);
 		
 		if (null != entries){		
 			if (entries.containsKey(new Integer(i))){
