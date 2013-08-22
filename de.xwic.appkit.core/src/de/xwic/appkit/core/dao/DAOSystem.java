@@ -68,10 +68,10 @@ public class DAOSystem {
      * @param daoType
      * @return
      */
-    public static DAO getDAO(Class<? extends DAO> daoType) {
+    public static <D extends DAO> D getDAO(Class<D> daoType) {
     	
     	if (daoFactory != null) {
-    		DAO dao = (DAO)daoFactory.getDAO(daoType);
+    		D dao = (D)daoFactory.getDAO(daoType);
     		if (dao == null) {
     			throw new IllegalArgumentException("A DAO for the specified type is not registered: " + daoType.getName());
     		}
