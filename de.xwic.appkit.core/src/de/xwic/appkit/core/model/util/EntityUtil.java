@@ -103,6 +103,17 @@ public class EntityUtil {
 	}
 
 	/**
+	 * @param entity
+	 * @return
+	 */
+	public static <E extends IEntity> E update(E entity) {
+		if (entity != null) {
+			findDAO(entity.getClass()).update(entity);
+		}
+		return entity;
+	}
+
+	/**
 	 * @param entityClass
 	 * @param action
 	 * @return
