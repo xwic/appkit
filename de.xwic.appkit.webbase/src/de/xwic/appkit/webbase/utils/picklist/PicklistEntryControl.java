@@ -11,6 +11,7 @@
  */
 package de.xwic.appkit.webbase.utils.picklist;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -84,7 +85,7 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 	 */
 	private PicklistEntryControl(IControlContainer container, String name, boolean allowEmptySelection, Comparator<IPicklistEntry> comparator) {
 		super(container, name);
-		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
+		plDao = DAOSystem.getDAO(IPicklisteDAO.class);
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 		setTemplateName(ListBox.class.getName());
@@ -206,6 +207,21 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 	@Override
 	public IPicklistEntry getSelectedEntry() {
 		return getEntry(getSelectedKey());
+	}
+
+	/**
+	 * @param picklistKey
+	 */
+	public void selectEntryByKey(String picklistKey) {
+		if (picklistKey != null) {
+			Collection<IPicklistEntry> values = entries.values();
+			for (IPicklistEntry pe : values) {
+				if (pe.getKey().equals(picklistKey)) {
+					selectEntry(pe);
+					return;
+				}
+			}
+		}
 	}
 
 	/**

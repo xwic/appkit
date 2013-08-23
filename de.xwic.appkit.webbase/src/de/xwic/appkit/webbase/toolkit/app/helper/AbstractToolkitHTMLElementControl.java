@@ -10,7 +10,7 @@ import de.xwic.appkit.webbase.toolkit.app.IToolkitControlHelper;
  * @author Alexandru Bledea
  * @since Aug 14, 2013
  */
-abstract class AbstractToolkitHTMLElementControl<H extends IHTMLElement> implements IToolkitControlHelper<H> {
+public abstract class AbstractToolkitHTMLElementControl<H extends IHTMLElement> implements IToolkitControlHelper<H> {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.toolkit.app.IToolkitControlHelper#markField(de.jwic.base.IControl, java.lang.String)
