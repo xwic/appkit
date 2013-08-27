@@ -135,7 +135,7 @@ public class EntityActionsHelper {
 		String scope = actionExtension.getAttribute(ATTRIBUTE_SCOPE);
 		if (scope != null && !scope.isEmpty()) {
 			if (!DAOSystem.getSecurityManager().hasRight(scope, ApplicationData.SECURITY_ACTION_ACCESS)) {
-				log.info(String.format("Skipped action '%s' because the user doesn't have access to scope '%s'", actionId, scope));
+				log.debug(String.format("Skipped action '%s' because the user doesn't have access to scope '%s'", actionId, scope));
 				return null;
 			}
 		}
