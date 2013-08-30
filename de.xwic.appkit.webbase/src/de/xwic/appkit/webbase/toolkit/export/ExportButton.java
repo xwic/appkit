@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
+import de.jwic.base.JavaScriptSupport;
 import de.jwic.controls.Button;
 
 /**
@@ -17,6 +18,7 @@ import de.jwic.controls.Button;
  *
  */
 @SuppressWarnings("serial")
+@JavaScriptSupport(jsTemplate="de.jwic.controls.Button")
 public class ExportButton  extends Button implements IResourceControl {
 
 	private IExportContentProvider contentProvider;
