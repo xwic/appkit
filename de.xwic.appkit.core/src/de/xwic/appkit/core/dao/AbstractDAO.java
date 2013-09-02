@@ -5,6 +5,7 @@
  */
 package de.xwic.appkit.core.dao;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -358,6 +359,16 @@ public abstract class AbstractDAO implements DAO {
 		
 		try {
 			Method mRead = property.getDescriptor().getReadMethod();
+			if (mRead == null) {
+				// the property is not defined on the entity class. Search for the property in the superclass
+				// and use that. This is needed for cases where the entity is using the history and therefore
+				// extending a base implementation
+				PropertyDescriptor pd = new PropertyDescriptor(property.getName(), entity.getClass().getSuperclass());
+				mRead = pd.getReadMethod();
+				if (mRead == null) {
+					throw new ConfigurationException("The property " + property.getName() + " can not be resolved on entity " + entity.getClass().getName());
+				}
+			}
 			Object value = mRead.invoke(entity, (Object[]) null);
 			return value;
 		} catch (Exception se) {
