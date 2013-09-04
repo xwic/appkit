@@ -19,6 +19,9 @@ import de.xwic.appkit.core.util.InternalEvaluator.IDupeChecker;
 public class MapUtil {
 
 	/**
+	 * Used to generate a map from the collection if <b>items</b> by using a <b>evaluator</b>. <br>
+	 * If there are two objects with the same key, the latest entry will override the previous entry<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
@@ -32,6 +35,9 @@ public class MapUtil {
 	}
 
 	/**
+	 * Used to generate a map from the collection if <b>items</b> by using a <b>evaluator</b>. <br>
+	 * Use <b>allowDupes</b> if you want values that evaluate to the same key to be added to the map. This will override the previous entry.<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
 	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
@@ -44,6 +50,10 @@ public class MapUtil {
 	}
 
 	/**
+	 * Used to generate a map from the collection if <b>items</b> by using a <b>evaluator</b>. <br>
+	 * Use <b>allowDupes</b> if you want values that evaluate to the same key to be added to the map. This will override the previous entry.<br>
+	 * Use <b>skipNullObjects</b> to avoid {@link java.lang.NullPointerException} if a null value is in the collection<br>
+	 * Objects that evaluate to <b>null</b> won't be added to the map
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
 	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
@@ -58,6 +68,10 @@ public class MapUtil {
 	}
 
 	/**
+	 * Used to generate a map from the collection if <b>items</b> by using a <b>evaluator</b>. <br>
+	 * Use <b>allowDupes</b> if you want values that evaluate to the same key to be added to the map. This will override the previous entry.<br>
+	 * Use <b>skipNullObjects</b> to avoid {@link java.lang.NullPointerException} if a null value is in the collection<br>
+	 * Use <b>skipNullValues</b> to skip adding object to the map it evaluates to null
 	 * @param items the collection from which we create the map
 	 * @param generator the key generator
 	 * @param allowDupes if we allow duplicate keys in the map, the latest one will always override the previous value, if we don't support it, throw {@link de.xwic.appkit.core.util.DuplicateKeyException}
@@ -84,7 +98,7 @@ public class MapUtil {
 
 	/**
 	 * @param initializer the map initializer
-	 * @return an unmodifiable {@link java.util.HashMap} containting the values that were set using the initializer
+	 * @return a unmodifiable {@link java.util.HashMap} containting the values that were set using the <b>initializer</b>
 	 */
 	public static <Key, Obj> Map<Key, Obj> unmodifiableMap(IMapInitializer<Key, Obj> initializer) {
 		Map<Key, Obj> map = new HashMap<Key, Obj>();
@@ -93,7 +107,18 @@ public class MapUtil {
 	}
 
 	/**
-	 * @param get or create and add
+	 * equivallent to<br>
+	 * if (<b>map</b>.contains(<b>key</b>){<br>
+	 * &nbsp;&nbsp;return <b>map</b>.get(<b>key</b>);<br>
+	 * }<br>
+	 * ? x = <b>initializer</b>.evaluate(<b>initValue</b>); // init something that should be mapped to the <b>key</b><br>
+	 * <b>map</b>.put(<b>key</b>, x);<br>
+	 * return x;<br>
+	 *
+	 * @param map
+	 * @param key
+	 * @param initValue
+	 * @param initializer
 	 * @return
 	 */
 	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, IEvaluator<X, Obj> initializer) {
@@ -106,11 +131,22 @@ public class MapUtil {
 	}
 
 	/**
-	 * @param get or create and add
+	 * equivallent to<br>
+	 * if (<b>map</b>.contains(<b>key</b>){<br>
+	 * &nbsp;&nbsp;return <b>map</b>.get(<b>key</b>);<br>
+	 * }<br>
+	 * ? x = <b>initializer</b>.call(); // init something that should be mapped to the <b>key</b><br>
+	 * <b>map</b>.put(<b>key</b>, x);<br>
+	 * return x;<br>
+	 *
+	 * @param map
+	 * @param key
+	 * @param initializer
 	 * @return
+	 *
 	 */
-	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final NewObjectInitializer<Obj> newObjectInitializer) {
-		return get(map, key, null, newObjectInitializer);
+	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final NewObjectInitializer<Obj> initializer) {
+		return get(map, key, null, initializer);
 	}
 
 	/**
@@ -131,9 +167,15 @@ public class MapUtil {
 	}
 
 	/**
+	 * used to create objects in a lazy manner, used when you <b>may</b> need something<br><br>
+	 * for instance<br>
+	 * if (condition1 & condition2 & condition3 & condition4){<br>
+	 * &nbsp;&nbsp;return <b>initializer.call();</b><br>
+	 * }
 	 * @author Alexandru Bledea
 	 * @since Aug 12, 2013
 	 * @param <V>
+	 *
 	 */
 	public abstract static class NewObjectInitializer<V> implements IEvaluator<Void, V>, Callable<V> {
 
@@ -151,9 +193,15 @@ public class MapUtil {
 	}
 
 	/**
+	 * used to create objects in a lazy manner, used when you <b>may</b> need something<br><br>
+	 * for instance<br>
+	 * if (condition1 & condition2 & condition3 & condition4){<br>
+	 * &nbsp;&nbsp;return <b>initializer.call();</b><br>
+	 * }
 	 * @author Alexandru Bledea
 	 * @since Aug 12, 2013
 	 * @param <V>
+	 *
 	 */
 	public static class NewObjectFromCallable<V> extends NewObjectInitializer<V> {
 
@@ -168,8 +216,8 @@ public class MapUtil {
 			}
 		}
 
-		/**
-		 * only called if we didn't instantiate with a callable
+		/* (non-Javadoc)
+		 * @see java.util.concurrent.Callable#call()
 		 */
 		@Override
 		public final V call() throws Exception {
