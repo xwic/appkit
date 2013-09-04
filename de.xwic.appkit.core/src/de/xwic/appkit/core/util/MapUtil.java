@@ -145,7 +145,7 @@ public class MapUtil {
 	 * @return
 	 *
 	 */
-	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final NewObjectInitializer<Obj> initializer) {
+	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final LazyInit<Obj> initializer) {
 		return get(map, key, null, initializer);
 	}
 
@@ -177,7 +177,7 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public abstract static class NewObjectInitializer<V> implements IEvaluator<Void, V>, Callable<V> {
+	public abstract static class LazyInit<V> implements IEvaluator<Void, V>, Callable<V> {
 
 		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
@@ -203,14 +203,14 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public static class NewObjectFromCallable<V> extends NewObjectInitializer<V> {
+	public static class LazyInitCallable<V> extends LazyInit<V> {
 
 		protected Callable<V> callable;
 
 		/**
 		 * @param callable
 		 */
-		public NewObjectFromCallable(Callable<V> callable) {
+		public LazyInitCallable(Callable<V> callable) {
 			if ((this.callable = callable) == null) {
 				throw new RuntimeException("Missing initializer");
 			}
