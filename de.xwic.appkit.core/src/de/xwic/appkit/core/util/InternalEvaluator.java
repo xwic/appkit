@@ -18,7 +18,7 @@ class InternalEvaluator {
 	 * @return
 	 * @throws DuplicateKeyException
 	 */
-	static <Result, Obj> EvaluationResult<Result> evaluate(Obj obj, boolean skipNullObjects, IEvaluator<Obj, Result> generator,
+	static <Result, Obj> EvaluationResult<Result> evaluate(Obj obj, boolean skipNullObjects, ILazyEval<Obj, Result> generator,
 			boolean skipNullValues, boolean allowDupes, IDupeChecker<Result> where, EvaluationResult<Result> result)
 			throws DuplicateKeyException {
 		result.clear();

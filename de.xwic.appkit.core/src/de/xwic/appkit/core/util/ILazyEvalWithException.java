@@ -14,12 +14,13 @@ package de.xwic.appkit.core.util;
  * @author Alexandru Bledea
  * @since Jul 9, 2013
  */
-public interface IEvaluator<Obj, ReturnValue> extends IEvaluatorWithException<Obj, ReturnValue> {
+public interface ILazyEvalWithException<O, R> {
 
-	/* (non-Javadoc)
-	 * @see com.notbed.util.map.IEvaluatorWithException#evaluate(java.lang.Object)
+	/**
+	 * @param obj
+	 * @return
+	 * @throws Exception
 	 */
-	@Override
-	ReturnValue evaluate(Obj obj);
+	R evaluate(O obj) throws Exception;
 
 }

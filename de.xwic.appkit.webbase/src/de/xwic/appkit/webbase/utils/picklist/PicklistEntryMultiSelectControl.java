@@ -11,7 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import de.jwic.base.IControlContainer;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.util.CollectionUtil;
-import de.xwic.appkit.core.util.IEvaluator;
+import de.xwic.appkit.core.util.ILazyEval;
 import de.xwic.appkit.webbase.toolkit.components.IEntityListBoxMultiControl;
 
 /**
@@ -20,8 +20,8 @@ import de.xwic.appkit.webbase.toolkit.components.IEntityListBoxMultiControl;
  */
 public class PicklistEntryMultiSelectControl extends PicklistEntryControl implements IEntityListBoxMultiControl<IPicklistEntry> {
 
-	private final IEvaluator<String, IPicklistEntry> keyToEntity;
-	private final IEvaluator<IPicklistEntry, String> entityToKey;
+	private final ILazyEval<String, IPicklistEntry> keyToEntity;
+	private final ILazyEval<IPicklistEntry, String> entityToKey;
 
 	/**
 	 * @param container
@@ -45,14 +45,14 @@ public class PicklistEntryMultiSelectControl extends PicklistEntryControl implem
 		if (noScroll && entries != null) {
 			setSize(entries.size());
 		}
-		keyToEntity = new IEvaluator<String, IPicklistEntry>() {
+		keyToEntity = new ILazyEval<String, IPicklistEntry>() {
 
 			@Override
 			public IPicklistEntry evaluate(String obj) {
 				return getEntry(obj);
 			}
 		};
-		entityToKey = new IEvaluator<IPicklistEntry, String>() {
+		entityToKey = new ILazyEval<IPicklistEntry, String>() {
 
 			@Override
 			public String evaluate(IPicklistEntry obj) {

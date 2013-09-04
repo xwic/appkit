@@ -16,7 +16,7 @@ import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.util.CollectionUtil;
-import de.xwic.appkit.core.util.IEvaluator;
+import de.xwic.appkit.core.util.ILazyEval;
 
 /**
  * @author Alexandru Bledea
@@ -24,7 +24,7 @@ import de.xwic.appkit.core.util.IEvaluator;
  */
 public class EntityUtil {
 
-	public final static IEvaluator<IEntity, Integer> ENTITY_ID_EVALUATOR = new IEvaluator<IEntity, Integer>() {
+	public final static ILazyEval<IEntity, Integer> ENTITY_ID_EVALUATOR = new ILazyEval<IEntity, Integer>() {
 
 		@Override
 		public Integer evaluate(IEntity obj) {

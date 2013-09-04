@@ -26,7 +26,7 @@ public class MapUtil {
 	 * @param generator the key generator
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator) {
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, ILazyEval<Obj, Key> generator) {
 		try {
 			return generateMap(items, generator, true);
 		} catch (DuplicateKeyException e) {
@@ -44,7 +44,7 @@ public class MapUtil {
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes)
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, ILazyEval<Obj, Key> generator, boolean allowDupes)
 			throws DuplicateKeyException {
 		return generateMap(items, generator, allowDupes, true);
 	}
@@ -62,7 +62,7 @@ public class MapUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, ILazyEval<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects) throws DuplicateKeyException {
 		return generateMap(items, generator, allowDupes, skipNullObjects, true);
 	}
@@ -81,7 +81,7 @@ public class MapUtil {
 	 * @throws DuplicateKeyException if we have a duplicate key and we don't allow that
 	 * @throws NullPointerException if there is a null value in the collection and we don't skip it
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, IEvaluator<Obj, Key> generator, boolean allowDupes,
+	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, ILazyEval<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
 		EvaluationResult<Key> result = new EvaluationResult<Key>();
 
@@ -121,7 +121,7 @@ public class MapUtil {
 	 * @param initializer
 	 * @return
 	 */
-	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, IEvaluator<X, Obj> initializer) {
+	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, ILazyEval<X, Obj> initializer) {
 		if (map.containsKey(key)) {
 			return map.get(key);
 		}
@@ -177,7 +177,7 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public abstract static class LazyInit<V> implements IEvaluator<Void, V>, Callable<V> {
+	public abstract static class LazyInit<V> implements ILazyEval<Void, V>, Callable<V> {
 
 		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
