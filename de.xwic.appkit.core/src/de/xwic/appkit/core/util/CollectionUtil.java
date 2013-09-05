@@ -150,6 +150,16 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * @param element
+	 * @param collection
+	 */
+	public static <O> void addIfNotNull(O element, Collection<O> collection) {
+		if (element != null) {
+			collection.add(element);
+		}
+	}
+
+	/**
 	 * @param clazz
 	 * @return
 	 */
