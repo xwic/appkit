@@ -107,6 +107,11 @@ public class CollectionUtil {
 	 */
 	public static <C extends Collection<V>, V, O> C createCollection(Collection<? extends O> objects, ILazyEval<O, V> evaluator, final C collection,
 			boolean allowDupes, boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
+
+		if (objects == null) {
+			objects = new ArrayList<O>();
+		}
+
 		EvaluationResult<V> result = new EvaluationResult<V>();
 		IDupeChecker<V> dupeChecker = new IDupeChecker<V>() {
 

@@ -3,6 +3,7 @@
  */
 package de.xwic.appkit.core.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,8 +84,12 @@ public class MapUtil {
 	 */
 	public static <Key, Obj> Map<Key, Obj> generateMap(Collection<? extends Obj> items, ILazyEval<Obj, Key> generator, boolean allowDupes,
 			boolean skipNullObjects, boolean skipNullValues) throws DuplicateKeyException {
-		EvaluationResult<Key> result = new EvaluationResult<Key>();
 
+		if (items == null) {
+			items = new ArrayList<Obj>();
+		}
+
+		EvaluationResult<Key> result = new EvaluationResult<Key>();
 		InternalHashMap<Key, Obj> map = new InternalHashMap<Key, Obj>();
 
 		for (Obj t : items) {
