@@ -79,7 +79,9 @@ public class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E refreshEntity(E entity) {
-		HibernateUtil.currentSession().refresh(entity);
+		if (entity != null) {
+			HibernateUtil.currentSession().refresh(entity);
+		}
 		return entity;
 	}
 
