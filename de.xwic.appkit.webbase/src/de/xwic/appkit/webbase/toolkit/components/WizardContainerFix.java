@@ -207,9 +207,10 @@ public class WizardContainerFix {
 	}
 
 	/**
-	 * @param currentPage2
+	 * @param page
 	 */
 	private void activatePage(WizardPage page) {
+		onActivatePage(errorWarning);
 		currentPage = page;
 		
 		lblPageTitle.setText(page.getTitle());
@@ -234,6 +235,14 @@ public class WizardContainerFix {
 		
 		btFinish.setEnabled(wizard.canFinish(currentPage));
 		page.activated();
+	}
+
+	/**
+	 * i'm here if you need me...
+	 *
+	 * @param errorWarning
+	 */
+	protected void onActivatePage(ErrorWarning errorWarning) {
 	}
 
 	/**
