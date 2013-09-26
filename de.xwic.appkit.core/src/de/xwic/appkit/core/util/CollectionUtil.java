@@ -162,13 +162,13 @@ public class CollectionUtil {
 	 * @param emptyMessage
 	 * @return
 	 */
-	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String emptyMessage) {
+	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator, String emptyMessage) {
 		List<String> strings = new ArrayList();
 		createCollection(collection, evaluator, strings);
 
 		Iterator<String> iterator = strings.iterator();
 		if (iterator.hasNext()) {
-			return StringUtils.join(iterator, ';');
+			return StringUtils.join(iterator, separator);
 		}
 		return emptyMessage;
 	}
@@ -178,8 +178,8 @@ public class CollectionUtil {
 	 * @param evaluator
 	 * @return an empty string if no values
 	 */
-	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator) {
-		return join(collection, evaluator, "");
+	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator) {
+		return join(collection, evaluator, separator, "");
 	}
 
 	/**
