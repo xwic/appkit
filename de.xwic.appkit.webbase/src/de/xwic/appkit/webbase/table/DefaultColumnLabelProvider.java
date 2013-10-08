@@ -103,6 +103,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			}else {
 				dateFormatter = new SimpleDateFormat("dd-MMM-yyyy hh:mm a", locale);
 			}
+			dateFormatter.setTimeZone(timeZone);
 			break;
 		case Property.DATETYPE_TIME:
 			if(timeFormat != null){
@@ -112,6 +113,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			}else {
 				dateFormatter = new SimpleDateFormat("hh:mm a");
 			}
+			dateFormatter.setTimeZone(timeZone);
 			break;
 		default:
 			if(dateFormat != null){
@@ -124,8 +126,6 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			break;
 			
 		}
-		dateFormatter.setTimeZone(timeZone);
-
 	}
 	
 	/* (non-Javadoc)
