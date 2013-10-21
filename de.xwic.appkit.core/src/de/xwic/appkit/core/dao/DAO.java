@@ -63,14 +63,14 @@ public interface DAO<I extends IEntity> {
 	 * @param id
 	 * @return
 	 */
-    public IEntity getEntity(int id) throws DataAccessException;
+	public I getEntity(int id) throws DataAccessException;
 
     /**
 	 * Update the entity in the database.
 	 * @param entity
 	 * @return
 	 */
-    public void update(IEntity entity) throws DataAccessException;
+	public void update(IEntity entity) throws DataAccessException;
 
     /**
 	 * Delete the entity from the database. If the entity is unsaved,

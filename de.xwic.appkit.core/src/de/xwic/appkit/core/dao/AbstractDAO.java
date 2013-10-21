@@ -139,11 +139,11 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getEntity(int)
 	 */
-	public IEntity getEntity(final int id) throws DataAccessException {
+	public I getEntity(final int id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
-		return (IEntity) provider.execute(new DAOCallback() {
+		return (I) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				return api.getEntity(getEntityImplClass(), id);
 			}
