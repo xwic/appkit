@@ -70,7 +70,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 *
 	 * @return
 	 */
-	public Class<E> getEntityImplClass() {
+	public final Class<E> getEntityImplClass() {
 		return eClass;
 	}
 
@@ -78,7 +78,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
 	 */
 	@Override
-	public Class<I> getEntityClass() {
+	public final Class<I> getEntityClass() {
 		return iClass;
 	}
 

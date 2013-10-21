@@ -11,7 +11,6 @@ import java.util.Date;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
 import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
@@ -25,27 +24,20 @@ import de.xwic.appkit.core.util.DigestTool;
 /**
  * @author Florian Lippisch
  */
-public class UserSessionDAO extends AbstractDAO implements IUserSessionDAO {
+public class UserSessionDAO extends AbstractDAO<IUserSession, UserSession> implements IUserSessionDAO {
+	/**
+	 *
+	 */
+	public UserSessionDAO() {
+		super(IUserSession.class, UserSession.class);
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
 	 */
+	@Override
 	public IEntity createEntity() throws DataAccessException {
 		return new UserSession();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
-	 */
-	public Class<? extends IEntity> getEntityClass() {
-		return IUserSession.class;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.AbstractDAO#getEntityImplClass()
-	 */
-	public Class<? extends Entity> getEntityImplClass() {
-		return UserSession.class;
 	}
 
 	/* (non-Javadoc)
@@ -53,7 +45,7 @@ public class UserSessionDAO extends AbstractDAO implements IUserSessionDAO {
 	 */
 	@Override
 	public IUserSession getUserSession(String key) {
-		
+
 		PropertyQuery query = new PropertyQuery();
 		query.addEquals("key", key);
 		EntityList list = getEntities(new Limit(0, 1), query);
@@ -61,7 +53,7 @@ public class UserSessionDAO extends AbstractDAO implements IUserSessionDAO {
 			return (IUserSession) list.get(0);
 		}
 		return null;
-		
+
 	}
 
 	/* (non-Javadoc)
@@ -73,10 +65,10 @@ public class UserSessionDAO extends AbstractDAO implements IUserSessionDAO {
 		IUserSession us = (IUserSession)createEntity();
 		us.setLastAccess(new Date());
 		us.setUsername(user.getLogonName());
-		
+
 		String rawInfo = System.currentTimeMillis() + user.getLogonName().hashCode() + "_" + user.getLogonName() + "_xwic";
 		us.setKey(DigestTool.encodeString(rawInfo));
-		
+
 		update(us);
 		return us;
 	}

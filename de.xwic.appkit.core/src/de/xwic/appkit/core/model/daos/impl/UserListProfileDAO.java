@@ -7,24 +7,22 @@ package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
 import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IUserListProfileDAO;
 import de.xwic.appkit.core.model.entities.IUserListProfile;
 import de.xwic.appkit.core.model.entities.impl.UserListProfile;
 
 /**
- * 
+ *
  * @author Aron Cotrau
  */
-public class UserListProfileDAO extends AbstractDAO implements IUserListProfileDAO {
+public class UserListProfileDAO extends AbstractDAO<IUserListProfile, UserListProfile> implements IUserListProfileDAO {
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.AbstractDAO#getEntityImplClass()
+	/**
+	 *
 	 */
-	@Override
-	public Class<? extends Entity> getEntityImplClass() {
-		return UserListProfile.class;
+	public UserListProfileDAO() {
+		super(IUserListProfile.class, UserListProfile.class);
 	}
 
 	/* (non-Javadoc)
@@ -33,14 +31,6 @@ public class UserListProfileDAO extends AbstractDAO implements IUserListProfileD
 	@Override
 	public IEntity createEntity() throws DataAccessException {
 		return new UserListProfile();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
-	 */
-	@Override
-	public Class<? extends IEntity> getEntityClass() {
-		return IUserListProfile.class;
 	}
 
 }
