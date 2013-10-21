@@ -15,7 +15,6 @@ import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 import de.xwic.appkit.core.model.entities.impl.ServerConfigProperty;
@@ -42,7 +41,7 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
 	 */
 	@Override
-	public IEntity createEntity() throws DataAccessException {
+	public IServerConfigProperty createEntity() throws DataAccessException {
 		//ServerConfigProperties are created without returning it.
 		//It is not allowed here, to return an unsaved, empty ServerConfigProperty
 		return null;

@@ -82,6 +82,19 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 		return iClass;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
+	 */
+	@Override
+	public I createEntity() throws DataAccessException {
+		Class<E> entityImplClass = getEntityImplClass();
+		try {
+			return (I) entityImplClass.newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to instantiate " + entityImplClass.getSimpleName(), e);
+		}
+	}
+
 	/**
 	 * Returns the classname of the history implementation.
 	 * 

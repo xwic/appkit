@@ -23,23 +23,23 @@ public interface DAO<I extends IEntity> {
 	/** The name of the trace category all DAO operations use. */
 	public final static String TRACE_CAT = "DAO";
 
-	/** 
-	 * Creates an unsaved entity. The final DAO implementation may 
-	 * implement a <code>createXY(..)</code> method that has the correct 
+	/**
+	 * Creates an unsaved entity. The final DAO implementation may
+	 * implement a <code>createXY(..)</code> method that has the correct
 	 * return type. This methode just creates an "empty" object
 	 * with no "must have" parameters. Use this methode wisely!
-	 * 
+	 *
 	 * There should be a named methode like <code>createUnternehmen(..)</code><br>
 	 * in the specific DAO for the specific business object. <br>
 	 * If not, then this methode is the right way to get an entitiy instance.
-	 *  
+	 *
 	 * @return unsaved entity with no fields filled or default filled
 	 */
-	public IEntity createEntity() throws DataAccessException;
+	public I createEntity() throws DataAccessException;
 
     /**
 	 * Creates an unsaved entity of the specified subtype. This method is
-	 * used for DAOs that support subclassed entitys. 
+	 * used for DAOs that support subclassed entitys.
 	 * @param type
 	 * @return
 	 */
@@ -59,21 +59,21 @@ public interface DAO<I extends IEntity> {
     public boolean handlesEntity(String entityClass);
 
     /**
-	 * Returns the entity with the specified ID. 
+	 * Returns the entity with the specified ID.
 	 * @param id
 	 * @return
 	 */
     public IEntity getEntity(int id) throws DataAccessException;
 
     /**
-	 * Update the entity in the database. 
+	 * Update the entity in the database.
 	 * @param entity
 	 * @return
 	 */
     public void update(IEntity entity) throws DataAccessException;
 
     /**
-	 * Delete the entity from the database. If the entity is unsaved, 
+	 * Delete the entity from the database. If the entity is unsaved,
 	 * an exception is thrown.
 	 * @param entity
 	 * @return
@@ -134,7 +134,7 @@ public interface DAO<I extends IEntity> {
 	public EntityList getHistoryEntities(Limit limit, EntityQuery filter);
 
     /**
-	 * Returns the history entity with the specified ID.  
+	 * Returns the history entity with the specified ID.
 	 * @param id
 	 * @return
 	 */
@@ -142,15 +142,15 @@ public interface DAO<I extends IEntity> {
 
     /**
 	 * Checks an entity on its validate state. <p>
-	 * 
+	 *
 	 * This checks, if all "must to have" fields are filled properly
 	 * and other necessary checks. <br>
 	 * The ValidationResult contains the property as Strings to be key and the
 	 * value is a ResourceString key to get the proper error message
 	 * from the Resource property file.<br>
-	 * 
+	 *
 	 * Should be done before an update will be made.
-	 * 
+	 *
 	 * @param entity the entity which should be validated
 	 * @return ValidationResult with all properties, which have validate errors
 	 */
