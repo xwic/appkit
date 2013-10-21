@@ -83,13 +83,6 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	}
 
 	/**
-	 * Returns the classname of the entity implementation.
-	 * 
-	 * @return
-	 */
-	public abstract Class<? extends Entity> getEntityImplClass();
-
-	/**
 	 * Returns the classname of the history implementation.
 	 * 
 	 * @return
