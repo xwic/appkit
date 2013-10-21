@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.ISyncStateDAO;
 import de.xwic.appkit.core.model.entities.ISyncState;
 import de.xwic.appkit.core.model.entities.impl.SyncState;
@@ -27,14 +25,6 @@ public class SyncStateDAO extends AbstractDAO<ISyncState, SyncState> implements 
 	 */
 	public SyncStateDAO() {
 		super(ISyncState.class, SyncState.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new SyncState();
 	}
 
 }

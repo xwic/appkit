@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.security.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.security.IScope;
 import de.xwic.appkit.core.security.daos.IScopeDAO;
 import de.xwic.appkit.core.security.impl.Scope;
@@ -24,14 +22,6 @@ public class ScopeDAO extends AbstractDAO<IScope, Scope> implements IScopeDAO {
 	 */
 	public ScopeDAO() {
 		super(IScope.class, Scope.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new Scope();
 	}
 
 }

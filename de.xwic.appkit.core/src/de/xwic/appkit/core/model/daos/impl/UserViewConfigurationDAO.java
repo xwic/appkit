@@ -8,9 +8,7 @@ package de.xwic.appkit.core.model.daos.impl;
 import java.util.List;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
@@ -27,14 +25,6 @@ public class UserViewConfigurationDAO extends AbstractDAO<IUserViewConfiguration
 	 */
 	public UserViewConfigurationDAO() {
 		super(IUserViewConfiguration.class, UserViewConfiguration.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new UserViewConfiguration();
 	}
 
 	/* (non-Javadoc)

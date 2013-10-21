@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IReportFolderDAO;
 import de.xwic.appkit.core.model.entities.IReportFolder;
 import de.xwic.appkit.core.model.entities.impl.ReportFolder;
@@ -27,14 +25,6 @@ public class ReportFolderDAO extends AbstractDAO<IReportFolder, ReportFolder> im
 	 */
 	public ReportFolderDAO() {
 		super(IReportFolder.class, ReportFolder.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new ReportFolder();
 	}
 
 }

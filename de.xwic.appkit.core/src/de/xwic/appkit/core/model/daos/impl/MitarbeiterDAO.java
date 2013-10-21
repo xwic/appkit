@@ -13,7 +13,6 @@ import de.xwic.appkit.core.dao.AbstractHistoryDAO;
 import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
@@ -38,14 +37,6 @@ public class MitarbeiterDAO extends AbstractHistoryDAO<IMitarbeiter, Mitarbeiter
 	public MitarbeiterDAO() {
 		super(IMitarbeiter.class, Mitarbeiter.class);
 	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-    @Override
-	public IEntity createEntity() throws DataAccessException {
-        return new Mitarbeiter();
-    }
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.AbstractDAO#getHistoryImplClass()

@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IEntityCommentDAO;
 import de.xwic.appkit.core.model.entities.IEntityComment;
 import de.xwic.appkit.core.model.entities.impl.EntityComment;
@@ -27,14 +25,6 @@ public class EntityCommentDAO extends AbstractDAO<IEntityComment, EntityComment>
 	 */
 	public EntityCommentDAO() {
 		super(IEntityComment.class, EntityComment.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new EntityComment();
 	}
 
 }

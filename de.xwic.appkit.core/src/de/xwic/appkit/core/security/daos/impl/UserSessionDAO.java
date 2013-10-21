@@ -10,9 +10,7 @@ package de.xwic.appkit.core.security.daos.impl;
 import java.util.Date;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.security.IUser;
@@ -30,14 +28,6 @@ public class UserSessionDAO extends AbstractDAO<IUserSession, UserSession> imple
 	 */
 	public UserSessionDAO() {
 		super(IUserSession.class, UserSession.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new UserSession();
 	}
 
 	/* (non-Javadoc)

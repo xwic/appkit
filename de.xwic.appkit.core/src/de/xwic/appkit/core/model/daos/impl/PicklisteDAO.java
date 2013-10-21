@@ -69,14 +69,6 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new Pickliste();
-	}
-
-	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.AbstractDAO#createEntity(java.lang.String)
 	 */
 	@Override

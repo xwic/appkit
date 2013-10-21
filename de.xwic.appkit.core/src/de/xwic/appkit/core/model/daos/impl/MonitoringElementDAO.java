@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IMonitoringElementDAO;
 import de.xwic.appkit.core.model.entities.IMonitoringElement;
 import de.xwic.appkit.core.model.entities.impl.MonitoringElement;
@@ -24,14 +22,6 @@ public class MonitoringElementDAO extends AbstractDAO<IMonitoringElement, Monito
 	 */
 	public MonitoringElementDAO() {
 		super(IMonitoringElement.class, MonitoringElement.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new MonitoringElement();
 	}
 
 }

@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IMitarbeiterRelationDAO;
 import de.xwic.appkit.core.model.entities.IMitarbeiterRelation;
 import de.xwic.appkit.core.model.entities.impl.MitarbeiterRelation;
@@ -27,16 +25,6 @@ public class MitarbeiterRelationDAO extends AbstractDAO<IMitarbeiterRelation, Mi
 	 */
 	public MitarbeiterRelationDAO() {
 		super(IMitarbeiterRelation.class, MitarbeiterRelation.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		MitarbeiterRelation mitRelation = new MitarbeiterRelation();
-
-		return mitRelation;
 	}
 
 }

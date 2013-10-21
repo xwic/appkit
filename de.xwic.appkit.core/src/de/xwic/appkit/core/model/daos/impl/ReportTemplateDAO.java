@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IReportTemplateDAO;
 import de.xwic.appkit.core.model.entities.IReportTemplate;
 import de.xwic.appkit.core.model.entities.impl.ReportTemplate;
@@ -27,14 +25,6 @@ public class ReportTemplateDAO extends AbstractDAO<IReportTemplate, ReportTempla
 	 */
 	public ReportTemplateDAO() {
 		super(IReportTemplate.class, ReportTemplate.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new ReportTemplate();
 	}
 
 }

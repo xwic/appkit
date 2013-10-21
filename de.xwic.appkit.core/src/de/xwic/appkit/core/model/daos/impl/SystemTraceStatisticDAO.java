@@ -6,8 +6,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.ISystemTraceStatisticDAO;
 import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
 import de.xwic.appkit.core.model.entities.impl.SystemTraceStatistic;
@@ -25,14 +23,6 @@ public class SystemTraceStatisticDAO extends AbstractDAO<ISystemTraceStatistic, 
 	 */
 	public SystemTraceStatisticDAO() {
 		super(ISystemTraceStatistic.class, SystemTraceStatistic.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new SystemTraceStatistic();
 	}
 
 }

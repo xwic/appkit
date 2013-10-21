@@ -8,9 +8,7 @@
 package de.xwic.appkit.core.security.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.security.IAction;
 import de.xwic.appkit.core.security.IRight;
 import de.xwic.appkit.core.security.IRole;
@@ -29,14 +27,6 @@ public class RightDAO extends AbstractDAO<IRight, Right> implements IRightDAO {
 	 */
 	public RightDAO() {
 		super(IRight.class, Right.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new Right();
 	}
 
 	/* (non-Javadoc)

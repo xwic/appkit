@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.security.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.security.IActionSet;
 import de.xwic.appkit.core.security.daos.IActionSetDAO;
 import de.xwic.appkit.core.security.impl.ActionSet;
@@ -24,14 +22,6 @@ public class ActionSetDAO extends AbstractDAO<IActionSet, ActionSet> implements 
 	 */
 	public ActionSetDAO() {
 		super(IActionSet.class, ActionSet.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new ActionSet();
 	}
 
 }

@@ -8,7 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.model.daos.ISalesTeamDAO;
@@ -28,14 +27,6 @@ public class SalesTeamDAO extends AbstractDAO<ISalesTeam, SalesTeam> implements 
 	public SalesTeamDAO() {
 		super(ISalesTeam.class, SalesTeam.class);
 	}
-
-    /* (non-Javadoc)
-     * @see de.xwic.appkit.core.dao.DAO#createEntity()
-     */
-    @Override
-	public IEntity createEntity() throws DataAccessException {
-        return new SalesTeam();
-    }
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.AbstractDAO#validateEntity(de.xwic.appkit.core.dao.IEntity)

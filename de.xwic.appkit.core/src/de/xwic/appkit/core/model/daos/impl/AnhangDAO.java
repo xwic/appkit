@@ -8,7 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.model.daos.IAnhangDAO;
@@ -27,14 +26,6 @@ public class AnhangDAO extends AbstractDAO<IAnhang, Anhang> implements IAnhangDA
 	 */
 	public AnhangDAO() {
 		super(IAnhang.class, Anhang.class);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	@Override
-	public IEntity createEntity() throws DataAccessException {
-		return new Anhang();
 	}
 
 	/*
