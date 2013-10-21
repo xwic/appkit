@@ -93,7 +93,7 @@ public interface DAO<I extends IEntity> {
 	 * @param limit
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit);
+	public EntityList<I> getEntities(Limit limit);
 
 	/**
 	 * Returns a list of entities filtered by the EntityFilter. If the filter argument
@@ -102,7 +102,7 @@ public interface DAO<I extends IEntity> {
 	 * @param filter
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit, EntityQuery filter);
+	public EntityList<I> getEntities(Limit limit, EntityQuery filter);
 
 	/**
 	 * Returns a list of entities filtered by the EntityFilter. If the filter argument
@@ -113,7 +113,7 @@ public interface DAO<I extends IEntity> {
 	 * @param checkReadRights
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit, EntityQuery filter, boolean checkReadRights);
+	public EntityList<I> getEntities(Limit limit, EntityQuery filter, boolean checkReadRights);
 
 	/**
 	 * Fetches the collection specified in a single property for the given type.
