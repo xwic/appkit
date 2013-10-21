@@ -33,7 +33,7 @@ import de.xwic.appkit.core.security.IUser;
  * 
  * @author Florian Lippisch
  */
-public abstract class AbstractDAO implements DAO {
+public abstract class AbstractDAO<I extends IEntity, E extends Entity> implements DAO<I> {
 
 	private final Log log = LogFactory.getLog(getClass());
 	/** Provides access to the basic DAO operations */
@@ -44,6 +44,43 @@ public abstract class AbstractDAO implements DAO {
 	 * EntityDiscriptor.isHistory() is true
 	 **/
 	protected boolean handleHistory = false;
+	private final Class<I> iClass;
+	private final Class<E> eClass;
+
+	/**
+	 * @param iClass
+	 * @param eClass
+	 */
+	public AbstractDAO(Class<I> iClass, Class<E> eClass) {
+		if (iClass == null || eClass == null) {
+			throw new NullPointerException("No classes provided for dao " + getClass());
+		}
+		if (!iClass.isInterface()) {
+			throw new IllegalStateException("First parameter must be an interface.");
+		}
+		if (!iClass.isAssignableFrom(eClass)) {
+			throw new IllegalStateException("Illegal parameters for " + getClass());
+		}
+		this.iClass = iClass;
+		this.eClass = eClass;
+	}
+
+	/**
+	 * Returns the classname of the entity implementation.
+	 *
+	 * @return
+	 */
+	public Class<E> getEntityImplClass() {
+		return eClass;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
+	 */
+	@Override
+	public Class<I> getEntityClass() {
+		return iClass;
+	}
 
 	/**
 	 * Returns the classname of the entity implementation.
@@ -456,7 +493,7 @@ public abstract class AbstractDAO implements DAO {
 			 * logbuffer.append("SECURITY CHECK: User: ").append(user != null ?
 			 * user.getName() : "<no user: systemstart>");
 			 * logbuffer.append(" RECHT: ").append(rightName);
-			 * logbuffer.append("... Bei Entität: "
+			 * logbuffer.append("... Bei Entitï¿½t: "
 			 * ).append(getEntityClass().getName());
 			 * log.debug(logbuffer.toString());
 			 */
@@ -467,7 +504,7 @@ public abstract class AbstractDAO implements DAO {
 		if (user != null && !result) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("Fehlendes Recht: ").append(rightName);
-			sb.append("... Bei Entität: ").append(getEntityClass().getName());
+			sb.append("... Bei Entitï¿½t: ").append(getEntityClass().getName());
 			log.error("SECURITY EXCEPTION: " + sb.toString());
 			throw new SecurityException(sb.toString());
 		}
