@@ -39,7 +39,7 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 	 * @see de.xwic.appkit.webbase.toolkit.components.IEntityListBoxControl#selectEntry(de.xwic.appkit.core.dao.IEntity)
 	 */
 	@Override
-	public void selectEntry(IEntity entity){
+	public void selectEntry(E entity){
 		if (entity != null) {
 			setSelectedKey(Integer.toString(entity.getId()));
 		}
