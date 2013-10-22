@@ -7,6 +7,7 @@ package de.xwic.appkit.core.model.daos.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
@@ -405,12 +406,19 @@ public class PicklisteDAO extends AbstractDAO implements IPicklisteDAO {
     			cache.clear();
 
     			PropertyQuery query = new PropertyQuery();
-    			query.addLeftOuterJoinProperty("picklistEntry");
-    			query.addLeftOuterJoinProperty("picklistEntry.pickliste");
+//    			2013-10-04:
+//    			if a picklist entry doesn't have a picklist text we assume that this is
+//    			because it's a new language so we create a new text for it
+//    			when we left outer join, we also fetch the deleted picklist entry and pickliste
+//    			which causes them to get cached and show up in selectors
     			
-				EntityList list = api.getEntities(PicklistText.class, null, query);
-		    	for (Iterator<?> it = list.iterator(); it.hasNext(); ) {
-		    		IPicklistText text = (IPicklistText)it.next();
+//				query.addLeftOuterJoinProperty("picklistEntry");
+//				query.addLeftOuterJoinProperty("picklistEntry.pickliste");
+				query.addEquals("picklistEntry.deleted", false);
+				query.addEquals("picklistEntry.pickliste.deleted", false);
+
+				List<IPicklistText> list = api.getEntities(PicklistText.class, null, query);
+				for (IPicklistText text : list) {
 		    		IPicklistEntry entry = text.getPicklistEntry();
 		    		IPickliste p = entry.getPickliste();
 		    		cache.putPickliste(p);

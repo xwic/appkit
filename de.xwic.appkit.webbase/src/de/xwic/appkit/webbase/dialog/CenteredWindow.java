@@ -17,7 +17,7 @@ public class CenteredWindow extends Window {
 		super(site.getDialogContainer());
 		setTemplateName(Window.class.getName());
 		setWidth(400);
-		setHeight(250);
+		//setHeight(250);
 		
 		setVisible(false);
 		setModal(true);
@@ -29,27 +29,11 @@ public class CenteredWindow extends Window {
 		
 	}
 
-	private void centerWindow() {
-		//only if we show it...
-		int left = Page.findPage(this).getPageSize().width / 2 - (getWidth() / 2);
-		if (left != getLeft()) {
-			setLeft(left);
-		}
-		
-		//subtract 20 because it looks a bit too high..
-		int top = Page.findPage(this).getPageSize().height / 2 - (getHeight() / 2)
-				+ Page.findPage(this).getClientTop() - 20;
-		if (top != getTop()) {
-			setTop(top);
-		}
-
-	}
-	
 	/**
 	 * Show the window and center it.
 	 */
 	public void show() {
-		centerWindow();
+//		centerWindow(); this is redundant since windows are automatically set to be centered
 		setVisible(true);
 	}
 	

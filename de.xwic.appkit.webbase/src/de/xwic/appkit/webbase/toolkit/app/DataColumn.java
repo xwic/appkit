@@ -8,14 +8,12 @@ import de.jwic.base.IOuterLayout;
  * @author bogdan
  *
  */
-public class GroupPanelContainer extends ControlContainer implements IOuterLayout {
-
-	private String title = "";
+public class DataColumn extends ControlContainer implements IOuterLayout{
 
 	/**
 	 * @param container
 	 */
-	public GroupPanelContainer(IControlContainer container) {
+	public DataColumn(IControlContainer container) {
 		super(container);
 		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
@@ -24,7 +22,7 @@ public class GroupPanelContainer extends ControlContainer implements IOuterLayou
 	 * @param container
 	 * @param name
 	 */
-	public GroupPanelContainer(IControlContainer container, String name) {
+	public DataColumn(IControlContainer container, String name) {
 		super(container, name);
 		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
@@ -34,21 +32,24 @@ public class GroupPanelContainer extends ControlContainer implements IOuterLayou
 	 */
 	@Override
 	public String getOuterTemplateName() {
-		return GroupPanelContainer.class.getName()+"_outerLayout";
-	}
-
-	/**
-	 * @param title
-	 */
-	public void setTitle(String title){
-		this.title  = title;
+		return this.getClass().getName()+"_outerLayout";
 	}
 	
 	/**
-	 * @return
+	 * @return new DataBlock
 	 */
-	public String getTitle(){
-		return this.title;
+	public DataBlock addDataBlock(){
+		return new DataBlock(this);
 	}
+	
+	/**
+	 * @param name of DataBlock 
+	 * @return new DataBlock with given name
+	 */
+	public DataBlock addDataBlock(String name){
+		return new DataBlock(this,name);
+	}
+
+	
 	
 }

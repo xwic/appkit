@@ -17,6 +17,7 @@ public class PanelSectionContainer extends ControlContainer implements IOuterLay
 	 */
 	public PanelSectionContainer(IControlContainer container, String name) {
 		super(container, name);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/**
@@ -24,6 +25,7 @@ public class PanelSectionContainer extends ControlContainer implements IOuterLay
 	 */
 	public PanelSectionContainer(IControlContainer container) {
 		super(container);
+		setRendererId(DEFAULT_OUTER_RENDERER);
 	}
 
 	/* (non-Javadoc)
@@ -31,7 +33,7 @@ public class PanelSectionContainer extends ControlContainer implements IOuterLay
 	 */
 	@Override
 	public String getOuterTemplateName() {
-		return this.getClass().getName()+"_outerLayout";
+		return PanelSectionContainer.class.getName()+"_outerLayout";
 	}
 
 	

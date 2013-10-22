@@ -292,10 +292,12 @@ public class MultiAttachmentControl extends Control implements
 	 * @return
 	 */
 	public boolean hasAttachments() {
-		for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
-			IAttachmentWrapper attachment = (IAttachmentWrapper) iterator.next();
-			if (attachment != null && !attachment.isDeleted()) {
-				return true;
+		if (attachments != null){
+			for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
+				IAttachmentWrapper attachment = (IAttachmentWrapper) iterator.next();
+				if (attachment != null && !attachment.isDeleted()) {
+					return true;
+				}
 			}
 		}
 		return false;

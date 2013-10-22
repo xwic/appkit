@@ -19,6 +19,7 @@ import java.util.Set;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.util.CollectionUtil;
 
 /**
  * Generic query definition based upon entity properties. 
@@ -582,29 +583,15 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 */
 	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
-		values = processCollection(values);
-		Set<Set> sets = new HashSet<Set>();
-		Set set = new HashSet();
-		Iterator iterator = values.iterator();
-		while (iterator.hasNext()) {
-			if (set.size() == 1000) {
-				sets.add(set);
-				set = new HashSet();
-			}
-			set.add(iterator.next());
-		}
-		if (!set.isEmpty()) {
-			sets.add(set);
-		}
+		List<? extends Collection<?>> sets = CollectionUtil.breakCollection(processCollection(values), 1000, HashSet.class);
 		PropertyQuery subQuery = new PropertyQuery();
-		for (Set ids : sets) {
+		for (Collection ids : sets) {
 			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
 		}
 		if (sets.isEmpty()) {
-			addEquals("id", null);
-		} else {
-			addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+			subQuery.addEquals("id", null);
 		}
+		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
 	}
 
 	/**

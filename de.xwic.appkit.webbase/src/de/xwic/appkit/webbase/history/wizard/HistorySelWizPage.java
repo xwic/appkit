@@ -17,6 +17,7 @@ import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.controls.wizard.WizardPage;
 import de.xwic.appkit.webbase.history.HistorySelectionModel;
+import de.xwic.appkit.webbase.toolkit.app.PanelSectionContainer;
 
 
 /**
@@ -51,7 +52,7 @@ public class HistorySelWizPage extends WizardPage {
 	 */
 	@Override
 	public void createControls(IControlContainer container) {
-		ControlContainer composite = new ControlContainer(container, "parent");
+		PanelSectionContainer composite = new PanelSectionContainer(container, "parent");
 		
 		errorControl = new ErrorWarning(composite, "error");
 		
@@ -62,7 +63,7 @@ public class HistorySelWizPage extends WizardPage {
 		tableViewer.getModel().setSelectionMode(TableModel.SELECTION_MULTI);
 		
 		tableViewer.setHeight(350);
-		tableViewer.setWidth(850);
+		//tableViewer.setWidth(850);
 		
 		createColumns();
 

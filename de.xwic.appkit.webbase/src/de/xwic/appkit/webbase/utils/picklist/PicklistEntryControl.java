@@ -6,15 +6,15 @@
 
  * com.netapp.balanceit.tools.PicklistControl.java
  * Created on 19.02.2008
- * 
+ *
  * @author Ronny Pfretzschner
  */
 package de.xwic.appkit.webbase.utils.picklist;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,51 +23,73 @@ import de.jwic.controls.ListBox;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.webbase.toolkit.components.IEntityListBoxControl;
 
 /**
  * PicklistSingleSelection control.
- * 
+ *
  * Created on 19.02.2008
  * @author Ronny Pfretzschner
  */
-public class PicklistEntryControl extends ListBox implements IPicklistEntryControl {
+public class PicklistEntryControl extends ListBox implements IPicklistEntryControl, IEntityListBoxControl<IPicklistEntry> {
 
-	String lang = "DE";
+	private String lang = "DE";
 	private boolean allowEmptySelection = true;
-	private Map<Integer, IPicklistEntry> entries;
-	
+	protected Map<Integer, IPicklistEntry> entries;
+
 	private IPicklisteDAO plDao = null;
 	private String picklistKey = null;
-	
+
 	private Comparator<IPicklistEntry> comparator = null;
-	
+
 	private String emptySelectionText = "";
-	
+
+	/**
+	 * @param container
+	 * @param name
+	 * @param picklistKey
+	 */
 	public PicklistEntryControl(IControlContainer container, String name, String picklistKey) {
 		this(container, name, picklistKey, true, null);
 	}
 
+	/**
+	 * @param container
+	 * @param name
+	 * @param picklistKey
+	 * @param allowEmptySelection
+	 * @param comparator
+	 */
 	public PicklistEntryControl(IControlContainer container, String name, String picklistKey, boolean allowEmptySelection, Comparator<IPicklistEntry> comparator) {
-		super(container, name);
-		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
+		this(container, name, allowEmptySelection, comparator);
 		this.picklistKey = picklistKey;
-		this.allowEmptySelection = allowEmptySelection;
-		setTemplateName(ListBox.class.getName());
-		this.lang = getSessionContext().getLocale().getLanguage();
-		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 		setupEntries(lang, picklistKey);
 	}
-	
+
+	/**
+	 * @param container
+	 * @param name
+	 * @param entryList
+	 * @param allowEmptySelection
+	 */
 	public PicklistEntryControl(IControlContainer container, String name, List<IPicklistEntry> entryList, boolean allowEmptySelection) {
-		super(container, name);
-		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
-		this.allowEmptySelection = allowEmptySelection;
-		setTemplateName(ListBox.class.getName());
-		this.lang = getSessionContext().getLocale().getLanguage();
-		this.comparator = new PicklistEntryComparator(lang);
+		this(container, name, allowEmptySelection, null);
 		setupEntries(lang, entryList);
 	}
 
+	/**
+	 * @param container
+	 * @param name
+	 * @param allowEmptySelection
+	 * @param comparator
+	 */
+	private PicklistEntryControl(IControlContainer container, String name, boolean allowEmptySelection, Comparator<IPicklistEntry> comparator) {
+		super(container, name);
+		plDao = DAOSystem.getDAO(IPicklisteDAO.class);
+		this.lang = getSessionContext().getLocale().getLanguage();
+		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
+		setTemplateName(ListBox.class.getName());
+	}
 
 	/**
 	 * set an internal array for the given list of entries
@@ -77,43 +99,43 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 	protected void setupEntries(String lang, List<IPicklistEntry> entryList){
 		clear();
 		this.lang = lang;
-		
-		
+
+
 		if (null != entryList){
 			entries = new HashMap<Integer, IPicklistEntry>();
-			
-			for (Iterator<IPicklistEntry> it = entryList.iterator(); it.hasNext(); ) {
-				IPicklistEntry entry = (IPicklistEntry)it.next();
+
+			for (IPicklistEntry iPicklistEntry : entryList) {
+				IPicklistEntry entry = iPicklistEntry;
 				if (!entry.isVeraltet()) {
 					entries.put(new Integer(entry.getId()), entry);
 					this.picklistKey = entry.getPickliste().getKey();
 				}
 			}
-			
-			// sort the list 
+
+			// sort the list
 			Collections.sort(entryList, comparator);
-			
+
 			//add empty selection
 			if (allowEmptySelection){
 				entries.put(new Integer(0), null);
 				addElement(emptySelectionText, "0");
 			}
-	
+
 			String preSelection = null;
-			
+
 			// add entries into combo
 			for (int i = 0; i < entryList.size(); i++) {
-				IPicklistEntry entry = (IPicklistEntry)entryList.get(i);
+				IPicklistEntry entry = entryList.get(i);
 				if (!entry.isVeraltet()) {
 					addElement(entry.getBezeichnung(lang), Integer.toString(entry.getId()));
 				}
-				
+
 				if (i == 0) {
 					preSelection = Integer.toString(entry.getId());
 				}
-				
+
 			}
-			
+
 			if (allowEmptySelection) {
 				setSelectedKey("0");
 			} else if (preSelection != null){
@@ -121,8 +143,8 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 * set an internal array for the given list of entries
 	 * @param lang
@@ -132,68 +154,108 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 	protected void setupEntries(String lang, String picklistKey){
 		clear();
 		this.lang = lang;
-		
+
 		List<IPicklistEntry> entryList = plDao.getAllEntriesToList(picklistKey);
-		
+
 		setupEntries(lang, entryList);
 	}
-	
-	
-	/** select the item corresponding to the given entry id
-	 * @param pickEntryId
+
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.toolkit.components.IEntityListBoxControl#selectEntry(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public void selectEntry(IPicklistEntry pEntry){
-		if (null != entries && null != pEntry){
+		String key = getKey(pEntry);
+		if (key != null) {
+			setSelectedKey(key);
+		}
+	}
+
+	/**
+	 * @param pEntry
+	 * @return
+	 */
+	protected String getKey(IPicklistEntry pEntry) {
+		String key = null;
+		if (null != entries && null != pEntry) {
 			boolean found = false;
-			
-			if (entries.containsKey(new Integer(pEntry.getId()))) {
+
+			int id = pEntry.getId();
+			if (entries.containsKey(new Integer(id))) {
 				found = true;
-				setSelectedKey(Integer.toString(pEntry.getId()));
-			}
-			
-			if (!found && pEntry.isVeraltet()) {
-				entries.put(new Integer(pEntry.getId()), pEntry);
-				addElement("[" + pEntry.getBezeichnung(lang) + "]", Integer.toString(pEntry.getId()));
-				setSelectedKey(Integer.toString(entries.size() - 1));
+				key = Integer.toString(id);
 			}
 
-		}else{
-			if (entries!=null && pEntry==null && allowEmptySelection){
-				setSelectedKey("0");
+			if (!found && pEntry.isVeraltet()) {
+				entries.put(new Integer(id), pEntry);
+				addElement("[" + pEntry.getBezeichnung(lang) + "]", Integer.toString(id));
+				key = Integer.toString(entries.size() - 1);
+			}
+
+		} else {
+			if (entries != null && pEntry == null && allowEmptySelection) {
+				key = "0";
 			}
 		}
-		
-	} 
-	
-	/**
-	 * @return the id of the selected entry
+		return key;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.toolkit.components.IEntityListBoxControl#getSelectedEntry()
 	 */
-	public IPicklistEntry getSelectionEntry(){
-		if (getSelectedKey() == null || getSelectedKey().length() < 1) {
+	@Override
+	public IPicklistEntry getSelectedEntry() {
+		return getEntry(getSelectedKey());
+	}
+
+	/**
+	 * @param picklistKey
+	 */
+	public void selectEntryByKey(String picklistKey) {
+		if (picklistKey != null) {
+			Collection<IPicklistEntry> values = entries.values();
+			for (IPicklistEntry pe : values) {
+				if (pe.getKey().equals(picklistKey)) {
+					selectEntry(pe);
+					return;
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param idString
+	 * @return
+	 */
+	protected IPicklistEntry getEntry(String idString){
+		if (idString == null || idString.length() < 1) {
 			return null;
 		}
-		
-		int i = Integer.parseInt(getSelectedKey());
-		
-		if (null != entries){		
+
+		int i = Integer.parseInt(idString);
+
+		if (null != entries){
 			if (entries.containsKey(new Integer(i))){
-				IPicklistEntry entry = (IPicklistEntry) entries.get(new Integer(i));
+				IPicklistEntry entry = entries.get(new Integer(i));
 				return entry;
 			}
 		}
 		return null;
 	}
-	
-	/**
-	 * @return Returns the picklistKey.
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl#getPicklistKey()
 	 */
+	@Override
 	public String getPicklistKey() {
 		return picklistKey;
 	}
 
-	/**
-	 * @param picklistKey The picklistKey to set.
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl#setPicklistKey(java.lang.String)
 	 */
+	@Override
 	public void setPicklistKey(String picklistKey) {
 		this.picklistKey = picklistKey;
 	}
@@ -220,5 +282,5 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 		this.emptySelectionText = emptySelectionText;
 		setupEntries(lang, picklistKey);
 	}
-	
+
 }

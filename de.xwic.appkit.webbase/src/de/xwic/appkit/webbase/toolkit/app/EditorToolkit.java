@@ -4,13 +4,14 @@
 package de.xwic.appkit.webbase.toolkit.app;
 
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckBox;
 import de.jwic.controls.CheckBoxGroup;
 import de.jwic.controls.DatePicker;
 import de.jwic.controls.InputBox;
@@ -23,12 +24,14 @@ import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitEmployeeControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitInputBoxControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitMultiAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionControl;
+import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionMultiControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitSingleAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.attachment.SingleAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.comment.SingleCommentEditorControl;
 import de.xwic.appkit.webbase.toolkit.components.EmployeeSelectionCombo;
 import de.xwic.appkit.webbase.toolkit.editor.EditorModel;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
+import de.xwic.appkit.webbase.utils.picklist.PicklistEntryMultiSelectControl;
 
 /**
  * Editortoolkit to create controls for editors.
@@ -56,6 +59,7 @@ public class EditorToolkit {
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
 		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
+		allControls.put(PicklistEntryMultiSelectControl.class, new ToolkitPicklistSelectionMultiControl());
 		allControls.put(CheckBoxGroup.class, new ToolkitCheckBoxControl());
 		allControls.put(SingleAttachmentControl.class, new ToolkitSingleAttachmentControl());
 		allControls.put(SingleCommentEditorControl.class, new ToolkitMultiAttachmentControl());
@@ -87,11 +91,11 @@ public class EditorToolkit {
 	 * @param optionalParam 
 	 * @return a control
 	 */
-	public IControl createControl(Class<? extends IControl> controlType, IControlContainer container, String propertyName, Object optionalParam) {
-		IToolkitControlHelper implclass = allControls.get(controlType);
+	public <C extends IControl> C createControl(Class<C> controlType, IControlContainer container, String propertyName, Object optionalParam) {
+		IToolkitControlHelper<C> implclass = allControls.get(controlType);
 		
 		if (implclass != null) {
-			IControl con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
+			C con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
 			
 			if (con != null) {
 				registeredControls.put(propertyName, con);
@@ -112,6 +116,37 @@ public class EditorToolkit {
 			return name.substring(FIELD_NAME_PREFIX.length());
 		}
 		return name;
+	}
+
+	/**
+	 * @param controlClass
+	 * @param container
+	 * @param elements
+	 * @return
+	 */
+	public <C extends IControl> Collection<C> massCreateControls(Class<C> controlClass, IControlContainer container, Object... elements) {
+		return massCreateControls(controlClass, container, true, elements);
+	}
+
+	/**
+	 * @param controlClass
+	 * @param container
+	 * @param hasOptional
+	 * @param elements
+	 * @return
+	 */
+	public <C extends IControl> Collection<C> massCreateControls(Class<C> controlClass, IControlContainer container, boolean hasOptional, Object... elements) {
+		Collection<C> controls = new ArrayList<C>();
+		for (int i = 0; i < elements.length; i++) {
+			String name = (String) elements[i];
+			Object optional = null;
+			if (hasOptional) {
+				i++;
+				optional = elements[i];
+			}
+			controls.add(createControl(controlClass, container, name, optional));
+		}
+		return controls;
 	}
 
 	/**

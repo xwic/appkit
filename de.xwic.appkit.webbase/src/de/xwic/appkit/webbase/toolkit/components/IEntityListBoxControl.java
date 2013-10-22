@@ -6,7 +6,7 @@
 
  * com.netapp.balanceit.tools.list.IEntityListBoxControl.java
  * Created on 29.02.2008
- * 
+ *
  * @author Ronny Pfretzschner
  */
 package de.xwic.appkit.webbase.toolkit.components;
@@ -15,23 +15,23 @@ import de.xwic.appkit.core.dao.IEntity;
 
 /**
  * Listboxcontrol of entities.
- * 
+ *
  * Created on 29.02.2008
  * @author Ronny Pfretzschner
  */
-public interface IEntityListBoxControl {
+public interface IEntityListBoxControl<E extends IEntity> {
 
-	
-	/** 
+
+	/**
 	 * select the item corresponding to the given entity
-	 * 
+	 *
 	 * @param entity
 	 */
-	public void selectEntry(IEntity entity);
-	
+	public void selectEntry(E entity);
+
 	/**
 	 * @return the Entity of the selected entry, can be null if nothing is selected
 	 */
-	public IEntity getSelectedEntry();
+	public E getSelectedEntry();
 
 }

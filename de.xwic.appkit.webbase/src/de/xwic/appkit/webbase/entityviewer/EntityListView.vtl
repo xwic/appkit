@@ -1,9 +1,9 @@
 <div class="contentPanel">
 	<div class="panelHeader roundTop">
 		$insert.control("toolbar")
-		$insert.control("errorWarning")
 	</div>
 	<div class="panelBody roundBottom">
+		$insert.control("errorWarning")
 		#if($control.getQuickFilterPanelName() != "")
 		<div class="panelFilter">
 			$insert.control($control.getQuickFilterPanelName())
