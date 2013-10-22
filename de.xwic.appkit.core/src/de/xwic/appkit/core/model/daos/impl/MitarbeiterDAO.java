@@ -126,4 +126,29 @@ public class MitarbeiterDAO extends AbstractHistoryDAO implements
 		}
 		return null;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.daos.IMitarbeiterDAO#getAllMyReports()
+	 */
+	@Override
+	public List<IMitarbeiter> getAllMyReports() {
+		return getAllReportsByUser(getByCurrentUser());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.daos.IMitarbeiterDAO#getAllReportsByUser(de.xwic.appkit.core.model.entities.IMitarbeiter)
+	 */
+	@SuppressWarnings ("unchecked")
+	@Override
+	public List<IMitarbeiter> getAllReportsByUser(IMitarbeiter leader) {
+		if (leader != null) {
+			PropertyQuery query = new PropertyQuery();
+			query.addEquals("vorgesetzter", leader);
+			
+			return getEntities(null, query);
+		}
+		return null;
+	}
 }
