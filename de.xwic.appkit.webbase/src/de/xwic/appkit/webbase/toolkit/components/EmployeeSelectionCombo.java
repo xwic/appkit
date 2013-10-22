@@ -3,11 +3,9 @@
  */
 package de.xwic.appkit.webbase.toolkit.components;
 
-import java.util.List;
-
 import de.jwic.base.IControlContainer;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
@@ -33,7 +31,7 @@ public class EmployeeSelectionCombo extends AbstractEntityComboControl<IMitarbei
 		super(container, name);
 		this.allowEmptySelection = allowEmptySelection;
 
-		emplDao = (IMitarbeiterDAO) DAOSystem.getDAO(IMitarbeiterDAO.class);
+		emplDao = DAOSystem.getDAO(IMitarbeiterDAO.class);
 		setupEntries();
 		if (allowEmptySelection) {
 			setSelectedKey("0");
@@ -50,7 +48,7 @@ public class EmployeeSelectionCombo extends AbstractEntityComboControl<IMitarbei
 		query.setSortDirection(PropertyQuery.SORT_DIRECTION_UP);
 		query.setSortField("nachname");
 
-		List entryList = emplDao.getEntities(null, query);
+		EntityList<IMitarbeiter> entryList = emplDao.getEntities(null, query);
 
 		if (null != entryList){
 			//add empty selection
@@ -61,7 +59,7 @@ public class EmployeeSelectionCombo extends AbstractEntityComboControl<IMitarbei
 			String defSel = null;
 
 			for (int i = 0; i < entryList.size(); i++) {
-				IMitarbeiter employee = (IMitarbeiter) entryList.get(i);
+				IMitarbeiter employee = entryList.get(i);
 				String title = employee.getNachname() + ", " + employee.getVorname();
 
 				String key = String.valueOf(employee.getId());
@@ -83,7 +81,7 @@ public class EmployeeSelectionCombo extends AbstractEntityComboControl<IMitarbei
 	 *
 	 */
 	@Override
-	public DAO getEntityDao() {
+	public IMitarbeiterDAO getEntityDao() {
 		return emplDao;
 	}
 
