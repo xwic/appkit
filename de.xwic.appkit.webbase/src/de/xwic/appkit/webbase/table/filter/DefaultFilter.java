@@ -22,6 +22,7 @@ public class DefaultFilter extends AbstractFilterControl {
 	private DropDown ddLogic;
 	private InputBox inpText;
 	
+	
 	/**
 	 * @param container
 	 * @param name
@@ -35,6 +36,7 @@ public class DefaultFilter extends AbstractFilterControl {
 		ddLogic.addElement("Starts With", "sw");
 		ddLogic.addElement("Ends With", "ew");
 		ddLogic.addElement("Contains", "c");
+		ddLogic.addElement("Does Not Contain","nc");
 		ddLogic.setWidth(225);
 		
 		ddLogic.selectedByKey("sw");
@@ -80,14 +82,19 @@ public class DefaultFilter extends AbstractFilterControl {
 						qe.setOperation(QueryElement.EQUALS);
 					} else if ("neq".equals(logic)) {
 						qe.setOperation(QueryElement.NOT_EQUALS);
-					} else {
-						qe.setOperation(QueryElement.LIKE);
-						if (("sw".equals(logic) || "c".equals(logic)) && !search.endsWith("%")) {
+					} else{
+						if(("sw".equals(logic) || "c".equals(logic))){
+							qe.setOperation(QueryElement.LIKE);
+						}else if("nc".equals(logic)){
+							qe.setOperation(QueryElement.NOT_LIKE);
+						}
+						if (("sw".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.endsWith("%")) {
 							search = search + "%";
 						} 
-						if (("ew".equals(logic) || "c".equals(logic)) && !search.startsWith("%")) {
+						if (("ew".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.startsWith("%")) {
 							search = "%" + search;
-						} 
+						}
+						
 					}
 					qe.setValue(search);
 				}
@@ -134,6 +141,14 @@ public class DefaultFilter extends AbstractFilterControl {
 				} else {
 					ddLogic.selectedByKey("eq");
 				}
+			}else if(QueryElement.NOT_LIKE.equals(queryElement.getOperation())){
+				if(search.startsWith("%")){
+					search = search.substring(1);
+				}
+				if(search.endsWith("%")){
+					search = search.substring(0,search.length()-1);
+				}
+				ddLogic.selectedByKey("nc");
 			}
 			inpText.setText(search);
 		}

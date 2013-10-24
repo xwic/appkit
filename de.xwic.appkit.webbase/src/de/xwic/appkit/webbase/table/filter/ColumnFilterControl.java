@@ -167,7 +167,6 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		btColSetup.setTitle("");
 		btColSetup.setIconEnabled(ImageLibrary.ICON_TABLE);
 		btColSetup.setTooltip("Column Configuration");
-		btColSetup.setWidth(45);
 		btColSetup.addSelectionListener(new SelectionListener() {
 			@Override
 			public void objectSelected(SelectionEvent event) {
