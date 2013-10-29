@@ -689,25 +689,6 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	}
 
 	/**
-	 * @return
-	 * @throws Exception
-	 */
-	public IEntity getEntityThrowingException() throws Exception {
-		if (!hasEntity()) {
-			return null;
-		}
-
-		String selection = getEntityKey();
-
-		if (selection.trim().length() > 0) {
-			int id = Integer.parseInt(selection);
-			return dao.getEntity(id);
-		}
-
-		return null;
-	}
-
-	/**
 	 * @param listener
 	 */
 	public void addElementSelectedListener(ElementSelectedListener listener) {
