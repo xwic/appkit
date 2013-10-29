@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.xwic.appkit.core.util.InternalEvaluator.EvaluationResult;
 import de.xwic.appkit.core.util.InternalEvaluator.IDupeChecker;
 
@@ -152,6 +154,32 @@ public class CollectionUtil {
 			result.add(step);
 		}
 		return result;
+	}
+
+	/**
+	 * @param collection
+	 * @param evaluator
+	 * @param emptyMessage
+	 * @return
+	 */
+	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator, String emptyMessage) {
+		List<String> strings = new ArrayList();
+		createCollection(collection, evaluator, strings);
+
+		Iterator<String> iterator = strings.iterator();
+		if (iterator.hasNext()) {
+			return StringUtils.join(iterator, separator);
+		}
+		return emptyMessage;
+	}
+
+	/**
+	 * @param collection
+	 * @param evaluator
+	 * @return an empty string if no values
+	 */
+	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator) {
+		return join(collection, evaluator, separator, "");
 	}
 
 	/**

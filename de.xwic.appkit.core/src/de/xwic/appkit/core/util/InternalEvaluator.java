@@ -45,6 +45,29 @@ class InternalEvaluator {
 	}
 
 	/**
+	 * @param obj
+	 * @param generator
+	 * @param result
+	 * @return
+	 */
+	static <Result, Obj> EvaluationResult<Result> evaluate(Obj obj, ILazyEval<Obj, Result> generator, EvaluationResult<Result> result) {
+		result.clear();
+		boolean skip = false;
+		if (obj == null) {
+			skip = true;
+		} else {
+			Result evaluate = generator.evaluate(obj);
+			if (evaluate == null) {
+				skip = true;
+			} else {
+				result.result = evaluate;
+			}
+		}
+		result.skip = skip;
+		return result;
+	}
+
+	/**
 	 * @author Alexandru Bledea
 	 * @since Jul 31, 2013
 	 * @param <What>
