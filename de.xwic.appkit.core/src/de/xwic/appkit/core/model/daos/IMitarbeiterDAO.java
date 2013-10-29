@@ -34,4 +34,15 @@ public interface IMitarbeiterDAO extends DAO {
 	 * @return
 	 */
 	public IMitarbeiter getMittarbeiterByUsername(String username);
+	
+	/**
+	 * @return
+	 */
+	public List<IMitarbeiter> getAllMyReports();
+	
+	/**
+	 * @param leader
+	 * @return
+	 */
+	public List<IMitarbeiter> getAllReportsByUser(IMitarbeiter leader);
 }
