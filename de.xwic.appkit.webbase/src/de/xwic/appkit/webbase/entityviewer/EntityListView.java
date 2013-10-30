@@ -688,6 +688,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		return null;
 	}
 
+
 	/**
 	 * @param listener
 	 */
@@ -718,7 +719,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 			return null;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.actions.IEntityProvider#getBaseEntity()
 	 */
