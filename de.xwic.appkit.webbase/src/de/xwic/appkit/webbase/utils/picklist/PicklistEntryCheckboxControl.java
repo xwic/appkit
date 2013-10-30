@@ -15,11 +15,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.util.CollectionUtil;
+import de.xwic.appkit.core.util.ILazyStringEval;
 
 /**
  * Custom control for displaying picklist entries from a pickliste using
@@ -134,12 +138,12 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	 */
 	public void selectEntries(List<IPicklistEntry> plEntries) {
 		if (null != plEntries) {
-			String key = "";
-			for (IPicklistEntry entry : plEntries) {
-				key += entry.getKey() != null ? entry.getKey() : new Integer(entry.getId()).toString();
-				key +=";";
-			}
-			
+			String key = CollectionUtil.join(plEntries, new ILazyStringEval<IPicklistEntry>() {
+				@Override
+				public String evaluate(IPicklistEntry obj) {
+					return obj.getKey();
+				}
+			}, ";");
 			setSelectedKey(key);
 		}
 	}
