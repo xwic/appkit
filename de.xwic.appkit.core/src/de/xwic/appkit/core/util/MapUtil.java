@@ -120,17 +120,19 @@ public class MapUtil {
 	 * <b>map</b>.put(<b>key</b>, x);<br>
 	 * return x;<br>
 	 *
+	 * @deprecated consider using AIMap instead
 	 * @param map
 	 * @param key
 	 * @param initValue
 	 * @param initializer
 	 * @return
 	 */
-	public static <Key, Obj, X> Obj get(Map<Key, Obj> map, Key key, X initValue, ILazyEval<X, Obj> initializer) {
+	@Deprecated
+	public static <K, X, I, V extends X> V get(Map<K, V> map, K key, I initValue, ILazyEval<I, X> initializer) {
 		if (map.containsKey(key)) {
 			return map.get(key);
 		}
-		Obj call = initializer.evaluate(initValue);
+		V call = (V) initializer.evaluate(initValue);
 		map.put(key, call);
 		return call;
 	}
@@ -144,13 +146,15 @@ public class MapUtil {
 	 * <b>map</b>.put(<b>key</b>, x);<br>
 	 * return x;<br>
 	 *
+	 * @deprecated consider using AIMap instead
 	 * @param map
 	 * @param key
 	 * @param initializer
 	 * @return
 	 *
 	 */
-	public static <Key, Obj> Obj get(Map<Key, Obj> map, Key key, final LazyInit<Obj> initializer) {
+	@Deprecated
+	public static <K, V, X extends V> X get(Map<K, X> map, K key, LazyInit<X> initializer) {
 		return get(map, key, null, initializer);
 	}
 
@@ -182,13 +186,13 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public abstract static class LazyInit<V> implements ILazyEval<Void, V>, Callable<V> {
+	public abstract static class LazyInit<V> implements ILazyEval<Object, V>, Callable<V> {
 
 		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
 		 */
 		@Override
-		public final V evaluate(Void obj) {
+		public final V evaluate(Object ignoreThis) {
 			try {
 				return call();
 			} catch (Exception e) {
@@ -208,14 +212,14 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public static class LazyInitCallable<V> extends LazyInit<V> {
+	public static class LazyCallable<V> extends LazyInit<V> {
 
 		protected Callable<V> callable;
 
 		/**
 		 * @param callable
 		 */
-		public LazyInitCallable(Callable<V> callable) {
+		public LazyCallable(Callable<V> callable) {
 			if ((this.callable = callable) == null) {
 				throw new RuntimeException("Missing initializer");
 			}
