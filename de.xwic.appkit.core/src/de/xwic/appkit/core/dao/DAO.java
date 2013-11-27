@@ -14,41 +14,41 @@ import de.xwic.appkit.core.config.model.EntityDescriptor;
 
 /**
  * Maps basic CRUD (Create Read Update Delete) methods to a
- * DAOProvider and implements object specific operations. 
- * 
+ * DAOProvider and implements object specific operations.
+ *
  * @author Florian Lippisch
  */
-public interface DAO {
+public interface DAO<I extends IEntity> {
 
 	/** The name of the trace category all DAO operations use. */
 	public final static String TRACE_CAT = "DAO";
-	
-    /** 
-     * Creates an unsaved entity. The final DAO implementation may 
-     * implement a <code>createXY(..)</code> method that has the correct 
-     * return type. This methode just creates an "empty" object
-     * with no "must have" parameters. Use this methode wisely!
-     * 
-     * There should be a named methode like <code>createUnternehmen(..)</code><br>
-     * in the specific DAO for the specific business object. <br>
-     * If not, then this methode is the right way to get an entitiy instance.
-     *  
-     * @return unsaved entity with no fields filled or default filled
-     */
-    public IEntity createEntity() throws DataAccessException;
-    
+
+	/**
+	 * Creates an unsaved entity. The final DAO implementation may
+	 * implement a <code>createXY(..)</code> method that has the correct
+	 * return type. This methode just creates an "empty" object
+	 * with no "must have" parameters. Use this methode wisely!
+	 *
+	 * There should be a named methode like <code>createUnternehmen(..)</code><br>
+	 * in the specific DAO for the specific business object. <br>
+	 * If not, then this methode is the right way to get an entitiy instance.
+	 *
+	 * @return unsaved entity with no fields filled or default filled
+	 */
+	public I createEntity() throws DataAccessException;
+
     /**
-     * Creates an unsaved entity of the specified subtype. This method is
-     * used for DAOs that support subclassed entitys. 
-     * @param type
-     * @return
-     */
+	 * Creates an unsaved entity of the specified subtype. This method is
+	 * used for DAOs that support subclassed entitys.
+	 * @param type
+	 * @return
+	 */
     public IEntity createEntity(String subtype);
-    
+
     /**
      * Returns the Class managed by the DAO implementation.
      */
-    public Class<? extends IEntity> getEntityClass(); 
+	public Class<I> getEntityClass();
 
     /**
      * Returns true if the DAO implementation can handle entities of the
@@ -57,29 +57,29 @@ public interface DAO {
      * @return
      */
     public boolean handlesEntity(String entityClass);
-    
+
     /**
-     * Returns the entity with the specified ID. 
-     * @param id
-     * @return
-     */
-    public IEntity getEntity(int id) throws DataAccessException;
-    
+	 * Returns the entity with the specified ID.
+	 * @param id
+	 * @return
+	 */
+	public I getEntity(int id) throws DataAccessException;
+
     /**
-     * Update the entity in the database. 
-     * @param entity
-     * @return
-     */
-    public void update(IEntity entity) throws DataAccessException;
-    
+	 * Update the entity in the database.
+	 * @param entity
+	 * @return
+	 */
+	public void update(IEntity entity) throws DataAccessException;
+
     /**
-     * Delete the entity from the database. If the entity is unsaved, 
-     * an exception is thrown.
-     * @param entity
-     * @return
-     */
+	 * Delete the entity from the database. If the entity is unsaved,
+	 * an exception is thrown.
+	 * @param entity
+	 * @return
+	 */
     public void delete(IEntity entity) throws DataAccessException;
-    
+
     /**
      * Marks the entity as deleted. The entities "deleted" property is
      * set to true after reference checks.
@@ -87,14 +87,14 @@ public interface DAO {
      * @throws DataAccessException
      */
     public void softDelete(final IEntity entity) throws DataAccessException;
-    
+
 	/**
 	 * Returns the list of entities.
 	 * @param limit
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit);
-	
+	public EntityList<I> getEntities(Limit limit);
+
 	/**
 	 * Returns a list of entities filtered by the EntityFilter. If the filter argument
 	 * is <code>null</code>, all entities are returned (only limited by the Limit).
@@ -102,8 +102,8 @@ public interface DAO {
 	 * @param filter
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit, EntityQuery filter);
-	
+	public EntityList<I> getEntities(Limit limit, EntityQuery filter);
+
 	/**
 	 * Returns a list of entities filtered by the EntityFilter. If the filter argument
 	 * is <code>null</code>, all entities are returned (only limited by the Limit).
@@ -113,7 +113,7 @@ public interface DAO {
 	 * @param checkReadRights
 	 * @return
 	 */
-	public EntityList getEntities(Limit limit, EntityQuery filter, boolean checkReadRights);
+	public EntityList<I> getEntities(Limit limit, EntityQuery filter, boolean checkReadRights);
 
 	/**
 	 * Fetches the collection specified in a single property for the given type.
@@ -122,7 +122,7 @@ public interface DAO {
 	 * @return
 	 */
 	public Collection<?> getCollectionProperty(int entityId, String propertyId);
-	
+
 	/**
 	 * Returns a list of history entities filtered by the EntityFilter. If the filter argument
 	 * is <code>null</code>, all entities are returned (only limited by the Limit).
@@ -134,28 +134,28 @@ public interface DAO {
 	public EntityList getHistoryEntities(Limit limit, EntityQuery filter);
 
     /**
-     * Returns the history entity with the specified ID.  
-     * @param id
-     * @return
-     */
+	 * Returns the history entity with the specified ID.
+	 * @param id
+	 * @return
+	 */
 	public IEntity getHistoryEntity(final int id) throws DataAccessException;
-	
+
     /**
-     * Checks an entity on its validate state. <p>
-     * 
-     * This checks, if all "must to have" fields are filled properly
-     * and other necessary checks. <br>
-     * The ValidationResult contains the property as Strings to be key and the
-     * value is a ResourceString key to get the proper error message
-     * from the Resource property file.<br>
-     * 
-     * Should be done before an update will be made.
-     * 
-     * @param entity the entity which should be validated
-     * @return ValidationResult with all properties, which have validate errors
-     */
+	 * Checks an entity on its validate state. <p>
+	 *
+	 * This checks, if all "must to have" fields are filled properly
+	 * and other necessary checks. <br>
+	 * The ValidationResult contains the property as Strings to be key and the
+	 * value is a ResourceString key to get the proper error message
+	 * from the Resource property file.<br>
+	 *
+	 * Should be done before an update will be made.
+	 *
+	 * @param entity the entity which should be validated
+	 * @return ValidationResult with all properties, which have validate errors
+	 */
     public abstract ValidationResult validateEntity(IEntity entity);
-    
+
     /**
      * Create a title string for the specified entity. The default
      * implementation is using the titlePattern that is specified within
@@ -164,12 +164,12 @@ public interface DAO {
      * @return
      */
     public String buildTitle(IEntity entity);
-    
+
     /**
      * @return Returns the provider.
      */
     public DAOProvider getProvider();
-    
+
     /**
      * @param provider The provider to set.
      */
@@ -183,9 +183,9 @@ public interface DAO {
     public List<IEntity> getHistory(IEntity entity);
 
     /**
-     * Returns the EntityDescriptor for the base type.
-     * @return
-     */    
+	 * Returns the EntityDescriptor for the base type.
+	 * @return
+	 */
     public EntityDescriptor getEntityDescriptor();
 
 	/**
@@ -193,21 +193,21 @@ public interface DAO {
 	 * @return
 	 */
 	public EntityDescriptor getEntityDescriptor(String subtype);
-	
+
 	/**
-	 * 
+	 *
 	 * @param mainObject
 	 * @param relationObject
 	 * @return
 	 */
 	public IEntity findCorrectVersionForEntityRelation(IEntity mainObject, IEntity relationObject);
-    
+
 	/**
 	 * Returns true if the specified action is true for the entity.
 	 * @param entity
 	 * @param action
 	 * @return
 	 */
-	public boolean hasRight(IEntity entity, String action); 
-	
+	public boolean hasRight(IEntity entity, String action);
+
 }

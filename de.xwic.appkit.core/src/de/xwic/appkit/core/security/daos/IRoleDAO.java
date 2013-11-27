@@ -8,10 +8,11 @@
 package de.xwic.appkit.core.security.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.security.IRole;
 
 /**
  * @author Florian Lippisch
  */
-public interface IRoleDAO extends DAO {
+public interface IRoleDAO extends DAO<IRole> {
 
 }

@@ -62,7 +62,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * 
  * @author Adrian Ionescu
  */
-public class EntityListView extends ControlContainer implements IEntityProvider {
+public class EntityListView<I extends IEntity> extends ControlContainer implements IEntityProvider {
 
 	protected EntityListViewConfiguration configuration;
 	
@@ -673,7 +673,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * @return
 	 * @throws Exception
 	 */
-	public IEntity getEntityThrowingException() throws Exception {
+	public I getEntityThrowingException() throws Exception {
 		if (!hasEntity()) {
 			return null;
 		}
@@ -682,7 +682,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 
 		if (selection.trim().length() > 0) {
 			int id = Integer.parseInt(selection);
-			return dao.getEntity(id);
+			return (I) dao.getEntity(id);
 		}
 
 		return null;
@@ -711,7 +711,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * @see de.xwic.appkit.webbase.actions.IEntityProvider#getEntity()
 	 */
 	@Override
-	public IEntity getEntity() {
+	public I getEntity() {
 		try {
 			return getEntityThrowingException();
 		} catch (Exception e) {

@@ -33,7 +33,7 @@ import de.xwic.appkit.core.security.IUser;
  * 
  * @author Florian Lippisch
  */
-public abstract class AbstractDAO implements DAO {
+public abstract class AbstractDAO<I extends IEntity, E extends Entity> implements DAO<I> {
 
 	private final Log log = LogFactory.getLog(getClass());
 	/** Provides access to the basic DAO operations */
@@ -44,13 +44,56 @@ public abstract class AbstractDAO implements DAO {
 	 * EntityDiscriptor.isHistory() is true
 	 **/
 	protected boolean handleHistory = false;
+	private final Class<I> iClass;
+	private final Class<E> eClass;
+
+	/**
+	 * @param iClass
+	 * @param eClass
+	 */
+	public AbstractDAO(Class<I> iClass, Class<E> eClass) {
+		if (iClass == null || eClass == null) {
+			throw new NullPointerException("No classes provided for dao " + getClass());
+		}
+		if (!iClass.isInterface()) {
+			throw new IllegalStateException("First parameter must be an interface.");
+		}
+		if (!iClass.isAssignableFrom(eClass)) {
+			throw new IllegalStateException("Illegal parameters for " + getClass());
+		}
+		this.iClass = iClass;
+		this.eClass = eClass;
+	}
 
 	/**
 	 * Returns the classname of the entity implementation.
-	 * 
+	 *
 	 * @return
 	 */
-	public abstract Class<? extends Entity> getEntityImplClass();
+	public final Class<E> getEntityImplClass() {
+		return eClass;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
+	 */
+	@Override
+	public final Class<I> getEntityClass() {
+		return iClass;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
+	 */
+	@Override
+	public I createEntity() throws DataAccessException {
+		Class<E> entityImplClass = getEntityImplClass();
+		try {
+			return (I) entityImplClass.newInstance();
+		} catch (Exception e) {
+			throw new IllegalStateException("Failed to instantiate " + entityImplClass.getSimpleName(), e);
+		}
+	}
 
 	/**
 	 * Returns the classname of the history implementation.
@@ -96,11 +139,11 @@ public abstract class AbstractDAO implements DAO {
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getEntity(int)
 	 */
-	public IEntity getEntity(final int id) throws DataAccessException {
+	public I getEntity(final int id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
-		return (IEntity) provider.execute(new DAOCallback() {
+		return (I) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				return api.getEntity(getEntityImplClass(), id);
 			}
@@ -456,7 +499,7 @@ public abstract class AbstractDAO implements DAO {
 			 * logbuffer.append("SECURITY CHECK: User: ").append(user != null ?
 			 * user.getName() : "<no user: systemstart>");
 			 * logbuffer.append(" RECHT: ").append(rightName);
-			 * logbuffer.append("... Bei Entität: "
+			 * logbuffer.append("... Bei Entitï¿½t: "
 			 * ).append(getEntityClass().getName());
 			 * log.debug(logbuffer.toString());
 			 */
@@ -467,7 +510,7 @@ public abstract class AbstractDAO implements DAO {
 		if (user != null && !result) {
 			StringBuffer sb = new StringBuffer();
 			sb.append("Fehlendes Recht: ").append(rightName);
-			sb.append("... Bei Entität: ").append(getEntityClass().getName());
+			sb.append("... Bei Entitï¿½t: ").append(getEntityClass().getName());
 			log.error("SECURITY EXCEPTION: " + sb.toString());
 			throw new SecurityException(sb.toString());
 		}

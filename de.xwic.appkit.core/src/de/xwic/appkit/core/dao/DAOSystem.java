@@ -86,13 +86,8 @@ public class DAOSystem {
      * @param daoType
      * @return
      */
-    public static DAO findDAOforEntity(Class<? extends IEntity> entityClass) {
-    	
-    	if (daoFactory != null) {
-    		return (DAO)daoFactory.findDAOforEntity(entityClass.getName());
-    	}
-    	return null;
-    	
+    public static <I extends IEntity> DAO<I> findDAOforEntity(Class<I> entityClass) {
+		return findDAOforEntity(entityClass.getName());
     }
 
 	/**

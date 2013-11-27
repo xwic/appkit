@@ -8,11 +8,12 @@
 package de.xwic.appkit.core.model.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.model.entities.ISalesTeam;
 
 /**
  * @author Ronny Pfretzschner
  */
-public interface ISalesTeamDAO extends DAO {
+public interface ISalesTeamDAO extends DAO<ISalesTeam> {
 
-    
+
 }
