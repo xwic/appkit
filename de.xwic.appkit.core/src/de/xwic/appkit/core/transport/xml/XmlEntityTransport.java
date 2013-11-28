@@ -115,6 +115,19 @@ public class XmlEntityTransport {
 		l.add(entity);
 		write(writer, l, descr);
 	}
+
+	/**
+	 * Export a list of entities to a xml file.
+	 * @param file
+	 * @param entities
+	 * @throws IOException
+	 * @throws ConfigurationException
+	 */
+	public void write(Writer writer, EntityTransferObject eto, EntityDescriptor descr) throws IOException, ConfigurationException {
+		List<EntityTransferObject> l = new ArrayList<EntityTransferObject>();
+		l.add(eto);
+		write(writer, l, descr);
+	}
 	/**
 	 * Export a list of entities to a xml file.
 	 * @param file
