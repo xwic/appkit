@@ -31,7 +31,7 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 	}
 
 
-	public abstract DAO getEntityDao();
+	public abstract DAO<E> getEntityDao();
 
 	protected abstract void setupEntries();
 
@@ -39,7 +39,7 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 	 * @see de.xwic.appkit.webbase.toolkit.components.IEntityListBoxControl#selectEntry(de.xwic.appkit.core.dao.IEntity)
 	 */
 	@Override
-	public void selectEntry(IEntity entity){
+	public void selectEntry(E entity){
 		if (entity != null) {
 			setSelectedKey(Integer.toString(entity.getId()));
 		}
@@ -61,7 +61,7 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 		int i = Integer.parseInt(selectedKey);
 
 		if (i > 0){
-			return (E) getEntityDao().getEntity(i);
+			return getEntityDao().getEntity(i);
 		}
 		return null;
 	}

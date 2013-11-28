@@ -8,6 +8,7 @@ import java.util.List;
 import de.jwic.base.IControlContainer;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.daos.ISalesTeamDAO;
 import de.xwic.appkit.core.model.entities.ISalesTeam;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
@@ -16,7 +17,7 @@ import de.xwic.appkit.core.model.queries.PropertyQuery;
  * @author Ronny Pfretzschner
  *
  */
-public class SalesTeamSelectionCombo extends AbstractEntityComboControl {
+public class SalesTeamSelectionCombo extends AbstractEntityComboControl<ISalesTeam> {
 
 	private ISalesTeamDAO elaDao = null;
 	
@@ -30,7 +31,7 @@ public class SalesTeamSelectionCombo extends AbstractEntityComboControl {
 		super(container, name);
 		this.allowEmptySelection = allowEmptySelection;
 		
-		elaDao = (ISalesTeamDAO) DAOSystem.getDAO(ISalesTeamDAO.class);
+		elaDao = DAOSystem.getDAO(ISalesTeamDAO.class);
 		setupEntries();
 		if (allowEmptySelection) {
 			setSelectedKey("0");
@@ -47,7 +48,7 @@ public class SalesTeamSelectionCombo extends AbstractEntityComboControl {
 		
 		PropertyQuery query = new PropertyQuery();
 		
-		List entryList = elaDao.getEntities(null, query);
+		EntityList<ISalesTeam> entryList = elaDao.getEntities(null, query);
 		
 		if (null != entryList){
 			//add empty selection
@@ -60,7 +61,7 @@ public class SalesTeamSelectionCombo extends AbstractEntityComboControl {
 			long actualTime = System.currentTimeMillis();
 			
 			for (int i = 0; i < entryList.size(); i++) {
-				ISalesTeam budget = (ISalesTeam) entryList.get(i);
+				ISalesTeam budget = entryList.get(i);
 				String title = budget.getBezeichnung();
 				
 				String key = String.valueOf(budget.getId());
@@ -78,10 +79,11 @@ public class SalesTeamSelectionCombo extends AbstractEntityComboControl {
 		}
 	}
 
-	/*
-	 * 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.toolkit.components.AbstractEntityComboControl#getEntityDao()
 	 */
-	public DAO getEntityDao() {
+	@Override
+	public ISalesTeamDAO getEntityDao() {
 		return elaDao;
 	}
 

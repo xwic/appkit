@@ -442,7 +442,9 @@ public class XmlBeanSerializer {
 							value = new Long(text);
 						} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
 							value = new Boolean(text.equals("true"));
-						} else if (Date.class.equals(type)) {
+						} else if (Date.class.equals(type) || java.sql.Timestamp.class.equals(type)) {
+							// entities coming from the DB have the Date field as java.sql.Timestamp
+							// the serialized value is the ms timestamp, so we can instantiate a Date from it
 							value = new Date(Long.parseLong(text));
 						} else if (double.class.equals(type) || Double.class.equals(type)) {
 							value = new Double(text);

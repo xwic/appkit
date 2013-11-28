@@ -8,8 +8,6 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.model.daos.IAnhangDAO;
@@ -18,40 +16,27 @@ import de.xwic.appkit.core.model.entities.impl.Anhang;
 
 /**
  * DAO implementation for the Anhang object. <p>
- * 
+ *
  * @author Ronny Pfretzschner
  */
-public class AnhangDAO extends AbstractDAO implements IAnhangDAO {
+public class AnhangDAO extends AbstractDAO<IAnhang, Anhang> implements IAnhangDAO {
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.AbstractDAO#getEntityImplClass()
+	/**
+	 *
 	 */
-	public Class<? extends Entity> getEntityImplClass() {
-		return Anhang.class;
+	public AnhangDAO() {
+		super(IAnhang.class, Anhang.class);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
-	 */
-	public IEntity createEntity() throws DataAccessException {
-		return new Anhang();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAO#getEntityClass()
-	 */
-	public Class<? extends IEntity> getEntityClass() {
-		return IAnhang.class;
-	}
-	
 	/*
 	 *  (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#validateEntity(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public ValidationResult validateEntity(IEntity entity) {
 		ValidationResult result = new ValidationResult();
 		IAnhang newAH = (IAnhang) entity;
-		
+
 		if (newAH.getDateiName() == null || newAH.getDateiName().length() < 1) {
 			result.addError("ah.dateiName", ValidationResult.ENTITY_ARGUMENTS_ERROR_RESOURCE_KEY);
 		}
@@ -67,7 +52,7 @@ public class AnhangDAO extends AbstractDAO implements IAnhangDAO {
 		if (newAH.getFileID() < 1) {
 			result.addError("ah.fileID", ValidationResult.ENTITY_ARGUMENTS_ERROR_RESOURCE_KEY);
 		}
-		
+
 		return result;
 	}
 }
