@@ -6,7 +6,7 @@ package de.xwic.appkit.core.remote.client;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import de.xwic.appkit.core.access.AccessHandler;
+import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ISecurityManager;
@@ -94,6 +94,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 	 * @param i
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private Object handleGetter(String methodName, int prefixLength) {
 
 		if (methodName.length() > prefixLength) {
@@ -109,9 +110,10 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 				// Lazy Load 
 				System.out.println("Lazy loading " + propertyName);
 				Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
-				EntityTransferObject refEto = AccessHandler.getInstance().getETO(clazz.getName(), pv.getEntityId());
-				IEntity entity = EntityProxyFactory.createEntityProxy(refEto);
-
+//				EntityTransferObject refEto = .getETO(clazz.getName(), pv.getEntityId());
+//				IEntity entity = EntityProxyFactory.createEntityProxy(refEto);
+				IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
+				
 				pv.setValue(entity);
 				pv.setLoaded(true);
 				return entity;

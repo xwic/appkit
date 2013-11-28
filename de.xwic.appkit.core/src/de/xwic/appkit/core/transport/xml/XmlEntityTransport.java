@@ -34,6 +34,8 @@ import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.export.XmlExport;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
@@ -358,12 +360,34 @@ public class XmlEntityTransport {
 				Element elmProp = itP.next();
 				Property prop = descr.getProperty(elmProp.getName());
 				if (prop != null) {
+					
+					
+					Class<?> propertyType = prop.getDescriptor().getPropertyType();
+					boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
+					boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
+					boolean isNull = elmProp.element(XmlExport.ELM_NULL) != null || XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("null"));
+					
 					PropertyValue pv = new PropertyValue();
-					pv.setType(prop.getDescriptor().getPropertyType());
-					if (prop.isCollection() && XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
-						pv.setLoaded(false);
+					pv.setType(propertyType);
+					if (isNull) {
+						pv.setValue(null);
+						pv.setLoaded(true);
 					} else {
-						pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+						if ((isEntityRef && !isPicklistRef)) {
+							String id = elmProp.attributeValue("id");
+							if (id != null && !id.isEmpty()) {
+								int refId = Integer.parseInt(id);
+								pv.setEntityId(refId);
+								pv.setLoaded(false);
+							} else {
+								pv.setLoaded(true);
+								
+							}
+						} else if (prop.isCollection() && XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
+							pv.setLoaded(false);
+						} else {
+							pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+						}
 					}
 					
 					values.put(elmProp.getName(), pv);

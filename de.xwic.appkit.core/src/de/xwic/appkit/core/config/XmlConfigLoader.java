@@ -20,6 +20,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -41,6 +43,8 @@ import de.xwic.appkit.core.config.utils.ListSetupFileIconWrapper;
  */
 public class XmlConfigLoader {
 
+	private static final Log log = LogFactory.getLog(XmlConfigLoader.class);
+	
 	/** Filename of the product setup. */
 	public static final String FILENAME_PRODUCT_SETUP = "product.setup.xml";
 	private URL location;
@@ -378,80 +382,84 @@ public class XmlConfigLoader {
 					String className = element.getAttribute("class");
 					String iconKey = element.getAttribute("icon");
 					
-					EntityDescriptor descriptor = null;
-					
-					if (fileName != null && fileName.length() > 0) {
-						URL entityFile = new URL(location, fileName);
-						fileList.add(entityFile);
-						if (!headerOnly && !profileMode) {
-							descriptor = XmlEntityDescriptorReader.loadEntityDescriptor(entityFile);
-							descriptor.setDomain(domain);
-							model.addEntityDescriptor(descriptor);
+					try {
+						EntityDescriptor descriptor = null;
+						
+						if (fileName != null && fileName.length() > 0) {
+							URL entityFile = new URL(location, fileName);
+							fileList.add(entityFile);
+							if (!headerOnly && !profileMode) {
+								descriptor = XmlEntityDescriptorReader.loadEntityDescriptor(entityFile);
+								descriptor.setDomain(domain);
+								model.addEntityDescriptor(descriptor);
+							}
+						} else if (!profileMode) {
+							try {
+								descriptor = new EntityDescriptor(XmlEntityDescriptorReader.getClassLoader().loadClass(className));
+								descriptor.setDomain(domain);
+								model.addEntityDescriptor(descriptor);
+								
+							} catch (Exception e) {
+								throw new ParseException("Illegal entity class specified: " + e);
+							}
 						}
-					} else if (!profileMode) {
-						try {
-							descriptor = new EntityDescriptor(XmlEntityDescriptorReader.getClassLoader().loadClass(className));
-							descriptor.setDomain(domain);
-							model.addEntityDescriptor(descriptor);
-							
-						} catch (Exception e) {
-							throw new ParseException("Illegal entity class specified: " + e);
+						
+						if (null != descriptor) {
+							descriptor.setIconKey(iconKey);
 						}
-					}
-					
-					if (null != descriptor) {
-						descriptor.setIconKey(iconKey);
-					}
-					
-					// register list and editor files to be loaded after the model
-					// is completed
-					NodeList nlEntity = element.getChildNodes();
-					for (int a = 0; a < nlEntity.getLength(); a++) {
-						if (nlEntity.item(a).getNodeType() == Node.ELEMENT_NODE) {
-							Element subElm = (Element)nlEntity.item(a);
-							if (subElm.getNodeName().equals("list")) {
-								URL listFile = new URL(location, subElm.getAttribute("file"));
-								fileList.add(listFile);
-								
-								ListSetupFileIconWrapper wrapper = new ListSetupFileIconWrapper();
-								wrapper.setUrl(listFile);
-								wrapper.setIconKey(subElm.getAttribute("icon"));
-								
-								listFiles.add(wrapper);
-							} else if (subElm.getNodeName().equals("editor")) {
-								URL editorFile = new URL(location, subElm.getAttribute("file"));
-								fileList.add(editorFile);
-								editorFiles.add(editorFile);
-								
-							} else if (subElm.getNodeName().equals("mailtemplate") && !profileMode) {
-								String templateFile = subElm.getAttribute("file");
-								if (templateFile != null && templateFile.length() > 0) {
-									URL emailTemplate = new URL(location, templateFile);
-									fileList.add(emailTemplate);
-									if (!headerOnly) {
-										descriptor.setEmailTemplate(emailTemplate);
-									}
-								}
-							} else if (subElm.getNodeName().equals("report") && !profileMode) {
-								String templateFile = subElm.getAttribute("file");
-								if (templateFile != null && templateFile.length() > 0) {
-									URL reportTemplate = new URL(location, templateFile);
-									fileList.add(reportTemplate);
-									if (!headerOnly) {
-										ReportTemplate tpl = new ReportTemplate();
-										tpl.setLocation(reportTemplate);
-										tpl.setFilePath(templateFile);
-										if (subElm.hasAttribute("title")) {
-											tpl.setTitle(subElm.getAttribute("title"));
+						
+						// register list and editor files to be loaded after the model
+						// is completed
+						NodeList nlEntity = element.getChildNodes();
+						for (int a = 0; a < nlEntity.getLength(); a++) {
+							if (nlEntity.item(a).getNodeType() == Node.ELEMENT_NODE) {
+								Element subElm = (Element)nlEntity.item(a);
+								if (subElm.getNodeName().equals("list")) {
+									URL listFile = new URL(location, subElm.getAttribute("file"));
+									fileList.add(listFile);
+									
+									ListSetupFileIconWrapper wrapper = new ListSetupFileIconWrapper();
+									wrapper.setUrl(listFile);
+									wrapper.setIconKey(subElm.getAttribute("icon"));
+									
+									listFiles.add(wrapper);
+								} else if (subElm.getNodeName().equals("editor")) {
+									URL editorFile = new URL(location, subElm.getAttribute("file"));
+									fileList.add(editorFile);
+									editorFiles.add(editorFile);
+									
+								} else if (subElm.getNodeName().equals("mailtemplate") && !profileMode) {
+									String templateFile = subElm.getAttribute("file");
+									if (templateFile != null && templateFile.length() > 0) {
+										URL emailTemplate = new URL(location, templateFile);
+										fileList.add(emailTemplate);
+										if (!headerOnly) {
+											descriptor.setEmailTemplate(emailTemplate);
 										}
-										if (subElm.hasAttribute("right")) {
-											tpl.setRight(subElm.getAttribute("right"));
-										}
-										descriptor.addReportTemplate(tpl);
 									}
-								}
-							} 
+								} else if (subElm.getNodeName().equals("report") && !profileMode) {
+									String templateFile = subElm.getAttribute("file");
+									if (templateFile != null && templateFile.length() > 0) {
+										URL reportTemplate = new URL(location, templateFile);
+										fileList.add(reportTemplate);
+										if (!headerOnly) {
+											ReportTemplate tpl = new ReportTemplate();
+											tpl.setLocation(reportTemplate);
+											tpl.setFilePath(templateFile);
+											if (subElm.hasAttribute("title")) {
+												tpl.setTitle(subElm.getAttribute("title"));
+											}
+											if (subElm.hasAttribute("right")) {
+												tpl.setRight(subElm.getAttribute("right"));
+											}
+											descriptor.addReportTemplate(tpl);
+										}
+									}
+								} 
+							}
 						}
+					} catch (Exception e) {
+						log.warn("Error loading EntityDescriptor for entity " + className + ". Skipping Descriptor! :" + e.toString());
 					}
 				}
 			}
