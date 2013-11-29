@@ -61,9 +61,21 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 			
 		} else if (methodName.equals("equals")) {
 			return handleEquals(methodName, args);
+			
+		} else if (methodName.equals("hashCode")) {
+			return handleHashCode(methodName, args);
 		}
 		
 		return null;
+	}
+
+	/**
+	 * @param methodName
+	 * @param args
+	 * @return
+	 */
+	private Object handleHashCode(String methodName, Object[] args) {
+		return eto.hashCode();
 	}
 
 	/**

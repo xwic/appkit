@@ -93,8 +93,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		Document doc = postRequest(param);
 		
-		XmlEntityTransport xet = new XmlEntityTransport();
-		
+		XmlEntityTransport xet = new XmlEntityTransport();		
 		EntityList list = xet.createETOList(doc, limit);
 
 		return list;

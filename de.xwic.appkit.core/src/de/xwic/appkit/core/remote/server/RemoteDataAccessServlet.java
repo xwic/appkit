@@ -128,7 +128,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			pwOut.close();
 			
 		} catch (Exception e) {
-			log.error(e);
+			log.error(e.getMessage(), e);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 		}
 		
