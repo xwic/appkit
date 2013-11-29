@@ -3,7 +3,9 @@
  */
 package de.xwic.appkit.core.dao.impl.remote;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DAOSystem;
@@ -14,7 +16,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
-import de.xwic.appkit.core.remote.client.RemoteDataAccessClient;
+import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.TransportException;
 
@@ -24,32 +26,14 @@ import de.xwic.appkit.core.transport.xml.TransportException;
  */
 public class RemoteDAOProviderAPI implements DAOProviderAPI {
 
-	private RemoteDataAccessClient client;
-	private RemoteServerDAOProvider daoProvider;
+	private IRemoteDataAccessClient client;
 
 	/**
 	 * @param remoteServerDAOProvider
 	 * @param client
 	 */
-	public RemoteDAOProviderAPI(RemoteServerDAOProvider remoteServerDAOProvider, RemoteDataAccessClient client) {
-		this.daoProvider = remoteServerDAOProvider;
+	public RemoteDAOProviderAPI(RemoteServerDAOProvider remoteServerDAOProvider, IRemoteDataAccessClient client) {
 		this.client = client;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#delete(de.xwic.appkit.core.dao.IEntity)
-	 */
-	@Override
-	public void delete(IEntity entity) throws DataAccessException {
-
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#softDelete(de.xwic.appkit.core.dao.IEntity)
-	 */
-	@Override
-	public void softDelete(IEntity entity) throws DataAccessException {
-
 	}
 
 	/* (non-Javadoc)
@@ -63,7 +47,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			// therefore we need to translate it back to the type name
 			Class<? extends Object> trueClass = DAOSystem.findDAOforEntity(clazz.getName()).getEntityClass();
 			EntityTransferObject eto = client.getETO(trueClass.getName(), id);
-			return EntityProxyFactory.createEntityProxy(eto);
+			return eto != null ? EntityProxyFactory.createEntityProxy(eto) : null;
 		} catch (TransportException e) {
 			throw new DataAccessException("Error loading remote entity '" + clazz.getName() + "' #" + id, e);
 		}
@@ -74,7 +58,12 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 */
 	@Override
 	public void update(IEntity entity) throws DataAccessException {
-
+		try {
+			EntityTransferObject eto = new EntityTransferObject(entity, true);
+			client.updateETO(entity.type().getName(), eto);
+		} catch (Exception e) {
+			throw new DataAccessException("Error updating remote entity '" + entity.type().getName() + "' #" + entity.getId(), e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -82,7 +71,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 */
 	@Override
 	public EntityList getEntities(Class<? extends Object> clazz, Limit limit) {
-		return null;
+		return getEntities(clazz, limit, null);
 	}
 
 	/* (non-Javadoc)
@@ -90,15 +79,48 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 */
 	@Override
 	public EntityList getEntities(Class<? extends Object> clazz, Limit limit, EntityQuery filter) {
-		return null;
+		try {
+			// unfortunately, the abstract DAO makes the call with the implementation class name, 
+			// therefore we need to translate it back to the type name
+			Class<? extends Object> trueClass = DAOSystem.findDAOforEntity(clazz.getName()).getEntityClass();
+			EntityList<EntityTransferObject> etos = client.getETOs(trueClass.getName(), limit, filter);
+			
+			List<IEntity> entities = new ArrayList<IEntity>();
+			
+			for (EntityTransferObject eto : etos) {
+				entities.add(EntityProxyFactory.createEntityProxy(eto));
+			}
+			
+			EntityList<IEntity> result = new EntityList<IEntity>(entities, limit, etos.getTotalSize());
+			
+			return result;
+		} catch (TransportException e) {
+			throw new DataAccessException("Error loading remote entities '" + clazz.getName() + "'", e);
+		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#delete(de.xwic.appkit.core.dao.IEntity)
+	 */
+	@Override
+	public void delete(IEntity entity) throws DataAccessException {
+		throw new UnsupportedOperationException();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#softDelete(de.xwic.appkit.core.dao.IEntity)
+	 */
+	@Override
+	public void softDelete(IEntity entity) throws DataAccessException {
+		throw new UnsupportedOperationException();
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
 	 */
 	@Override
 	public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 }

@@ -21,8 +21,11 @@ public class TestClient {
 
 		String remoteUrl = "http://localhost:8080/pulse/";
 		String remoteSystemId = "lippisch";
+		String apiSuffix = "rda.api";
 		
-		RemoteDataAccessClient client = new RemoteDataAccessClient(remoteUrl, remoteSystemId);
+		RemoteSystemConfiguration config = new RemoteSystemConfiguration(remoteUrl, remoteSystemId, apiSuffix);
+		
+		RemoteDataAccessClient client = new RemoteDataAccessClient(config);
 		EntityTransferObject eto = client.getETO("com.netapp.pulse.model.entities.IMitarbeiter", 15);
 		
 		System.out.println(eto);

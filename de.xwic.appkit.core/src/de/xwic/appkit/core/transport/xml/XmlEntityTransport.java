@@ -74,16 +74,16 @@ public class XmlEntityTransport {
 	
 	private static Set<String> SKIP_PROPS = new HashSet<String>(); 
 	static {
-		SKIP_PROPS.add("id");
-		SKIP_PROPS.add("version");
-		SKIP_PROPS.add("changed");
-		SKIP_PROPS.add("deleted");
-		/*SKIP_PROPS.add("lastModifiedAt");
-		SKIP_PROPS.add("lastModifiedFrom");
-		SKIP_PROPS.add("createdAt");
-		SKIP_PROPS.add("createdFrom");*/
-		SKIP_PROPS.add("serverEntityId");
-		SKIP_PROPS.add("downloadVersion");
+		//SKIP_PROPS.add("id");
+		//SKIP_PROPS.add("version");
+		//SKIP_PROPS.add("changed");
+		//SKIP_PROPS.add("deleted");
+		//SKIP_PROPS.add("lastModifiedAt");
+		//SKIP_PROPS.add("lastModifiedFrom");
+		//SKIP_PROPS.add("createdAt");
+		//SKIP_PROPS.add("createdFrom");
+		//SKIP_PROPS.add("serverEntityId");
+		//SKIP_PROPS.add("downloadVersion");
 	}
 	
 	private boolean exportAll = false;
@@ -127,7 +127,9 @@ public class XmlEntityTransport {
 	 */
 	public void write(Writer writer, EntityTransferObject eto, EntityDescriptor descr) throws IOException, ConfigurationException {
 		List<EntityTransferObject> l = new ArrayList<EntityTransferObject>();
-		l.add(eto);
+		if (eto != null) {
+			l.add(eto);
+		}
 		write(writer, l, descr);
 	}
 	/**
@@ -387,6 +389,14 @@ public class XmlEntityTransport {
 							pv.setLoaded(false);
 						} else {
 							pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+						}
+						
+						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
+							pv.setModified(true);
+						}
+						
+						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
+							pv.setEntityType(true);
 						}
 					}
 					

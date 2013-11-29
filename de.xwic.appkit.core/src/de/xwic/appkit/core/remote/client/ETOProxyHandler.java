@@ -55,9 +55,38 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 			
 		} else if (methodName.startsWith("set")) {
 			return handleSetter(methodName, args);
+			
+		} else if (methodName.equals("type")) {
+			return handleType(methodName, args);
+			
+		} else if (methodName.equals("equals")) {
+			return handleEquals(methodName, args);
 		}
 		
 		return null;
+	}
+
+	/**
+	 * @param methodName
+	 * @param args
+	 * @return
+	 */
+	private Object handleEquals(String methodName, Object[] args) {
+		if (args != null && args.length == 1) {
+			return eto.equals(args[0]);
+		}
+		
+		return false;
+	}
+
+	/**
+	 * @param methodName
+	 * @param args
+	 * @return
+	 */
+	private Object handleType(String methodName, Object[] args) {
+		// we get the implementation class, but we need the interface
+		return DAOSystem.findDAOforEntity(eto.getEntityClass().getName()).getEntityClass();
 	}
 
 	/**
@@ -108,10 +137,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 				return pv.getValue();
 			} else {
 				// Lazy Load 
-				System.out.println("Lazy loading " + propertyName);
 				Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
-//				EntityTransferObject refEto = .getETO(clazz.getName(), pv.getEntityId());
-//				IEntity entity = EntityProxyFactory.createEntityProxy(refEto);
 				IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
 				
 				pv.setValue(entity);

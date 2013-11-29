@@ -518,9 +518,9 @@ public class AccessHandler {
 						} else {
 							log.warn("Tried to modify attribute without rights:  " + propName);
 						}
-					}
-				} else {
-					log.warn("No write method for property " + propName);
+					} else {
+						log.warn("No write method for property " + propName);
+					} 
 				}
 			}
 		} catch (Exception ie) {

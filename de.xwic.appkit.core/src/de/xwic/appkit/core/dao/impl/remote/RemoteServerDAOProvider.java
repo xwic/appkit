@@ -8,8 +8,7 @@ import de.xwic.appkit.core.dao.DAOProvider;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntityQueryResolver;
-import de.xwic.appkit.core.dao.impl.hbn.HibernateDAOProviderAPI;
-import de.xwic.appkit.core.remote.client.RemoteDataAccessClient;
+import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 
 /**
  * @author lippisch
@@ -18,13 +17,13 @@ import de.xwic.appkit.core.remote.client.RemoteDataAccessClient;
 public class RemoteServerDAOProvider implements DAOProvider {
 
 	
-	private RemoteDataAccessClient client;
+	private IRemoteDataAccessClient client;
 	
 
 	/**
 	 * @param client
 	 */
-	public RemoteServerDAOProvider(RemoteDataAccessClient client) {
+	public RemoteServerDAOProvider(IRemoteDataAccessClient client) {
 		super();
 		this.client = client;
 	}
@@ -48,7 +47,7 @@ public class RemoteServerDAOProvider implements DAOProvider {
 	 */
 	@Override
 	public void registerQuery(Class<? extends EntityQuery> queryClass, IEntityQueryResolver resolver) {
-
+		
 	}
 
 }

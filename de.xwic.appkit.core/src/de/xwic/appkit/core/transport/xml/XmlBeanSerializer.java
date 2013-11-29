@@ -141,6 +141,7 @@ public class XmlBeanSerializer {
 					value = null; 
 				} else {
 					elm.addAttribute("id", Integer.toString(pv.getEntityId()));
+					elm.addAttribute("entityType", ATTRVALUE_TRUE);
 					if (pv.isLoaded()) {
 						value = pv.getValue();
 					} else {
@@ -156,6 +157,9 @@ public class XmlBeanSerializer {
 				return; // BREAK
 			}
 			
+			if (pv.isModified()) {
+				elm.addAttribute("modified", ATTRVALUE_TRUE);
+			}
 		}
 		
 		String typeInfo = value != null ? value.getClass().getName() : null;

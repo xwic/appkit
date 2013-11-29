@@ -14,6 +14,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.dao.EntityQuery;
+import de.xwic.appkit.core.dao.Limit;
 
 /**
  * Serializes and deserializes an EntityQuery object.
@@ -55,9 +56,6 @@ public class EntityQuerySerializer {
 		return baOut.toString();
 	}
 	
-	
-
-
 	/**
 	 * Returns the EntityQuery serialized in the parameter string.
 	 * @param queryString
@@ -75,4 +73,46 @@ public class EntityQuerySerializer {
 		}
 	}
 	
+	/**
+	 * @param limit
+	 * @return
+	 */
+	public static String limitToString(Limit limit) {
+		if (limit == null) {
+			return "";
+		}
+		
+		return limit.startNo + ";" + limit.maxResults;
+	}
+	
+	/**
+	 * @param strLimit
+	 * @return
+	 */
+	public static Limit stringToLimit(String strLimit) {
+		
+		if (strLimit == null || !strLimit.isEmpty()) {
+			return null;
+		}
+		
+		int separatorIndex = strLimit.indexOf(";");
+		
+		if (separatorIndex < 0) {
+			throw new IllegalArgumentException("Cannot find ';' separator: " + strLimit);
+		}
+		
+		String strStart = strLimit.substring(0, separatorIndex);
+		String strMax = strLimit.substring(separatorIndex + 1);
+		
+		Limit limit = new Limit();
+		try {
+			limit.startNo = Integer.parseInt(strStart);
+			limit.maxResults = Integer.parseInt(strMax);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Badly formatted string: " + strLimit);
+		}
+		
+		return limit;
+		
+	}
 }
