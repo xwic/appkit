@@ -14,6 +14,7 @@ import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Model;
+import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 
 
 
@@ -31,6 +32,7 @@ public class DAOSystem {
     private static IFileHandler fileHandler = null;
     private static ISecurityManager securityManager = null;
     private static IUseCaseService useCaseService = null;
+    private static IRemoteDataAccessClient remoteDataAccessClient = null;
     
     private static Map<String, String> shortNames = new HashMap<String, String>();
     private static boolean oracleCaseInsensitve = false;
@@ -227,6 +229,20 @@ public class DAOSystem {
 	 */
 	public static void setOracleCaseInsensitve(boolean oracleCaseInsensitve) {
 		DAOSystem.oracleCaseInsensitve = oracleCaseInsensitve;
+	}
+
+	/**
+	 * @return the remoteDataAccessClient
+	 */
+	public static IRemoteDataAccessClient getRemoteDataAccessClient() {
+		return remoteDataAccessClient;
+	}
+
+	/**
+	 * @param remoteDataAccessClient the remoteDataAccessClient to set
+	 */
+	public static void setRemoteDataAccessClient(IRemoteDataAccessClient remoteDataAccessClient) {
+		DAOSystem.remoteDataAccessClient = remoteDataAccessClient;
 	}
 	
 }

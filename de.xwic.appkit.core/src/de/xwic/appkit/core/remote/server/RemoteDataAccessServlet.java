@@ -6,6 +6,9 @@ package de.xwic.appkit.core.remote.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -44,6 +47,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String PARAM_ACTION = "a";
 	public final static String PARAM_ENTITY_TYPE = "et";
 	public final static String PARAM_ENTITY_ID = "eid";
+	public final static String PARAM_ENTITY_PROPERTY = "prop";
 	public final static String PARAM_VERSION = "ev";
 	public final static String PARAM_QUERY = "pq";
 	public final static String PARAM_LIMIT = "limit";
@@ -52,6 +56,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String ACTION_GET_ENTITY = "ge";
 	public final static String ACTION_GET_ENTITIES = "gea";
 	public final static String ACTION_UPDATE_ENTITY = "ue";
+	public final static String ACTION_GET_COLLECTION = "gc";
 	
 	public final static String ELM_RESPONSE = "resp";
 	public final static String PARAM_VALUE = "value";
@@ -120,6 +125,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			} else if (action.equals(ACTION_UPDATE_ENTITY)) {
 				handleUpdateEntity(entityType, req, resp, pwOut);
 					
+			} else if (action.equals(ACTION_GET_COLLECTION)) {
+				handleGetCollection(entityType, req, resp, pwOut);
+
 			} else {
 				throw new IllegalArgumentException("Unknown action");
 			}
@@ -133,6 +141,41 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		}
 		
 		
+	}
+
+	/**
+	 * @param entityType
+	 * @param req
+	 * @param resp
+	 * @param pwOut
+	 * @throws ConfigurationException 
+	 * @throws IOException 
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void handleGetCollection(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws ConfigurationException, IOException {
+		
+		String entityId = req.getParameter(PARAM_ENTITY_ID);
+		String propName = req.getParameter(PARAM_ENTITY_PROPERTY);
+		
+		assertValue(entityType, "Entity Type not specified");
+		assertValue(entityId, "Entity Id not specified");
+		assertValue(propName, "Entity PropertyName not specified");
+
+		int eId = Integer.parseInt(entityId);
+		
+		
+		Object collection = accessHandler.getETOCollection(entityType, eId, propName);
+	
+		List list = new ArrayList();
+		if (collection instanceof Collection<?>) {
+			for (Object o : (Collection<?>)collection) {
+				list.add(o);
+			}
+		}
+
+		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
+		XmlEntityTransport et = new XmlEntityTransport();
+		et.write(pwOut, list, entityDescriptor);
 	}
 
 	/**

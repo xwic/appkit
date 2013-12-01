@@ -4,6 +4,8 @@
 package de.xwic.appkit.core.remote.client;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
@@ -46,4 +48,18 @@ public interface IRemoteDataAccessClient {
 	 * @throws ConfigurationException
 	 */
 	public void updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
+	
+	/**
+	 * Returns the collection of an entity property.
+	 * @param entityType
+	 * @param entityId
+	 * @param propertyName
+	 * @return
+	 * @throws RemoteDataAccessException
+	 * @throws TransportException
+	 * @throws IOException
+	 * @throws ConfigurationException
+	 */
+	public List<?> getETOCollection(String entityType, int entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
+	
 }

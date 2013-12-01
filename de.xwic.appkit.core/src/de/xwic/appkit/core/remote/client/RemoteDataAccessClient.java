@@ -12,7 +12,9 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -95,6 +97,25 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		XmlEntityTransport xet = new XmlEntityTransport();		
 		EntityList list = xet.createETOList(doc, limit);
+
+		return list;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getETOCollection(java.lang.String, int, java.lang.String)
+	 */
+	@Override
+	public List<?> getETOCollection(String entityType, int entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
+		Map<String, String> param = new HashMap<String, String>();
+		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_COLLECTION);
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Integer.toString(entityId));
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_PROPERTY, propertyName);
+		
+		Document doc = postRequest(param);
+		
+		XmlEntityTransport xet = new XmlEntityTransport();		
+		EntityList list = xet.createETOList(doc, new Limit());
 
 		return list;
 	}

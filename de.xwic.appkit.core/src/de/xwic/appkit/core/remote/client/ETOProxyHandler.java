@@ -5,7 +5,13 @@ package de.xwic.appkit.core.remote.client;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
@@ -149,12 +155,53 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 				return pv.getValue();
 			} else {
 				// Lazy Load 
-				Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
-				IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
 				
-				pv.setValue(entity);
-				pv.setLoaded(true);
-				return entity;
+				// figure out type
+				if (IEntity.class.isAssignableFrom(pv.getType())) { // Resolve entity reference
+				
+					Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
+					IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
+					
+					pv.setValue(entity);
+					pv.setLoaded(true);
+					return entity;
+					
+				} else if (Collection.class.isAssignableFrom(pv.getType())) { // resolve collection
+					
+					IRemoteDataAccessClient remoteDataAccessClient = DAOSystem.getRemoteDataAccessClient();
+					if (remoteDataAccessClient == null) {
+						throw new IllegalStateException("RemoteDataAccessClient not available/configured!");
+					}
+					try {
+						EntityDescriptor descriptor = DAOSystem.findEntityDescriptor(eto.getEntityClass().getName());
+						List collection = remoteDataAccessClient.getETOCollection(descriptor.getClassname(), eto.getEntityId(), propertyName);
+						
+						Collection newCol;
+						if (Set.class.isAssignableFrom(pv.getType())) {
+							// need to transform into a set
+							newCol = new HashSet();
+						} else if (List.class.isAssignableFrom(pv.getType())) {
+							newCol = new ArrayList();
+						} else {
+							throw new RemoteDataAccessException("Unsupported collection type: " + pv.getType().getName());
+						}
+						
+						for (Object o : collection) {
+							if (o instanceof EntityTransferObject) {
+								newCol.add(EntityProxyFactory.createEntityProxy((EntityTransferObject) o));
+							} else {
+								newCol.add(o);
+							}
+						}
+						
+						pv.setValue(newCol);
+						pv.setLoaded(true);
+						return newCol;
+					} catch (Exception e) {
+						throw new RemoteDataAccessException("Cannot initilaize collection '" + propertyName + "' for entity " + eto.getEntityClass().getName() + ": " + e, e);
+					}
+					
+				}
 			}
 			
 		}
