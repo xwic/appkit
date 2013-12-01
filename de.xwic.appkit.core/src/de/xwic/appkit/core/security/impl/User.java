@@ -8,18 +8,14 @@
 package de.xwic.appkit.core.security.impl;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.Entity;
-import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.security.IRight;
-import de.xwic.appkit.core.security.IRole;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.security.ScopeActionKey;
-import de.xwic.appkit.core.security.daos.IRightDAO;
+import de.xwic.appkit.core.security.daos.IUserDAO;
 import de.xwic.appkit.core.util.DigestTool;
 
 /**
@@ -86,19 +82,8 @@ public class User extends Entity implements IUser {
 	 * @see de.xwic.appkit.core.security.IUser#buildAllRights()
 	 */
 	public Set<ScopeActionKey> buildAllRights() {
-		// read effective rights
-		Set<ScopeActionKey> allRights = new HashSet<ScopeActionKey>();
-		IRightDAO rightDAO = (IRightDAO)DAOSystem.getDAO(IRightDAO.class);
-		for (Iterator<?> it = getRoles().iterator(); it.hasNext(); ) {
-			IRole role = (IRole)it.next();
-			EntityList list = rightDAO.getRightsByRole(role);
-			for (Iterator<Object> rIt = list.iterator(); rIt.hasNext(); ) {
-				IRight right = (IRight)rIt.next();
-				allRights.add(new ScopeActionKey(right.getScope(), right.getAction()));
-			}
-		}
-		return allRights;
-
+		IUserDAO userDAO = (IUserDAO)DAOSystem.getDAO(IUserDAO.class);
+		return userDAO.buildAllRights(this);
 	}
 
 	/**
