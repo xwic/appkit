@@ -199,8 +199,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		Document doc = xmlReader.read(new StringReader(strEto));
 		
 		XmlEntityTransport xet = new XmlEntityTransport();
-		EtoEntityNodeParser etoParser = new EtoEntityNodeParser();
-		EntityList list = xet.createList(doc, null, etoParser);
+		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
 		
 		if (!list.isEmpty()) {
 			EntityTransferObject eto = (EntityTransferObject) list.get(0);

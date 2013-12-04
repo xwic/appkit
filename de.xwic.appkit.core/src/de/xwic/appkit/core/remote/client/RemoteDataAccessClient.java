@@ -44,8 +44,6 @@ import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 
 	private RemoteSystemConfiguration config;
-	private EtoEntityNodeParser etoParser;
-	private ObjectArrayEntityNodeParser arrParser;
 	
 	/**
 	 * @param remoteBaseUrl
@@ -53,8 +51,6 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 */
 	public RemoteDataAccessClient(RemoteSystemConfiguration config) {
 		this.config = config;
-		etoParser = new EtoEntityNodeParser();
-		arrParser = new ObjectArrayEntityNodeParser();
 	}
 	
 	/* (non-Javadoc)
@@ -74,7 +70,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		XmlEntityTransport xet = new XmlEntityTransport();
 		
-		EntityList list = xet.createList(doc, limit, etoParser);
+		EntityList list = xet.createList(doc, limit, new EtoEntityNodeParser());
 
 		if (!list.isEmpty()) {
 			return (EntityTransferObject) list.get(0);
@@ -99,9 +95,9 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		EntityList list = null;
 		XmlEntityTransport xet = new XmlEntityTransport();		
 		if (query.getColumns() == null) {
-			list = xet.createList(doc, limit, etoParser);
+			list = xet.createList(doc, limit, new EtoEntityNodeParser());
 		} else {
-			list = xet.createList(doc, limit, arrParser);
+			list = xet.createList(doc, limit, new ObjectArrayEntityNodeParser());
 		}
 
 		return list;
@@ -121,7 +117,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Document doc = postRequest(param);
 		
 		XmlEntityTransport xet = new XmlEntityTransport();		
-		EntityList list = xet.createList(doc, new Limit(), etoParser);
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
 
 		return list;
 	}
