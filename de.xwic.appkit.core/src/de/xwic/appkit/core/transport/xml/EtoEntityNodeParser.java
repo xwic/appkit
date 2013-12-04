@@ -25,9 +25,6 @@ import de.xwic.appkit.core.transfer.PropertyValue;
  */
 public class EtoEntityNodeParser implements IEntityNodeParser {
 
-	private String lastType = null;
-	private Class etoClass = null;
-	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.transport.xml.IEntityNodeParser#parseElement(org.dom4j.Element, java.util.Map, de.xwic.appkit.core.config.model.EntityDescriptor, de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
 	 */
@@ -39,17 +36,15 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 			throw new TransportException("Missing id and version.");
 		}
 		
+		Class etoClass = entityClass;
+		
 		String sType = elmEntity.attributeValue("type");
-		if (sType != null && sType.length() != 0 && !sType.equals(lastType)) {
+		if (etoClass != null && !etoClass.getName().equals(sType) && sType != null && sType.length() != 0) {
 			try {
-				// cache the class, to not load it every time if we are parsing a long list of ETOs
 				etoClass = DAOSystem.getModelClassLoader().loadClass(sType);
-				lastType = sType;
 			} catch (ClassNotFoundException e) {
 				throw new TransportException("Wront type specified" + sType, e);
 			}
-		} else {
-			etoClass = entityClass;
 		}
 		
 		EntityTransferObject eto = new EntityTransferObject();
