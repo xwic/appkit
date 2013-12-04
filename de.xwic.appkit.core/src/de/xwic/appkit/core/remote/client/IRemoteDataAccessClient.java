@@ -37,7 +37,7 @@ public interface IRemoteDataAccessClient {
 	 * @throws RemoteDataAccessException
 	 * @throws TransportException
 	 */
-	public EntityList<EntityTransferObject> getETOs(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException;
+	public EntityList getList(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException;
 	
 	/**
 	 * @param entityType

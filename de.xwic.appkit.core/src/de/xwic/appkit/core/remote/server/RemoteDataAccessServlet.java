@@ -32,6 +32,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
+import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
@@ -198,7 +199,8 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		Document doc = xmlReader.read(new StringReader(strEto));
 		
 		XmlEntityTransport xet = new XmlEntityTransport();
-		EntityList list = xet.createETOList(doc, null);
+		EtoEntityNodeParser etoParser = new EtoEntityNodeParser();
+		EntityList list = xet.createList(doc, null, etoParser);
 		
 		if (!list.isEmpty()) {
 			EntityTransferObject eto = (EntityTransferObject) list.get(0);
@@ -234,9 +236,8 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityList list = accessHandler.getEntities(entityType, limit, query);
 	
-		XmlEntityTransport et = new XmlEntityTransport();
-		et.write(pwOut, list, entityDescriptor);
-		
+		XmlEntityTransport et = new XmlEntityTransport();		
+		et.write(pwOut, list, entityDescriptor, query.getColumns());		
 	}
 
 

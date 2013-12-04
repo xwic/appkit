@@ -83,16 +83,21 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			// unfortunately, the abstract DAO makes the call with the implementation class name, 
 			// therefore we need to translate it back to the type name
 			Class<? extends Object> trueClass = DAOSystem.findDAOforEntity(clazz.getName()).getEntityClass();
-			EntityList<EntityTransferObject> etos = client.getETOs(trueClass.getName(), limit, filter);
+			EntityList objects = client.getList(trueClass.getName(), limit, filter);
 			
-			List<IEntity> entities = new ArrayList<IEntity>();
+			List<Object> list = new ArrayList<Object>();
 			
-			for (EntityTransferObject eto : etos) {
-				entities.add(EntityProxyFactory.createEntityProxy(eto));
+			boolean isObjectArray = filter.getColumns() != null;
+			
+			for (Object obj : objects) {
+				if (isObjectArray) {
+					list.add(obj);
+				} else {
+					list.add(EntityProxyFactory.createEntityProxy((EntityTransferObject) obj));
+				}
 			}
 			
-			EntityList<IEntity> result = new EntityList<IEntity>(entities, limit, etos.getTotalSize());
-			
+			EntityList result = new EntityList(list, limit, objects.getTotalSize());			
 			return result;
 		} catch (TransportException e) {
 			throw new DataAccessException("Error loading remote entities '" + clazz.getName() + "'", e);

@@ -132,6 +132,18 @@ public class XmlEntityTransport {
 		}
 		write(writer, l, descr);
 	}
+	
+	/**
+	 * @param writer
+	 * @param entities
+	 * @param descr
+	 * @throws IOException
+	 * @throws ConfigurationException
+	 */
+	public void write(Writer writer, List<?> entities, EntityDescriptor descr) throws IOException, ConfigurationException {
+		write(writer, entities, descr, null);
+	}
+	
 	/**
 	 * Export a list of entities to a xml file.
 	 * @param file
@@ -139,12 +151,16 @@ public class XmlEntityTransport {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void write(Writer writer, List<?> entities, EntityDescriptor descr) throws IOException, ConfigurationException {
+	public void write(Writer writer, List<?> entities, EntityDescriptor descr, List<String> columnNames) throws IOException, ConfigurationException {
 		
 		boolean isETO = false;
+		boolean isEntity = false;
 		if (entities.size() > 0) {
 			Object first = entities.get(0);
 			isETO = first instanceof EntityTransferObject;
+			if (!isETO) {
+				isEntity = first instanceof IEntity;
+			}
 		}
 		
 		Document doc = DocumentFactory.getInstance().createDocument();
@@ -165,13 +181,20 @@ public class XmlEntityTransport {
 		
 
 		for (Iterator<?> it = entities.iterator(); it.hasNext(); ) {
+			Object o = it.next();
 			if (isETO) {
-				EntityTransferObject eto = (EntityTransferObject)it.next();
+				EntityTransferObject eto = (EntityTransferObject)o;
 				addEntity(elmEntities, descr, eto);
-			} else {
-				Object o = it.next();
-				IEntity entity = (IEntity)o;
+			} else if (isEntity) {
+				IEntity entity = (IEntity) o;
 				addEntity(elmEntities, descr, entity);
+			} else {
+				// it's an object array - the list comes from a query for columns, usually for list views 
+				if (columnNames == null) {
+					throw new IllegalArgumentException("Error attempting to serialize Object array with no column information");
+				}
+				Object[] arr = (Object[]) o;
+				addObjectArray(elmEntities, descr, arr, columnNames);
 			}
 		}
 		
@@ -188,7 +211,6 @@ public class XmlEntityTransport {
 		xmlWriter.flush();
 
 	}
-
 
 	/**
 	 * @param elmEntities
@@ -276,15 +298,42 @@ public class XmlEntityTransport {
 		}
 		
 	}
+	
+	/**
+	 * @param entities
+	 * @param descr
+	 * @param arr
+	 * @param columnNames 
+	 */
+	public void addObjectArray(Element entities, EntityDescriptor descr, Object[] arr, List<String> columnNames) {
+		
+		try {
+			Element elm = entities.addElement(ELM_ENTITY);
+			
+			// first one is always the ID
+			Element idValue = elm.addElement("id");
+			xmlBeanSerializer.addValue(idValue, arr[0], true);
+			
+			for (int i = 1; i < arr.length; i++) {
+				// use the column name as the tag
+				Element pValue = elm.addElement(columnNames.get(i-1));
+				Object value = arr[i];
+				
+				xmlBeanSerializer.addValue(pValue, value, true);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error transforming object array into XML: " + arr, e);
+		}
+		
+	}
 
 	/**
-	 * Build a list of ETO objects from a XML document.
 	 * @param doc
 	 * @param limit
 	 * @return
+	 * @throws TransportException
 	 */
-	public EntityList createETOList(Document doc, Limit limit) throws TransportException {
-		
+	public EntityList createList(Document doc, Limit limit, IEntityNodeParser parser) throws TransportException {
 		Element elmExport = doc.getRootElement();
 		if (!ELM_EXPORT.equals(elmExport.getName())) {
 			throw new TransportException("Wrong format: Root element '" + ELM_EXPORT + "' expected.");
@@ -323,92 +372,147 @@ public class XmlEntityTransport {
 		List data = new ArrayList();
 		EntityList list = new EntityList(data, limit, totalSize);
 		
-		String lastType = null;
-		Class etoClass = entityClass;
-		
 		for (Iterator<Element> it = elmEntities.elementIterator(ELM_ENTITY); it.hasNext(); ) {
-			
-
-			Element elmEntity = it.next();
-			String sId = elmEntity.attributeValue("id");
-			String sVersion = elmEntity.attributeValue("version");
-			if (sId == null || sId.length() == 0 || sVersion == null || sVersion.length() == 0) {
-				throw new TransportException("Missing id and version.");
-			}
-			String sType = elmEntity.attributeValue("type");
-			if (sType != null && sType.length() != 0 && !sType.equals(lastType)) {
-				try {
-					etoClass = DAOSystem.getModelClassLoader().loadClass(sType);
-				} catch (ClassNotFoundException e) {
-					throw new TransportException("Wront type specified" + sType, e);
-				}
-			}
-			
-			EntityTransferObject eto = new EntityTransferObject();
-			eto.setEntityId(Integer.parseInt(sId));
-			eto.setEntityVersion(Integer.parseInt(sVersion));
-			eto.setEntityClass(etoClass);
-			eto.setModified(false);
-			Map<String, PropertyValue> values = new HashMap<String, PropertyValue>();
-			eto.setPropertyValues(values);
-			
-			// add deleted property value
-			PropertyValue pvDeleted = new PropertyValue();
-			pvDeleted.setValue(XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmEntity.attributeValue("deleted")));
-			pvDeleted.setType(boolean.class);
-			values.put("deleted", pvDeleted);
-			
-			for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext(); ) {
-				Element elmProp = itP.next();
-				Property prop = descr.getProperty(elmProp.getName());
-				if (prop != null) {
-					
-					
-					Class<?> propertyType = prop.getDescriptor().getPropertyType();
-					boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
-					boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
-					boolean isNull = elmProp.element(XmlExport.ELM_NULL) != null || XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("null"));
-					
-					PropertyValue pv = new PropertyValue();
-					pv.setType(propertyType);
-					if (isNull) {
-						pv.setValue(null);
-						pv.setLoaded(true);
-					} else {
-						if ((isEntityRef && !isPicklistRef)) {
-							String id = elmProp.attributeValue("id");
-							if (id != null && !id.isEmpty()) {
-								int refId = Integer.parseInt(id);
-								pv.setEntityId(refId);
-								pv.setLoaded(false);
-							} else {
-								pv.setLoaded(true);
-								
-							}
-						} else if (prop.isCollection() && XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
-							pv.setLoaded(false);
-						} else {
-							pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
-						}
-						
-						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
-							pv.setModified(true);
-						}
-						
-						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
-							pv.setEntityType(true);
-						}
-					}
-					
-					values.put(elmProp.getName(), pv);
-				}
-			}
-			
-			data.add(eto);
+			Element elmEntity = it.next();			
+			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer));			
 		}
-		
 		
 		return list;
 	}
+	
+//	/**
+//	 * Build a list of ETO objects from a XML document.
+//	 * @param doc
+//	 * @param limit
+//	 * @return
+//	 */
+//	public EntityList createETOList(Document doc, Limit limit) throws TransportException {
+//		
+//		Element elmExport = doc.getRootElement();
+//		if (!ELM_EXPORT.equals(elmExport.getName())) {
+//			throw new TransportException("Wrong format: Root element '" + ELM_EXPORT + "' expected.");
+//		}
+//		Element elmData = elmExport.element(ELM_DATA);
+//		if (elmData == null) {
+//			throw new TransportException("Wrong format: Element '" + ELM_DATA + "' not found.");
+//		}
+//		Element elmEntities = elmData.element(ELM_ENTITIES);
+//		if (elmEntities== null) {
+//			throw new TransportException("Wrong format: Element '" + ELM_ENTITIES + "' not found.");
+//		}
+//		
+//		String type = elmEntities.attributeValue("type");
+//		if (type == null || type.length() == 0) {
+//			throw new TransportException("Type not specified.");
+//		}
+//		
+//		EntityDescriptor descr;
+//		Class entityClass;
+//		try {
+//			descr = DAOSystem.getEntityDescriptor(type);
+//			entityClass = DAOSystem.getModelClassLoader().loadClass(descr.getClassname());
+//		} catch (Exception e) {
+//			throw new TransportException("Specified type not available/configured: " + type, e);
+//		}
+//		
+//		String sSize = elmEntities.attributeValue("size");
+//		String sTotalSize = elmEntities.attributeValue("totalSize");
+//		int size = sSize != null && sSize.length() != 0 ? Integer.parseInt(sSize) : 0;
+//		int totalSize = sTotalSize != null && sTotalSize.length() != 0 ? Integer.parseInt(sTotalSize) : size;
+//
+//		
+//		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
+//		
+//		List data = new ArrayList();
+//		EntityList list = new EntityList(data, limit, totalSize);
+//		
+//		String lastType = null;
+//		Class etoClass = entityClass;
+//		
+//		for (Iterator<Element> it = elmEntities.elementIterator(ELM_ENTITY); it.hasNext(); ) {
+//			
+//
+//			Element elmEntity = it.next();
+//			String sId = elmEntity.attributeValue("id");
+//			String sVersion = elmEntity.attributeValue("version");
+//			if (sId == null || sId.length() == 0 || sVersion == null || sVersion.length() == 0) {
+//				throw new TransportException("Missing id and version.");
+//			}
+//			String sType = elmEntity.attributeValue("type");
+//			if (sType != null && sType.length() != 0 && !sType.equals(lastType)) {
+//				try {
+//					etoClass = DAOSystem.getModelClassLoader().loadClass(sType);
+//					lastType = stype;
+//				} catch (ClassNotFoundException e) {
+//					throw new TransportException("Wront type specified" + sType, e);
+//				}
+//			}
+//			
+//			EntityTransferObject eto = new EntityTransferObject();
+//			eto.setEntityId(Integer.parseInt(sId));
+//			eto.setEntityVersion(Integer.parseInt(sVersion));
+//			eto.setEntityClass(etoClass);
+//			eto.setModified(false);
+//			Map<String, PropertyValue> values = new HashMap<String, PropertyValue>();
+//			eto.setPropertyValues(values);
+//			
+//			// add deleted property value
+//			PropertyValue pvDeleted = new PropertyValue();
+//			pvDeleted.setValue(XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmEntity.attributeValue("deleted")));
+//			pvDeleted.setType(boolean.class);
+//			values.put("deleted", pvDeleted);
+//			
+//			for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext(); ) {
+//				Element elmProp = itP.next();
+//				Property prop = descr.getProperty(elmProp.getName());
+//				if (prop != null) {
+//					
+//					
+//					Class<?> propertyType = prop.getDescriptor().getPropertyType();
+//					boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
+//					boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
+//					boolean isNull = elmProp.element(XmlExport.ELM_NULL) != null || XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("null"));
+//					
+//					PropertyValue pv = new PropertyValue();
+//					pv.setType(propertyType);
+//					if (isNull) {
+//						pv.setValue(null);
+//						pv.setLoaded(true);
+//					} else {
+//						if ((isEntityRef && !isPicklistRef)) {
+//							String id = elmProp.attributeValue("id");
+//							if (id != null && !id.isEmpty()) {
+//								int refId = Integer.parseInt(id);
+//								pv.setEntityId(refId);
+//								pv.setLoaded(false);
+//							} else {
+//								pv.setLoaded(true);
+//								
+//							}
+//						} else if (prop.isCollection() && XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
+//							pv.setLoaded(false);
+//						} else {
+//							pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+//						}
+//						
+//						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
+//							pv.setModified(true);
+//						}
+//						
+//						if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
+//							pv.setEntityType(true);
+//						}
+//					}
+//					
+//					values.put(elmProp.getName(), pv);
+//				}
+//			}
+//			
+//			data.add(eto);
+//		}
+//		
+//		
+//		return list;
+//	}
 
 }
