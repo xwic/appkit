@@ -30,6 +30,8 @@ import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
+import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
+import de.xwic.appkit.core.transport.xml.ObjectArrayEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
@@ -51,13 +53,8 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		this.config = config;
 	}
 	
-	/**
-	 * Fetch an ETO from a server.
-	 * @param entityType
-	 * @param id
-	 * @return
-	 * @throws RemoteDataAccessException
-	 * @throws TransportException 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getETO(java.lang.String, int)
 	 */
 	@SuppressWarnings("rawtypes")
 	public EntityTransferObject getETO(String entityType, int id) throws RemoteDataAccessException, TransportException {
@@ -73,7 +70,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		XmlEntityTransport xet = new XmlEntityTransport();
 		
-		EntityList list = xet.createETOList(doc, limit);
+		EntityList list = xet.createList(doc, limit, new EtoEntityNodeParser());
 
 		if (!list.isEmpty()) {
 			return (EntityTransferObject) list.get(0);
@@ -86,7 +83,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getETOs(java.lang.String, de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
 	@Override
-	public EntityList<EntityTransferObject> getETOs(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException {
+	public EntityList getList(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_ENTITIES);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
@@ -95,8 +92,13 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		Document doc = postRequest(param);
 		
+		EntityList list = null;
 		XmlEntityTransport xet = new XmlEntityTransport();		
-		EntityList list = xet.createETOList(doc, limit);
+		if (query.getColumns() == null) {
+			list = xet.createList(doc, limit, new EtoEntityNodeParser());
+		} else {
+			list = xet.createList(doc, limit, new ObjectArrayEntityNodeParser());
+		}
 
 		return list;
 	}
@@ -115,7 +117,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Document doc = postRequest(param);
 		
 		XmlEntityTransport xet = new XmlEntityTransport();		
-		EntityList list = xet.createETOList(doc, new Limit());
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
 
 		return list;
 	}
