@@ -33,7 +33,7 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 	public AsyncProcessDialog(Site site, IAsyncProcess process) {
 		super(site);
 		this.process = process;
-		setWidth(412);
+		setWidth(427);
 		setHeight(180);
 	}
 
