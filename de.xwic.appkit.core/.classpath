@@ -36,6 +36,6 @@
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/velocity-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="/de.xwic.libs.common/lib/xwic-cube.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

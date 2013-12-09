@@ -156,7 +156,7 @@ public class WizardContainerFix {
 	 */
 	protected void createControls(IControlContainer container) {
 
-		Messages messages = new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
+		new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
 		
 		InnerPage win = new InnerPage(container, null);
 		win.setTitle(wizard.getTitle());
@@ -169,7 +169,7 @@ public class WizardContainerFix {
 		}
 		
 		ControlContainer winContainer = new ControlContainer(win);
-		winContainer.setTemplateName(WizardContainerFix.class.getName());
+		winContainer.setTemplateName(getContainerTemplate());
 		
 		lblPageTitle = new Label(winContainer, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
@@ -204,6 +204,13 @@ public class WizardContainerFix {
 
 		activatePage(currentPage);
 		
+	}
+
+	/**
+	 * @return
+	 */
+	protected String getContainerTemplate() {
+		return WizardContainerFix.class.getName();
 	}
 
 	/**
