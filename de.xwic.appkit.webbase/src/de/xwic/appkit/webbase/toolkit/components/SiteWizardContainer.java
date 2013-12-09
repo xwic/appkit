@@ -15,7 +15,7 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
  */
 public class SiteWizardContainer extends WizardContainerFix {
 
-	private Site site = null;
+	protected final Site site;
 	private boolean autoClose;
 
 	/**
