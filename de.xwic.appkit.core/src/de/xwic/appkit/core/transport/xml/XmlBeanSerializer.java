@@ -378,31 +378,45 @@ public class XmlBeanSerializer {
 					}
 					
 				} else if (IPicklistEntry.class.isAssignableFrom(type)){
-	
-					String picklistId = elProp.attributeValue("picklistid");
-					String key = elProp.attributeValue("key");
-					String langid = elProp.attributeValue("langid");
-					String text = elProp.getText();
-					
-					if (langid == null || langid.length() == 0) {
-						langid = "de";
-					}
-					
-					// try to find by key
+
 					IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
 					IPicklistEntry entry = null;
-					if (key != null && key.length() != 0 && picklistId != null && picklistId.length() != 0) {
-						entry = plDAO.getPickListEntryByKey(picklistId, key); // try to find by key
-					}
 					
-					// not found, try by title
-					if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
-						List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
-						for (Iterator<IPicklistEntry> it = lst.iterator(); it.hasNext(); ) {
-							IPicklistEntry pe = it.next();
-							if (text.equals(pe.getBezeichnung(langid))) {
-								entry = pe;
-								break;
+					String picklistId = elProp.attributeValue("picklistid");
+					String key = elProp.attributeValue("key");
+					String text = elProp.getText();
+					
+					if ((picklistId == null || picklistId.trim().isEmpty()) || (key == null || key.trim().isEmpty())) {
+						// maybe it was sent with the ID?
+						
+						String strId = elProp.attributeValue("id");
+						
+						if (strId != null && !strId.isEmpty()) {
+							int id = Integer.parseInt(strId);							
+							entry = plDAO.getPickListEntryByID(id);
+						}
+						
+					} else {
+					
+						String langid = elProp.attributeValue("langid");
+						if (langid == null || langid.length() == 0) {
+							langid = "en";
+						}
+						
+						// try to find by key
+						if (key != null && key.length() != 0 && picklistId != null && picklistId.length() != 0) {
+							entry = plDAO.getPickListEntryByKey(picklistId, key); // try to find by key
+						}
+					
+						// not found, try by title
+						if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
+							List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
+							for (Iterator<IPicklistEntry> it = lst.iterator(); it.hasNext(); ) {
+								IPicklistEntry pe = it.next();
+								if (text.equals(pe.getBezeichnung(langid))) {
+									entry = pe;
+									break;
+								}
 							}
 						}
 					}
