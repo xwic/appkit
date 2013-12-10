@@ -209,5 +209,16 @@ public interface DAO<I extends IEntity> {
 	 * @return
 	 */
 	public boolean hasRight(IEntity entity, String action);
+	
+	/**
+	 * @return the handleHistory
+	 */
+	public boolean isHandleHistory();
+
+	/**
+	 * @param handleHistory
+	 *            the handleHistory to set
+	 */
+	public void setHandleHistory(boolean handleHistory);
 
 }

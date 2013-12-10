@@ -15,4 +15,10 @@ import de.xwic.appkit.core.security.IRole;
  */
 public interface IRoleDAO extends DAO<IRole> {
 
+	/**
+	 * @param roleName
+	 * @return
+	 */
+	public IRole getRoleByName(String roleName);
+	
 }

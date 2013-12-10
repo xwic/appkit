@@ -17,8 +17,7 @@ import de.xwic.appkit.core.model.entities.ISalesTeam;
  * 
  * @author Ronny Pfretzschner
  */
-public class MitarbeiterBase extends Entity implements
-        IMitarbeiter {
+public class MitarbeiterBase extends Entity implements IMitarbeiter {
 
     private String vorname = "";
     private String nachname = "";
@@ -36,6 +35,9 @@ public class MitarbeiterBase extends Entity implements
     private boolean ausgeschieden = false;
 
     private IMitarbeiter vorgesetzter;
+    
+    // AI 09-Dec-2013: this is used for the accounts created from nPulse
+    private boolean specialAccount;
 
     private boolean info1 = false;
     
@@ -259,5 +261,19 @@ public class MitarbeiterBase extends Entity implements
 	 */
 	public void setInfo1(boolean info1) {
 		this.info1 = info1;
+	}
+
+	/**
+	 * @return the specialAccount
+	 */
+	public boolean isSpecialAccount() {
+		return specialAccount;
+	}
+
+	/**
+	 * @param specialAccount the specialAccount to set
+	 */
+	public void setSpecialAccount(boolean specialAccount) {
+		this.specialAccount = specialAccount;
 	}
 }

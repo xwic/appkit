@@ -68,6 +68,9 @@
         	<column name="LOGON_NAME" length="50"/>
         </property>
 
+		<property name="specialAccount" type="boolean">
+			<column name="SPECIAL_ACCOUNT" default="0"/>
+		</property>
 
 		<!-- Relations of type SalesTeam -->
 		<many-to-one name="salesTeam" class="de.xwic.appkit.core.model.entities.impl.SalesTeam" column="SALES_TEAM"/>
@@ -76,7 +79,6 @@
 		<!-- Relations to PicklistEntries -->
 		<many-to-one name="einheit" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="EINHEIT"/>
 		<many-to-one name="team" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="TEAM"/>
-
 
 		<!-- additional object properties -->
 

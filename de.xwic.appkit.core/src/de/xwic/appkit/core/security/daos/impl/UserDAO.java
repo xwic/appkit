@@ -14,6 +14,8 @@ import java.util.Set;
 import de.xwic.appkit.core.dao.AbstractDAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.security.IRight;
 import de.xwic.appkit.core.security.IRole;
 import de.xwic.appkit.core.security.IUser;
@@ -54,5 +56,22 @@ public class UserDAO extends AbstractDAO<IUser, User> implements IUserDAO {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.daos.IUserDAO#getUserByLogonName(java.lang.String)
+	 */
+	@Override
+	public IUser getUserByLogonName(String logonName) {
+		
+		PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("logonName", logonName);
+		
+		EntityList<IUser> list = getEntities(new Limit(0,1), pq);
+		
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+		
+		return null;
+	}
 	
 }

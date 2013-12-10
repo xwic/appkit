@@ -134,6 +134,8 @@ public class XmlBeanSerializer {
 			}
 		}
 		
+		String typeInfo = null;
+		
 		if (value instanceof PropertyValue) {
 			PropertyValue pv = (PropertyValue)value;
 			if (pv.isEntityType()) {
@@ -146,6 +148,7 @@ public class XmlBeanSerializer {
 						value = pv.getValue();
 					} else {
 						value = "";
+						typeInfo = pv.getType().getName();
 					}
 				}
 			} else if (pv.isLoaded()) {
@@ -162,7 +165,10 @@ public class XmlBeanSerializer {
 			}
 		}
 		
-		String typeInfo = value != null ? value.getClass().getName() : null;
+		if (typeInfo == null) {
+			typeInfo = value != null ? value.getClass().getName() : null;
+		}
+		
 		if (value == null) {
 			//elm.addElement(ELM_NULL);
 			elm.addAttribute("null", ATTRVALUE_TRUE);

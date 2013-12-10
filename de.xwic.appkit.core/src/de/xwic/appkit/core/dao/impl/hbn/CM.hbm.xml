@@ -55,6 +55,10 @@
         <property name="logonName">
         	<column name="LOGON_NAME" length="50"/>
         </property>
+        
+        <property name="specialAccount" type="boolean">
+			<column name="SPECIAL_ACCOUNT" default="0"/>
+		</property>
 
 		<!-- Relations of type SalesTeam -->
 		<many-to-one name="salesTeam" class="de.xwic.appkit.core.model.entities.impl.SalesTeam" column="SALES_TEAM"/>

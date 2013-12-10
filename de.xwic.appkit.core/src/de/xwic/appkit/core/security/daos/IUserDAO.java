@@ -25,4 +25,10 @@ public interface IUserDAO extends DAO<IUser> {
 	 */
 	public Set<ScopeActionKey> buildAllRights(IUser user);
 	
+	/**
+	 * @param logonName
+	 * @return
+	 */
+	public IUser getUserByLogonName(String logonName);
+	
 }
