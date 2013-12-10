@@ -92,10 +92,25 @@ public class PicklistCache {
 //			sublist = new EntityList(new ArrayList(), null, 0);
 //			allListsWithEntries.put(key, sublist);
 //		}
-		if (null != sublist && !sublist.contains(e)) {
+		if (null != sublist && !contains(e, sublist)) {
 			sublist.add(e);
 		}
 
+	}
+	
+	/**
+	 * @param e
+	 * @param sublist
+	 * @return
+	 */
+	private boolean contains(IPicklistEntry e, EntityList<IPicklistEntry> sublist) {
+		for (IPicklistEntry pe : sublist) {
+			if (pe.getId() == e.getId()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**

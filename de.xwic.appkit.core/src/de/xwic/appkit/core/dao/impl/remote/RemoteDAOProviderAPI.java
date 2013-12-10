@@ -15,6 +15,8 @@ import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.model.entities.IPicklistText;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
@@ -82,7 +84,18 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 		try {
 			// unfortunately, the abstract DAO makes the call with the implementation class name, 
 			// therefore we need to translate it back to the type name
-			Class<? extends Object> trueClass = DAOSystem.findDAOforEntity(clazz.getName()).getEntityClass();
+			
+			Class<? extends Object> trueClass = null;
+			
+			// PicklistEntries and PicklistText are handled by the PicklistDao, this is why we need to hardcode below 
+			if (clazz.getName().endsWith("PicklistEntry")) {
+				trueClass = IPicklistEntry.class;
+			} else if (clazz.getName().endsWith("PicklistText")) {
+				trueClass = IPicklistText.class;
+			} else {
+				trueClass = DAOSystem.findDAOforEntity(clazz.getName()).getEntityClass();				
+			}
+			
 			EntityList objects = client.getList(trueClass.getName(), limit, filter);
 			
 			List<Object> list = new ArrayList<Object>();

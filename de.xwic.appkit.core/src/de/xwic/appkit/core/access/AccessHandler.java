@@ -253,8 +253,9 @@ public class AccessHandler {
         
 		EntityDescriptor desc = dao.getEntityDescriptor(classname);
 		
-        // generate transfer objects if it contains entites other then picklistEntries
-        if (!(dao instanceof IPicklisteDAO) && desc.isTransform()) {
+//        // generate transfer objects if it contains entites other then picklistEntries
+//        if (!(dao instanceof IPicklisteDAO) && desc.isTransform()) {
+		if (desc.isTransform()) {
 	        if (list.size() > 0 && list.get(0) instanceof IEntity) {
 	        	List<Object> data = new ArrayList<Object>(list.size());
 	        	for (Iterator<Object> it = list.iterator(); it.hasNext(); ) {
