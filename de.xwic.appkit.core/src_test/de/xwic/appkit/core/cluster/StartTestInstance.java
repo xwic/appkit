@@ -11,13 +11,6 @@ import java.util.Set;
 
 import org.apache.log4j.BasicConfigurator;
 
-import de.xwic.appkit.core.cluster.ClusterConfiguration;
-import de.xwic.appkit.core.cluster.ClusterEvent;
-import de.xwic.appkit.core.cluster.ClusterEventListener;
-import de.xwic.appkit.core.cluster.ClusterManager;
-import de.xwic.appkit.core.cluster.ICluster;
-import de.xwic.appkit.core.cluster.NodeAddress;
-
 /**
  * @author lippisch
  *

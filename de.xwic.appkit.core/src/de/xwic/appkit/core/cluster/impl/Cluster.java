@@ -20,11 +20,11 @@ import de.xwic.appkit.core.cluster.EventTimeOutException;
 import de.xwic.appkit.core.cluster.ICluster;
 import de.xwic.appkit.core.cluster.IClusterService;
 import de.xwic.appkit.core.cluster.INode;
+import de.xwic.appkit.core.cluster.INode.NodeStatus;
 import de.xwic.appkit.core.cluster.Message;
 import de.xwic.appkit.core.cluster.NodeAddress;
 import de.xwic.appkit.core.cluster.Response;
 import de.xwic.appkit.core.cluster.TransportResult;
-import de.xwic.appkit.core.cluster.INode.NodeStatus;
 
 /**
  * Central accessor to obtain information about the cluster, it's nodes and ways to interact with it.

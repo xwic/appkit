@@ -3,10 +3,7 @@
  */
 package de.xwic.appkit.webbase.toolkit.components;
 
-import java.util.List;
-
 import de.jwic.base.IControlContainer;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.daos.ISalesTeamDAO;

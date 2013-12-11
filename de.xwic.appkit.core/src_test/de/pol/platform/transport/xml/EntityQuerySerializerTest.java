@@ -3,11 +3,11 @@
  */
 package de.pol.platform.transport.xml;
 
+import junit.framework.TestCase;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.TransportException;
-import junit.framework.TestCase;
 
 /**
  * @author Florian Lippisch

@@ -23,12 +23,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.dialogs.DialogEvent;
 import de.jwic.controls.dialogs.DialogListener;
 import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
-import de.xwic.appkit.webbase.dialog.CenteredWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 

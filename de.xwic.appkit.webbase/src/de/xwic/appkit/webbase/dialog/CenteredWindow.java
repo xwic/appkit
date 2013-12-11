@@ -1,6 +1,5 @@
 package de.xwic.appkit.webbase.dialog;
 
-import de.jwic.base.Page;
 import de.jwic.controls.Window;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 

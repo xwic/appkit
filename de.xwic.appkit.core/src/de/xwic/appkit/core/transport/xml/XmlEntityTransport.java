@@ -34,8 +34,6 @@ import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.export.XmlExport;
-import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 

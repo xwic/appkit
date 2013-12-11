@@ -17,11 +17,11 @@ import de.xwic.appkit.core.cluster.ClusterServiceStatus;
 import de.xwic.appkit.core.cluster.CommunicationException;
 import de.xwic.appkit.core.cluster.IClusterService;
 import de.xwic.appkit.core.cluster.INode;
+import de.xwic.appkit.core.cluster.INode.NodeStatus;
 import de.xwic.appkit.core.cluster.IRemoteService;
 import de.xwic.appkit.core.cluster.Message;
 import de.xwic.appkit.core.cluster.RemoteInvokationException;
 import de.xwic.appkit.core.cluster.Response;
-import de.xwic.appkit.core.cluster.INode.NodeStatus;
 
 /**
  * Handles all cluster service related activities.

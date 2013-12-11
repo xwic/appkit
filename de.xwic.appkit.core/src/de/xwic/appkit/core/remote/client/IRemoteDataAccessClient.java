@@ -4,7 +4,6 @@
 package de.xwic.appkit.core.remote.client;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 import de.xwic.appkit.core.config.ConfigurationException;

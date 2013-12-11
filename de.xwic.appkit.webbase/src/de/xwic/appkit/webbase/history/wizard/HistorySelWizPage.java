@@ -9,7 +9,6 @@ package de.xwic.appkit.webbase.history.wizard;
 
 import java.util.Collection;
 
-import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.tableviewer.TableColumn;
