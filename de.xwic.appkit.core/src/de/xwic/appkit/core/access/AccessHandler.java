@@ -7,16 +7,20 @@
  */
 package de.xwic.appkit.core.access;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -42,6 +46,8 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
+import de.xwic.appkit.core.util.ILazyEval;
+import de.xwic.appkit.core.util.MapUtil;
 
 /**
  * <p>Handles common access operations to the backend model using
@@ -68,6 +74,14 @@ public class AccessHandler {
 	
 	private static AccessHandler instance = null;
 	
+	private static final ILazyEval<PropertyDescriptor, String> PROPERTY_DESCRIPTOR_NAME_EXTRACTOR = new ILazyEval<PropertyDescriptor, String>() {
+
+		@Override
+		public String evaluate(PropertyDescriptor obj) {
+			return obj.getName();
+		}
+	};
+
 	/**
 	 * Constructor.
 	 */
@@ -420,6 +434,11 @@ public class AccessHandler {
 			omTp = omSettings.getMonitoringProperties(scope);
 		}
 		try {
+//			AAA TODO AI use intelligence to cache this information
+			BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
+			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
+			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
+
 			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext(); ) {
 				String propName = it.next();
 				PropertyValue pValue = eto.getPropertyValue(propName);
@@ -430,7 +449,8 @@ public class AccessHandler {
 						monitoring = false; // no need to monitor any other properties
 						log.debug("ObjectMonitoring detected change.");
 					}
-					PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
+					PropertyDescriptor pd = propertyMap.get(propName);
+//					PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
 					Method mWrite = pd.getWriteMethod();
 					if (mWrite != null) {
 						if (secMan.getAccess(scope, propName) == ISecurityManager.READ_WRITE) {
