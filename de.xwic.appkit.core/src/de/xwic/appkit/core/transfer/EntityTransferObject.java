@@ -117,12 +117,23 @@ public class EntityTransferObject {
 			
 			// read the properties
 			for (int i = 0; i < descriptors.length; i++) {
-				if (!descriptors[i].getName().equals("class")) {
-					Property property = entityDescr.getProperty(descriptors[i].getName());
-					Class<?> type = descriptors[i].getPropertyType();
-					Method mRead = descriptors[i].getReadMethod();
+				PropertyDescriptor descriptor = descriptors[i];
+				
+				if (!descriptor.getName().equals("class")) {
+					Property property = entityDescr.getProperty(descriptor.getName());
+					Class<?> type = descriptor.getPropertyType();
+					Method mRead = descriptor.getReadMethod();
 					
-					if (property == null && !EXTRA_PROPERTIES.contains(descriptors[i].getName())) {
+					if (mRead == null) {
+						// TODO AI investigate some more
+						// if we have a Boolean field, the java sepcification is that the getter starts with
+						// 'get', not 'is', therefore the read method is not located
+						// by instantiating the property descriptor manually, the read method is located successfully
+						PropertyDescriptor pd = new PropertyDescriptor(descriptor.getName(), entity.getClass());
+						mRead = pd.getReadMethod();
+					}
+					
+					if (property == null && !EXTRA_PROPERTIES.contains(descriptor.getName())) {
 						// if the property is not specified by the entity and it
 						// is not a special extra property, it is skiped.
 						continue;
@@ -133,7 +144,7 @@ public class EntityTransferObject {
 					value.setModified(loadCollections);
 					
 					// check rights
-					value.setAccess(secMan.getAccess(scope, descriptors[i].getName()));
+					value.setAccess(secMan.getAccess(scope, descriptor.getName()));
 					if (value.getAccess() != ISecurityManager.NONE) {
 						Object data = mRead.invoke(entity, (Object[]) null);
 						
@@ -196,7 +207,7 @@ public class EntityTransferObject {
 							value.setValue(data);
 						}
 					}
-					propertyValues.put(descriptors[i].getName(), value);
+					propertyValues.put(descriptor.getName(), value);
 				}
 			}
 			
