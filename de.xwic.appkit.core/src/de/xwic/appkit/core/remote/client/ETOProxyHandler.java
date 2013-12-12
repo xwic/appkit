@@ -16,6 +16,9 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ISecurityManager;
+import de.xwic.appkit.core.model.daos.IPicklisteDAO;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.model.entities.IPicklistText;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.IEntityInvocationHandler;
 import de.xwic.appkit.core.transfer.PropertyValue;
@@ -146,6 +149,17 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 
 		if (methodName.length() > prefixLength) {
 
+			// TODO AI make this nicer!
+			if (eto.getEntityClass().equals(IPicklistEntry.class) && methodName.equals("getBezeichnung")) {
+				IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+				
+				IPicklistEntry pe = dao.getPickListEntryByID(eto.getEntityId());
+				
+				IPicklistText text = (IPicklistText)dao.getPicklistText(pe, "en");
+				
+				return text != null ? text.getBezeichnung() : "";
+			}
+			
 			String propertyName = getPropertyName(methodName, prefixLength);
 			PropertyValue pv = eto.getPropertyValue(propertyName);
 			if (pv == null) {
