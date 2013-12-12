@@ -450,6 +450,9 @@ public class AccessHandler {
 						log.debug("ObjectMonitoring detected change.");
 					}
 					PropertyDescriptor pd = propertyMap.get(propName);
+					if (pd == null){
+						continue;
+					}
 //					PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
 					Method mWrite = pd.getWriteMethod();
 					if (mWrite != null) {
