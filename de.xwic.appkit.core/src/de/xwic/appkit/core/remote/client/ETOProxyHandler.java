@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.xwic.appkit.core.remote.client;
 
@@ -31,7 +31,7 @@ import de.xwic.appkit.core.util.Equals;
 public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHandler {
 
 	private EntityTransferObject eto;
-	
+
 	/**
 	 * @param eto
 	 */
@@ -53,9 +53,9 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 	 */
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		
+
 		String methodName = method.getName();
-		
+
 //		AAA use inteligence to make this support all function calls
 
 		if (methodName.startsWith("get")) {
@@ -63,20 +63,20 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 			return handleGetter(methodName, 3);
 		} else if (methodName.startsWith("is")) {
 			return handleGetter(methodName, 2);
-			
+
 		} else if (methodName.startsWith("set")) {
 			return handleSetter(methodName, args);
-			
+
 		} else if (methodName.equals("type")) {
 			return handleType(methodName, args);
-			
+
 		} else if (methodName.equals("equals")) {
 			return handleEquals(methodName, args);
-			
+
 		} else if (methodName.equals("hashCode")) {
 			return handleHashCode(methodName, args);
 		}
-		
+
 		return null;
 	}
 
@@ -98,7 +98,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 		if (args != null && args.length == 1) {
 			return eto.equals(args[0]);
 		}
-		
+
 		return false;
 	}
 
@@ -118,7 +118,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 	 * @return
 	 */
 	private Object handleSetter(String methodName, Object[] args) {
-		
+
 		String propertyName = getPropertyName(methodName, 3);
 		if (args != null && args.length == 1) {
 
@@ -130,14 +130,14 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 			if (pv.getAccess() != ISecurityManager.READ_WRITE) {
 				throw new DataAccessException("No RW access to this property (" + propertyName + ")");
 			}
-			
+
 			if (!Equals.equal(pv.getValue(), newValue)) {
 				pv.setValue(args[0]);
 				pv.setModified(true);
 				eto.setModified(true);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -152,38 +152,38 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 		if (methodName.length() > prefixLength) {
 
 			// TODO AI make this nicer!
-			if (eto.getEntityClass().equals(IPicklistEntry.class) && methodName.equals("getBezeichnung")) {
-				IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
-				
+			if (IPicklistEntry.class.isAssignableFrom(eto.getEntityClass()) && methodName.equals("getBezeichnung")) {
+				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
+
 				IPicklistEntry pe = dao.getPickListEntryByID(eto.getEntityId());
-				
-				IPicklistText text = (IPicklistText)dao.getPicklistText(pe, "en");
-				
+
+				IPicklistText text = dao.getPicklistText(pe, "en");
+
 				return text != null ? text.getBezeichnung() : "";
 			}
-			
+
 			String propertyName = getPropertyName(methodName, prefixLength);
 			PropertyValue pv = eto.getPropertyValue(propertyName);
 			if (pv == null) {
-				throw new IllegalStateException("Unknown property: " + propertyName);
+				throw new IllegalStateException(String.format("Unknown property '%s' for '%s': ", propertyName, eto.getEntityClass()));
 			}
 			if (pv.isLoaded()) {
 				return pv.getValue();
 			} else {
-				// Lazy Load 
-				
+				// Lazy Load
+
 				// figure out type
 				if (IEntity.class.isAssignableFrom(pv.getType())) { // Resolve entity reference
-				
+
 					Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
 					IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
-					
+
 					pv.setValue(entity);
 					pv.setLoaded(true);
 					return entity;
-					
+
 				} else if (Collection.class.isAssignableFrom(pv.getType())) { // resolve collection
-					
+
 					IRemoteDataAccessClient remoteDataAccessClient = DAOSystem.getRemoteDataAccessClient();
 					if (remoteDataAccessClient == null) {
 						throw new IllegalStateException("RemoteDataAccessClient not available/configured!");
@@ -191,7 +191,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 					try {
 						EntityDescriptor descriptor = DAOSystem.findEntityDescriptor(eto.getEntityClass().getName());
 						List collection = remoteDataAccessClient.getETOCollection(descriptor.getClassname(), eto.getEntityId(), propertyName);
-						
+
 						Collection newCol;
 						if (Set.class.isAssignableFrom(pv.getType())) {
 							// need to transform into a set
@@ -201,7 +201,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 						} else {
 							throw new RemoteDataAccessException("Unsupported collection type: " + pv.getType().getName());
 						}
-						
+
 						for (Object o : collection) {
 							if (o instanceof EntityTransferObject) {
 								newCol.add(EntityProxyFactory.createEntityProxy((EntityTransferObject) o));
@@ -209,17 +209,17 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 								newCol.add(o);
 							}
 						}
-						
+
 						pv.setValue(newCol);
 						pv.setLoaded(true);
 						return newCol;
 					} catch (Exception e) {
 						throw new RemoteDataAccessException("Cannot initilaize collection '" + propertyName + "' for entity " + eto.getEntityClass().getName() + ": " + e, e);
 					}
-					
+
 				}
 			}
-			
+
 		}
 		return null;
 	}
@@ -242,7 +242,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 		} else { // just one character, i.e. getA() -> property name is 'a'
 			return suffix.toLowerCase();
 		}
-		
+
 	}
 
 }
