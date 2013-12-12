@@ -56,6 +56,8 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 		
 		String methodName = method.getName();
 		
+//		AAA use inteligence to make this support all function calls
+
 		if (methodName.startsWith("get")) {
 			// is a getter -> find out the property name
 			return handleGetter(methodName, 3);
