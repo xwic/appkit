@@ -13,11 +13,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Model;
+import de.xwic.appkit.core.config.model.Property;
 
 /**
  * The setup is the central dictionary for the systems configuration. The model
@@ -295,6 +297,36 @@ public class Setup {
 		defaultProfile.initializeConfig();
 		for (Profile profile : profiles.values()) {
 			profile.initializeConfig();
+		}
+	}
+	
+	/**
+	 * @param newSetup
+	 * @throws ConfigurationException 
+	 */
+	public void mergeSetup(Setup newSetup) throws ConfigurationException {
+
+		setId(newSetup.getId());
+		setAppTitle(newSetup.getAppTitle());
+		setVersion(newSetup.getVersion());
+		setDefaultLangId(newSetup.getDefaultLangId());
+		setLanguages(newSetup.getLanguages());
+		
+		for (Model model : newSetup.getModels()) {
+			addModel(model);
+		}
+		
+		for (Domain domain : newSetup.domains.values()) {
+			addDomain(domain);
+		}
+
+		for (Entry<String, Profile> entry: newSetup.profiles.entrySet()) {
+			addProfile(entry.getKey(), entry.getValue());
+		}
+		
+		for (Object prop : newSetup.properties.keySet()) {
+			String key = (String) prop;
+			setProperty(key, newSetup.getProperty(key));
 		}
 	}
 }

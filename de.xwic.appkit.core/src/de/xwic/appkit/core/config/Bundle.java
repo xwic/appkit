@@ -8,6 +8,7 @@
 package de.xwic.appkit.core.config;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Wrapper for the map that contains the key/value pairs.
@@ -56,6 +57,13 @@ public class Bundle {
 	 */
 	public void setLinkedBundle(Bundle linkedBundle) {
 		this.linkedBundle = linkedBundle;
+	}
+	
+	/**
+	 * @return
+	 */
+	public Set getKeys() {
+		return map.keySet();
 	}
 	
 }
