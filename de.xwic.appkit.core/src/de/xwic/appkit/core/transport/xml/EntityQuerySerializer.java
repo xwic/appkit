@@ -91,7 +91,7 @@ public class EntityQuerySerializer {
 	 */
 	public static Limit stringToLimit(String strLimit) {
 		
-		if (strLimit == null || !strLimit.isEmpty()) {
+		if (strLimit == null || strLimit.isEmpty()) {
 			return null;
 		}
 		
