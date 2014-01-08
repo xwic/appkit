@@ -13,7 +13,9 @@ package de.xwic.appkit.core.dao;
  * @author Florian Lippisch
  */
 public class Limit {
-    
+
+	public static final Limit ONE = new Limit(0, 1);
+
     /** The number to start from. The first entity is 0. */
     public int startNo = 0;
     /** The maximum number of objects that should be returned. 0 means all entities. */
