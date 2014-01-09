@@ -41,9 +41,10 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  */
 public class EntityTransferObject {
 	
-	private Class<? extends IEntity> entityClass = null;
-	private int entityId = 0;
-	private long entityVersion = 0;
+	private final Class<? extends IEntity> entityClass;
+	private final int entityId;
+	private long entityVersion;
+
 	private boolean modified = false;
 	private Map<String, PropertyValue> propertyValues = new HashMap<String, PropertyValue>();
 	
@@ -55,10 +56,14 @@ public class EntityTransferObject {
 	}
 	
 	/**
-	 * Default Constructor.
+	 * @param entityId
+	 * @param entityVersion
+	 * @param entityClass
 	 */
-	public EntityTransferObject() {
-		
+	public EntityTransferObject(final String entityId, final String entityVersion, final Class<? extends IEntity> entityClass) {
+		this.entityId = Integer.parseInt(entityId);
+		this.entityVersion = Integer.parseInt(entityVersion);
+		this.entityClass = entityClass;
 	}
 	
 	/**
@@ -81,17 +86,21 @@ public class EntityTransferObject {
 		if (entity == null) {
 			throw new NullPointerException("Entity must not be null");
 		}
-		
+		final Class<? extends IEntity> clasz;
 		if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
-			entityClass = (Class<? extends IEntity>) entity.getClass().getSuperclass();
+			clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
 		} else if (Proxy.isProxyClass(entity.getClass())) {
 			InvocationHandler ih = Proxy.getInvocationHandler(entity);
 			if (ih instanceof IEntityInvocationHandler) {
-				entityClass = (Class<? extends IEntity>)((IEntityInvocationHandler)ih).getEntityImplClass();
+				clasz = (Class<? extends IEntity>)((IEntityInvocationHandler)ih).getEntityImplClass();
+			} else {
+				clasz = null;
 			}
 		} else {
-			entityClass = entity.getClass();
+			clasz = entity.getClass();
 		}
+
+		entityClass = clasz;
 		entityId = entity.getId();
 		entityVersion = entity.getVersion();
 		
@@ -251,13 +260,6 @@ public class EntityTransferObject {
 	}
 
 	/**
-	 * @param entityClass The entityClass to set.
-	 */
-	public void setEntityClass(Class<? extends IEntity> entityClass) {
-		this.entityClass = entityClass;
-	}
-
-	/**
 	 * @return Returns the entityId.
 	 */
 	public int getEntityId() {
@@ -265,24 +267,10 @@ public class EntityTransferObject {
 	}
 
 	/**
-	 * @param entityId The entityId to set.
-	 */
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
-	}
-
-	/**
 	 * @return Returns the entityVersion.
 	 */
 	public long getEntityVersion() {
 		return entityVersion;
-	}
-
-	/**
-	 * @param entityVersion The entityVersion to set.
-	 */
-	public void setEntityVersion(long entityVersion) {
-		this.entityVersion = entityVersion;
 	}
 
 	/**

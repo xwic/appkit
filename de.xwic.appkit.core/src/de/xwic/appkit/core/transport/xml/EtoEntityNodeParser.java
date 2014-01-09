@@ -47,10 +47,7 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 			}
 		}
 		
-		EntityTransferObject eto = new EntityTransferObject();
-		eto.setEntityId(Integer.parseInt(sId));
-		eto.setEntityVersion(Integer.parseInt(sVersion));
-		eto.setEntityClass(etoClass);
+		EntityTransferObject eto = new EntityTransferObject(sId, sVersion, etoClass);
 		eto.setModified(false);
 		Map<String, PropertyValue> values = new HashMap<String, PropertyValue>();
 		eto.setPropertyValues(values);
