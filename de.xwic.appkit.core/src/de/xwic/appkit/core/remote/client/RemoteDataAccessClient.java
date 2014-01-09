@@ -28,6 +28,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
@@ -132,26 +133,11 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, eto.getEntityClass().getName());
 		
-		String serialized = serializeETO(entityType, eto);
+		String serialized = UETO.serialize(entityType, eto);
 		
 		param.put(RemoteDataAccessServlet.PARAM_ETO, serialized);
 		
 		postRequest(param);
-	}
-
-	/**
-	 * @param entityType
-	 * @param eto
-	 * @return
-	 * @throws IOException
-	 * @throws ConfigurationException
-	 */
-	private final String serializeETO(final String entityType, final EntityTransferObject eto) throws IOException, ConfigurationException {
-		final EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
-		final StringWriter sw = new StringWriter();
-		final XmlEntityTransport xet = new XmlEntityTransport();
-		xet.write(sw, eto, descr);
-		return sw.toString();
 	}	
 	
 	/**

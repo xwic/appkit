@@ -30,6 +30,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
@@ -188,27 +189,13 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws TransportException 
 	 */
 	private void handleUpdateEntity(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws DocumentException, TransportException {
-		
+
 		String strEto = req.getParameter(PARAM_ETO);
-		
-		assertValue(strEto, "ETO details not specified");
-		
-		// deserialize ETO
-		
-		SAXReader xmlReader = new SAXReader();
-		Document doc = xmlReader.read(new StringReader(strEto));
-		
-		XmlEntityTransport xet = new XmlEntityTransport();
-		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
-		
-		if (!list.isEmpty()) {
-			EntityTransferObject eto = (EntityTransferObject) list.get(0);
-			accessHandler.updateETO(eto);
-			
-			printResponse(pwOut, RESPONSE_OK);
-		} else {
-			throw new IllegalStateException("ETO could not be parsed: " + strEto);
-		}
+
+		EntityTransferObject eto = UETO.deserialize(strEto);
+		accessHandler.updateETO(eto);
+
+		printResponse(pwOut, RESPONSE_OK);
 	}
 
 	/**
