@@ -49,8 +49,7 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 		
 		EntityTransferObject eto = new EntityTransferObject(sId, sVersion, etoClass);
 		eto.setModified(false);
-		Map<String, PropertyValue> values = new HashMap<String, PropertyValue>();
-		eto.setPropertyValues(values);
+		Map<String, PropertyValue> values = eto.getPropertyValues();
 		
 		// add deleted property value
 		PropertyValue pvDeleted = new PropertyValue();

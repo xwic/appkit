@@ -46,7 +46,7 @@ public class EntityTransferObject {
 	private long entityVersion;
 
 	private boolean modified = false;
-	private Map<String, PropertyValue> propertyValues = new HashMap<String, PropertyValue>();
+	private final Map<String, PropertyValue> propertyValues = new HashMap<String, PropertyValue>();
 	
 	private final static Set<String> EXTRA_PROPERTIES = new HashSet<String>();
 	static {
@@ -280,13 +280,6 @@ public class EntityTransferObject {
 		return propertyValues;
 	}
 
-	/**
-	 * @param propertyValues The propertyValues to set.
-	 */
-	public void setPropertyValues(Map<String, PropertyValue> propertyValues) {
-		this.propertyValues = propertyValues;
-	}
-
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -348,7 +341,8 @@ public class EntityTransferObject {
 		if (response.entityVersion > entityVersion) {
 			// update
 			entityVersion = response.entityVersion;
-			propertyValues = response.propertyValues;
+			propertyValues.clear();
+			propertyValues.putAll(response.propertyValues);
 		}
 		
 	}
