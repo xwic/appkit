@@ -484,14 +484,14 @@ public class AccessHandler {
 					// entities to reduce message-size.
 					} else if (value != null && value.getClass().isArray()) {
 									
-									Collection<Object> newCol;
-									if (pValue.getType().isAssignableFrom(Set.class)) {
-										newCol = new HashSet<Object>();
-									} else if (pValue.getType().isAssignableFrom(List.class)) {
-										newCol = new ArrayList<Object>();
-									} else {
-										throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
-									}
+					Collection<Object> newCol;
+					if (pValue.getType().isAssignableFrom(Set.class)) {
+						newCol = new HashSet<Object>();
+					} else if (pValue.getType().isAssignableFrom(List.class)) {
+						newCol = new ArrayList<Object>();
+					} else {
+						throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
+					}
 									Object[] oArray = (Object[])value;
 									for (int i = 0; i < oArray.length; i++) {
 										Object o = oArray[i];
