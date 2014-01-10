@@ -493,14 +493,14 @@ public class AccessHandler {
 							throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
 						}
 
-					Object[] oArray = (Object[])value;
-					for (int i = 0; i < oArray.length; i++) {
-						Object o = oArray[i];
-						if (o instanceof PropertyValue) {
-							PropertyValue pv = (PropertyValue)o;
-							if (pv.isLoaded()) {
-								o = pv.getValue();
-							} else if(pv.isEntityType()) {
+						Object[] oArray = (Object[])value;
+						for (int i = 0; i < oArray.length; i++) {
+							Object o = oArray[i];
+							if (o instanceof PropertyValue) {
+								PropertyValue pv = (PropertyValue)o;
+								if (pv.isLoaded()) {
+									o = pv.getValue();
+								} else if(pv.isEntityType()) {
 								if (pv.getType().equals(IPicklistEntry.class)) {
 									o = plDAO.getPickListEntryByID(pv.getEntityId());
 								} else {
