@@ -506,9 +506,9 @@ public class AccessHandler {
 									} else {
 										o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
 									}
-							} else {
-								throw new DataAccessException("A collection can not contain another lazy collection.");
-							}
+								} else {
+									throw new DataAccessException("A collection can not contain another lazy collection.");
+								}
 						} else if (o instanceof EntityTransferObject) {
 											EntityTransferObject refEto = (EntityTransferObject)o;
 											o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
