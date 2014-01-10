@@ -543,16 +543,11 @@ public class AccessHandler {
 	 * @param pValue
 	 * @param value
 	 * @return
+	 * @throws DataAccessException if support for the collection type is not implemented
 	 */
-	private Collection<Object> parseCollection(IPicklisteDAO plDAO, PropertyValue pValue, Object value) {
-		Collection<Object> newCol;
-		if (pValue.getType().isAssignableFrom(Set.class)) {
-			newCol = new HashSet<Object>();
-		} else if (pValue.getType().isAssignableFrom(List.class)) {
-			newCol = new ArrayList<Object>();
-		} else {
-			throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
-		}
+	private Collection<Object> parseCollection(final IPicklisteDAO plDAO, final PropertyValue pValue, final Object value) throws DataAccessException {
+
+		Collection<Object> newCol = instantiateCollection(pValue, value);
 
 		Object[] oArray = (Object[]) value;
 		for (Object element : oArray) {
@@ -577,6 +572,23 @@ public class AccessHandler {
 			newCol.add(o);
 		}
 		return newCol;
+	}
+
+	/**
+	 * @param propertyValue determines the collection to instantiate
+	 * @param object only used to log the instance class
+	 * @return
+	 * @throws DataAccessException if support for the collection type is not implemented
+	 */
+	private Collection<Object> instantiateCollection(final PropertyValue propertyValue, final Object object) throws DataAccessException {
+		final Class<?> type = propertyValue.getType();
+		if (type.isAssignableFrom(Set.class)) {
+			return new HashSet<Object>();
+		}
+		if (type.isAssignableFrom(List.class)) {
+			return new ArrayList<Object>();
+		}
+		throw new DataAccessException("Can't handle collection type: " + object.getClass().getName());
 	}
 
 	/**
