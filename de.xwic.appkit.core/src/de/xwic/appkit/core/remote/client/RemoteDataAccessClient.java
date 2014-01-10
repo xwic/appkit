@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -138,12 +139,12 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		// after an update, the updated entity is returned from the server
 		Document doc = postRequest(param);
 		
-		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
+		String strEto = doc.asXML();
 
-		if (!list.isEmpty()) {
-			return (EntityTransferObject) list.get(0);
-		} else {		
-			throw new RemoteDataAccessException("Reponse ETO could not be parsed");
+		try {
+			return UETO.deserialize(strEto);
+		} catch (DocumentException e) {
+			throw new RemoteDataAccessException(e);
 		}
 	}	
 	

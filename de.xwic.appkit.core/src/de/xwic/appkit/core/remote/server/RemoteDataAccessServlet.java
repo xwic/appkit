@@ -5,7 +5,6 @@ package de.xwic.appkit.core.remote.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.access.AccessHandler;
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -33,7 +31,6 @@ import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
-import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
