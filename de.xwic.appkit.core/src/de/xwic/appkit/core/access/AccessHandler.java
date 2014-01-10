@@ -434,14 +434,15 @@ public class AccessHandler {
 			omTp = omSettings.getMonitoringProperties(scope);
 		}
 		try {
+
 //			AAA TODO AI use intelligence to cache this information
 			BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
 			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
 			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 
-			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext();) {
+			Set<String> keySet = eto.getPropertyValues().keySet();
+			for (String propName : keySet) {
 
-				String propName = it.next();
 				PropertyValue pValue = eto.getPropertyValue(propName);
 				if (!pValue.isModified()) {
 					continue;
@@ -494,8 +495,8 @@ public class AccessHandler {
 						}
 
 						Object[] oArray = (Object[]) value;
-						for (int i = 0; i < oArray.length; i++) {
-							Object o = oArray[i];
+						for (Object element : oArray) {
+							Object o = element;
 							if (o instanceof PropertyValue) {
 								PropertyValue pv = (PropertyValue) o;
 								if (pv.isLoaded()) {
@@ -541,8 +542,8 @@ public class AccessHandler {
 					if (pd.getPropertyType().equals(Set.class)) {
 						Object[] array = (Object[]) value;
 						Set<Object> set = new HashSet<Object>();
-						for (int i = 0; i < array.length; i++) {
-							set.add(array[i]);
+						for (Object element : array) {
+							set.add(element);
 						}
 						mWrite.invoke(entity, new Object[]{set});
 					} else {
