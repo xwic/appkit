@@ -311,15 +311,7 @@ public class XmlBeanSerializer {
 	@SuppressWarnings("unchecked")
 	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd) throws TransportException {
 
-		String typeName = elProp.attributeValue("type");
-		Class<?> type = null;
-		if (typeName != null) {
-			try {
-				type = Class.forName(typeName);
-			} catch (ClassNotFoundException e) {
-				throw new TransportException("Can not create class: " + e, e);
-			}
-		}
+		Class<?> type = getType(elProp.attributeValue("type"));
 
 		if (type == null) {
 			if (pd != null) {
@@ -478,6 +470,22 @@ public class XmlBeanSerializer {
 			}
 		}
 		return value;
+	}
+
+	/**
+	 * @param typeName
+	 * @return
+	 * @throws TransportException if the class is not found
+	 */
+	private Class<?> getType(final String typeName) throws TransportException {
+		if (typeName != null) {
+			try {
+				return Class.forName(typeName);
+			} catch (ClassNotFoundException e) {
+				throw new TransportException("Can not create class: " + e, e);
+			}
+		}
+		return null;
 	}
 
 }
