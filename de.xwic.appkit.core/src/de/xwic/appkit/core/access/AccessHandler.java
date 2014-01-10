@@ -477,7 +477,7 @@ public class AccessHandler {
 				if (pValue.isLoaded()) {
 					value = pValue.getValue();
 					if (pd.getPropertyType().equals(Date.class) && value instanceof Calendar) {
-						value = ((Calendar)value).getTime();
+						value = ((Calendar) value).getTime();
 
 					// handle collections --
 					// collections may contain PropertyValue 'stubs' instead of
@@ -517,9 +517,9 @@ public class AccessHandler {
 						}
 						value = newCol;
 					}
-							} else if (pValue.getType().equals(IPicklistEntry.class)) {
-								value = plDAO.getPickListEntryByID(pValue.getEntityId()); 
-							} else {
+				} else if (pValue.getType().equals(IPicklistEntry.class)) {
+					value = plDAO.getPickListEntryByID(pValue.getEntityId());
+				} else {
 								if (pValue.isEntityType()) { 
 									if (pValue.getType().getName().equals(entity.type().getName()) &&
 										pValue.getEntityId() == entity.getId()) {
