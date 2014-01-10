@@ -520,7 +520,11 @@ public class AccessHandler {
 				} else if (pValue.getType().equals(IPicklistEntry.class)) {
 					value = plDAO.getPickListEntryByID(pValue.getEntityId());
 				} else {
-					if (pValue.isEntityType()) {
+					if (!pValue.isEntityType()) {
+						// must be a Set that has not been loaded
+						log.warn("Modified but not-loaded set detected in property " + propName);
+						continue;
+					}
 						if (pValue.getType().getName().equals(entity.type().getName()) &&
 								pValue.getEntityId() == entity.getId()) {
 							value = entity;
@@ -530,11 +534,6 @@ public class AccessHandler {
 							// double update by hibernate
 							HibernateUtil.currentSession().evict(value);
 						}
-					} else {
-						// must be a Set that has not been loaded
-						log.warn("Modified but not-loaded set detected in property " + propName);
-						continue;
-					}
 				}
 							
 				if (value != null && value.getClass().isArray()) {
