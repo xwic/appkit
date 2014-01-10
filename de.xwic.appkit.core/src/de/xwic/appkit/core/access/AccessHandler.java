@@ -493,7 +493,7 @@ public class AccessHandler {
 							throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
 						}
 
-						Object[] oArray = (Object[])value;
+						Object[] oArray = (Object[]) value;
 						for (int i = 0; i < oArray.length; i++) {
 							Object o = oArray[i];
 							if (o instanceof PropertyValue) {
@@ -513,10 +513,10 @@ public class AccessHandler {
 								EntityTransferObject refEto = (EntityTransferObject) o;
 								o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
 							}
-										newCol.add(o);
-									}
-									value = newCol;
-								}
+							newCol.add(o);
+						}
+						value = newCol;
+					}
 							} else if (pValue.getType().equals(IPicklistEntry.class)) {
 								value = plDAO.getPickListEntryByID(pValue.getEntityId()); 
 							} else {
