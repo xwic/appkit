@@ -501,11 +501,11 @@ public class AccessHandler {
 								if (pv.isLoaded()) {
 									o = pv.getValue();
 								} else if(pv.isEntityType()) {
-								if (pv.getType().equals(IPicklistEntry.class)) {
-									o = plDAO.getPickListEntryByID(pv.getEntityId());
-								} else {
-									o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
-								}
+									if (pv.getType().equals(IPicklistEntry.class)) {
+										o = plDAO.getPickListEntryByID(pv.getEntityId());
+									} else {
+										o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
+									}
 							} else {
 								throw new DataAccessException("A collection can not contain another lazy collection.");
 							}
