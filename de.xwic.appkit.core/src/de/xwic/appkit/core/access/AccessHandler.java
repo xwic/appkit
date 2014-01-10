@@ -497,10 +497,10 @@ public class AccessHandler {
 						for (int i = 0; i < oArray.length; i++) {
 							Object o = oArray[i];
 							if (o instanceof PropertyValue) {
-								PropertyValue pv = (PropertyValue)o;
+								PropertyValue pv = (PropertyValue) o;
 								if (pv.isLoaded()) {
 									o = pv.getValue();
-								} else if(pv.isEntityType()) {
+								} else if (pv.isEntityType()) {
 									if (pv.getType().equals(IPicklistEntry.class)) {
 										o = plDAO.getPickListEntryByID(pv.getEntityId());
 									} else {
@@ -509,10 +509,10 @@ public class AccessHandler {
 								} else {
 									throw new DataAccessException("A collection can not contain another lazy collection.");
 								}
-						} else if (o instanceof EntityTransferObject) {
-											EntityTransferObject refEto = (EntityTransferObject)o;
-											o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
-										} 
+							} else if (o instanceof EntityTransferObject) {
+								EntityTransferObject refEto = (EntityTransferObject) o;
+								o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
+							}
 										newCol.add(o);
 									}
 									value = newCol;
