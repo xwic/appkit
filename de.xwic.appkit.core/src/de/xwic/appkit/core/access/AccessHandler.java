@@ -8,6 +8,7 @@
 package de.xwic.appkit.core.access;
 
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -435,11 +436,7 @@ public class AccessHandler {
 		}
 		try {
 
-//			AAA TODO AI use intelligence to cache this information
-			BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
-			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
-			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
-
+			Map<String, PropertyDescriptor> propertyMap = getPropertyMap(entity);
 			Set<String> propertyKeys = eto.getPropertyValues().keySet();
 			for (String propName : propertyKeys) {
 
@@ -536,6 +533,17 @@ public class AccessHandler {
 		EntityTransferObject result = new EntityTransferObject(entity);
 		
 		return result;
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 * @throws IntrospectionException
+	 */
+	private Map<String, PropertyDescriptor> getPropertyMap(IEntity entity) throws IntrospectionException {
+		final BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
+		final List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
+		return MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 	}
 
 	/**
