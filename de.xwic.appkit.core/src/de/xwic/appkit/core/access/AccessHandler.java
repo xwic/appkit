@@ -492,7 +492,7 @@ public class AccessHandler {
 							pValue.getEntityId() == entity.getId()) {
 						value = entity;
 					} else {
-						value = DAOSystem.findDAOforEntity(pValue.getType().getName()).getEntity(pValue.getEntityId());
+						value = toEntity(pValue.getType().getName(), pValue.getEntityId());
 						// disconnect entity from session to prevent
 						// double update by hibernate
 						HibernateUtil.currentSession().evict(value);
