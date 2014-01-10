@@ -440,43 +440,49 @@ public class AccessHandler {
 			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 
 			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext(); ) {
+
 				String propName = it.next();
 				PropertyValue pValue = eto.getPropertyValue(propName);
 				if (!pValue.isModified()) {
 					continue;
 				}
+
 				log.debug("Modified attribute: " + propName);
 				if (monitoring && omTp.isMonitored(propName)) {
 					setChanged = true;
 					monitoring = false; // no need to monitor any other properties
 					log.debug("ObjectMonitoring detected change.");
 				}
+
 				PropertyDescriptor pd = propertyMap.get(propName);
 				if (pd == null){
 					log.error("Attribute modified but no such property: " + propName, new IllegalStateException());
 					continue;
 				}
+
 //				PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
 				Method mWrite = pd.getWriteMethod();
 				if (mWrite == null) {
 					log.warn("No write method for property " + propName);
 					continue;
 				}
+
 				if (secMan.getAccess(scope, propName) != ISecurityManager.READ_WRITE) {
 					log.warn("Tried to modify attribute without rights:  " + propName);
 					continue;
 				}
-							Object value;
-							
-							if (pValue.isLoaded()) {
-								value = pValue.getValue();
-								if (pd.getPropertyType().equals(Date.class) && value instanceof Calendar) {
-									value = ((Calendar)value).getTime();
-									
-								// handle collections --
-								// collections may contain PropertyValue 'stubs' instead of 
-								// entities to reduce message-size.
-								} else if (value != null && value.getClass().isArray()) {
+
+				Object value;
+
+				if (pValue.isLoaded()) {
+					value = pValue.getValue();
+					if (pd.getPropertyType().equals(Date.class) && value instanceof Calendar) {
+						value = ((Calendar)value).getTime();
+
+					// handle collections --
+					// collections may contain PropertyValue 'stubs' instead of
+					// entities to reduce message-size.
+					} else if (value != null && value.getClass().isArray()) {
 									
 									Collection<Object> newCol;
 									if (pValue.getType().isAssignableFrom(Set.class)) {
