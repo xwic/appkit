@@ -76,7 +76,7 @@ public class AccessHandler {
 	private ObjectMonitoringSettings omSettings = new ObjectMonitoringSettings();
 
 //	pretty sure that class properties don't change over time, we can safely 'cache' them... i think...
-	private final Map<Class<IEntity>, Map<String, PropertyDescriptor>> allPropertyMaps = PropertyDescriptorFromClass.createMapGenerator();
+	private final Map<Class<IEntity>, Map<String, PropertyDescriptor>> classProperties = PropertyDescriptorFromClass.createMapGenerator();
 
 	private static AccessHandler instance = null;
 
@@ -433,7 +433,7 @@ public class AccessHandler {
 		}
 		try {
 
-			Map<String, PropertyDescriptor> propertyMap = allPropertyMaps.get(entity);
+			Map<String, PropertyDescriptor> propertyMap = classProperties.get(entity.getClass());
 			Set<String> propertyKeys = eto.getPropertyValues().keySet();
 			for (String propName : propertyKeys) {
 
