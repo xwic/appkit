@@ -110,11 +110,6 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 	 * @throws IllegalStateException if the type cannot be found
 	 */
 	private Object handleType(final String methodName, final Object[] args) throws IllegalStateException {
-		// we get the implementation class, but we need the interface
-
-//		this assumes that the dao only handles one class, not good enough!
-//		return DAOSystem.findDAOforEntity(eto.getEntityClass().getName()).getEntityClass();
-
 		return EntityUtil.type(eto.getEntityClass());
 	}
 

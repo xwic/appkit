@@ -199,7 +199,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			throw new IllegalStateException("Result ETO is null");
 		}
 		
-		String strResult = UETO.serialize(entityType, eto);
+		String strResult = UETO.serialize(entityType, result);
 		
 		pwOut.write(strResult);
 		pwOut.flush();
