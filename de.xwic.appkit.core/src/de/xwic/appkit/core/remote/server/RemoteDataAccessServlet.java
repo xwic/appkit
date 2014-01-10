@@ -30,6 +30,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
@@ -193,31 +194,18 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		
 		String strEto = req.getParameter(PARAM_ETO);
 		
-		assertValue(strEto, "ETO details not specified");
+		EntityTransferObject eto = UETO.deserialize(strEto);
 		
-		// deserialize ETO
+		EntityTransferObject result = accessHandler.updateETO(eto);
 		
-		SAXReader xmlReader = new SAXReader();
-		Document doc = xmlReader.read(new StringReader(strEto));
-		
-		XmlEntityTransport xet = new XmlEntityTransport();
-		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
-		
-		if (!list.isEmpty()) {
-			EntityTransferObject eto = (EntityTransferObject) list.get(0);
-			
-			EntityTransferObject result = accessHandler.updateETO(eto);
-			
-			if (result == null) {
-				throw new IllegalStateException("Resulted ETO is null");
-			}
-			
-			EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
-			XmlEntityTransport et = new XmlEntityTransport();
-			et.write(pwOut, result, entityDescriptor);
-		} else {
-			throw new IllegalStateException("ETO could not be parsed: " + strEto);
+		if (result == null) {
+			throw new IllegalStateException("Result ETO is null");
 		}
+		
+		String strResult = UETO.serialize(entityType, eto);
+		
+		pwOut.write(strResult);
+		pwOut.flush();
 	}
 
 	/**

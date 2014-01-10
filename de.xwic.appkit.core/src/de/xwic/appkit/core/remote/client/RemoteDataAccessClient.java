@@ -25,8 +25,10 @@ import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
+import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
@@ -129,12 +131,9 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
 		
-		EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
-		StringWriter sw = new StringWriter();
-		XmlEntityTransport xet = new XmlEntityTransport();
-		xet.write(sw, eto, descr);
+		String serialized = UETO.serialize(entityType, eto);
 		
-		param.put(RemoteDataAccessServlet.PARAM_ETO, sw.toString());
+		param.put(RemoteDataAccessServlet.PARAM_ETO, serialized);
 		
 		// after an update, the updated entity is returned from the server
 		Document doc = postRequest(param);
