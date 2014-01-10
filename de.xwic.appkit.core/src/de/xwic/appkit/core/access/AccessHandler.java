@@ -458,8 +458,14 @@ public class AccessHandler {
 				}
 //				PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
 				Method mWrite = pd.getWriteMethod();
-					if (mWrite != null) {
-						if (secMan.getAccess(scope, propName) == ISecurityManager.READ_WRITE) {
+				if (mWrite == null) {
+					log.warn("No write method for property " + propName);
+					continue;
+				}
+				if (secMan.getAccess(scope, propName) != ISecurityManager.READ_WRITE) {
+					log.warn("Tried to modify attribute without rights:  " + propName);
+					continue;
+				}
 							Object value;
 							
 							if (pValue.isLoaded()) {
@@ -542,12 +548,6 @@ public class AccessHandler {
 							} else {
 								mWrite.invoke(entity, new Object[] { value });
 							}
-						} else {
-							log.warn("Tried to modify attribute without rights:  " + propName);
-						}
-					} else {
-						log.warn("No write method for property " + propName);
-					} 
 				}
 		} catch (Exception ie) {
 			throw new DataAccessException("Error writing entity properties: " + ie, ie);
