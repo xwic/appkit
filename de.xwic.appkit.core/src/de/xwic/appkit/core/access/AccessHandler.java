@@ -439,7 +439,7 @@ public class AccessHandler {
 			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
 			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 
-			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext(); ) {
+			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext();) {
 
 				String propName = it.next();
 				PropertyValue pValue = eto.getPropertyValue(propName);
@@ -455,7 +455,7 @@ public class AccessHandler {
 				}
 
 				PropertyDescriptor pd = propertyMap.get(propName);
-				if (pd == null){
+				if (pd == null) {
 					log.error("Attribute modified but no such property: " + propName, new IllegalStateException());
 					continue;
 				}
@@ -535,21 +535,21 @@ public class AccessHandler {
 						HibernateUtil.currentSession().evict(value);
 					}
 				}
-							
+
 				if (value != null && value.getClass().isArray()) {
 					// AXIS turns Set's into arrays - need to be converted
 					if (pd.getPropertyType().equals(Set.class)) {
-						Object[] array = (Object[])value;
+						Object[] array = (Object[]) value;
 						Set<Object> set = new HashSet<Object>();
 						for (int i = 0; i < array.length; i++) {
 							set.add(array[i]);
 						}
-						mWrite.invoke(entity, new Object[] { set });
+						mWrite.invoke(entity, new Object[]{set});
 					} else {
 						throw new RuntimeException("NOT IMPLEMENTED: Handle Arrays.");
 					}
 				} else {
-					mWrite.invoke(entity, new Object[] { value });
+					mWrite.invoke(entity, new Object[]{value});
 				}
 			}
 		} catch (Exception ie) {
