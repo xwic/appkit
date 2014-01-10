@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +48,7 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
+import de.xwic.appkit.core.util.AIMap;
 import de.xwic.appkit.core.util.ILazyEval;
 import de.xwic.appkit.core.util.MapUtil;
 
@@ -72,16 +74,11 @@ public class AccessHandler {
 	private static final int EVENT_UPDATE = 2;
 	
 	private ObjectMonitoringSettings omSettings = new ObjectMonitoringSettings();
-	
-	private static AccessHandler instance = null;
-	
-	private static final ILazyEval<PropertyDescriptor, String> PROPERTY_DESCRIPTOR_NAME_EXTRACTOR = new ILazyEval<PropertyDescriptor, String>() {
 
-		@Override
-		public String evaluate(PropertyDescriptor obj) {
-			return obj.getName();
-		}
-	};
+//	pretty sure that class properties don't change over time, we can safely 'cache' them... i think...
+	private final Map<Class<IEntity>, Map<String, PropertyDescriptor>> allPropertyMaps = PropertyDescriptorFromClass.createMapGenerator();
+
+	private static AccessHandler instance = null;
 
 	/**
 	 * Constructor.
@@ -436,7 +433,7 @@ public class AccessHandler {
 		}
 		try {
 
-			Map<String, PropertyDescriptor> propertyMap = getPropertyMap(entity);
+			Map<String, PropertyDescriptor> propertyMap = allPropertyMaps.get(entity);
 			Set<String> propertyKeys = eto.getPropertyValues().keySet();
 			for (String propName : propertyKeys) {
 
@@ -533,17 +530,6 @@ public class AccessHandler {
 		EntityTransferObject result = new EntityTransferObject(entity);
 		
 		return result;
-	}
-
-	/**
-	 * @param entity
-	 * @return
-	 * @throws IntrospectionException
-	 */
-	private Map<String, PropertyDescriptor> getPropertyMap(IEntity entity) throws IntrospectionException {
-		final BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
-		final List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
-		return MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 	}
 
 	/**
