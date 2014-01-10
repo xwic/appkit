@@ -537,9 +537,7 @@ public class AccessHandler {
 					}
 				}
 							
-				if (value == null) {
-					mWrite.invoke(entity, new Object[] { value });
-				} else if (value.getClass().isArray()) {
+				if (value != null && value.getClass().isArray()) {
 					// AXIS turns Set's into arrays - need to be converted
 					if (pd.getPropertyType().equals(Set.class)) {
 						Object[] array = (Object[])value;
