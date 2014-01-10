@@ -530,12 +530,12 @@ public class AccessHandler {
 							// double update by hibernate
 							HibernateUtil.currentSession().evict(value);
 						}
-								} else {
-									// must be a Set that has not been loaded
-									log.warn("Modified but not-loaded set detected in property " + propName);
-									continue;
-								}
-							}
+					} else {
+						// must be a Set that has not been loaded
+						log.warn("Modified but not-loaded set detected in property " + propName);
+						continue;
+					}
+				}
 							
 							if (value == null) {
 								mWrite.invoke(entity, new Object[] { value });
