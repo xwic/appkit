@@ -492,23 +492,24 @@ public class AccessHandler {
 					} else {
 						throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
 					}
-									Object[] oArray = (Object[])value;
-									for (int i = 0; i < oArray.length; i++) {
-										Object o = oArray[i];
-										if (o instanceof PropertyValue) {
-											PropertyValue pv = (PropertyValue)o;
-											if (pv.isLoaded()) {
-												o = pv.getValue();
-											} else if(pv.isEntityType()) {
-												if (pv.getType().equals(IPicklistEntry.class)) {
-													o = plDAO.getPickListEntryByID(pv.getEntityId());
-												} else {
-													o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
-												}
-											} else {
-												throw new DataAccessException("A collection can not contain another lazy collection.");
-											}
-										} else if (o instanceof EntityTransferObject) {
+
+					Object[] oArray = (Object[])value;
+					for (int i = 0; i < oArray.length; i++) {
+						Object o = oArray[i];
+						if (o instanceof PropertyValue) {
+							PropertyValue pv = (PropertyValue)o;
+							if (pv.isLoaded()) {
+								o = pv.getValue();
+							} else if(pv.isEntityType()) {
+								if (pv.getType().equals(IPicklistEntry.class)) {
+									o = plDAO.getPickListEntryByID(pv.getEntityId());
+								} else {
+									o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
+								}
+							} else {
+								throw new DataAccessException("A collection can not contain another lazy collection.");
+							}
+						} else if (o instanceof EntityTransferObject) {
 											EntityTransferObject refEto = (EntityTransferObject)o;
 											o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
 										} 
