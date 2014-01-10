@@ -8,6 +8,7 @@
 package de.xwic.appkit.core.access;
 
 import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,6 +48,7 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
+import de.xwic.appkit.core.util.AIMap;
 import de.xwic.appkit.core.util.ILazyEval;
 import de.xwic.appkit.core.util.MapUtil;
 
@@ -71,16 +74,11 @@ public class AccessHandler {
 	private static final int EVENT_UPDATE = 2;
 	
 	private ObjectMonitoringSettings omSettings = new ObjectMonitoringSettings();
-	
-	private static AccessHandler instance = null;
-	
-	private static final ILazyEval<PropertyDescriptor, String> PROPERTY_DESCRIPTOR_NAME_EXTRACTOR = new ILazyEval<PropertyDescriptor, String>() {
 
-		@Override
-		public String evaluate(PropertyDescriptor obj) {
-			return obj.getName();
-		}
-	};
+//	pretty sure that class properties don't change over time, we can safely 'cache' them... i think...
+	private final Map<Class<IEntity>, Map<String, PropertyDescriptor>> classProperties = PropertyDescriptorFromClass.createMapGenerator();
+
+	private static AccessHandler instance = null;
 
 	/**
 	 * Constructor.
@@ -434,117 +432,87 @@ public class AccessHandler {
 			omTp = omSettings.getMonitoringProperties(scope);
 		}
 		try {
-//			AAA TODO AI use intelligence to cache this information
-			BeanInfo beanInfo = Introspector.getBeanInfo(entity.getClass());
-			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
-			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 
-			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext(); ) {
-				String propName = it.next();
+			Map<String, PropertyDescriptor> propertyMap = classProperties.get(entity.getClass());
+			Set<String> propertyKeys = eto.getPropertyValues().keySet();
+			for (String propName : propertyKeys) {
+
 				PropertyValue pValue = eto.getPropertyValue(propName);
-				if (pValue.isModified()) {
-					log.debug("Modified attribute: " + propName);
-					if (monitoring && omTp.isMonitored(propName)) {
-						setChanged = true; 
-						monitoring = false; // no need to monitor any other properties
-						log.debug("ObjectMonitoring detected change.");
+				if (!pValue.isModified()) {
+					continue;
+				}
+
+				log.debug("Modified attribute: " + propName);
+				if (monitoring && omTp.isMonitored(propName)) {
+					setChanged = true;
+					monitoring = false; // no need to monitor any other properties
+					log.debug("ObjectMonitoring detected change.");
+				}
+
+				PropertyDescriptor pd = propertyMap.get(propName);
+				if (pd == null) {
+					log.error("Attribute modified but no such property: " + propName, new IllegalStateException());
+					continue;
+				}
+
+//				PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
+				Method mWrite = pd.getWriteMethod();
+				if (mWrite == null) {
+					log.warn("No write method for property " + propName);
+					continue;
+				}
+
+				if (secMan.getAccess(scope, propName) != ISecurityManager.READ_WRITE) {
+					log.warn("Tried to modify attribute without rights:  " + propName);
+					continue;
+				}
+
+				Object value;
+
+				if (pValue.isLoaded()) {
+					value = pValue.getValue();
+					if (pd.getPropertyType().equals(Date.class) && value instanceof Calendar) {
+						value = ((Calendar) value).getTime();
+
+					// handle collections --
+					// collections may contain PropertyValue 'stubs' instead of
+					// entities to reduce message-size.
+					} else if (value != null && value.getClass().isArray()) {
+						value = parseCollection(plDAO, pValue, value);
 					}
-					PropertyDescriptor pd = propertyMap.get(propName);
-					if (pd == null){
+				} else if (pValue.getType().equals(IPicklistEntry.class)) {
+					value = plDAO.getPickListEntryByID(pValue.getEntityId());
+				} else {
+					if (!pValue.isEntityType()) {
+						// must be a Set that has not been loaded
+						log.warn("Modified but not-loaded set detected in property " + propName);
 						continue;
 					}
-//					PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
-					Method mWrite = pd.getWriteMethod();
-					if (mWrite != null) {
-						if (secMan.getAccess(scope, propName) == ISecurityManager.READ_WRITE) {
-							Object value;
-							
-							if (pValue.isLoaded()) {
-								value = pValue.getValue();
-								if (pd.getPropertyType().equals(Date.class) && value instanceof Calendar) {
-									value = ((Calendar)value).getTime();
-									
-								// handle collections --
-								// collections may contain PropertyValue 'stubs' instead of 
-								// entities to reduce message-size.
-								} else if (value != null && value.getClass().isArray()) {
-									
-									Collection<Object> newCol;
-									if (pValue.getType().isAssignableFrom(Set.class)) {
-										newCol = new HashSet<Object>();
-									} else if (pValue.getType().isAssignableFrom(List.class)) {
-										newCol = new ArrayList<Object>();
-									} else {
-										throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
-									}
-									Object[] oArray = (Object[])value;
-									for (int i = 0; i < oArray.length; i++) {
-										Object o = oArray[i];
-										if (o instanceof PropertyValue) {
-											PropertyValue pv = (PropertyValue)o;
-											if (pv.isLoaded()) {
-												o = pv.getValue();
-											} else if(pv.isEntityType()) {
-												if (pv.getType().equals(IPicklistEntry.class)) {
-													o = plDAO.getPickListEntryByID(pv.getEntityId());
-												} else {
-													o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
-												}
-											} else {
-												throw new DataAccessException("A collection can not contain another lazy collection.");
-											}
-										} else if (o instanceof EntityTransferObject) {
-											EntityTransferObject refEto = (EntityTransferObject)o;
-											o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
-										} 
-										newCol.add(o);
-									}
-									value = newCol;
-								}
-							} else if (pValue.getType().equals(IPicklistEntry.class)) {
-								value = plDAO.getPickListEntryByID(pValue.getEntityId()); 
-							} else {
-								if (pValue.isEntityType()) { 
-									if (pValue.getType().getName().equals(entity.type().getName()) &&
-										pValue.getEntityId() == entity.getId()) {
-										value = entity;
-									} else {
-										value = DAOSystem.findDAOforEntity(pValue.getType().getName()).getEntity(pValue.getEntityId());
-										// disconnect entity from session to prevent 
-										// double update by hibernate
-										HibernateUtil.currentSession().evict(value);
-									}
-								} else {
-									// must be a Set that has not been loaded
-									log.warn("Modified but not-loaded set detected in property " + propName);
-									continue;
-								}
-							}
-							
-							if (value == null) {
-								mWrite.invoke(entity, new Object[] { value });
-							} else if (value.getClass().isArray()) {
-								// AXIS turns Set's into arrays - need to be converted
-								if (pd.getPropertyType().equals(Set.class)) {
-									Object[] array = (Object[])value;
-									Set<Object> set = new HashSet<Object>();
-									for (int i = 0; i < array.length; i++) {
-										set.add(array[i]);
-									}
-									mWrite.invoke(entity, new Object[] { set });
-								} else {
-									throw new RuntimeException("NOT IMPLEMENTED: Handle Arrays.");
-								}
-							
-							} else {
-								mWrite.invoke(entity, new Object[] { value });
-							}
-						} else {
-							log.warn("Tried to modify attribute without rights:  " + propName);
-						}
+					if (pValue.getType().getName().equals(entity.type().getName()) &&
+							pValue.getEntityId() == entity.getId()) {
+						value = entity;
 					} else {
-						log.warn("No write method for property " + propName);
-					} 
+						value = toEntity(pValue.getType().getName(), pValue.getEntityId());
+						// disconnect entity from session to prevent
+						// double update by hibernate
+						HibernateUtil.currentSession().evict(value);
+					}
+				}
+
+				if (value != null && value.getClass().isArray()) {
+					// AXIS turns Set's into arrays - need to be converted
+					if (pd.getPropertyType().equals(Set.class)) {
+						Object[] array = (Object[]) value;
+						Set<Object> set = new HashSet<Object>();
+						for (Object element : array) {
+							set.add(element);
+						}
+						mWrite.invoke(entity, new Object[]{set});
+					} else {
+						throw new RuntimeException("NOT IMPLEMENTED: Handle Arrays.");
+					}
+				} else {
+					mWrite.invoke(entity, new Object[]{value});
 				}
 			}
 		} catch (Exception ie) {
@@ -562,6 +530,70 @@ public class AccessHandler {
 		EntityTransferObject result = new EntityTransferObject(entity);
 		
 		return result;
+	}
+
+	/**
+	 * @param plDAO
+	 * @param pValue
+	 * @param value
+	 * @return
+	 * @throws DataAccessException if support for the collection type is not implemented
+	 */
+	private Collection<Object> parseCollection(final IPicklisteDAO plDAO, final PropertyValue pValue, final Object value) throws DataAccessException {
+
+		final Collection<Object> newCol = instantiateCollection(pValue, value);
+
+		final Object[] oArray = (Object[]) value;
+
+		for (final Object element : oArray) {
+			Object o = element;
+			if (o instanceof PropertyValue) {
+				PropertyValue pv = (PropertyValue) o;
+				if (pv.isLoaded()) {
+					o = pv.getValue();
+				} else if (pv.isEntityType()) {
+					if (pv.getType().equals(IPicklistEntry.class)) {
+						o = plDAO.getPickListEntryByID(pv.getEntityId());
+					} else {
+						o = toEntity(pv.getType().getName(), pv.getEntityId());
+					}
+				} else {
+					throw new DataAccessException("A collection can not contain another lazy collection.");
+				}
+			} else if (o instanceof EntityTransferObject) {
+				EntityTransferObject eto = (EntityTransferObject) o;
+				o = toEntity(eto.getEntityClass().getName(), eto.getEntityId());
+			}
+			newCol.add(o);
+		}
+		return newCol;
+	}
+
+	/**
+	 * @param name
+	 * @param entityId
+	 * @return
+	 * @throws DataAccessException
+	 */
+	private IEntity toEntity(final String name, final int entityId) throws DataAccessException {
+		return DAOSystem.findDAOforEntity(name).getEntity(entityId);
+	}
+
+	/**
+	 * @param propertyValue determines the collection to instantiate
+	 * @param object only used to log the instance class
+	 * @return
+	 * @throws DataAccessException if support for the collection type is not implemented
+	 */
+	private Collection<Object> instantiateCollection(final PropertyValue propertyValue, final Object object) throws DataAccessException {
+		final Class<?> type = propertyValue.getType();
+		if (type.isAssignableFrom(Set.class)) {
+			return new HashSet<Object>();
+		}
+		if (type.isAssignableFrom(List.class)) {
+			return new ArrayList<Object>();
+		}
+		throw new DataAccessException("Can't handle collection type: " + object.getClass().getName());
 	}
 
 	/**
