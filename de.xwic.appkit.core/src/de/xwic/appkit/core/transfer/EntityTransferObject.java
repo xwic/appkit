@@ -357,12 +357,10 @@ public class EntityTransferObject {
 			throw new IllegalArgumentException("The entity ID is not the same.");
 		}
 		
-		if (response.entityVersion > entityVersion) {
-			// update
-			entityVersion = response.entityVersion;
-			propertyValues = response.propertyValues;
-		}
-		
+		// update
+		entityId = response.entityId;
+		entityVersion = response.entityVersion;
+		propertyValues = response.propertyValues;
 	}
 
 	/**

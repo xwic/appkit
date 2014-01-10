@@ -39,14 +39,17 @@ public interface IRemoteDataAccessClient {
 	public EntityList getList(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException;
 	
 	/**
+	 * Returns the ID of the entity
+	 * 
 	 * @param entityType
 	 * @param eto
+	 * @return
 	 * @throws RemoteDataAccessException
 	 * @throws TransportException
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
+	public EntityTransferObject updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
 	
 	/**
 	 * Returns the collection of an entity property.

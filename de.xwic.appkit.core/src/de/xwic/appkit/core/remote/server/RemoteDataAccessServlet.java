@@ -186,8 +186,10 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @param pwOut
 	 * @throws DocumentException 
 	 * @throws TransportException 
+	 * @throws ConfigurationException 
+	 * @throws IOException 
 	 */
-	private void handleUpdateEntity(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws DocumentException, TransportException {
+	private void handleUpdateEntity(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws DocumentException, TransportException, ConfigurationException, IOException {
 		
 		String strEto = req.getParameter(PARAM_ETO);
 		
@@ -203,9 +205,16 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		
 		if (!list.isEmpty()) {
 			EntityTransferObject eto = (EntityTransferObject) list.get(0);
-			accessHandler.updateETO(eto);
 			
-			printResponse(pwOut, RESPONSE_OK);
+			EntityTransferObject result = accessHandler.updateETO(eto);
+			
+			if (result == null) {
+				throw new IllegalStateException("Resulted ETO is null");
+			}
+			
+			EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
+			XmlEntityTransport et = new XmlEntityTransport();
+			et.write(pwOut, result, entityDescriptor);
 		} else {
 			throw new IllegalStateException("ETO could not be parsed: " + strEto);
 		}

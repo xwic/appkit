@@ -63,13 +63,11 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Integer.toString(id));
 		
-		Limit limit = new Limit();
-		
 		Document doc = postRequest(param);
 		
 		XmlEntityTransport xet = new XmlEntityTransport();
 		
-		EntityList list = xet.createList(doc, limit, new EtoEntityNodeParser());
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
 
 		if (!list.isEmpty()) {
 			return (EntityTransferObject) list.get(0);
@@ -125,11 +123,11 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#updateETO(java.lang.String, de.xwic.appkit.core.transfer.EntityTransferObject)
 	 */
 	@Override
-	public void updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
+	public EntityTransferObject updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
 		
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
-		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, eto.getEntityClass().getName());
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
 		
 		EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
 		StringWriter sw = new StringWriter();
@@ -138,7 +136,16 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		param.put(RemoteDataAccessServlet.PARAM_ETO, sw.toString());
 		
-		postRequest(param);
+		// after an update, the updated entity is returned from the server
+		Document doc = postRequest(param);
+		
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
+
+		if (!list.isEmpty()) {
+			return (EntityTransferObject) list.get(0);
+		} else {		
+			throw new RemoteDataAccessException("Reponse ETO could not be parsed");
+		}
 	}	
 	
 	/**
