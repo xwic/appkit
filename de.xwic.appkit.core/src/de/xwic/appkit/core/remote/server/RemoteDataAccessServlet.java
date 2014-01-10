@@ -56,6 +56,8 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String ACTION_GET_ENTITIES = "gea";
 	public final static String ACTION_UPDATE_ENTITY = "ue";
 	public final static String ACTION_GET_COLLECTION = "gc";
+	public final static String ACTION_SOFT_DELETE = "sdel";
+	public final static String ACTION_DELETE = "del";
 	
 	public final static String ELM_RESPONSE = "resp";
 	public final static String PARAM_VALUE = "value";
@@ -126,6 +128,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 					
 			} else if (action.equals(ACTION_GET_COLLECTION)) {
 				handleGetCollection(entityType, req, resp, pwOut);
+				
+			} else if (action.equals(ACTION_DELETE) || action.equals(ACTION_SOFT_DELETE)) {
+				handleDelete(entityType, req, resp, pwOut, action.equals(ACTION_SOFT_DELETE));
 
 			} else {
 				throw new IllegalArgumentException("Unknown action");
@@ -147,6 +152,32 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @param req
 	 * @param resp
 	 * @param pwOut
+	 * @param equals
+	 * @throws ConfigurationException 
+	 */
+	private void handleDelete(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut,
+			boolean softDelete) throws ConfigurationException {
+		
+		String entityId = req.getParameter(PARAM_ENTITY_ID);
+		String version = req.getParameter(PARAM_VERSION);
+		
+		assertValue(entityId, "Entity Id not specified");
+		assertValue(version, "Version not specified");
+		
+		if (softDelete) {
+			accessHandler.softDelete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+		} else {
+			accessHandler.delete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+		}
+		
+		printResponse(pwOut, RESPONSE_OK);
+	}
+
+	/**
+	 * @param entityType
+	 * @param req
+	 * @param resp
+	 * @param pwOut
 	 * @throws ConfigurationException 
 	 * @throws IOException 
 	 */
@@ -156,7 +187,6 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 		String propName = req.getParameter(PARAM_ENTITY_PROPERTY);
 		
-		assertValue(entityType, "Entity Type not specified");
 		assertValue(entityId, "Entity Id not specified");
 		assertValue(propName, "Entity PropertyName not specified");
 
@@ -246,7 +276,6 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 		
-		assertValue(entityType, "Entity Type not specified");
 		assertValue(entityId, "Entity Id not specified");
 		
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);

@@ -146,7 +146,24 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		} catch (DocumentException e) {
 			throw new RemoteDataAccessException(e);
 		}
-	}	
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#deleteETO(java.lang.String, de.xwic.appkit.core.transfer.EntityTransferObject, boolean)
+	 */
+	@Override
+	public void delete(String entityType, int id, long version, boolean softDelete) {
+		Map<String, String> param = new HashMap<String, String>();
+		
+		String action = softDelete ? RemoteDataAccessServlet.ACTION_SOFT_DELETE : RemoteDataAccessServlet.ACTION_DELETE;
+		param.put(RemoteDataAccessServlet.PARAM_ACTION, action);
+		
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, String.valueOf(id));
+		param.put(RemoteDataAccessServlet.PARAM_VERSION, String.valueOf(version));
+		
+		postRequest(param);
+	}
 	
 	/**
 	 * Post a request and return a document.

@@ -13,6 +13,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
 import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
+import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.util.Equals;
 import de.xwic.appkit.webbase.core.Platform;
 import de.xwic.appkit.webbase.entityviewer.config.ColumnsConfigurationDeserializer.ColumnConfigurationWrapper;
@@ -205,6 +206,9 @@ public class UserConfigHandler {
 		if (mainConfig == null) {
 			return;
 		}
+		
+		// refresh first, to get the latest version, as remote deletes also look at the entity version
+		mainConfig = DAOSystem.getDAO(IUserViewConfigurationDAO.class).getEntity(mainConfig.getId());
 		
 		IUserViewConfiguration related = mainConfig.getRelatedConfiguration();
 		

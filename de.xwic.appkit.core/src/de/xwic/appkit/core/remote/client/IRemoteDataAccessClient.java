@@ -64,4 +64,10 @@ public interface IRemoteDataAccessClient {
 	 */
 	public List<?> getETOCollection(String entityType, int entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
 	
+	/**
+	 * @param entityType
+	 * @param eto
+	 * @param softDelete
+	 */
+	public void delete(String entityType, int id, long version, boolean softDelete);
 }
