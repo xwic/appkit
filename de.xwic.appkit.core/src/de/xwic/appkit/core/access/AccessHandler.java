@@ -484,39 +484,7 @@ public class AccessHandler {
 					// collections may contain PropertyValue 'stubs' instead of
 					// entities to reduce message-size.
 					} else if (value != null && value.getClass().isArray()) {
-
-						Collection<Object> newCol;
-						if (pValue.getType().isAssignableFrom(Set.class)) {
-							newCol = new HashSet<Object>();
-						} else if (pValue.getType().isAssignableFrom(List.class)) {
-							newCol = new ArrayList<Object>();
-						} else {
-							throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
-						}
-
-						Object[] oArray = (Object[]) value;
-						for (Object element : oArray) {
-							Object o = element;
-							if (o instanceof PropertyValue) {
-								PropertyValue pv = (PropertyValue) o;
-								if (pv.isLoaded()) {
-									o = pv.getValue();
-								} else if (pv.isEntityType()) {
-									if (pv.getType().equals(IPicklistEntry.class)) {
-										o = plDAO.getPickListEntryByID(pv.getEntityId());
-									} else {
-										o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
-									}
-								} else {
-									throw new DataAccessException("A collection can not contain another lazy collection.");
-								}
-							} else if (o instanceof EntityTransferObject) {
-								EntityTransferObject refEto = (EntityTransferObject) o;
-								o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
-							}
-							newCol.add(o);
-						}
-						value = newCol;
+						value = parseCollection(plDAO, pValue, value);
 					}
 				} else if (pValue.getType().equals(IPicklistEntry.class)) {
 					value = plDAO.getPickListEntryByID(pValue.getEntityId());
@@ -568,6 +536,47 @@ public class AccessHandler {
 		EntityTransferObject result = new EntityTransferObject(entity);
 		
 		return result;
+	}
+
+	/**
+	 * @param plDAO
+	 * @param pValue
+	 * @param value
+	 * @return
+	 */
+	private Collection<Object> parseCollection(IPicklisteDAO plDAO, PropertyValue pValue, Object value) {
+		Collection<Object> newCol;
+		if (pValue.getType().isAssignableFrom(Set.class)) {
+			newCol = new HashSet<Object>();
+		} else if (pValue.getType().isAssignableFrom(List.class)) {
+			newCol = new ArrayList<Object>();
+		} else {
+			throw new DataAccessException("Cant handle collection type: " + value.getClass().getName());
+		}
+
+		Object[] oArray = (Object[]) value;
+		for (Object element : oArray) {
+			Object o = element;
+			if (o instanceof PropertyValue) {
+				PropertyValue pv = (PropertyValue) o;
+				if (pv.isLoaded()) {
+					o = pv.getValue();
+				} else if (pv.isEntityType()) {
+					if (pv.getType().equals(IPicklistEntry.class)) {
+						o = plDAO.getPickListEntryByID(pv.getEntityId());
+					} else {
+						o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
+					}
+				} else {
+					throw new DataAccessException("A collection can not contain another lazy collection.");
+				}
+			} else if (o instanceof EntityTransferObject) {
+				EntityTransferObject refEto = (EntityTransferObject) o;
+				o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
+			}
+			newCol.add(o);
+		}
+		return newCol;
 	}
 
 	/**
