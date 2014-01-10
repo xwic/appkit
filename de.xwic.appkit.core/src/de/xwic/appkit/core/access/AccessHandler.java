@@ -440,8 +440,8 @@ public class AccessHandler {
 			List<PropertyDescriptor> propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
 			Map<String, PropertyDescriptor> propertyMap = MapUtil.generateMap(propertyDescriptors, PROPERTY_DESCRIPTOR_NAME_EXTRACTOR);
 
-			Set<String> keySet = eto.getPropertyValues().keySet();
-			for (String propName : keySet) {
+			Set<String> propertyKeys = eto.getPropertyValues().keySet();
+			for (String propName : propertyKeys) {
 
 				PropertyValue pValue = eto.getPropertyValue(propName);
 				if (!pValue.isModified()) {
