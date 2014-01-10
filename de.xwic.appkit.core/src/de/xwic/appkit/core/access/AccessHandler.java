@@ -445,18 +445,19 @@ public class AccessHandler {
 				if (!pValue.isModified()) {
 					continue;
 				}
-					log.debug("Modified attribute: " + propName);
-					if (monitoring && omTp.isMonitored(propName)) {
-						setChanged = true; 
-						monitoring = false; // no need to monitor any other properties
-						log.debug("ObjectMonitoring detected change.");
-					}
-					PropertyDescriptor pd = propertyMap.get(propName);
-					if (pd == null){
-						continue;
-					}
-//					PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
-					Method mWrite = pd.getWriteMethod();
+				log.debug("Modified attribute: " + propName);
+				if (monitoring && omTp.isMonitored(propName)) {
+					setChanged = true;
+					monitoring = false; // no need to monitor any other properties
+					log.debug("ObjectMonitoring detected change.");
+				}
+				PropertyDescriptor pd = propertyMap.get(propName);
+				if (pd == null){
+					log.error("Attribute modified but no such property: " + propName, new IllegalStateException());
+					continue;
+				}
+//				PropertyDescriptor pd = new PropertyDescriptor(propName, entity.getClass());
+				Method mWrite = pd.getWriteMethod();
 					if (mWrite != null) {
 						if (secMan.getAccess(scope, propName) == ISecurityManager.READ_WRITE) {
 							Object value;
