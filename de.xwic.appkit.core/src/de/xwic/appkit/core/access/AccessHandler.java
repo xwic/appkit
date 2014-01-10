@@ -442,7 +442,9 @@ public class AccessHandler {
 			for (Iterator<String> it = eto.getPropertyValues().keySet().iterator(); it.hasNext(); ) {
 				String propName = it.next();
 				PropertyValue pValue = eto.getPropertyValue(propName);
-				if (pValue.isModified()) {
+				if (!pValue.isModified()) {
+					continue;
+				}
 					log.debug("Modified attribute: " + propName);
 					if (monitoring && omTp.isMonitored(propName)) {
 						setChanged = true; 
@@ -546,7 +548,6 @@ public class AccessHandler {
 						log.warn("No write method for property " + propName);
 					} 
 				}
-			}
 		} catch (Exception ie) {
 			throw new DataAccessException("Error writing entity properties: " + ie, ie);
 		}
