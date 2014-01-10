@@ -547,10 +547,11 @@ public class AccessHandler {
 	 */
 	private Collection<Object> parseCollection(final IPicklisteDAO plDAO, final PropertyValue pValue, final Object value) throws DataAccessException {
 
-		Collection<Object> newCol = instantiateCollection(pValue, value);
+		final Collection<Object> newCol = instantiateCollection(pValue, value);
 
-		Object[] oArray = (Object[]) value;
-		for (Object element : oArray) {
+		final Object[] oArray = (Object[]) value;
+
+		for (final Object element : oArray) {
 			Object o = element;
 			if (o instanceof PropertyValue) {
 				PropertyValue pv = (PropertyValue) o;
@@ -560,18 +561,28 @@ public class AccessHandler {
 					if (pv.getType().equals(IPicklistEntry.class)) {
 						o = plDAO.getPickListEntryByID(pv.getEntityId());
 					} else {
-						o = DAOSystem.findDAOforEntity(pv.getType().getName()).getEntity(pv.getEntityId());
+						o = toEntity(pv.getType().getName(), pv.getEntityId());
 					}
 				} else {
 					throw new DataAccessException("A collection can not contain another lazy collection.");
 				}
 			} else if (o instanceof EntityTransferObject) {
-				EntityTransferObject refEto = (EntityTransferObject) o;
-				o = DAOSystem.findDAOforEntity(refEto.getEntityClass().getName()).getEntity(refEto.getEntityId());
+				EntityTransferObject eto = (EntityTransferObject) o;
+				o = toEntity(eto.getEntityClass().getName(), eto.getEntityId());
 			}
 			newCol.add(o);
 		}
 		return newCol;
+	}
+
+	/**
+	 * @param name
+	 * @param entityId
+	 * @return
+	 * @throws DataAccessException
+	 */
+	private IEntity toEntity(final String name, final int entityId) throws DataAccessException {
+		return DAOSystem.findDAOforEntity(name).getEntity(entityId);
 	}
 
 	/**
