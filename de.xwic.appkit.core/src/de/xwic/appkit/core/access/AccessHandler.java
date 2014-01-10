@@ -537,25 +537,24 @@ public class AccessHandler {
 					}
 				}
 							
-							if (value == null) {
-								mWrite.invoke(entity, new Object[] { value });
-							} else if (value.getClass().isArray()) {
-								// AXIS turns Set's into arrays - need to be converted
-								if (pd.getPropertyType().equals(Set.class)) {
-									Object[] array = (Object[])value;
-									Set<Object> set = new HashSet<Object>();
-									for (int i = 0; i < array.length; i++) {
-										set.add(array[i]);
-									}
-									mWrite.invoke(entity, new Object[] { set });
-								} else {
-									throw new RuntimeException("NOT IMPLEMENTED: Handle Arrays.");
-								}
-							
-							} else {
-								mWrite.invoke(entity, new Object[] { value });
-							}
+				if (value == null) {
+					mWrite.invoke(entity, new Object[] { value });
+				} else if (value.getClass().isArray()) {
+					// AXIS turns Set's into arrays - need to be converted
+					if (pd.getPropertyType().equals(Set.class)) {
+						Object[] array = (Object[])value;
+						Set<Object> set = new HashSet<Object>();
+						for (int i = 0; i < array.length; i++) {
+							set.add(array[i]);
+						}
+						mWrite.invoke(entity, new Object[] { set });
+					} else {
+						throw new RuntimeException("NOT IMPLEMENTED: Handle Arrays.");
+					}
+				} else {
+					mWrite.invoke(entity, new Object[] { value });
 				}
+			}
 		} catch (Exception ie) {
 			throw new DataAccessException("Error writing entity properties: " + ie, ie);
 		}
