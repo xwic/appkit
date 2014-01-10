@@ -19,6 +19,7 @@ import de.xwic.appkit.core.dao.ISecurityManager;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPicklistText;
+import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.IEntityInvocationHandler;
 import de.xwic.appkit.core.transfer.PropertyValue;
@@ -106,10 +107,15 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 	 * @param methodName
 	 * @param args
 	 * @return
+	 * @throws IllegalStateException if the type cannot be found
 	 */
-	private Object handleType(String methodName, Object[] args) {
+	private Object handleType(final String methodName, final Object[] args) throws IllegalStateException {
 		// we get the implementation class, but we need the interface
-		return DAOSystem.findDAOforEntity(eto.getEntityClass().getName()).getEntityClass();
+
+//		this assumes that the dao only handles one class, not good enough!
+//		return DAOSystem.findDAOforEntity(eto.getEntityClass().getName()).getEntityClass();
+
+		return EntityUtil.type(eto.getEntityClass());
 	}
 
 	/**

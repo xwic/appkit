@@ -7,6 +7,8 @@ package de.xwic.appkit.core.dao;
 
 import java.util.Date;
 
+import de.xwic.appkit.core.model.util.EntityUtil;
+
 
 /**
  * An entity is stored in a database and managed by a corrosponding DAO
@@ -166,32 +168,13 @@ public class Entity implements IEntity {
 		this.downloadVersion = downloadVersion;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntity#type()
 	 */
-    @SuppressWarnings("unchecked")
+	@Override
 	public Class<? extends IEntity> type() {
-    	
-    	// this method makes a 'guess' what type of entity it is by
-    	// iterating through all interfaces the instance implements
-    	// and returns the first interface that is not IEntity or IHistory,
-    	// but extends IEntity
-    	
-    	Class<?> clazz = getClass();
-    	while (clazz != null) {
-	    	Class<?>[] interfaces = clazz.getInterfaces();
-	    	for (int i = 0; i < interfaces.length; i++) {
-	    		if (!interfaces[i].equals(IEntity.class) && !interfaces[i].equals(IHistory.class)
-                        &&  IEntity.class.isAssignableFrom(interfaces[i])) {  
-	    			return (Class<? extends IEntity>) interfaces[i];
-	    		}
-	    	}
-	    	clazz = clazz.getSuperclass();
-    	}
-    	
-    	throw new IllegalStateException("Can't determine type!");
-    }
+		return EntityUtil.type(getClass());
+	}
 
     /*
      * (non-Javadoc)

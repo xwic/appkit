@@ -440,6 +440,9 @@ public class XmlBeanSerializer {
 					}
 					DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 					IEntity refEntity = refDAO.getEntity(refId);
+					if (refEntity == null){
+						throw new TransportException(String.format("No entity of type %s with id %s.", type, refId));
+					}
 					value = refEntity;
 					
 				} else {
