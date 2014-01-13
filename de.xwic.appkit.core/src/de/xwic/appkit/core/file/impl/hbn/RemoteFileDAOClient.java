@@ -7,6 +7,8 @@ import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.ACTION_F
 import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.PARAM_ACTION;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +31,11 @@ public class RemoteFileDAOClient implements IRemoteFileDAOClient {
 	 */
 	@Override
 	public void delete(final int id) {
-
+		Map<String, String> createParams = createParams();
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setRequestMethod("POST"); // always POST, we don't need to support GET
+		connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+		OutputStream outputStream = connection.getOutputStream();
 	}
 
 	/* (non-Javadoc)
