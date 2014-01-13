@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package de.xwic.appkit.core.remote.client;
 
@@ -10,6 +10,7 @@ import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.file.impl.hbn.IRemoteFileDAOClient;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.TransportException;
 
@@ -17,7 +18,7 @@ import de.xwic.appkit.core.transport.xml.TransportException;
 /**
  * @author Adrian Ionescu
  */
-public interface IRemoteDataAccessClient {
+public interface IRemoteDataAccessClient extends IRemoteFileDAOClient {
 
 	/**
 	 * @param entityType
@@ -37,10 +38,10 @@ public interface IRemoteDataAccessClient {
 	 * @throws TransportException
 	 */
 	public EntityList getList(String entityType, Limit limit, EntityQuery query) throws RemoteDataAccessException, TransportException;
-	
+
 	/**
 	 * Returns the ID of the entity
-	 * 
+	 *
 	 * @param entityType
 	 * @param eto
 	 * @return
@@ -50,7 +51,7 @@ public interface IRemoteDataAccessClient {
 	 * @throws ConfigurationException
 	 */
 	public EntityTransferObject updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
-	
+
 	/**
 	 * Returns the collection of an entity property.
 	 * @param entityType
@@ -63,11 +64,12 @@ public interface IRemoteDataAccessClient {
 	 * @throws ConfigurationException
 	 */
 	public List<?> getETOCollection(String entityType, int entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
-	
+
 	/**
 	 * @param entityType
 	 * @param eto
 	 * @param softDelete
 	 */
 	public void delete(String entityType, int id, long version, boolean softDelete);
+
 }
