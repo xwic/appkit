@@ -167,27 +167,4 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		return URemoteAccessClient.postRequest(param, config);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileAccessClient#storeFile(java.lang.String, long, java.io.InputStream)
-	 */
-	@Override
-	public int storeFile(final String filename, final long length, final InputStream in) {
-		return fileHandler.storeFile(filename, length, in);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileAccessClient#delete(int)
-	 */
-	@Override
-	public void delete(final int id) {
-		fileHandler.delete(id);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileAccessClient#loadFileInputStream(int)
-	 */
-	@Override
-	public InputStream loadFileInputStream(final int id) {
-		return fileHandler.loadFileInputStream(id);
-	}
 }

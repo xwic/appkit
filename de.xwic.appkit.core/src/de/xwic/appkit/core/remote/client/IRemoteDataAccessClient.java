@@ -18,7 +18,7 @@ import de.xwic.appkit.core.transport.xml.TransportException;
 /**
  * @author Adrian Ionescu
  */
-public interface IRemoteDataAccessClient extends IRemoteFileAccessClient {
+public interface IRemoteDataAccessClient {
 
 	/**
 	 * @param entityType
