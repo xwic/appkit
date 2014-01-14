@@ -4,26 +4,29 @@
 package de.xwic.appkit.core.remote.client;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.file.impl.hbn.RemoteFileAccessClient;
+import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
-import de.xwic.appkit.core.remote.util.UETO;
+import de.xwic.appkit.core.remote.server.UseCaseHandler;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.ObjectArrayEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
+import de.xwic.appkit.core.transport.xml.EtoSerializer;
+import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
+import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
@@ -122,7 +125,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
 
-		String serialized = UETO.serialize(entityType, eto);
+		String serialized = EtoSerializer.serialize(entityType, eto);
 
 		param.put(RemoteDataAccessServlet.PARAM_ETO, serialized);
 
@@ -132,7 +135,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		String strEto = doc.asXML();
 
 		try {
-			return UETO.deserialize(strEto);
+			return EtoSerializer.deserialize(strEto);
 		} catch (DocumentException e) {
 			throw new RemoteDataAccessException(e);
 		}
@@ -155,6 +158,19 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		postRequest(param);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#executeUseCase(de.xwic.appkit.core.dao.UseCase)
+	 */
+	@Override
+	public void executeUseCase(UseCase uc) throws TransportException {
+		Map<String, String> param = new HashMap<String, String>();
+
+		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_EXECUTE_USE_CASE);
+		param.put(UseCaseHandler.PARAM_USE_CASE, UseCaseSerializer.serialize(uc));
+
+		postRequest(param);
+	}
+	
 	/**
 	 * Post a request and return a document.
 	 * @param param

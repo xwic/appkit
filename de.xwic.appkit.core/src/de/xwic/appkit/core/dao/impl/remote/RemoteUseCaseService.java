@@ -5,26 +5,30 @@
  * Created on 20.09.2005
  *
  */
-package de.xwic.appkit.core.dao;
+package de.xwic.appkit.core.dao.impl.remote;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.xwic.appkit.core.dao.IUseCaseService;
+import de.xwic.appkit.core.dao.UseCase;
+import de.xwic.appkit.core.dao.UseCaseMonitor;
+import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
+import de.xwic.appkit.core.transport.xml.TransportException;
+
 /**
- * @author Florian Lippisch
+ * @author Adrian Ionescu
  */
 public class RemoteUseCaseService implements IUseCaseService {
 
 	private final Log log = LogFactory.getLog(getClass());
-	/** The DAOProvider */
-    protected DAOProvider provider = null;
+	private IRemoteDataAccessClient client;
 
     /**
-     * Constructor.
-     * @param provider
+     * @param client
      */
-    public RemoteUseCaseService(final DAOProvider provider) {
-    	this.provider = provider;
+    public RemoteUseCaseService(IRemoteDataAccessClient client) {
+    	this.client = client;
     }
 
 	/* (non-Javadoc)
@@ -32,17 +36,18 @@ public class RemoteUseCaseService implements IUseCaseService {
 	 */
 	@Override
 	public Object execute(final UseCase useCase) {
-
 		if (log.isDebugEnabled()) {
 			log.debug("Executing useCase " + useCase.getClass().getName());
 		}
-		return provider.execute(new DAOCallback() {
-    		@Override
-			public Object run(final DAOProviderAPI api) {
-    			return useCase.internalExecuteUseCase(api);
-    		}
-    	});
 
+		try {
+			client.executeUseCase(useCase);
+		} catch (TransportException e) {
+			log.error(e.getMessage(), e);
+			throw new RuntimeException(e);
+		}
+		
+		return null;
 	}
 
 	/* (non-Javadoc)

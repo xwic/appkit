@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.xwic.appkit.core.remote.util;
+package de.xwic.appkit.core.transport.xml;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -17,15 +17,12 @@ import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
-import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
-import de.xwic.appkit.core.transport.xml.TransportException;
-import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
  * @author Alexandru Bledea
  * @since Jan 9, 2014
  */
-public final class UETO {
+public final class EtoSerializer {
 
 	/**
 	 * @param entityType
@@ -62,7 +59,7 @@ public final class UETO {
 		int size = list.size();
 		if (size > 0) {
 			if (size > 1) {
-				LogFactory.getLog(UETO.class).warn("More than one ETO in list: " + serializedETO);
+				LogFactory.getLog(EtoSerializer.class).warn("More than one ETO in list: " + serializedETO);
 			}
 			return (EntityTransferObject) list.get(0);
 		}

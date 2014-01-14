@@ -18,6 +18,9 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 
 public class HbnFileOracleFixDAO extends HbnFileDAO {
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.file.impl.hbn.HbnFileDAO#storeFile(java.lang.String)
+	 */
 	@Override
 	public int storeFile(final String fileName) throws DataAccessException {
 		final HbnFile hFile = new HbnFile();
@@ -60,6 +63,9 @@ public class HbnFileOracleFixDAO extends HbnFileDAO {
 		return hFile.getId();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.file.impl.hbn.HbnFileDAO#storeFileInUC(java.lang.String)
+	 */
 	@Override
 	public int storeFileInUC(final String fileName) throws DataAccessException {
 		final HbnFile hFile = new HbnFile();
@@ -101,6 +107,10 @@ public class HbnFileOracleFixDAO extends HbnFileDAO {
 		return hFile.getId();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.file.impl.hbn.HbnFileDAO#loadFileInputStream(int)
+	 */
+	@Override
 	public InputStream loadFileInputStream(final int id) throws DataAccessException {
 		InputStream stream = null;
 		

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,10 +30,10 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.TransportException;
+import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
@@ -58,7 +60,8 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String ACTION_GET_COLLECTION = "gc";
 	public final static String ACTION_SOFT_DELETE = "sdel";
 	public final static String ACTION_DELETE = "del";
-
+	
+	public final static String ACTION_EXECUTE_USE_CASE = "euc";
 	public final static String ACTION_FILE_HANDLE = "fh";
 
 	public final static String ELM_RESPONSE = "resp";
@@ -69,14 +72,30 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static Log log = LogFactory.getLog(RemoteDataAccessServlet.class);
 
 	private AccessHandler accessHandler;
-	private RemoteFileAccessHandler handler;
+	
+	private Map<String, IRequestHandler> handlers;
 
 	/**
 	 *
 	 */
 	public RemoteDataAccessServlet() {
 		accessHandler = AccessHandler.getInstance();
-		handler = new RemoteFileAccessHandler();
+		
+		registerHandlers();
+	}
+
+	/**
+	 * 
+	 */
+	private void registerHandlers() {
+		List<IRequestHandler> aux = new ArrayList<IRequestHandler>();
+		aux.add(new RemoteFileAccessHandler());
+		aux.add(new UseCaseHandler());
+
+		handlers = new HashMap<String, IRequestHandler>();
+		for (IRequestHandler ha : aux) {
+			handlers.put(ha.getAction(), ha);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -116,9 +135,14 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		try {
 
-			if (action.equals(ACTION_FILE_HANDLE)) {
+			IRequestHandler handler = handlers.get(action);
+			
+			if (handler != null) {
+				
 				handler.handle(req, resp, pwOut);
+				
 			} else {
+				
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
 
@@ -136,9 +160,11 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 				} else if (action.equals(ACTION_DELETE) || action.equals(ACTION_SOFT_DELETE)) {
 					handleDelete(entityType, req, resp, pwOut, action.equals(ACTION_SOFT_DELETE));
+					
 				} else {
 					throw new IllegalArgumentException("Unknown action");
 				}
+				
 			}
 
 			pwOut.flush();
@@ -226,7 +252,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		String strEto = req.getParameter(PARAM_ETO);
 
-		EntityTransferObject eto = UETO.deserialize(strEto);
+		EntityTransferObject eto = EtoSerializer.deserialize(strEto);
 
 		EntityTransferObject result = accessHandler.updateETO(eto);
 
@@ -234,7 +260,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			throw new IllegalStateException("Result ETO is null");
 		}
 
-		String strResult = UETO.serialize(entityType, result);
+		String strResult = EtoSerializer.serialize(entityType, result);
 
 		pwOut.write(strResult);
 		pwOut.flush();

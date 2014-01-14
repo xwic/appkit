@@ -7,6 +7,9 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,7 +23,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
@@ -84,6 +91,39 @@ public class XmlBeanSerializer {
 	}
 	
 	/**
+	 * @param rootElement
+	 * @param bean
+	 * @return
+	 * @throws TransportException
+	 */
+	public static String serializeToXML(String rootElement, Object bean) throws TransportException {
+		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
+		OutputStreamWriter writer = new OutputStreamWriter(baOut);
+		
+		try {
+			Document doc = DocumentFactory.getInstance().createDocument();
+			Element root = doc.addElement(rootElement);
+			new XmlBeanSerializer().serializeBean(root, "bean", bean);
+			
+			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
+			// this "hack" is required to preserve the LBCR's in strings... 
+			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
+				public void write(Document arg0) throws IOException {
+					//this.preserve = true;
+					super.write(arg0);
+				}
+			};
+			xmlWriter.write(doc);
+			xmlWriter.flush();
+			
+		} catch (IOException e) {
+			throw new TransportException("Unexpected IOException while serializing query.", e);
+		}
+
+		return baOut.toString();
+	}
+	
+	/**
 	 * @param doc
 	 * @param string
 	 * @param query
@@ -95,27 +135,35 @@ public class XmlBeanSerializer {
 	public void serializeBean(Element elm, String elementName, Object bean) throws TransportException {
 		
 		Element root = elm.addElement(elementName);
-		root.addAttribute("type", bean.getClass().getName());
 		
-		try {
-			BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
-			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-				
-				if (!"class".equals(pd.getName())) {
-					Element pElm = root.addElement(pd.getName());
-					Method mRead = pd.getReadMethod();
-					Object value = mRead.invoke(bean, NO_ARGS);
+		if (bean == null) {
+			
+			root.addAttribute("null", "1");
+			
+		} else {
+		
+			root.addAttribute("type", bean.getClass().getName());
+			
+			try {
+				BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+				for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
 					
-					boolean addType = true;
-					addType = value != null && !value.getClass().equals(pd.getPropertyType()) && !pd.getPropertyType().isPrimitive();
-					addValue(pElm, value, addType);
+					if (!"class".equals(pd.getName())) {
+						Element pElm = root.addElement(pd.getName());
+						Method mRead = pd.getReadMethod();
+						Object value = mRead.invoke(bean, NO_ARGS);
+						
+						boolean addType = true;
+						addType = value != null && !value.getClass().equals(pd.getPropertyType()) && !pd.getPropertyType().isPrimitive();
+						addValue(pElm, value, addType);
+					}
+					
 				}
-				
+			} catch(Exception e) {
+				throw new TransportException("Error serializing bean: " + e, e);
 			}
-		} catch(Exception e) {
-			throw new TransportException("Error serializing bean: " + e, e);
-		}
 		
+		}
 		
 	}
 	
@@ -252,6 +300,10 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
+		if ("1".equals(elm.attributeValue("null"))) {
+			return null;
+		}
+		
 		String typeClass = elm.attributeValue("type");
 		if (typeClass == null || typeClass.length() == 0) {
 			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");

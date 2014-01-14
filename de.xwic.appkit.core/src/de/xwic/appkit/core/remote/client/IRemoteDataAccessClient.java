@@ -10,6 +10,7 @@ import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.TransportException;
 
@@ -71,4 +72,9 @@ public interface IRemoteDataAccessClient {
 	 */
 	public void delete(String entityType, int id, long version, boolean softDelete);
 
+	/**
+	 * @return
+	 * @throws TransportException 
+	 */
+	public void executeUseCase(UseCase uc) throws TransportException;
 }

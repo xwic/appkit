@@ -22,7 +22,7 @@ import de.xwic.appkit.core.transport.xml.TransportException;
  * @author Alexandru Bledea
  * @since Jan 13, 2014
  */
-public class RemoteFileAccessHandler {
+public class RemoteFileAccessHandler implements IRequestHandler {
 
 	private final Log log = LogFactory.getLog(getClass());
 
@@ -40,13 +40,19 @@ public class RemoteFileAccessHandler {
 		handler = DAOSystem.getFileHandler();
 	}
 
-	/**
-	 * @param req
-	 * @param resp
-	 * @param pwOut
-	 * @throws TransportException
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#getAction()
 	 */
-	void handle(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	@Override
+	public String getAction() {
+		return RemoteDataAccessServlet.ACTION_FILE_HANDLE;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#handle(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, java.io.PrintWriter)
+	 */
+	@Override
+	public void handle(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
 		String action = get(req, PARAM_FH_ACTION);
 		if (action.equals(PARAM_FH_DELETE)) {
 			delete(req, resp, pwOut);
