@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import de.jwic.upload.Upload;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IFileHandler;
 import de.xwic.appkit.core.transport.xml.TransportException;
@@ -28,29 +29,55 @@ public class RemoteFileAccessHandler {
 
 	public static final String PARAM_FH_ACTION = "fha";
 
-	public static final String PARAM_FH_ID = "id";
-	public static final String PARAM_FH_DELETE = "del";
+	public static final String PARAM_FH_ID = "fh_i";
 
-	private IFileHandler handler;
+	public static final String PARAM_FH_ACTION_DELETE = "fh_d";
+	public static final String PARAM_FH_ACTION_LOAD = "fh_l";
+
+	public static final String PARAM_FH_ACTION_UPLOAD = "fh_u";
+	public static final String PARAM_FH_UPLOAD_FILENAME = "fh_n";
+	public static final String PARAM_FH_UPLOAD_SIZE = "fh_s";
+	public static final String PARAM_FH_STREAM = "fh_is";
+
+	private final IFileHandler localHandler;
 
 	/**
 	 *
 	 */
 	RemoteFileAccessHandler() {
-		handler = DAOSystem.getFileHandler();
+		localHandler = DAOSystem.getFileHandler();
 	}
 
 	/**
 	 * @param req
 	 * @param resp
 	 * @param pwOut
+	 * @param multipart
+	 * @param multipart
 	 * @throws TransportException
 	 */
-	void handle(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	void handle(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut, final Upload upload, final boolean multipart)
+			throws TransportException {
 		String action = get(req, PARAM_FH_ACTION);
-		if (action.equals(PARAM_FH_DELETE)) {
+		if (action.equals(PARAM_FH_ACTION_DELETE)) {
 			delete(req, resp, pwOut);
+		} else if (action.equals(PARAM_FH_ACTION_UPLOAD)) {
+//			upload(req, resp, pwOut);
+		} else {
+			throw new UnsupportedOperationException("No such implementation " + action);
 		}
+	}
+
+	/**
+	 * @param upload
+	 * @param resp
+	 * @param pwOut
+	 * @throws TransportException
+	 */
+	void upload(final Upload upload, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+//		String filename = get(req, PARAM_FH_UPLOAD_FILENAME);
+//		long size = getLong(req, PARAM_FH_UPLOAD_SIZE);
+
 	}
 
 	/**
@@ -60,16 +87,9 @@ public class RemoteFileAccessHandler {
 	 * @throws TransportException
 	 */
 	private void delete(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
-		String idString = get(req, PARAM_FH_ID);
-		int id;
-		try {
-			id = Integer.parseInt(idString);
-		} catch (NumberFormatException nfe) {
-			log.error(String.format("Failed to parse '%s'", idString, nfe));
-			throw new IllegalArgumentException("Invalid delete request!", nfe);
-		}
+		int id = getInt(req, PARAM_FH_ID);
 		log.info("Received request to delete " + id);
-		handler.deleteFile(id);
+		localHandler.deleteFile(id);
 		printResponse(pwOut, RESPONSE_OK);
 	}
 
@@ -86,4 +106,31 @@ public class RemoteFileAccessHandler {
 		}
 		return parameter;
 	}
+
+	/**
+	 * @param req
+	 * @param what
+	 * @return
+	 * @throws TransportException
+	 */
+	private int getInt(final HttpServletRequest req, final String what) throws TransportException {
+		return (int) getLong(req, what);
+	}
+
+	/**
+	 * @param req
+	 * @param what
+	 * @return
+	 * @throws TransportException
+	 */
+	private long getLong(final HttpServletRequest req, final String what) throws TransportException {
+		String string = get(req, what);
+		try {
+			return Long.parseLong(string);
+		} catch (NumberFormatException nfe) {
+			log.error(String.format("Invalid request!", nfe));
+			throw new IllegalArgumentException("Invalid request!", nfe);
+		}
+	}
+
 }

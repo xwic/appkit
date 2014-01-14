@@ -6,12 +6,23 @@ package de.xwic.appkit.core.file.impl.hbn;
 import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.ACTION_FILE_HANDLE;
 import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.PARAM_ACTION;
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ACTION;
-import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_DELETE;
+import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ACTION_DELETE;
+import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ACTION_UPLOAD;
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ID;
+import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_STREAM;
+import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_UPLOAD_FILENAME;
+import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_UPLOAD_SIZE;
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 
 import de.xwic.appkit.core.remote.client.RemoteSystemConfiguration;
 import de.xwic.appkit.core.remote.client.URemoteAccessClient;
@@ -35,8 +46,16 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	 * @see de.xwic.appkit.core.file.impl.hbn.RemoteFileDAO#storeFile(java.lang.String, long, java.io.InputStream)
 	 */
 	@Override
-	protected int storeFile(final String filename, final long length, final InputStream in) {
-		throw new UnsupportedOperationException("storeFile is not implemented yet!");
+	protected int storeFile(final String filename, final long length, final File file) throws IOException {
+		MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create();
+		multipartEntity.addPart(PARAM_ACTION, new StringBody(ACTION_FILE_HANDLE, TEXT_PLAIN));
+		multipartEntity.addPart(PARAM_FH_ACTION, new StringBody(PARAM_FH_ACTION_UPLOAD, TEXT_PLAIN));
+		multipartEntity.addPart(PARAM_FH_UPLOAD_SIZE, new StringBody(String.valueOf(length), TEXT_PLAIN));
+		multipartEntity.addPart(PARAM_FH_UPLOAD_FILENAME, new StringBody(filename, TEXT_PLAIN));
+		multipartEntity.addPart(PARAM_FH_STREAM, new FileBody(file));
+
+		return URemoteAccessClient.postRequest(multipartEntity, length, config);
+//		throw new UnsupportedOperationException("storeFile is not implemented yet!");
 	}
 
 	/* (non-Javadoc)
@@ -45,7 +64,7 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	@Override
 	public void deleteFile(final int id) {
 		Map<String, String> createParams = createParams();
-		createParams.put(PARAM_FH_ACTION, PARAM_FH_DELETE);
+		createParams.put(PARAM_FH_ACTION, PARAM_FH_ACTION_DELETE);
 		createParams.put(PARAM_FH_ID, String.valueOf(id));
 		URemoteAccessClient.postRequest(createParams, config);
 	}

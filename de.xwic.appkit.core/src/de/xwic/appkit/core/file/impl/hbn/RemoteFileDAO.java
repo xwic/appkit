@@ -1,9 +1,7 @@
 package de.xwic.appkit.core.file.impl.hbn;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IFileHandler;
@@ -21,32 +19,36 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 */
 	@Override
 	public final int storeFile(final String filename) throws DataAccessException {
-		File file = new File(filename);
-		long length = file.length();
-		InputStream in = null;
 		try {
-			in = new FileInputStream(file);
-			return storeFile(filename, length, in);
-		} catch (Exception e) {
-			throw new DataAccessException("Could not create Blob!", e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					throw new DataAccessException(e);
-				}
+			File file = new File(filename);
+			if (!file.exists()) {
+				throw new DataAccessException("No such file " + file);
 			}
+			long length = file.length();
+			return storeFile(filename, length, file);
+		} catch (DataAccessException dae) {
+			throw dae;
+		} catch (Exception e) {
+			throw new DataAccessException("Failed to store file", e);
 		}
 	}
 
 	/**
 	 * @param filename
 	 * @param length
-	 * @param in
+	 * @param file
 	 * @return
+	 * @throws IOException
 	 */
-	protected abstract int storeFile(final String filename, final long length, final InputStream in);
+	protected abstract int storeFile(String filename, long length, File file) throws IOException;
+
+	/**
+	 * @param filename
+	 * @param length
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)

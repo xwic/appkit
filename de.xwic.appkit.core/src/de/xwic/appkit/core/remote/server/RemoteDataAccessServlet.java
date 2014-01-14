@@ -7,13 +7,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -21,6 +24,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 
+import de.jwic.upload.Upload;
 import de.xwic.appkit.core.access.AccessHandler;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
@@ -102,9 +106,19 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 */
 	private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 
-		// the API is taking its arguments from the URL and the parameters
+		Upload upload = null;
 
-		String action = req.getParameter(PARAM_ACTION);
+		// the API is taking its arguments from the URL and the parameters
+		final String action;
+
+		boolean multipart = ServletFileUpload.isMultipartContent(req);
+		if (multipart) {
+			upload = new Upload(req);
+			action = getParameter(upload, PARAM_ACTION);
+		} else {
+			action = req.getParameter(PARAM_ACTION);
+		}
+
 		if (action == null || action.isEmpty()) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing Parameters");
 			return;
@@ -117,7 +131,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		try {
 
 			if (action.equals(ACTION_FILE_HANDLE)) {
-				handler.handle(req, resp, pwOut);
+				handler.handle(req, resp, pwOut, upload, multipart);
 			} else {
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
@@ -150,6 +164,20 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		}
 
 
+	}
+
+	/**
+	 * @param upload
+	 * @return
+	 */
+	private String getParameter(final Upload upload, final String parameter) {
+		final String action;
+		Map<String, String> params = upload.getParams();
+		if (params == null) {
+			params = Collections.EMPTY_MAP;
+		}
+		action = params.get(parameter);
+		return action;
 	}
 
 	/**

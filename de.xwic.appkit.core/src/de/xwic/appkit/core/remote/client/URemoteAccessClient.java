@@ -3,6 +3,9 @@
  */
 package de.xwic.appkit.core.remote.client;
 
+import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.PARAM_RSID;
+import static org.apache.http.entity.ContentType.TEXT_PLAIN;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -13,6 +16,10 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.poi.util.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
@@ -71,6 +78,52 @@ public class URemoteAccessClient {
 			is.close();
 
 			return doc;
+		} catch (Exception e) {
+			throw new RemoteDataAccessException(e);
+		}
+	}
+
+	/**
+	 * @param param
+	 * @param config
+	 * @return
+	 */
+	public static int postRequest(final MultipartEntityBuilder builder, final long len, final RemoteSystemConfiguration config) {
+		try {
+			String targetUrl = config.getRemoteBaseUrl() + config.getApiSuffix();
+			builder.addPart(PARAM_RSID, new StringBody(config.getRemoteSystemId(), TEXT_PLAIN));
+			HttpEntity build = builder.build();
+			URL url = new URL(targetUrl);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", build.getContentType().getValue());
+			connection.setRequestProperty("Content-Length", String.valueOf(build.getContentLength()));
+			connection.setRequestProperty("Content-Language", "en-US");
+
+			connection.setUseCaches(false);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			// Send request
+//			OutputStream out = connection.getOutputStream();
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+
+			build.writeTo(wr);
+			wr.flush();
+			wr.close();
+
+			int responseCode = connection.getResponseCode();
+			String responseMessage = connection.getResponseMessage();
+			System.out.println(responseCode + " . " + responseMessage);
+
+			InputStream inputStream = connection.getInputStream();
+			byte[] byteArray = IOUtils.toByteArray(inputStream);
+			System.out.println(new String(byteArray));
+//			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+//
+//			wr.writeBytes(urlParameters);
+//			wr.flush();
+//			wr.close();
+			return 0;
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);
 		}
