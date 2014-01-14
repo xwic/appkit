@@ -27,7 +27,6 @@ import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.IFileHandler;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.remote.util.UETO;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
@@ -70,14 +69,14 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static Log log = LogFactory.getLog(RemoteDataAccessServlet.class);
 
 	private AccessHandler accessHandler;
-	private RemoteFileHandler handler;
+	private RemoteFileAccessHandler handler;
 
 	/**
 	 *
 	 */
 	public RemoteDataAccessServlet() {
 		accessHandler = AccessHandler.getInstance();
-		handler = new RemoteFileHandler();
+		handler = new RemoteFileAccessHandler();
 	}
 
 	/* (non-Javadoc)
@@ -117,27 +116,29 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		try {
 
-			String entityType = req.getParameter(PARAM_ENTITY_TYPE);
-			assertValue(entityType, "Entity Type not specified");
-
-			if (action.equals(ACTION_GET_ENTITY)) {
-				handleGetEntity(entityType, req, resp, pwOut);
-
-			} else if (action.equals(ACTION_GET_ENTITIES)) {
-				handleGetEntities(entityType, req, resp, pwOut);
-
-			} else if (action.equals(ACTION_UPDATE_ENTITY)) {
-				handleUpdateEntity(entityType, req, resp, pwOut);
-
-			} else if (action.equals(ACTION_GET_COLLECTION)) {
-				handleGetCollection(entityType, req, resp, pwOut);
-
-			} else if (action.equals(ACTION_DELETE) || action.equals(ACTION_SOFT_DELETE)) {
-				handleDelete(entityType, req, resp, pwOut, action.equals(ACTION_SOFT_DELETE));
-			} else if (action.equals(ACTION_FILE_HANDLE)){
+			if (action.equals(ACTION_FILE_HANDLE)) {
 				handler.handle(req, resp, pwOut);
 			} else {
-				throw new IllegalArgumentException("Unknown action");
+				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
+				assertValue(entityType, "Entity Type not specified");
+
+				if (action.equals(ACTION_GET_ENTITY)) {
+					handleGetEntity(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_GET_ENTITIES)) {
+					handleGetEntities(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_UPDATE_ENTITY)) {
+					handleUpdateEntity(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_GET_COLLECTION)) {
+					handleGetCollection(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_DELETE) || action.equals(ACTION_SOFT_DELETE)) {
+					handleDelete(entityType, req, resp, pwOut, action.equals(ACTION_SOFT_DELETE));
+				} else {
+					throw new IllegalArgumentException("Unknown action");
+				}
 			}
 
 			pwOut.flush();
@@ -302,7 +303,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	/**
 	 * @param pwOut
 	 */
-	private void printResponse(final PrintWriter pwOut, final String response) {
+	public static void printResponse(final PrintWriter pwOut, final String response) {
 		Document docResponse = DocumentFactory.getInstance().createDocument();
 		Element rootResponse = docResponse.addElement(ELM_RESPONSE);
 		rootResponse.addAttribute(PARAM_VALUE, response);

@@ -16,12 +16,12 @@ import de.xwic.appkit.core.dao.IFileHandler;
  */
 public class RemoteFileDAO implements IFileHandler {
 
-	private final IRemoteFileDAOClient client;
+	private final IRemoteFileAccessClient client;
 
 	/**
 	 * @param client
 	 */
-	public RemoteFileDAO(final IRemoteFileDAOClient client) {
+	public RemoteFileDAO(final IRemoteFileAccessClient client) {
 		this.client = client;
 	}
 

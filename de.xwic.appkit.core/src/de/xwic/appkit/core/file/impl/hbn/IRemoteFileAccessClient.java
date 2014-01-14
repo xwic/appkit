@@ -9,7 +9,7 @@ import java.io.InputStream;
  * @author Alexandru Bledea
  * @since Jan 13, 2014
  */
-public interface IRemoteFileDAOClient {
+public interface IRemoteFileAccessClient {
 
 	/**
 	 * @param filename
