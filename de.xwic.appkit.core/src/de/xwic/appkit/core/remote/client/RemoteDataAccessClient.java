@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
@@ -22,11 +21,10 @@ import de.xwic.appkit.core.remote.server.UseCaseHandler;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
+import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.ObjectArrayEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
-import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
-import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
