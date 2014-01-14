@@ -10,7 +10,6 @@ import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.file.impl.hbn.IRemoteFileAccessClient;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.TransportException;
 

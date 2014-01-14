@@ -20,7 +20,7 @@ import de.xwic.appkit.core.remote.client.URemoteAccessClient;
  * @author Alexandru Bledea
  * @since Jan 13, 2014
  */
-public class RemoteFileAccessClient implements IRemoteFileAccessClient {
+public class RemoteFileAccessClient extends RemoteFileDAO {
 
 	private final RemoteSystemConfiguration config;
 
@@ -32,18 +32,18 @@ public class RemoteFileAccessClient implements IRemoteFileAccessClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileDAOClient#storeFile(java.lang.String, long, java.io.InputStream)
+	 * @see de.xwic.appkit.core.file.impl.hbn.RemoteFileDAO#storeFile(java.lang.String, long, java.io.InputStream)
 	 */
 	@Override
-	public int storeFile(final String filename, final long length, final InputStream in) {
+	protected int storeFile(final String filename, final long length, final InputStream in) {
 		throw new UnsupportedOperationException("storeFile is not implemented yet!");
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileDAOClient#delete(int)
+	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
 	 */
 	@Override
-	public void delete(final int id) {
+	public void deleteFile(final int id) {
 		Map<String, String> createParams = createParams();
 		createParams.put(PARAM_FH_ACTION, PARAM_FH_DELETE);
 		createParams.put(PARAM_FH_ID, String.valueOf(id));

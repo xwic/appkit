@@ -14,28 +14,19 @@ import de.xwic.appkit.core.dao.IFileHandler;
  * @author Alexandru Bledea
  * @since Jan 13, 2014
  */
-public class RemoteFileDAO implements IFileHandler {
-
-	private final IRemoteFileAccessClient client;
-
-	/**
-	 * @param client
-	 */
-	public RemoteFileDAO(final IRemoteFileAccessClient client) {
-		this.client = client;
-	}
+public abstract class RemoteFileDAO implements IFileHandler {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFile(java.lang.String)
 	 */
 	@Override
-	public int storeFile(final String filename) throws DataAccessException {
+	public final int storeFile(final String filename) throws DataAccessException {
 		File file = new File(filename);
 		long length = file.length();
 		InputStream in = null;
 		try {
 			in = new FileInputStream(file);
-			return client.storeFile(filename, length, in);
+			return storeFile(filename, length, in);
 		} catch (Exception e) {
 			throw new DataAccessException("Could not create Blob!", e);
 		} finally {
@@ -49,13 +40,13 @@ public class RemoteFileDAO implements IFileHandler {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
+	/**
+	 * @param filename
+	 * @param length
+	 * @param in
+	 * @return
 	 */
-	@Override
-	public void deleteFile(final int id) {
-		client.delete(id);
-	}
+	protected abstract int storeFile(final String filename, final long length, final InputStream in);
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)
@@ -63,14 +54,6 @@ public class RemoteFileDAO implements IFileHandler {
 	@Override
 	public File loadFile(final int id, final String destination) throws DataAccessException {
 		throw new DataAccessException("This method is not supported on the server.");
-	}
-
-	/* (non-Javadoc)
-	 * @see de.pol.crm.dao.IFileHandler#loadFileInputStream(int)
-	 */
-	@Override
-	public InputStream loadFileInputStream(final int id) throws DataAccessException {
-		return client.loadFileInputStream(id);
 	}
 
 	/* (non-Javadoc)

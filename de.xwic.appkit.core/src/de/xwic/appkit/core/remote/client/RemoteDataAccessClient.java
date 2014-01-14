@@ -16,7 +16,6 @@ import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.file.impl.hbn.IRemoteFileAccessClient;
 import de.xwic.appkit.core.file.impl.hbn.RemoteFileAccessClient;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
 import de.xwic.appkit.core.remote.util.UETO;
@@ -36,7 +35,6 @@ import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 
 	private final RemoteSystemConfiguration config;
-	private final IRemoteFileAccessClient fileHandler;
 
 	/**
 	 * @param remoteBaseUrl
@@ -44,7 +42,6 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 */
 	public RemoteDataAccessClient(final RemoteSystemConfiguration config) {
 		this.config = config;
-		fileHandler = new RemoteFileAccessClient(config);
 	}
 
 	/* (non-Javadoc)
