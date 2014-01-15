@@ -32,8 +32,8 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
-import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.EtoSerializer;
+import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
@@ -121,27 +121,29 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 */
 	private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 
-		// the API is taking its arguments from the URL and the parameters
-
-		String action = req.getParameter(PARAM_ACTION);
-		if (action == null || action.isEmpty()) {
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing Parameters");
-			return;
-		}
-
-		// all responses will now basically be an XML document, so we can do some preparations
-		resp.setContentType("text/xml");
-		PrintWriter pwOut = resp.getWriter();
+		IParameterProvider pp = new ParameterProvider(req);
 
 		try {
+			// the API is taking its arguments from the URL and the parameters
+			final String action = pp.getParameter(PARAM_ACTION);
 
+			if (action == null || action.isEmpty()) {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing Parameters");
+				return;
+			}
+
+			PrintWriter pwOut = resp.getWriter();
+			
 			IRequestHandler handler = handlers.get(action);
 			
 			if (handler != null) {
 				
-				handler.handle(req, resp, pwOut);
+				handler.handle(pp, resp, pwOut);
 				
 			} else {
+				// all responses will now basically be an XML document, so we can do some preparations
+
+				resp.setContentType("text/xml");
 				
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
@@ -165,10 +167,10 @@ public class RemoteDataAccessServlet extends HttpServlet {
 					throw new IllegalArgumentException("Unknown action");
 				}
 				
+				pwOut.flush();
+				pwOut.close();
+				
 			}
-
-			pwOut.flush();
-			pwOut.close();
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

@@ -30,12 +30,12 @@ public class UseCaseHandler implements IRequestHandler {
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#handle(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, java.io.PrintWriter)
+	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#handle(de.xwic.appkit.core.remote.server.IParameterProvider, javax.servlet.http.HttpServletResponse, java.io.PrintWriter)
 	 */
 	@Override
-	public void handle(final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	public void handle(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
 		
-		String strUseCase = req.getParameter(PARAM_USE_CASE);
+		String strUseCase = pp.getParameter(PARAM_USE_CASE);
 		
 		if (strUseCase == null || strUseCase.trim().isEmpty()) {
 			throw new IllegalArgumentException("The string is empty!");
