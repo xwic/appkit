@@ -76,5 +76,5 @@ public interface IRemoteDataAccessClient {
 	 * @return
 	 * @throws TransportException 
 	 */
-	public void executeUseCase(UseCase uc) throws TransportException;
+	public Object executeUseCase(UseCase uc) throws TransportException;
 }

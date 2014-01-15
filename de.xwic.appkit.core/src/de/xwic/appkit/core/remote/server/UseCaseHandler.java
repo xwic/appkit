@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
+import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 
 /**
  * @author Alexandru Bledea
@@ -41,9 +42,11 @@ public class UseCaseHandler implements IRequestHandler {
 		}
 		
 		UseCase uc = UseCaseSerializer.deseralize(strUseCase);
-		uc.execute();
 		
-		RemoteDataAccessServlet.printResponse(pwOut, RemoteDataAccessServlet.RESPONSE_OK);
+		Object result = uc.execute();
+		String serialized = XmlBeanSerializer.serializeToXML("result", result);
+		
+		pwOut.write(serialized);
 	}
 
 }
