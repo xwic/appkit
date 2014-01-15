@@ -10,8 +10,6 @@ import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ACTION_UPLOAD;
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ID;
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_STREAM;
-import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_UPLOAD_FILENAME;
-import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_UPLOAD_SIZE;
 import static org.apache.http.entity.ContentType.TEXT_PLAIN;
 
 import java.io.File;
@@ -46,16 +44,12 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	 * @see de.xwic.appkit.core.file.impl.hbn.RemoteFileDAO#storeFile(java.lang.String, long, java.io.InputStream)
 	 */
 	@Override
-	protected int storeFile(final String filename, final long length, final File file) throws IOException {
+	protected int storeFile(final File file) throws IOException {
 		MultipartEntityBuilder multipartEntity = MultipartEntityBuilder.create();
 		multipartEntity.addPart(PARAM_ACTION, new StringBody(ACTION_FILE_HANDLE, TEXT_PLAIN));
 		multipartEntity.addPart(PARAM_FH_ACTION, new StringBody(PARAM_FH_ACTION_UPLOAD, TEXT_PLAIN));
-		multipartEntity.addPart(PARAM_FH_UPLOAD_SIZE, new StringBody(String.valueOf(length), TEXT_PLAIN));
-		multipartEntity.addPart(PARAM_FH_UPLOAD_FILENAME, new StringBody(filename, TEXT_PLAIN));
 		multipartEntity.addPart(PARAM_FH_STREAM, new FileBody(file));
-
-		return URemoteAccessClient.postRequest(multipartEntity, length, config);
-//		throw new UnsupportedOperationException("storeFile is not implemented yet!");
+		return URemoteAccessClient.multipartRequestInt(multipartEntity, config);
 	}
 
 	/* (non-Javadoc)

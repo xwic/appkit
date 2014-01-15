@@ -24,8 +24,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 			if (!file.exists()) {
 				throw new DataAccessException("No such file " + file);
 			}
-			long length = file.length();
-			return storeFile(filename, length, file);
+			return storeFile(file);
 		} catch (DataAccessException dae) {
 			throw dae;
 		} catch (Exception e) {
@@ -34,13 +33,11 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	}
 
 	/**
-	 * @param filename
-	 * @param length
 	 * @param file
 	 * @return
 	 * @throws IOException
 	 */
-	protected abstract int storeFile(String filename, long length, File file) throws IOException;
+	protected abstract int storeFile(File file) throws IOException;
 
 	/**
 	 * @param filename
