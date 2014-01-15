@@ -113,12 +113,12 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				return;
 			}
 
-			// all responses will now basically be an XML document, so we can do some preparations
-			PrintWriter pwOut = resp.getWriter();
-
 			if (action.equals(ACTION_FILE_HANDLE)) {
-				handler.handle(pp, resp, pwOut);
+				handler.handle(pp, resp);
 			} else {
+				// all responses will now basically be an XML document, so we can do some preparations
+				PrintWriter pwOut = resp.getWriter();
+
 				resp.setContentType("text/xml");
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
@@ -140,10 +140,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				} else {
 					throw new IllegalArgumentException("Unknown action");
 				}
+				pwOut.flush();
+				pwOut.close();
 			}
-
-			pwOut.flush();
-			pwOut.close();
 
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

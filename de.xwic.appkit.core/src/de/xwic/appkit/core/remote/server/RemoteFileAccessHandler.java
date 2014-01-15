@@ -56,11 +56,10 @@ public class RemoteFileAccessHandler {
 	/**
 	 * @param pp
 	 * @param resp
-	 * @param pwOut
 	 * @return
 	 * @throws TransportException
 	 */
-	void upload(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	void upload(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException {
 		Map<String, UploadFile> files = pp.getFiles();
 		UploadFile uploadFile = files.get(PARAM_FH_STREAM);
 		if (files.size() != 1 || uploadFile == null){
@@ -81,6 +80,7 @@ public class RemoteFileAccessHandler {
 			out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
 			int storeFile = DAOSystem.getFileHandler().storeFile(newFilePath);
+			PrintWriter pwOut = resp.getWriter();
 			pwOut.write(String.valueOf(storeFile));
 			pwOut.close();
 		} catch (IOException e) {
@@ -106,28 +106,51 @@ public class RemoteFileAccessHandler {
 	/**
 	 * @param pp
 	 * @param resp
-	 * @param pwOut
 	 * @throws TransportException
+	 * @throws IOException
 	 */
-	private void delete(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	private void delete(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException, IOException {
 		int id = pp.getInt(PARAM_FH_ID);
 		log.info("Received request to delete " + id);
 		localHandler.deleteFile(id);
-		printResponse(pwOut, RESPONSE_OK);
+		printResponse(resp.getWriter(), RESPONSE_OK);
 	}
 
 	/**
 	 * @param pp
 	 * @param resp
-	 * @param pwOut
 	 * @throws TransportException
 	 */
-	public void handle(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	private void stream(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException {
+		int id = pp.getInt(PARAM_FH_ID);
+		log.info("Received request to stream " + id);
+		InputStream in = null;
+		OutputStream out = null;
+		try {
+			in = localHandler.loadFileInputStream(id);
+			out = resp.getOutputStream();
+			IOUtils.copy(in, out);
+		} catch (IOException io) {
+			throw new TransportException("Failed to transfer stream", io);
+		} finally {
+			UStream.close(in, out);
+		}
+	}
+
+	/**
+	 * @param pp
+	 * @param resp
+	 * @throws TransportException
+	 * @throws IOException
+	 */
+	public void handle(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException, IOException {
 		String action = pp.getMandatory(PARAM_FH_ACTION);
 		if (action.equals(PARAM_FH_ACTION_DELETE)) {
-			delete(pp, resp, pwOut);
+			delete(pp, resp);
 		} else if (action.equals(PARAM_FH_ACTION_UPLOAD)) {
-			upload(pp, resp, pwOut);
+			upload(pp, resp);
+		} else if (action.equals(PARAM_FH_ACTION_LOAD)) {
+			stream(pp, resp);
 		} else {
 			throw new UnsupportedOperationException("No such implementation " + action);
 		}

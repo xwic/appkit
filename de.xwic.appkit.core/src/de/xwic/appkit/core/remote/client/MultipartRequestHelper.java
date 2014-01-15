@@ -3,15 +3,14 @@
  */
 package de.xwic.appkit.core.remote.client;
 
-import static de.xwic.appkit.core.remote.server.RemoteDataAccessServlet.PARAM_RSID;
-import static org.apache.http.entity.ContentType.TEXT_PLAIN;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
+
+import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
 
 /**
  * @author Alexandru Bledea
@@ -21,17 +20,18 @@ public class MultipartRequestHelper implements IRequestHelper {
 
 	private final String contentType;
 	private final long contentLength;
-	private final HttpEntity entity;
+	private final MultipartEntity entity;
 	private final String targetUrl;
 
 	/**
-	 * @param builder
+	 * @param entity
 	 * @param config
+	 * @throws UnsupportedEncodingException
 	 */
-	public MultipartRequestHelper(final MultipartEntityBuilder builder, final RemoteSystemConfiguration config) {
+	public MultipartRequestHelper(final MultipartEntity entity, final RemoteSystemConfiguration config) throws UnsupportedEncodingException {
 		targetUrl = config.getRemoteBaseUrl() + config.getApiSuffix();
-		builder.addPart(PARAM_RSID, new StringBody(config.getRemoteSystemId(), TEXT_PLAIN));
-		entity = builder.build();
+		entity.addPart(RemoteDataAccessServlet.PARAM_RSID, new StringBody(config.getRemoteSystemId()));
+		this.entity = entity;
 		contentType = entity.getContentType().getValue();
 		contentLength = entity.getContentLength();
 	}
