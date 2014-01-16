@@ -132,17 +132,15 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				return;
 			}
 
-			PrintWriter pwOut = resp.getWriter();
-			
 			IRequestHandler handler = handlers.get(action);
 			
 			if (handler != null) {
 				
-				handler.handle(pp, resp, pwOut);
+				handler.handle(pp, resp);
 				
 			} else {
 				// all responses will now basically be an XML document, so we can do some preparations
-
+				PrintWriter pwOut = resp.getWriter();
 				resp.setContentType("text/xml");
 				
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);

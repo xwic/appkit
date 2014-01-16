@@ -3,6 +3,7 @@
  */
 package de.xwic.appkit.core.remote.server;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ public class UseCaseHandler implements IRequestHandler {
 	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#handle(de.xwic.appkit.core.remote.server.IParameterProvider, javax.servlet.http.HttpServletResponse, java.io.PrintWriter)
 	 */
 	@Override
-	public void handle(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	public void handle(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException {
 		
 		String strUseCase = pp.getParameter(PARAM_USE_CASE);
 		
@@ -45,7 +46,12 @@ public class UseCaseHandler implements IRequestHandler {
 		
 		Object result = uc.execute();
 		String serialized = XmlBeanSerializer.serializeToXML("result", result);
-		
+		PrintWriter pwOut;
+		try {
+			pwOut = resp.getWriter();
+		} catch (IOException e) {
+			throw new TransportException(e);
+		}
 		pwOut.write(serialized);
 	}
 

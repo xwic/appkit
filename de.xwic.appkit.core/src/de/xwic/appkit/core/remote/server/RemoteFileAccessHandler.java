@@ -52,7 +52,7 @@ public class RemoteFileAccessHandler implements IRequestHandler {
 	RemoteFileAccessHandler() {
 		localHandler = DAOSystem.getFileHandler();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#getAction()
 	 */
@@ -60,12 +60,12 @@ public class RemoteFileAccessHandler implements IRequestHandler {
 	public String getAction() {
 		return RemoteDataAccessServlet.ACTION_FILE_HANDLE;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.remote.server.IRequestHandler#handle(de.xwic.appkit.core.remote.server.IParameterProvider, javax.servlet.http.HttpServletResponse, java.io.PrintWriter)
 	 */
 	@Override
-	public void handle(final IParameterProvider pp, final HttpServletResponse resp, final PrintWriter pwOut) throws TransportException {
+	public void handle(final IParameterProvider pp, final HttpServletResponse resp) throws TransportException {
 		String action = pp.getMandatory(PARAM_FH_ACTION);
 		if (action.equals(PARAM_FH_ACTION_DELETE)) {
 			delete(pp, resp);
