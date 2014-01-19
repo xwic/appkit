@@ -84,7 +84,7 @@
         <compileSource>1.6</compileSource>
         <compileTarget>1.6</compileTarget>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
         <runEnvironment></runEnvironment>
     </properties>
 
@@ -352,7 +352,36 @@
                 <artifactId>java2html</artifactId>
                 <version>5.0</version>
             </dependency>
-			
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-core</artifactId>
+				<version>5.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-controls</artifactId>
+				<version>5.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-compatibility</artifactId>
+				<version>5.2-SNAPSHOT</version>
+			</dependency>			
+			<dependency>
+				<groupId>de.xwic.cube</groupId>
+				<artifactId>cube-core</artifactId>
+				<version>5.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate</artifactId>
+    <version>3.2.6.ga</version>
+</dependency>
+<dependency>
+    <groupId>javax.transaction</groupId>
+    <artifactId>jta</artifactId>
+    <version>1.1</version>
+</dependency>
             <dependency>
                 <!-- Common Public License 1.0 -->
                 <groupId>junit</groupId>

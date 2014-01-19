@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>de.xwic.appkit</groupId>
+        <artifactId>appkit</artifactId>
+        <version>5.2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <name>Appkit::Webbase</name>
+
+    <groupId>de.xwic.appkit</groupId>
+    <artifactId>appkit-webbase</artifactId>
+    <version>5.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.xwic.appkit</groupId>
+            <artifactId>appkit-core</artifactId>
+            <version>5.2-SNAPSHOT</version>
+        </dependency>
+
+		<!-- jWic dependencies -->
+		<dependency>
+			<groupId>de.xwic.jwic</groupId>
+			<artifactId>jwic-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.xwic.jwic</groupId>
+			<artifactId>jwic-controls</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.xwic.jwic</groupId>
+			<artifactId>jwic-compatibility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>de.xwic.cube</groupId>
+			<artifactId>cube-core</artifactId>
+		</dependency>
+
+    </dependencies>
+
+</project>
