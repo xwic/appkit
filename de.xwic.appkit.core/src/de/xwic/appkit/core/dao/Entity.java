@@ -217,9 +217,15 @@ public class Entity implements IEntity {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+//		if (getClass() != obj.getClass())
+//			return false;
+		if (!(obj instanceof Entity)){
 			return false;
+		}
 		final Entity other = (Entity) obj;
+		if (!type().getName().equals(other.type().getName())) {
+			return false;
+		}
 		if (isChanged() != other.isChanged())
 			return false;
 		if (getCreatedAt() == null) {
@@ -240,9 +246,6 @@ public class Entity implements IEntity {
 			return false;
 		if (getVersion() != other.getVersion())
 			return false;
-		if (!type().getName().equals(other.type().getName())) {
-			return false;
-		}
 		
 		if (getId() != other.getId()) {
 			return false;
