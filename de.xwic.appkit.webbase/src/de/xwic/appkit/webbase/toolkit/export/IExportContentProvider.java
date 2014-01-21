@@ -11,13 +11,13 @@ import java.io.OutputStream;
  *
  */
 public interface IExportContentProvider {
-	
+	@Deprecated
 	public static final String CONTENT_TYPE_PDF = "application/pdf";
-
-	public static final String CONTENT_TYPE_XLS = "application/x-msdownload";
-	
+	@Deprecated
+	public static final String CONTENT_TYPE_XLS = "application/vnd.ms-excel";
+	@Deprecated
 	public static final String CONTENT_TYPE_RTF = "application/rtf";
-	
+	@Deprecated
 	public static final String CONTENT_TYPE_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 	
 	
