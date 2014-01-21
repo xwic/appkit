@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
@@ -25,6 +26,7 @@ import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.ObjectArrayEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
+import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
@@ -160,13 +162,20 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#executeUseCase(de.xwic.appkit.core.dao.UseCase)
 	 */
 	@Override
-	public void executeUseCase(UseCase uc) throws TransportException {
+	public Object executeUseCase(UseCase uc) throws TransportException {
 		Map<String, String> param = new HashMap<String, String>();
 
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_EXECUTE_USE_CASE);
 		param.put(UseCaseHandler.PARAM_USE_CASE, UseCaseSerializer.serialize(uc));
 
-		postRequest(param);
+		Document doc = postRequest(param);
+		Element root = doc.getRootElement();
+		
+		XmlBeanSerializer xml = new XmlBeanSerializer();
+		
+		Object x = xml.readValue(null, root, null);
+		
+		return x;
 	}
 	
 	/**

@@ -41,13 +41,11 @@ public class RemoteUseCaseService implements IUseCaseService {
 		}
 
 		try {
-			client.executeUseCase(useCase);
+			return client.executeUseCase(useCase);
 		} catch (TransportException e) {
 			log.error(e.getMessage(), e);
 			throw new RuntimeException(e);
 		}
-		
-		return null;
 	}
 
 	/* (non-Javadoc)

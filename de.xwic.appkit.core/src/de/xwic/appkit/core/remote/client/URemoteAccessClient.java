@@ -9,14 +9,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.poi.util.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
 
-import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.util.UStream;
 
 /**
  * @author Alexandru Bledea
@@ -31,37 +31,7 @@ public class URemoteAccessClient {
 	 */
 	public static Document postRequest(final Map<String, String> param, final RemoteSystemConfiguration config) {
 		try {
-			String targetUrl = config.getRemoteBaseUrl() + config.getApiSuffix();
-			param.put(RemoteDataAccessServlet.PARAM_RSID, config.getRemoteSystemId());
-
-			StringBuilder sbParam = new StringBuilder();
-			for (Entry<String, String> entry : param.entrySet()) {
-				if (sbParam.length() != 0) {
-					sbParam.append("&");
-				}
-				sbParam.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-			}
-			String urlParameters = sbParam.toString();
-
-			URL url = new URL(targetUrl);
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST"); // always POST, we don't need to support GET
-			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-			connection.setRequestProperty("Content-Length", Integer.toString(urlParameters.getBytes().length));
-			connection.setRequestProperty("Content-Language", "en-US");
-
-			connection.setUseCaches(false);
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-
-			// Send request
-			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-			wr.writeBytes(urlParameters);
-			wr.flush();
-			wr.close();
-
-			// Get Response
-			InputStream is = connection.getInputStream();
+			InputStream is = getStream(param, config);
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
 
 			SAXReader xmlReader = new SAXReader();
@@ -71,6 +41,75 @@ public class URemoteAccessClient {
 			is.close();
 
 			return doc;
+		} catch (RemoteDataAccessException rdae) {
+			throw rdae;
+		} catch (Exception e) {
+			throw new RemoteDataAccessException(e);
+		}
+	}
+
+	/**
+	 * @param param
+	 * @param config
+	 * @return
+	 */
+	public static InputStream getStream(final Map<String, String> param, final RemoteSystemConfiguration config) {
+		try {
+			SimpleRequestHelper requestHelper = new SimpleRequestHelper(param, config);
+			return postRequest(requestHelper);
+		} catch (RemoteDataAccessException rdae) {
+			throw rdae;
+		} catch (Exception e) {
+			throw new RemoteDataAccessException(e);
+		}
+	}
+
+	/**
+	 * @param builder
+	 * @param config
+	 * @return
+	 */
+	public static int multipartRequestInt(final MultipartEntity builder, final RemoteSystemConfiguration config) {
+		InputStream in = null;
+		try {
+			MultipartRequestHelper requestHelper = new MultipartRequestHelper(builder, config);
+			in = postRequest(requestHelper);
+			byte[] byteArray = IOUtils.toByteArray(in);
+			return Integer.valueOf(new String(byteArray));
+		} catch (RemoteDataAccessException rdae) {
+			throw rdae;
+		} catch (Exception e) {
+			throw new RemoteDataAccessException(e);
+		} finally {
+			UStream.close(in);
+		}
+	}
+
+	/**
+	 * @param param
+	 * @param config
+	 * @return
+	 */
+	public static InputStream postRequest(final IRequestHelper helper) {
+		try {
+			URL url = new URL(helper.getTargetUrl());
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("POST"); // always POST, we don't need to support GET
+			connection.setRequestProperty("Content-Type", helper.getContentType());
+			connection.setRequestProperty("Content-Length", String.valueOf(helper.getContentLen()));
+			connection.setRequestProperty("Content-Language", "en-US");
+
+			connection.setUseCaches(false);
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+
+			// Send request
+			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+			helper.writeToStream(wr);
+			wr.flush();
+			wr.close();
+
+			return connection.getInputStream();
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);
 		}

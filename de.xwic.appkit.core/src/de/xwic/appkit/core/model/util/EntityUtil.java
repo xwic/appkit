@@ -64,6 +64,9 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> String buildTitle(final E entity) {
+		if (entity == null) {
+			return "";
+		}
 		return findDAO(entity.getClass()).buildTitle(entity);
 	}
 
