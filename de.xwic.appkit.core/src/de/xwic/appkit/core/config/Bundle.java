@@ -17,14 +17,14 @@ import java.util.Set;
  */
 public class Bundle {
 
-	private Map<?, ?> map = null;
+	private Map<String, String> map = null;
 	private Bundle linkedBundle = null;
 
 	/**
 	 * Constructor.
 	 * @param stringMap
 	 */
-	public Bundle(Map<?, ?> stringMap) {
+	public Bundle(Map<String, String> stringMap) {
 		this.map = stringMap;
 	}
 	
@@ -34,7 +34,7 @@ public class Bundle {
 	 * @return
 	 */
 	public String getString(String key) {
-		String value = (String)map.get(key);
+		String value = map.get(key);
 		if (value == null) {
 			if (linkedBundle != null) {
 				value = linkedBundle.getString(key);
@@ -66,4 +66,10 @@ public class Bundle {
 		return map.keySet();
 	}
 	
+	/**
+	 * @param bundle
+	 */
+	public void merge(Bundle bundle) {
+		map.putAll(bundle.map);
+	}
 }
