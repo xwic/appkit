@@ -103,9 +103,27 @@ public abstract class ExtendedApplication extends Application implements INaviga
 	 * @return
 	 */
     public static ExtendedApplication getInstance(Control control) {
+        return getInstance(control.getSessionContext());
+    }
 
-        return (ExtendedApplication)control.getSessionContext().getApplication();
+    /**
+	 * Static access to the application.
+	 *
+	 * @param control
+	 * @return
+	 */
+    public static ExtendedApplication getInstance(final SessionContext sessionContext) {
+		return (ExtendedApplication)sessionContext.getApplication();
+    }
 
+    /**
+	 * Static access to the site.
+	 *
+	 * @param control
+	 * @return
+	 */
+    public static Site getSite(final SessionContext sessionContext) {
+		return getInstance(sessionContext).getSite();
     }
 
     /*
