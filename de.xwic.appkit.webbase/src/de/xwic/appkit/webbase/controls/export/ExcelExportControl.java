@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,6 +46,7 @@ import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.data.IContentProvider;
 import de.jwic.data.Range;
+import de.xwic.appkit.webbase.utils.MimeTypeUtil;
 
 /**
  * This control defines the ExcelExport button.
@@ -105,8 +107,8 @@ public class ExcelExportControl extends Button implements IResourceControl {
 		try {
 			String filename = "export.xls";
 			HSSFWorkbook wb = createWorkBook();
-	
-			res.setContentType("application/x-msdownload");
+			
+			res.setContentType(MimeTypeUtil.getMimeTypeForFileName(filename));
 			res.setHeader("Content-Disposition", "attachment; filename=" + filename);
 			wb.write(res.getOutputStream());
 			res.getOutputStream().close();
