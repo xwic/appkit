@@ -8,6 +8,7 @@
 package de.xwic.appkit.core.config;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Wrapper for the map that contains the key/value pairs.
@@ -16,14 +17,14 @@ import java.util.Map;
  */
 public class Bundle {
 
-	private Map<?, ?> map = null;
+	private Map<String, String> map = null;
 	private Bundle linkedBundle = null;
 
 	/**
 	 * Constructor.
 	 * @param stringMap
 	 */
-	public Bundle(Map<?, ?> stringMap) {
+	public Bundle(Map<String, String> stringMap) {
 		this.map = stringMap;
 	}
 	
@@ -33,7 +34,7 @@ public class Bundle {
 	 * @return
 	 */
 	public String getString(String key) {
-		String value = (String)map.get(key);
+		String value = map.get(key);
 		if (value == null) {
 			if (linkedBundle != null) {
 				value = linkedBundle.getString(key);
@@ -58,4 +59,17 @@ public class Bundle {
 		this.linkedBundle = linkedBundle;
 	}
 	
+	/**
+	 * @return
+	 */
+	public Set getKeys() {
+		return map.keySet();
+	}
+	
+	/**
+	 * @param bundle
+	 */
+	public void merge(Bundle bundle) {
+		map.putAll(bundle.map);
+	}
 }

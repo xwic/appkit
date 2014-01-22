@@ -29,31 +29,7 @@ public class EntityQuerySerializer {
 	 * @throws TransportException 
 	 */
 	public static String queryToString(EntityQuery query) throws TransportException {
-		
-		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
-		OutputStreamWriter writer = new OutputStreamWriter(baOut);
-		
-		try {
-			Document doc = DocumentFactory.getInstance().createDocument();
-			Element root = doc.addElement("query");
-			new XmlBeanSerializer().serializeBean(root, "bean", query);
-			
-			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
-			// this "hack" is required to preserve the LBCR's in strings... 
-			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
-				public void write(Document arg0) throws IOException {
-					//this.preserve = true;
-					super.write(arg0);
-				}
-			};
-			xmlWriter.write(doc);
-			xmlWriter.flush();
-			
-		} catch (IOException e) {
-			throw new TransportException("Unexpected IOException while serializing query.", e);
-		}
-
-		return baOut.toString();
+		return XmlBeanSerializer.serializeToXML("query", query);		
 	}
 	
 	/**
@@ -91,7 +67,7 @@ public class EntityQuerySerializer {
 	 */
 	public static Limit stringToLimit(String strLimit) {
 		
-		if (strLimit == null || !strLimit.isEmpty()) {
+		if (strLimit == null || strLimit.isEmpty()) {
 			return null;
 		}
 		

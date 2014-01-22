@@ -7,6 +7,9 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -20,7 +23,11 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
@@ -84,6 +91,41 @@ public class XmlBeanSerializer {
 	}
 	
 	/**
+	 * @param rootElement
+	 * @param bean
+	 * @return
+	 * @throws TransportException
+	 */
+	public static String serializeToXML(String rootElement, Object bean) throws TransportException {
+		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
+		OutputStreamWriter writer = new OutputStreamWriter(baOut);
+		
+		try {
+			Document doc = DocumentFactory.getInstance().createDocument();
+			Element root = doc.addElement(rootElement);
+			
+			XmlBeanSerializer xml = new XmlBeanSerializer();			
+			xml.addValue(root, bean, true);
+			
+			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
+			// this "hack" is required to preserve the LBCR's in strings... 
+			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
+				public void write(Document arg0) throws IOException {
+					//this.preserve = true;
+					super.write(arg0);
+				}
+			};
+			xmlWriter.write(doc);
+			xmlWriter.flush();
+			
+		} catch (IOException e) {
+			throw new TransportException("Unexpected IOException while serializing query.", e);
+		}
+
+		return baOut.toString();
+	}
+	
+	/**
 	 * @param doc
 	 * @param string
 	 * @param query
@@ -95,6 +137,7 @@ public class XmlBeanSerializer {
 	public void serializeBean(Element elm, String elementName, Object bean) throws TransportException {
 		
 		Element root = elm.addElement(elementName);
+		
 		root.addAttribute("type", bean.getClass().getName());
 		
 		try {
@@ -115,7 +158,6 @@ public class XmlBeanSerializer {
 		} catch(Exception e) {
 			throw new TransportException("Error serializing bean: " + e, e);
 		}
-		
 		
 	}
 	
@@ -170,8 +212,7 @@ public class XmlBeanSerializer {
 		}
 		
 		if (value == null) {
-			//elm.addElement(ELM_NULL);
-			elm.addAttribute("null", ATTRVALUE_TRUE);
+			elm.addAttribute(ELM_NULL, ATTRVALUE_TRUE);
 		} else if (value instanceof String) {
 			elm.setText((String)value);
 		} else if (value instanceof Integer) {
@@ -311,15 +352,12 @@ public class XmlBeanSerializer {
 	@SuppressWarnings("unchecked")
 	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd) throws TransportException {
 
-		String typeName = elProp.attributeValue("type");
-		Class<?> type = null;
-		if (typeName != null) {
-			try {
-				type = Class.forName(typeName);
-			} catch (ClassNotFoundException e) {
-				throw new TransportException("Can not create class: " + e, e);
-			}
+		// check if value is null
+		if (elProp.element(XmlExport.ELM_NULL) != null || ATTRVALUE_TRUE.equals(elProp.attributeValue("null"))) {
+			return null;
 		}
+		
+		Class<?> type = getType(elProp.attributeValue("type"));
 
 		if (type == null) {
 			if (pd != null) {
@@ -334,150 +372,167 @@ public class XmlBeanSerializer {
 				}
 			}
 		}
-		// check if value is null
-		boolean isNull = elProp.element(XmlExport.ELM_NULL) != null || ATTRVALUE_TRUE.equals(elProp.attributeValue("null"));
+		
 		
 		Object value = null;
-		if (!isNull) {
+		
+		// check custom object serializers first.
+		for (ICustomObjectSerializer cos : customSerializer) {
+			if (cos.handlesType(type)) {
+				value = cos.deserialize(elProp);
+				
+				// found a custom serializer, directly return the value, even if null
+				return value;
+			}
+		}
+
+		if (Set.class.isAssignableFrom(type)) {
+			// a set.
+			Element elSet = elProp.element(ELM_SET);
+			if (elSet != null) {
+				Set<Object> set = new HashSet<Object>();
+				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
+					Element elSetElement = (Element)itSet.next();
+					set.add(readValue(context, elSetElement, null));
+				}
+				value = set;
+			} else {
+				value = null;
+			}
+		} else if (List.class.isAssignableFrom(type)) {
+			Element elSet = elProp.element(ELM_LIST);
+			if (elSet != null) {
+				List<Object> list = new ArrayList<Object>();
+				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
+					Element elSetElement = (Element)itSet.next();
+					list.add(readValue(context, elSetElement, null));
+				}
+				value = list;
+			} else {
+				value = null;
+			}
 			
-			// check custom object serializers first.
-			boolean found = false;
-			for (ICustomObjectSerializer cos : customSerializer) {
-				if (cos.handlesType(type)) {
-					value = cos.deserialize(elProp);
-					found = true;
-					break;
+		} else if (IPicklistEntry.class.isAssignableFrom(type)){
+
+			IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+			IPicklistEntry entry = null;
+			
+			String picklistId = elProp.attributeValue("picklistid");
+			String key = elProp.attributeValue("key");
+			String text = elProp.getText();
+			
+			if ((picklistId == null || picklistId.trim().isEmpty()) || (key == null || key.trim().isEmpty())) {
+				// maybe it was sent with the ID?
+				
+				String strId = elProp.attributeValue("id");
+				
+				if (strId != null && !strId.isEmpty()) {
+					int id = Integer.parseInt(strId);							
+					entry = plDAO.getPickListEntryByID(id);
+				}
+				
+			} else {
+			
+				String langid = elProp.attributeValue("langid");
+				if (langid == null || langid.length() == 0) {
+					langid = "en";
+				}
+				
+				// try to find by key
+				if (key != null && key.length() != 0 && picklistId != null && picklistId.length() != 0) {
+					entry = plDAO.getPickListEntryByKey(picklistId, key); // try to find by key
+				}
+			
+				// not found, try by title
+				if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
+					List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
+					for (Iterator<IPicklistEntry> it = lst.iterator(); it.hasNext(); ) {
+						IPicklistEntry pe = it.next();
+						if (text.equals(pe.getBezeichnung(langid))) {
+							entry = pe;
+							break;
+						}
+					}
 				}
 			}
 
-			if (!found) {
-				if (Set.class.isAssignableFrom(type)) {
-					// a set.
-					Element elSet = elProp.element(ELM_SET);
-					if (elSet != null) {
-						Set<Object> set = new HashSet<Object>();
-						for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
-							Element elSetElement = (Element)itSet.next();
-							set.add(readValue(context, elSetElement, null));
-						}
-						value = set;
-					} else {
-						value = null;
+			if (entry == null && picklistId != null && text != null) {
+				// create?? 
+				IPickliste plist = plDAO.getPicklisteByKey(picklistId);
+				if (plist != null) {
+					entry = plDAO.createPicklistEntry();
+					entry.setKey(key);
+					entry.setPickliste(plist);
+					plDAO.update(entry);
+					
+					for(Iterator<Language> it = ConfigurationManager.getSetup().getLanguages().iterator(); it.hasNext(); ) {
+						Language lang = it.next();
+						plDAO.createBezeichnung(entry, lang.getId(), text);
 					}
-				} else if (List.class.isAssignableFrom(type)) {
-					Element elSet = elProp.element(ELM_LIST);
-					if (elSet != null) {
-						List<Object> list = new ArrayList<Object>();
-						for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
-							Element elSetElement = (Element)itSet.next();
-							list.add(readValue(context, elSetElement, null));
-						}
-						value = list;
-					} else {
-						value = null;
-					}
-					
-				} else if (IPicklistEntry.class.isAssignableFrom(type)){
-
-					IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
-					IPicklistEntry entry = null;
-					
-					String picklistId = elProp.attributeValue("picklistid");
-					String key = elProp.attributeValue("key");
-					String text = elProp.getText();
-					
-					if ((picklistId == null || picklistId.trim().isEmpty()) || (key == null || key.trim().isEmpty())) {
-						// maybe it was sent with the ID?
-						
-						String strId = elProp.attributeValue("id");
-						
-						if (strId != null && !strId.isEmpty()) {
-							int id = Integer.parseInt(strId);							
-							entry = plDAO.getPickListEntryByID(id);
-						}
-						
-					} else {
-					
-						String langid = elProp.attributeValue("langid");
-						if (langid == null || langid.length() == 0) {
-							langid = "en";
-						}
-						
-						// try to find by key
-						if (key != null && key.length() != 0 && picklistId != null && picklistId.length() != 0) {
-							entry = plDAO.getPickListEntryByKey(picklistId, key); // try to find by key
-						}
-					
-						// not found, try by title
-						if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
-							List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
-							for (Iterator<IPicklistEntry> it = lst.iterator(); it.hasNext(); ) {
-								IPicklistEntry pe = it.next();
-								if (text.equals(pe.getBezeichnung(langid))) {
-									entry = pe;
-									break;
-								}
-							}
-						}
-					}
-	
-					if (entry == null && picklistId != null && text != null) {
-						// create?? 
-						IPickliste plist = plDAO.getPicklisteByKey(picklistId);
-						if (plist != null) {
-							entry = plDAO.createPicklistEntry();
-							entry.setKey(key);
-							entry.setPickliste(plist);
-							plDAO.update(entry);
-							
-							for(Iterator<Language> it = ConfigurationManager.getSetup().getLanguages().iterator(); it.hasNext(); ) {
-								Language lang = it.next();
-								plDAO.createBezeichnung(entry, lang.getId(), text);
-							}
-						}
-					}
-					value = entry;
-					
-				} else if (IEntity.class.isAssignableFrom(type)){
-					// entity type
-					int refId = Integer.parseInt(elProp.attributeValue("id"));
-					Integer newId = context.get(new EntityKey(type.getName(), refId));
-					if (newId != null) {
-						// its an imported object
-						refId = newId.intValue();
-					}
-					DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
-					IEntity refEntity = refDAO.getEntity(refId);
-					value = refEntity;
-					
-				} else {
-					
-					Element elBean = elProp.element("bean");
-					if (elBean != null) {
-						value = deserializeBean(elBean, context);
-					} else {				
-						// basic type
-						String text = elProp.getText();
-						if (String.class.equals(type)) {
-							value = text;
-						} else if (int.class.equals(type) || Integer.class.equals(type)) {
-							value = new Integer(text);
-						} else if (long.class.equals(type) || Long.class.equals(type)) {
-							value = new Long(text);
-						} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
-							value = new Boolean(text.equals("true"));
-						} else if (Date.class.equals(type) || java.sql.Timestamp.class.equals(type)) {
-							// entities coming from the DB have the Date field as java.sql.Timestamp
-							// the serialized value is the ms timestamp, so we can instantiate a Date from it
-							value = new Date(Long.parseLong(text));
-						} else if (double.class.equals(type) || Double.class.equals(type)) {
-							value = new Double(text);
-						}
-					}
+				}
+			}
+			value = entry;
+			
+		} else if (IEntity.class.isAssignableFrom(type)){
+			// entity type
+			int refId = Integer.parseInt(elProp.attributeValue("id"));
+			if (context != null) {
+				Integer newId = context.get(new EntityKey(type.getName(), refId));
+				if (newId != null) {
+					// its an imported object
+					refId = newId.intValue();
+				}
+			}
+			DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
+			IEntity refEntity = refDAO.getEntity(refId);
+			if (refEntity == null){
+				throw new TransportException(String.format("No entity of type %s with id %s.", type, refId));
+			}
+			value = refEntity;
+			
+		} else {
+			
+			Element elBean = elProp.element("bean");
+			if (elBean != null) {
+				value = deserializeBean(elBean, context);
+			} else {				
+				// basic type
+				String text = elProp.getText();
+				if (String.class.equals(type)) {
+					value = text;
+				} else if (int.class.equals(type) || Integer.class.equals(type)) {
+					value = new Integer(text);
+				} else if (long.class.equals(type) || Long.class.equals(type)) {
+					value = new Long(text);
+				} else if (boolean.class.equals(type) || Boolean.class.equals(type)) {
+					value = new Boolean(text.equals("true"));
+				} else if (Date.class.equals(type) || java.sql.Timestamp.class.equals(type)) {
+					// entities coming from the DB have the Date field as java.sql.Timestamp
+					// the serialized value is the ms timestamp, so we can instantiate a Date from it
+					value = new Date(Long.parseLong(text));
+				} else if (double.class.equals(type) || Double.class.equals(type)) {
+					value = new Double(text);
 				}
 			}
 		}
+		
 		return value;
+	}
+
+	/**
+	 * @param typeName
+	 * @return
+	 * @throws TransportException if the class is not found
+	 */
+	private Class<?> getType(final String typeName) throws TransportException {
+		if (typeName != null) {
+			try {
+				return Class.forName(typeName);
+			} catch (ClassNotFoundException e) {
+				throw new TransportException("Can not create class: " + e, e);
+			}
+		}
+		return null;
 	}
 
 }

@@ -1,14 +1,15 @@
 /**
- * 
+ *
  */
 package de.xwic.appkit.core.remote.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,7 +22,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.access.AccessHandler;
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -32,14 +32,14 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
-import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
+import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.XmlEntityTransport;
 
 /**
  * This servlet allows remote applications to access entities on the server. It is the counterpart
  * to the remote.client package.
- * 
+ *
  * @author lippisch
  */
 public class RemoteDataAccessServlet extends HttpServlet {
@@ -53,95 +53,129 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String PARAM_QUERY = "pq";
 	public final static String PARAM_LIMIT = "limit";
 	public final static String PARAM_ETO = "eto";
-	
+
 	public final static String ACTION_GET_ENTITY = "ge";
 	public final static String ACTION_GET_ENTITIES = "gea";
 	public final static String ACTION_UPDATE_ENTITY = "ue";
 	public final static String ACTION_GET_COLLECTION = "gc";
+	public final static String ACTION_SOFT_DELETE = "sdel";
+	public final static String ACTION_DELETE = "del";
 	
+	public final static String ACTION_EXECUTE_USE_CASE = "euc";
+	public final static String ACTION_FILE_HANDLE = "fh";
+
 	public final static String ELM_RESPONSE = "resp";
 	public final static String PARAM_VALUE = "value";
 	public final static String RESPONSE_OK = "1";
 	public final static String RESPONSE_FAILED = "0";
 
 	public final static Log log = LogFactory.getLog(RemoteDataAccessServlet.class);
-	
+
 	private AccessHandler accessHandler;
+	
+	private Map<String, IRequestHandler> handlers;
+
+	/**
+	 *
+	 */
+	public RemoteDataAccessServlet() {
+		accessHandler = AccessHandler.getInstance();
+		
+		registerHandlers();
+	}
 
 	/**
 	 * 
 	 */
-	public RemoteDataAccessServlet() {
-		
-		accessHandler = AccessHandler.getInstance();
-		
+	private void registerHandlers() {
+		List<IRequestHandler> aux = new ArrayList<IRequestHandler>();
+		aux.add(new RemoteFileAccessHandler());
+		aux.add(new UseCaseHandler());
+
+		handlers = new HashMap<String, IRequestHandler>();
+		for (IRequestHandler ha : aux) {
+			handlers.put(ha.getAction(), ha);
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		handleRequest(req, resp);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
 		handleRequest(req, resp);
 	}
 
 	/**
 	 * @param req
 	 * @param resp
-	 * @throws IOException 
+	 * @throws IOException
 	 */
-	private void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 
-		// the API is taking its arguments from the URL and the parameters
-
-		String action = req.getParameter(PARAM_ACTION);
-		if (action == null || action.isEmpty()) {
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing Parameters");
-			return;
-		}
-		
-		// all responses will now basically be an XML document, so we can do some preparations
-		resp.setContentType("text/xml");
-		PrintWriter pwOut = resp.getWriter();
+		IParameterProvider pp = new ParameterProvider(req);
 
 		try {
-			
-			String entityType = req.getParameter(PARAM_ENTITY_TYPE);
-			assertValue(entityType, "Entity Type not specified");
-			
-			if (action.equals(ACTION_GET_ENTITY)) {
-				handleGetEntity(entityType, req, resp, pwOut);
-				
-			} else if (action.equals(ACTION_GET_ENTITIES)) {
-				handleGetEntities(entityType, req, resp, pwOut);
-				
-			} else if (action.equals(ACTION_UPDATE_ENTITY)) {
-				handleUpdateEntity(entityType, req, resp, pwOut);
-					
-			} else if (action.equals(ACTION_GET_COLLECTION)) {
-				handleGetCollection(entityType, req, resp, pwOut);
+			// the API is taking its arguments from the URL and the parameters
+			final String action = pp.getParameter(PARAM_ACTION);
 
-			} else {
-				throw new IllegalArgumentException("Unknown action");
+			if (action == null || action.isEmpty()) {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Missing Parameters");
+				return;
 			}
+
+			IRequestHandler handler = handlers.get(action);
 			
-			pwOut.flush();
-			pwOut.close();
-			
+			if (handler != null) {
+				
+				handler.handle(pp, resp);
+				
+			} else {
+				// all responses will now basically be an XML document, so we can do some preparations
+				PrintWriter pwOut = resp.getWriter();
+				resp.setContentType("text/xml");
+				
+				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
+				assertValue(entityType, "Entity Type not specified");
+
+				if (action.equals(ACTION_GET_ENTITY)) {
+					handleGetEntity(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_GET_ENTITIES)) {
+					handleGetEntities(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_UPDATE_ENTITY)) {
+					handleUpdateEntity(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_GET_COLLECTION)) {
+					handleGetCollection(entityType, req, resp, pwOut);
+
+				} else if (action.equals(ACTION_DELETE) || action.equals(ACTION_SOFT_DELETE)) {
+					handleDelete(entityType, req, resp, pwOut, action.equals(ACTION_SOFT_DELETE));
+					
+				} else {
+					throw new IllegalArgumentException("Unknown action");
+				}
+				
+				pwOut.flush();
+				pwOut.close();
+				
+			}
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.toString());
 		}
-		
-		
+
+
 	}
 
 	/**
@@ -149,24 +183,49 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @param req
 	 * @param resp
 	 * @param pwOut
-	 * @throws ConfigurationException 
-	 * @throws IOException 
+	 * @param equals
+	 * @throws ConfigurationException
+	 */
+	private void handleDelete(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut,
+			final boolean softDelete) throws ConfigurationException {
+
+		String entityId = req.getParameter(PARAM_ENTITY_ID);
+		String version = req.getParameter(PARAM_VERSION);
+
+		assertValue(entityId, "Entity Id not specified");
+		assertValue(version, "Version not specified");
+
+		if (softDelete) {
+			accessHandler.softDelete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+		} else {
+			accessHandler.delete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+		}
+
+		printResponse(pwOut, RESPONSE_OK);
+	}
+
+	/**
+	 * @param entityType
+	 * @param req
+	 * @param resp
+	 * @param pwOut
+	 * @throws ConfigurationException
+	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void handleGetCollection(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws ConfigurationException, IOException {
-		
+	private void handleGetCollection(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException {
+
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 		String propName = req.getParameter(PARAM_ENTITY_PROPERTY);
-		
-		assertValue(entityType, "Entity Type not specified");
+
 		assertValue(entityId, "Entity Id not specified");
 		assertValue(propName, "Entity PropertyName not specified");
 
 		int eId = Integer.parseInt(entityId);
-		
-		
+
+
 		Object collection = accessHandler.getETOCollection(entityType, eId, propName);
-	
+
 		List list = new ArrayList();
 		if (collection instanceof Collection<?>) {
 			for (Object o : (Collection<?>)collection) {
@@ -180,81 +239,76 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	}
 
 	/**
-	 * @param entityType 
+	 * @param entityType
 	 * @param req
 	 * @param resp
 	 * @param pwOut
-	 * @throws DocumentException 
-	 * @throws TransportException 
+	 * @throws DocumentException
+	 * @throws TransportException
+	 * @throws ConfigurationException
+	 * @throws IOException
 	 */
-	private void handleUpdateEntity(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws DocumentException, TransportException {
-		
+	private void handleUpdateEntity(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws DocumentException, TransportException, ConfigurationException, IOException {
+
 		String strEto = req.getParameter(PARAM_ETO);
-		
-		assertValue(strEto, "ETO details not specified");
-		
-		// deserialize ETO
-		
-		SAXReader xmlReader = new SAXReader();
-		Document doc = xmlReader.read(new StringReader(strEto));
-		
-		XmlEntityTransport xet = new XmlEntityTransport();
-		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
-		
-		if (!list.isEmpty()) {
-			EntityTransferObject eto = (EntityTransferObject) list.get(0);
-			accessHandler.updateETO(eto);
-			
-			printResponse(pwOut, RESPONSE_OK);
-		} else {
-			throw new IllegalStateException("ETO could not be parsed: " + strEto);
+
+		EntityTransferObject eto = EtoSerializer.deserialize(strEto);
+
+		EntityTransferObject result = accessHandler.updateETO(eto);
+
+		if (result == null) {
+			throw new IllegalStateException("Result ETO is null");
 		}
+
+		String strResult = EtoSerializer.serialize(entityType, result);
+
+		pwOut.write(strResult);
+		pwOut.flush();
 	}
 
 	/**
-	 * @param entityType 
+	 * @param entityType
 	 * @param req
 	 * @param resp
 	 * @param pwOut
-	 * @throws ConfigurationException 
-	 * @throws IOException 
+	 * @throws ConfigurationException
+	 * @throws IOException
 	 */
-	private void handleGetEntities(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws ConfigurationException, IOException, TransportException {
+	private void handleGetEntities(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException, TransportException {
 		Limit limit = null;
 		String strLimit = req.getParameter(PARAM_LIMIT);
 		if (strLimit != null && !strLimit.isEmpty()) {
 			limit = EntityQuerySerializer.stringToLimit(strLimit);
 		}
-		
+
 		EntityQuery query = null;
 		String strQuery = req.getParameter(PARAM_QUERY);
 		if (strQuery != null && !strQuery.isEmpty()) {
 			query = EntityQuerySerializer.stringToQuery(strQuery);
 		}
-		
+
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityList list = accessHandler.getEntities(entityType, limit, query);
-	
-		XmlEntityTransport et = new XmlEntityTransport();		
-		et.write(pwOut, list, entityDescriptor, query.getColumns());		
+
+		XmlEntityTransport et = new XmlEntityTransport();
+		et.write(pwOut, list, entityDescriptor, query.getColumns());
 	}
 
 
 	/**
-	 * @param entityType 
+	 * @param entityType
 	 * @param req
 	 * @param resp
 	 * @param pwOut
-	 * @throws ConfigurationException 
-	 * @throws IOException 
+	 * @throws ConfigurationException
+	 * @throws IOException
 	 */
-	private void handleGetEntity(String entityType, HttpServletRequest req, HttpServletResponse resp, PrintWriter pwOut) throws ConfigurationException, IOException {
+	private void handleGetEntity(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException {
 
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
-		
-		assertValue(entityType, "Entity Type not specified");
+
 		assertValue(entityId, "Entity Id not specified");
-		
+
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityTransferObject eto = accessHandler.getETO(entityType, Integer.parseInt(entityId));
 
@@ -266,16 +320,16 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @param entityType
 	 * @param message
 	 */
-	private void assertValue(String value, String message) {
+	private void assertValue(final String value, final String message) {
 		if (value == null || value.isEmpty()) {
 			throw new IllegalArgumentException(message);
 		}
 	}
-	
+
 	/**
-	 * @param pwOut 
+	 * @param pwOut
 	 */
-	private void printResponse(PrintWriter pwOut, String response) {
+	public static void printResponse(final PrintWriter pwOut, final String response) {
 		Document docResponse = DocumentFactory.getInstance().createDocument();
 		Element rootResponse = docResponse.addElement(ELM_RESPONSE);
 		rootResponse.addAttribute(PARAM_VALUE, response);

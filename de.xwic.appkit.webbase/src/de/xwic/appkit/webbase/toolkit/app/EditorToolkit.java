@@ -10,6 +10,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.CheckBoxGroup;
@@ -40,6 +43,8 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryMultiSelectControl;
  * @author Ronny Pfretzschner
  */
 public class EditorToolkit {
+
+	private final Log log = LogFactory.getLog(getClass());
 	
 	public static Map<Class<? extends IControl>, IToolkitControlHelper> allControls = new HashMap<Class<? extends IControl>, IToolkitControlHelper>();
 	private Map<String, IControl> registeredControls = new HashMap<String, IControl>();
@@ -91,18 +96,23 @@ public class EditorToolkit {
 	 * @param optionalParam 
 	 * @return a control
 	 */
-	public <C extends IControl> C createControl(Class<C> controlType, IControlContainer container, String propertyName, Object optionalParam) {
-		IToolkitControlHelper<C> implclass = allControls.get(controlType);
-		
-		if (implclass != null) {
-			C con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
-			
-			if (con != null) {
-				registeredControls.put(propertyName, con);
-				return con;
-			} 
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, 
+			final String propertyName, final Object optionalParam) {
+
+		final IToolkitControlHelper<C> implclass = allControls.get(controlType);
+		if (implclass == null) {
+			log.error("Control type not registered: " + controlType, new IllegalStateException());
+			return null;
 		}
-		return null;
+
+		final C con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
+		if (con == null) {
+			log.error("Implementation doesn't return anything, bad implementation " + implclass.getClass(), new IllegalStateException());
+			return null;
+		}
+
+		registeredControls.put(propertyName, con);
+		return con;
 	}
 	
 

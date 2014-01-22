@@ -133,6 +133,26 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * Used to filter a collection of <b>objects</b><br>
+	 * Only the values that return true are kept<br>
+	 * <b>It is your responsibility to make sure that the element is not null, consider {@link NotNullFilter}</b><br>
+	 * @param objects the collection from which we create the collection
+	 * @param filter the filter
+	 * @return the filtered collection passed as the parameter. <b>the original collection is also altered.</b>
+	 */
+	public static <C extends Collection<O>, O> C filter(C objects, IFilter<O> filter) {
+		if (objects != null) {
+			Iterator<O> iterator = objects.iterator();
+			while (iterator.hasNext()) {
+				if (!filter.keep(iterator.next())) {
+					iterator.remove();
+				}
+			}
+		}
+		return objects;
+	}
+
+	/**
 	 * used to break a large collection into smaller collection
 	 * @param collection
 	 * @param maxElements

@@ -305,8 +305,11 @@ public class XmlConfigLoader {
 								prop.load(in);
 								in.close();
 								// use unsynchronized hashMap
-								HashMap<Object, Object> map = new HashMap<Object, Object>();
-								map.putAll(prop);
+								HashMap<String, String> map = new HashMap<String, String>();
+								for (Object key : prop.keySet()) {
+									String strKey = (String) key;
+									map.put(strKey, prop.getProperty(strKey));
+								}
 								domain.addBundle(lang.getId(), new Bundle(map));
 							} catch (Exception e) {
 								// file might not exist. 
