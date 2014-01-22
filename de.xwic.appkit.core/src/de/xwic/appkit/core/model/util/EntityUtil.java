@@ -25,6 +25,9 @@ import de.xwic.appkit.core.util.ILazyEval;
  */
 public final class EntityUtil {
 
+	public static final int NEW_ENTITY_ID = 0;
+	public static final int LOWEST_POSSIBLE_ID = 1;
+
 	public final static ILazyEval<IEntity, Integer> ENTITY_ID_EVALUATOR = new ILazyEval<IEntity, Integer>() {
 
 		@Override

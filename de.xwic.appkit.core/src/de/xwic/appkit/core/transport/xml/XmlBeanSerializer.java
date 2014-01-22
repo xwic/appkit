@@ -29,6 +29,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
+import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
 import de.xwic.appkit.core.dao.DAO;
@@ -39,6 +40,8 @@ import de.xwic.appkit.core.export.XmlExport;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPickliste;
+import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
 /**
@@ -147,6 +150,10 @@ public class XmlBeanSerializer {
 				if (!"class".equals(pd.getName())) {
 					Element pElm = root.addElement(pd.getName());
 					Method mRead = pd.getReadMethod();
+					if (mRead == null) {
+						log.debug(String.format("No '%s' property on '%s'.", pd.getName(), bean.getClass()));
+						continue;
+					}
 					Object value = mRead.invoke(bean, NO_ARGS);
 					
 					boolean addType = true;
@@ -242,6 +249,10 @@ public class XmlBeanSerializer {
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity)value;
 			typeInfo = entity.type().getName();
+			if (entity.getId() == EntityUtil.NEW_ENTITY_ID) {
+				EntityTransferObject eto = new EntityTransferObject(entity, true);
+				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
+			}
 			elm.addAttribute("id", Integer.toString(entity.getId()));
 			DAO dao = DAOSystem.findDAOforEntity(entity.type());
 			elm.setText(dao.buildTitle(entity));
@@ -484,7 +495,12 @@ public class XmlBeanSerializer {
 				}
 			}
 			DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
-			IEntity refEntity = refDAO.getEntity(refId);
+			final IEntity refEntity;
+			if (refId == EntityUtil.NEW_ENTITY_ID) {
+				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
+			} else {
+				refEntity = refDAO.getEntity(refId);
+			}
 			if (refEntity == null){
 				throw new TransportException(String.format("No entity of type %s with id %s.", type, refId));
 			}

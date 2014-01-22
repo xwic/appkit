@@ -120,6 +120,10 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+//		This method can be called repeatedly to change the character encoding.
+//		This method has no effect if it is called after getWriter has been called or after
+//		the response has been committed.
+		resp.setContentType("text/xml; charset=UTF-8");
 
 		IParameterProvider pp = new ParameterProvider(req);
 
@@ -141,7 +145,6 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			} else {
 				// all responses will now basically be an XML document, so we can do some preparations
 				PrintWriter pwOut = resp.getWriter();
-				resp.setContentType("text/xml");
 				
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
