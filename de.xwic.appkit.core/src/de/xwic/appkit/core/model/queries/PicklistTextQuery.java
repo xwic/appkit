@@ -18,6 +18,7 @@ public class PicklistTextQuery extends EntityQuery {
 	private int picklistEntryID = -1;
 	private String bezeichnung = null;
 	private int picklisteID = -1;
+	private boolean excludeDeletedParents = false;
 	
 	/**
 	 * Default Constructor.
@@ -104,6 +105,14 @@ public class PicklistTextQuery extends EntityQuery {
 	 */
 	public void setPicklisteID(int picklisteID) {
 		this.picklisteID = picklisteID;
+	}
+
+	public boolean isExcludeDeletedParents() {
+		return excludeDeletedParents;
+	}
+
+	public void setExcludeDeletedParents(boolean excludeDeletedParents) {
+		this.excludeDeletedParents = excludeDeletedParents;
 	}
 	
 }
