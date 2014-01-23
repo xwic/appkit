@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.zefer.html.doc.q;
 
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityQuery;
@@ -166,13 +167,24 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 			sb.append(" ").append(customWhere).append(" ");
 		}
+
+		// add the order by part
 		
 		String orderBy = "";
 		if (!justCount) {
 			boolean hasCriteria = size != 0 || query.isHideDeleted();
 			orderBy = addSortingClause(query, "obj", hasCriteria, sbFrom, entityClass);
 		}
-		
+			
+		if(query.isConsistentOrder() && orderBy.indexOf("obj.id") == -1) {
+			if(orderBy.length() != 0) {
+				orderBy += ", "; 
+			} else {
+				orderBy = " order by ";
+			}
+			orderBy += "obj.id asc";
+		}
+				
 		if (checkPicklistJoin) {
 			PicklistJoinQueryParser tescht = new PicklistJoinQueryParser(entityClass.getName(), sbFrom.toString(), sb.toString(), query.getLanguageId(), justCount);
 			return tescht.toString() + " " + orderBy;
@@ -182,7 +194,6 @@ public class PropertyQueryResolver extends QueryResolver {
 				sb.toString() + " " + orderBy;
 			return erg;
 		}
-		
 	}
 
 	/**
