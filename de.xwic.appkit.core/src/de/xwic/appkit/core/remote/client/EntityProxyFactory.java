@@ -26,23 +26,12 @@ public class EntityProxyFactory {
 		// build list of interfaces
 		final Class[] interfaces = eto.getEntityClass().getInterfaces();
 
-		return (IEntity) Proxy.newProxyInstance(getClassLoader(interfaces),
-				interfaces,
-				handler);
-	}
-
-	/**
-	 * @param interfaces
-	 * @return
-	 */
-	private static ClassLoader getClassLoader(final Class... interfaces) {
-		if (interfaces != null && interfaces.length > 0) {
-			return interfaces[0].getClassLoader();
-		}
 //		i think that the classloader that contains IEntity would be a better idea
 //		since etoClass is bound to have IEntity in it, the system classloader isn't
-//		return ClassLoader.getSystemClassLoader();
-		return IEntity.class.getClassLoader();
+//		return (IEntity) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(),
+		return (IEntity) Proxy.newProxyInstance(IEntity.class.getClassLoader(),
+				interfaces,
+				handler);
 	}
 
 }
