@@ -5,12 +5,14 @@ package de.xwic.appkit.core.remote.client;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.UseCase;
+import de.xwic.appkit.core.security.ScopeActionKey;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.TransportException;
 
@@ -77,4 +79,11 @@ public interface IRemoteDataAccessClient {
 	 * @throws TransportException 
 	 */
 	public Object executeUseCase(UseCase uc) throws TransportException;
+	
+	/**
+	 * @param userId
+	 * @return
+	 * @throws TransportException
+	 */
+	public Set<ScopeActionKey> getUserRights(int userId) throws TransportException;
 }
