@@ -33,6 +33,12 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	private List<QueryElement> elements = new ArrayList<QueryElement>();
 	private Map<String, String> leftOuterJoinProperties = new LinkedHashMap<String, String>();
 	
+	/**
+	 * If set to true then the results should be sorted by id to maintain order consistency.
+	 * If a sort field already exists then the id is set as a second sort column.
+	 */
+	private Boolean consistentOrder = false;
+	
 	private String wildcardPreferenceSetting = null;
 	
 	/**
@@ -65,6 +71,10 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	public PropertyQuery() {
 		
+	}
+	
+	public PropertyQuery(Boolean consistentOrder) {
+		this.consistentOrder = consistentOrder;
 	}
 	
 	/**
@@ -606,6 +616,15 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			}
 		}
 		return collection instanceof HashSet ? collection : new HashSet(collection);
+	}
+
+	public Boolean isConsistentOrder() {
+		return consistentOrder;
+	}
+
+	
+	public void setConsistentOrder(Boolean consistentOrder) {
+		this.consistentOrder = consistentOrder;
 	}
 
 	/* (non-Javadoc)
