@@ -3,7 +3,9 @@
  */
 package de.xwic.appkit.core.model.util;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +29,9 @@ public final class EntityUtil {
 
 	public static final int NEW_ENTITY_ID = 0;
 	public static final int LOWEST_POSSIBLE_ID = 1;
+
+	private static final Collection<Class<? extends IEntity>> INVALID_TYPES =
+			Collections.unmodifiableCollection(Arrays.asList(IEntity.class, IHistory.class));
 
 	public final static ILazyEval<IEntity, Integer> ENTITY_ID_EVALUATOR = new ILazyEval<IEntity, Integer>() {
 
@@ -161,6 +166,33 @@ public final class EntityUtil {
 	 * @throws IllegalStateException if no type can be found
 	 */
 	public static Class<? extends IEntity> type(final Class<?> myClass) throws IllegalStateException {
+		if (myClass != null && myClass.isInterface()) {
+			if (isSatisfactoryEntityType(myClass)) {
+				return (Class<? extends IEntity>) myClass;
+			}
+		}
+		return oldType(myClass);
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 * @throws IllegalStateException if no type can be found
+	 */
+	public static Class<? extends IEntity> type(final IEntity entity) throws IllegalStateException {
+		Class<?> c = null;
+		if (entity != null) {
+			c = entity.getClass();
+		}
+		return oldType(c);
+	}
+
+	/**
+	 * @param myClass
+	 * @return
+	 * @throws IllegalStateException if no type can be found
+	 */
+	public static Class<? extends IEntity> oldType(final Class<?> myClass) throws IllegalStateException {
 
 		// this method makes a 'guess' what type of entity it is by
 		// iterating through all interfaces the instance implements
@@ -169,15 +201,25 @@ public final class EntityUtil {
 		Class<?> clasz = myClass;
 		while (clasz != null) {
 			Class<?>[] interfaces = clasz.getInterfaces();
-			for (int i = 0; i < interfaces.length; i++) {
-				if (!interfaces[i].equals(IEntity.class) && !interfaces[i].equals(IHistory.class)
-						&& IEntity.class.isAssignableFrom(interfaces[i])) {
-					return (Class<? extends IEntity>) interfaces[i];
+			for (Class<?> current : interfaces) {
+				if (isSatisfactoryEntityType(current)) {
+					return (Class<? extends IEntity>) current;
 				}
 			}
 			clasz = clasz.getSuperclass();
 		}
 
-		throw new IllegalStateException("Can't determine type!");
+		throw new IllegalStateException("Can't determine entity type.");
+	}
+
+	/**
+	 * @param clasz
+	 * @return
+	 */
+	private static boolean isSatisfactoryEntityType(final Class clasz) {
+		if (!INVALID_TYPES.contains(clasz)) {
+			return IEntity.class.isAssignableFrom(clasz);
+		}
+		return false;
 	}
 }
