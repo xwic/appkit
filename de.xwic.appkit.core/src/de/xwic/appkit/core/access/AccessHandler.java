@@ -7,18 +7,13 @@
  */
 package de.xwic.appkit.core.access;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,9 +43,6 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
-import de.xwic.appkit.core.util.AIMap;
-import de.xwic.appkit.core.util.ILazyEval;
-import de.xwic.appkit.core.util.MapUtil;
 
 /**
  * <p>Handles common access operations to the backend model using
@@ -301,26 +293,8 @@ public class AccessHandler {
     		log.debug("getETO " + classname + " ID#" + id + " by user " + getCurrentUsername());
     	}
 
-    	DAO dao = DAOSystem.findDAOforEntity(classname);
-    	IEntity entity;
-
-    	if (classname.endsWith("PicklistEntry")) {
-    		IPicklisteDAO plDAO = (IPicklisteDAO)dao;
-    		entity = plDAO.getPickListEntryByID(id);
-    	} else if (classname.endsWith("PicklistText")) {
-    		IPicklisteDAO plDAO = (IPicklisteDAO)dao;
-    		entity = plDAO.getPickListTextByID(id);
-    	} else {
-			try {
-				if (IHistory.class.isAssignableFrom(Class.forName(classname))) {
-					entity = dao.getHistoryEntity(id);
-				} else {
-					entity = dao.getEntity(id);
-				}
-			} catch (ClassNotFoundException e) {
-				throw new DataAccessException("Unknown classname specified: " + classname);			
-			}
-    	}
+    	IEntity entity = getEntityById(classname, id);
+    	
     	return entity != null ?  new EntityTransferObject(entity) : null;
     	
 	}
@@ -337,17 +311,9 @@ public class AccessHandler {
     	if (log.isDebugEnabled()) {
     		log.debug("getETOCollection: " + classname + "." + property + " ID#" + id + " by user " + getCurrentUsername());
     	}
-    	DAO dao = DAOSystem.findDAOforEntity(classname);
-    	IEntity entity;
-		try {
-			if (IHistory.class.isAssignableFrom(Class.forName(classname))) {
-				entity = dao.getHistoryEntity(id);
-			} else {
-				entity = dao.getEntity(id);
-			}
-		} catch (ClassNotFoundException e) {
-			throw new DataAccessException("Unknown classname specified: " + classname);			
-		}
+    	
+    	IEntity entity = getEntityById(classname, id);
+    	
     	try {
 	    	// extract property value
 	    	PropertyDescriptor descr = new PropertyDescriptor(property, entity.getClass());
@@ -381,6 +347,37 @@ public class AccessHandler {
     	}
     	
 	}	
+	
+	
+	/**
+	 * @param classname
+	 * @param id
+	 * @return
+	 */
+	private IEntity getEntityById(String classname, int id) {
+		DAO dao = DAOSystem.findDAOforEntity(classname);
+    	IEntity entity;
+
+    	if (classname.endsWith("PicklistEntry")) {
+    		IPicklisteDAO plDAO = (IPicklisteDAO)dao;
+    		entity = plDAO.getPickListEntryByID(id);
+    	} else if (classname.endsWith("PicklistText")) {
+    		IPicklisteDAO plDAO = (IPicklisteDAO)dao;
+    		entity = plDAO.getPickListTextByID(id);
+    	} else {
+			try {
+				if (IHistory.class.isAssignableFrom(Class.forName(classname))) {
+					entity = dao.getHistoryEntity(id);
+				} else {
+					entity = dao.getEntity(id);
+				}
+			} catch (ClassNotFoundException e) {
+				throw new DataAccessException("Unknown classname specified: " + classname);			
+			}
+    	}
+    	
+    	return entity;
+	}
 	
 	/**
 	 * Update the entity specified by this EntityTransferObject.

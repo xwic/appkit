@@ -19,7 +19,6 @@ import java.util.Set;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Model;
-import de.xwic.appkit.core.config.model.Property;
 
 /**
  * The setup is the central dictionary for the systems configuration. The model

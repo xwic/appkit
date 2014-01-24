@@ -49,14 +49,22 @@ public class BundleProvider implements IBundleProvider {
 	 */
 	@Override
 	public Bundle getBundle(SessionContext sessionContext) {
+		String langId = sessionContext.getLocale().getLanguage();
+		return getBundle(langId);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.toolkit.util.bundles.IBundleProvider#getBundle(java.lang.String)
+	 */
+	@Override
+	public Bundle getBundle(String langId) {
 		// override with the one from the LanguageProvider
 		// this is used only to allow overriding the languages and using a default one for certain bundles
 		
-		String langId = sessionContext.getLocale().getLanguage();
 		Language langFromProvider = languageProvider.getLanguageById(langId);
 		langId = langFromProvider != null ? langFromProvider.getId() : langId;
 		
-		return bundles.get(langId);
+		return bundles.get(langId);		
 	}
 	
 	/**

@@ -18,4 +18,9 @@ public interface IBundleProvider {
 	 */
 	public Bundle getBundle(SessionContext sessionContext);
 	
+	/**
+	 * @param langId
+	 * @return
+	 */
+	public Bundle getBundle(String langId);
 }

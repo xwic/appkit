@@ -37,6 +37,10 @@ public class PicklistTextQueryResolver implements IEntityQueryResolver {
 		
 		sb.append(" AS obj where obj.deleted = 0 ");
 		
+		if (query.isExcludeDeletedParents()) {
+			sb.append(" AND picklistEntry.deleted = 0 AND picklistEntry.pickliste.deleted = 0 ");
+		}
+		
 		if (query.getPicklistEntryID() > 0) {
 		  sb.append(" AND obj.picklistEntry.id = ?");
 			if (query.getLanguageId() != null) {
