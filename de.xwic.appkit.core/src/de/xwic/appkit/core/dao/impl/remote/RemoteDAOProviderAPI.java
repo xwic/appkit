@@ -46,7 +46,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	@Override
 	public IEntity getEntity(Class<? extends Object> clazz, int id) throws DataAccessException {
 		try {
-			Class<? extends Object> trueClass = getEntityType(clazz);
+			Class<? extends Object> trueClass = EntityUtil.type(clazz);
 			EntityTransferObject eto = client.getETO(trueClass.getName(), id);
 			return eto != null ? EntityProxyFactory.createEntityProxy(eto) : null;
 		} catch (TransportException e) {
@@ -92,7 +92,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	@Override
 	public EntityList getEntities(Class<? extends Object> clazz, Limit limit, EntityQuery filter) {
 		try {
-			Class<? extends Object> trueClass = getEntityType(clazz);
+			Class<? extends Object> trueClass = EntityUtil.type(clazz);
 			
 			EntityList objects = client.getList(trueClass.getName(), limit, filter);
 			
@@ -149,28 +149,5 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	@Override
 	public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId) {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @param clazz
-	 * @return
-	 */
-	private Class<? extends Object> getEntityType(Class<? extends Object> clazz) {
-
-		// the abstract DAO makes the call with the implementation class name, 
-		// therefore we need to translate it back to the type name
-		
-		Class<? extends Object> trueClass = null;
-		
-		// PicklistEntries and PicklistText are handled by the PicklistDao, this is why we need to hardcode below 
-		if (clazz.getName().endsWith("PicklistEntry")) {
-			trueClass = IPicklistEntry.class;
-		} else if (clazz.getName().endsWith("PicklistText")) {
-			trueClass = IPicklistText.class;
-		} else {
-			trueClass = EntityUtil.type(clazz);				
-		}
-		
-		return trueClass;
 	}
 }
