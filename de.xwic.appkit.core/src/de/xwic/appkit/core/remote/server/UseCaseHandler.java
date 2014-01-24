@@ -6,7 +6,6 @@ package de.xwic.appkit.core.remote.server;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.xwic.appkit.core.dao.UseCase;

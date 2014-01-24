@@ -3,7 +3,6 @@
  */
 package de.xwic.appkit.core.transport.xml;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 

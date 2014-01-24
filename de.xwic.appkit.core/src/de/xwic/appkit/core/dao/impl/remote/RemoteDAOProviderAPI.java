@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 import de.xwic.appkit.core.dao.DAOProviderAPI;
-import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.EntityList;
