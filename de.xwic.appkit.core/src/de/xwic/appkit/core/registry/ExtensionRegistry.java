@@ -38,7 +38,7 @@ public class ExtensionRegistry {
 	private Map<String, Map<String, List<IExtension>>> extensions; //<extensionPointId, <extensionId, List<IExtension>>>
 	
 	private ExtensionSortIndexComparator sortIndexComparator = new ExtensionSortIndexComparator();
-	private ExtensionSortIndexComparator priorityComparator = new ExtensionSortIndexComparator();
+	private ExtensionPriorityComparator priorityComparator = new ExtensionPriorityComparator();
 	
 	/**
 	 * 

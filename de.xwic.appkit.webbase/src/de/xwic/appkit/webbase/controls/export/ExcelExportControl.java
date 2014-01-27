@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

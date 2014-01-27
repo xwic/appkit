@@ -28,7 +28,6 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.model.queries.PicklistEntryQuery;
 import de.xwic.appkit.core.model.queries.PicklistQuery;
 import de.xwic.appkit.core.model.queries.PicklistTextQuery;
-import de.xwic.appkit.core.model.queries.PropertyQuery;
 
 /**
  * DAO implementation for the Pickliste object.
@@ -415,17 +414,19 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
     			// clear cache
     			cache.clear();
 
-    			PropertyQuery query = new PropertyQuery();
 //    			2013-10-04:
 //    			if a picklist entry doesn't have a picklist text we assume that this is
 //    			because it's a new language so we create a new text for it
 //    			when we left outer join, we also fetch the deleted picklist entry and pickliste
 //    			which causes them to get cached and show up in selectors
 
-//				query.addLeftOuterJoinProperty("picklistEntry");
-//				query.addLeftOuterJoinProperty("picklistEntry.pickliste");
-				query.addEquals("picklistEntry.deleted", false);
-				query.addEquals("picklistEntry.pickliste.deleted", false);
+    			// use the PicklistTextQuery because, since we don't have dedicated DAOs for PicklistTexts
+    			// a normal query won't work when called from a remote client
+    			PicklistTextQuery query = new PicklistTextQuery();
+    			query.setExcludeDeletedParents(true);
+    			query.setLanguageId(null);
+//				query.addEquals("picklistEntry.deleted", false);
+//				query.addEquals("picklistEntry.pickliste.deleted", false);
 
 				List<IPicklistText> list = api.getEntities(PicklistText.class, null, query);
 				for (IPicklistText text : list) {

@@ -39,15 +39,31 @@ public class Domain {
 	}
 
 	/**
+	 * @param langId
+	 * @param bundle
+	 */
+	public void addBundle(String langId, Bundle bundle) {
+		this.addBundle(langId, bundle, false);
+	}
+	
+	/**
 	 * Add a bundle.
 	 * @param basename
 	 * @param location
 	 */
-	public void addBundle(String langId, Bundle bundle) {
+	public void addBundle(String langId, Bundle bundle, boolean mergeIfExists) {
 		Bundle currBundle = bundles.get(langId);
 		if (currBundle != null) {
-			bundle.setLinkedBundle(currBundle);
+			
+			// merge is different than link, merge overrides common values while link
+			// simply adds to the existing set			
+			if (mergeIfExists) {
+				currBundle.merge(bundle);
+			} else {			
+				bundle.setLinkedBundle(currBundle);
+			}
 		}
+		
 		bundles.put(langId, bundle);
 	}
 	

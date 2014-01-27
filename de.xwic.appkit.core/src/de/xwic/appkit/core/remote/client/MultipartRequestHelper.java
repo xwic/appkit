@@ -10,7 +10,10 @@ import java.io.UnsupportedEncodingException;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 
+import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.SystemSecurityManager;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.security.IUser;
 
 /**
  * @author Alexandru Bledea
@@ -31,6 +34,12 @@ public class MultipartRequestHelper implements IRequestHelper {
 	public MultipartRequestHelper(final MultipartEntity entity, final RemoteSystemConfiguration config) throws UnsupportedEncodingException {
 		targetUrl = config.getRemoteBaseUrl() + config.getApiSuffix();
 		entity.addPart(RemoteDataAccessServlet.PARAM_RSID, new StringBody(config.getRemoteSystemId()));
+		
+		IUser currentUser = DAOSystem.getSecurityManager().getCurrentUser();
+		if (currentUser != null && !SystemSecurityManager.USER.equals(currentUser.getLogonName())) {
+			entity.addPart(RemoteDataAccessServlet.PARAM_USERNAME, new StringBody(currentUser.getLogonName()));
+		}
+		
 		this.entity = entity;
 		contentType = entity.getContentType().getValue();
 		contentLength = entity.getContentLength();
