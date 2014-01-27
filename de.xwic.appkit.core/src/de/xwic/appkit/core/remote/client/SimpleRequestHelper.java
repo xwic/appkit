@@ -36,7 +36,7 @@ class SimpleRequestHelper implements IRequestHelper {
 			param.put(PARAM_RSID, config.getRemoteSystemId());
 			
 			IUser currentUser = DAOSystem.getSecurityManager().getCurrentUser();
-			if (currentUser != null && !"SYSTEM".equals(currentUser.getLogonName())) {
+			if (currentUser != null) {
 				param.put(RemoteDataAccessServlet.PARAM_USERNAME, currentUser.getLogonName());
 			}
 
