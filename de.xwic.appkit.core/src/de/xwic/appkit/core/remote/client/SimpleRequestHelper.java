@@ -11,6 +11,10 @@ import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.security.IUser;
+
 /**
  * @author Alexandru Bledea
  * @since Jan 15, 2014
@@ -30,6 +34,11 @@ class SimpleRequestHelper implements IRequestHelper {
 		try {
 			targetUrl = config.getRemoteBaseUrl() + config.getApiSuffix();
 			param.put(PARAM_RSID, config.getRemoteSystemId());
+			
+			IUser currentUser = DAOSystem.getSecurityManager().getCurrentUser();
+			if (currentUser != null && !"SYSTEM".equals(currentUser.getLogonName())) {
+				param.put(RemoteDataAccessServlet.PARAM_USERNAME, currentUser.getLogonName());
+			}
 
 			StringBuilder sbParam = new StringBuilder();
 			for (Entry<String, String> entry : param.entrySet()) {

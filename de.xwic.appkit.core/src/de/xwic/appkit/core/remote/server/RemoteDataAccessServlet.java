@@ -53,6 +53,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String PARAM_QUERY = "pq";
 	public final static String PARAM_LIMIT = "limit";
 	public final static String PARAM_ETO = "eto";
+	public final static String PARAM_USERNAME = "usr";
 
 	public final static String ACTION_GET_ENTITY = "ge";
 	public final static String ACTION_GET_ENTITIES = "gea";
