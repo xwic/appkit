@@ -13,6 +13,8 @@ import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +71,11 @@ public class XmlBeanSerializer {
 	 * 
 	 */
 	public  static final String ELM_LIST = "list";
+	/**
+	 * 
+	 */
+	public static final String ELM_BEAN = "bean";
+	
 
 	private final static Object[] NO_ARGS = new Object[0];
 	protected static final Log log = LogFactory.getLog(XmlBeanSerializer.class);
@@ -99,6 +106,16 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public static String serializeToXML(String rootElement, Object bean) throws TransportException {
+		return serializeCollectionToXML(rootElement, Arrays.asList(bean));
+	}
+	
+	/**
+	 * @param rootElement
+	 * @param beans
+	 * @return
+	 * @throws TransportException
+	 */
+	public static String serializeCollectionToXML(String rootElement, Collection<?> beans) throws TransportException {
 		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 		OutputStreamWriter writer = new OutputStreamWriter(baOut);
 		
@@ -106,8 +123,11 @@ public class XmlBeanSerializer {
 			Document doc = DocumentFactory.getInstance().createDocument();
 			Element root = doc.addElement(rootElement);
 			
-			XmlBeanSerializer xml = new XmlBeanSerializer();			
-			xml.addValue(root, bean, true);
+			XmlBeanSerializer xml = new XmlBeanSerializer();
+			
+			for (Object bean : beans) {
+				xml.addValue(root, bean, true);				
+			}
 			
 			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
 			// this "hack" is required to preserve the LBCR's in strings... 
@@ -273,7 +293,7 @@ public class XmlBeanSerializer {
 				addValue(entry, o, true);
 			}
 		} else {
-			serializeBean(elm, "bean", value);
+			serializeBean(elm, ELM_BEAN, value);
 			addTypeInfo = false;
 		}
 		
@@ -289,10 +309,8 @@ public class XmlBeanSerializer {
 	 * @return
 	 */
 	public Object deserializeBean(Element elm) throws TransportException {
-		
 		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
 		return deserializeBean(elm, context);
-
 	}
 	
 	/**
@@ -303,25 +321,35 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
-		String typeClass = elm.attributeValue("type");
-		if (typeClass == null || typeClass.length() == 0) {
-			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");
-		}
-		// instanciate bean
-		Object bean;
-		try {
-			bean = Class.forName(typeClass).newInstance();
-		} catch (InstantiationException e) {
-			throw new TransportException("Can not instantiate bean class " + typeClass, e);
-		} catch (IllegalAccessException e) {
-			throw new TransportException("IllegalAccessException instantiating bean class " + typeClass);
-		} catch (ClassNotFoundException e) {
-			throw new TransportException("The bean '" + typeClass + "' can not be deserialized because the class can not be found.", e);
+		Element firstElem = (Element) elm.elementIterator().next();
+		if (firstElem != null && (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
+			return readValue(context, elm, null);
 		}
 		
-		return deserializeBean(bean, elm, context);
-	}		
+		String strTypeClass = elm.attributeValue("type");
+		if (strTypeClass == null || strTypeClass.length() == 0) {
+			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");
+		}
+		
+		// instanciate bean
+		Class beanType;
+		Object bean;
+		try {
+			beanType = Class.forName(strTypeClass);
+			bean = beanType.newInstance();
+		} catch (InstantiationException e) {
+			throw new TransportException("Can not instantiate bean class " + strTypeClass, e);
+		} catch (IllegalAccessException e) {
+			throw new TransportException("IllegalAccessException instantiating bean class " + strTypeClass);
+		} catch (ClassNotFoundException e) {
+			throw new TransportException("The bean '" + strTypeClass + "' can not be deserialized because the class can not be found.", e);
+		}
 
+		deserializeBean(bean, elm, context);
+		
+		return bean;
+	}		
+	
 	/**
 	 * Deserializes an element into a bean.
 	 * @param elm
@@ -329,7 +357,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Object deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
 		// now read the properties
 		try {
 			BeanInfo bi = Introspector.getBeanInfo(bean.getClass());
@@ -348,8 +376,6 @@ public class XmlBeanSerializer {
 		} catch (Exception e) {
 			throw new TransportException("Error deserializing bean: " + e, e);
 		}
-		
-		return bean;
 	}
 
 	/**
@@ -374,7 +400,7 @@ public class XmlBeanSerializer {
 				type = pd.getPropertyType();
 			} else {
 				// is it a bean?
-				Element elBean = elProp.element("bean");
+				Element elBean = elProp.element(ELM_BEAN);
 				if (elBean != null) {
 					return deserializeBean(elBean, context);
 				} else {
@@ -507,7 +533,7 @@ public class XmlBeanSerializer {
 			
 		} else {
 			
-			Element elBean = elProp.element("bean");
+			Element elBean = elProp.element(ELM_BEAN);
 			if (elBean != null) {
 				value = deserializeBean(elBean, context);
 			} else {				

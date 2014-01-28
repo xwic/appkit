@@ -120,9 +120,10 @@ public class EntityTransferObject {
 		try {
 			BeanInfo bi = Introspector.getBeanInfo(entity.getClass());
 			PropertyDescriptor descriptors[] = bi.getPropertyDescriptors();
-			ISecurityManager secMan = DAOSystem.getSecurityManager();
 			EntityDescriptor entityDescr = DAOSystem.getEntityDescriptor(entity.type().getName());
-			String scope = entity.type().getName();
+			
+//			ISecurityManager secMan = DAOSystem.getSecurityManager();
+//			String scope = entity.type().getName();
 			
 			// read the properties
 			for (int i = 0; i < descriptors.length; i++) {
@@ -152,9 +153,10 @@ public class EntityTransferObject {
 					value.setType(type);
 					value.setModified(loadCollections);
 					
-					// check rights
-					value.setAccess(secMan.getAccess(scope, descriptor.getName()));
-					if (value.getAccess() != ISecurityManager.NONE) {
+					// do not check the rights.. the checks are already done on the server
+//					value.setAccess(secMan.getAccess(scope, descriptor.getName()));
+//					if (value.getAccess() != ISecurityManager.NONE) {
+					
 						Object data = mRead.invoke(entity, (Object[]) null);
 						
 						if (IEntity.class.isAssignableFrom(type)) {
@@ -215,7 +217,9 @@ public class EntityTransferObject {
 						} else {
 							value.setValue(data);
 						}
-					}
+						
+//					}
+						
 					propertyValues.put(descriptor.getName(), value);
 				}
 			}

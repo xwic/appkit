@@ -53,6 +53,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String PARAM_QUERY = "pq";
 	public final static String PARAM_LIMIT = "limit";
 	public final static String PARAM_ETO = "eto";
+	public final static String PARAM_USERNAME = "usr";
 
 	public final static String ACTION_GET_ENTITY = "ge";
 	public final static String ACTION_GET_ENTITIES = "gea";
@@ -63,6 +64,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	
 	public final static String ACTION_EXECUTE_USE_CASE = "euc";
 	public final static String ACTION_FILE_HANDLE = "fh";
+	public final static String ACTION_GET_USER_RIGHTS = "gur";
 
 	public final static String ELM_RESPONSE = "resp";
 	public final static String PARAM_VALUE = "value";
@@ -91,6 +93,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		List<IRequestHandler> aux = new ArrayList<IRequestHandler>();
 		aux.add(new RemoteFileAccessHandler());
 		aux.add(new UseCaseHandler());
+		aux.add(new UserRightsHandler());
 
 		handlers = new HashMap<String, IRequestHandler>();
 		for (IRequestHandler ha : aux) {
@@ -125,9 +128,10 @@ public class RemoteDataAccessServlet extends HttpServlet {
 //		the response has been committed.
 		resp.setContentType("text/xml; charset=UTF-8");
 
-		IParameterProvider pp = new ParameterProvider(req);
 
 		try {
+			IParameterProvider pp = new ParameterProvider(req);
+			
 			// the API is taking its arguments from the URL and the parameters
 			final String action = pp.getParameter(PARAM_ACTION);
 

@@ -5,8 +5,11 @@ package de.xwic.appkit.core.remote.client;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -19,6 +22,8 @@ import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
 import de.xwic.appkit.core.remote.server.UseCaseHandler;
+import de.xwic.appkit.core.remote.server.UserRightsHandler;
+import de.xwic.appkit.core.security.ScopeActionKey;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
@@ -176,6 +181,25 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Object x = xml.readValue(null, root, null);
 		
 		return x;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getUserRights(int)
+	 */
+	@Override
+	public Set<ScopeActionKey> getUserRights(int userId) throws TransportException {
+		Map<String, String> param = new HashMap<String, String>();
+
+		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_USER_RIGHTS);
+		param.put(UserRightsHandler.PARAM_USER_ID, String.valueOf(userId));
+
+		Document doc = postRequest(param);
+		Element root = doc.getRootElement();
+		
+		XmlBeanSerializer xml = new XmlBeanSerializer();
+		Set<ScopeActionKey> result = (Set<ScopeActionKey>) xml.deserializeBean(root);
+		
+		return result;
 	}
 	
 	/**
