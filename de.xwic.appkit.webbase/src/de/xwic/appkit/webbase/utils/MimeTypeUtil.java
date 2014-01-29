@@ -9,6 +9,7 @@ import javax.activation.MimetypesFileTypeMap;
  * 
  */
 public class MimeTypeUtil {
+	private static final String GENERIC_MIME_TYPE = "application/octet-stream";
 	private static final MimetypesFileTypeMap mimeTypes = new MimetypesFileTypeMap();
 	static {
 		init();
@@ -20,7 +21,12 @@ public class MimeTypeUtil {
 	 * @return the mime type
 	 */
 	public static String getMimeTypeForFileName(String filename) {
-		return mimeTypes.getContentType(filename);
+		String mimeType = mimeTypes.getContentType(filename);
+		if (mimeType != null) {
+			return mimeType;
+		} else {
+			return GENERIC_MIME_TYPE;
+		}
 	}
 
 	/**
