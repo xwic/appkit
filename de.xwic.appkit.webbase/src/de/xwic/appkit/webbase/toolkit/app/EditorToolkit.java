@@ -101,8 +101,7 @@ public class EditorToolkit {
 
 		final IToolkitControlHelper<C> implclass = allControls.get(controlType);
 		if (implclass == null) {
-			log.error("Control type not registered: " + controlType, new IllegalStateException());
-			return null;
+			throw new IllegalArgumentException("Control type not registered: " + controlType);
 		}
 
 		final C con = implclass.create(container, FIELD_NAME_PREFIX + propertyName, optionalParam);
