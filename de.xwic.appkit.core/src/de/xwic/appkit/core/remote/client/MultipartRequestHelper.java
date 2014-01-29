@@ -36,7 +36,7 @@ public class MultipartRequestHelper implements IRequestHelper {
 		entity.addPart(RemoteDataAccessServlet.PARAM_RSID, new StringBody(config.getRemoteSystemId()));
 		
 		IUser currentUser = DAOSystem.getSecurityManager().getCurrentUser();
-		if (currentUser != null && !SystemSecurityManager.USER.equals(currentUser.getLogonName())) {
+		if (currentUser != null) {
 			entity.addPart(RemoteDataAccessServlet.PARAM_USERNAME, new StringBody(currentUser.getLogonName()));
 		}
 		
