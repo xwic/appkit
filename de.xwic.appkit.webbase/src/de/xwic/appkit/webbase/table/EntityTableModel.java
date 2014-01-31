@@ -327,7 +327,7 @@ public class EntityTableModel {
 	 */
 	public void buildQuery() {
 		
-		PropertyQuery q = new PropertyQuery();
+		PropertyQuery q = new PropertyQuery(true);
 		PropertyQuery userFilter = new PropertyQuery();
 		
 		// build column list
