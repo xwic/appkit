@@ -254,11 +254,11 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see
 	 * de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit)
 	 */
-	public EntityList getEntities(final Limit limit) {
+	public EntityList<I> getEntities(final Limit limit) {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
-		return (EntityList) provider.execute(new DAOCallback() {
+		return (EntityList<I>) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getEntityImplClass(), limit);
 			}
@@ -268,7 +268,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
-	public EntityList getEntities(Limit limit, EntityQuery filter) {
+	public EntityList<I> getEntities(Limit limit, EntityQuery filter) {
 
 		return getEntities(limit, filter, true);
 	}
@@ -276,14 +276,14 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery, boolean)
 	 */
-	public EntityList getEntities(final Limit limit, final EntityQuery filter, boolean checkReadRights) {
+	public EntityList<I> getEntities(final Limit limit, final EntityQuery filter, boolean checkReadRights) {
 		
 		
 		if (checkReadRights) {
 			checkRights(ApplicationData.SECURITY_ACTION_READ);
 		}
 
-		return (EntityList) provider.execute(new DAOCallback() {
+		return (EntityList<I>) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getEntityImplClass(), limit, filter);
 			}
