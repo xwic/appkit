@@ -65,9 +65,7 @@ public class CollectionUtil {
 				}
 
 				final V value = evaluator.evaluate(obj);
-				if (value != null) {
-					collection.add(value);
-				}
+				addIfNotNull(value, collection);
 			}
 
 		}
@@ -95,6 +93,7 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * used to break a large collection into hashsets
 	 * @param collection
 	 * @param maxElements
 	 * @return
@@ -104,6 +103,7 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * used to break a large collection into arraylists
 	 * @param collection
 	 * @param maxElements
 	 * @return
@@ -114,6 +114,7 @@ public class CollectionUtil {
 
 	/**
 	 * used to break a large collection into smaller collection
+	 * consider using {@link CollectionUtil#breakInLists(Collection, int)} or {@link CollectionUtil#breakInSets(Collection, int)} instead
 	 * @param collection
 	 * @param maxElements
 	 * @param type
