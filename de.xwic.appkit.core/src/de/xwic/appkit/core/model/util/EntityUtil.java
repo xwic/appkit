@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.xwic.appkit.core.ApplicationData;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.core.dao.Limit;
@@ -64,7 +64,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E createEntity(final Class<E> entityClass) {
-		return (E) findDAO(entityClass).createEntity();
+		return findDAO(entityClass).createEntity();
 	}
 
 	/**
@@ -82,7 +82,7 @@ public final class EntityUtil {
 	 * @param entityClass
 	 * @return
 	 */
-	public static <E extends IEntity> DAO findDAO(final Class<E> entityClass) {
+	public static <E extends IEntity> DAO<E> findDAO(final Class<E> entityClass) {
 		return DAOSystem.findDAOforEntity(entityClass);
 	}
 
@@ -102,8 +102,8 @@ public final class EntityUtil {
 	 * @param query
 	 * @return
 	 */
-	public static <E extends IEntity> List<E> getEntities(final Class<E> entityClass, final PropertyQuery query) {
-		return getEntities(entityClass, null, query);
+	public static <E extends IEntity> EntityList<E> getEntities(final Class<E> entityClass, final PropertyQuery query) {
+		return getEntities(entityClass, query, null);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class EntityUtil {
 	 * @param query
 	 * @return
 	 */
-	public static <E extends IEntity> List<E> getEntities(final Class<E> entityClass, final Limit limit, final PropertyQuery query) {
+	public static <E extends IEntity> EntityList<E> getEntities(final Class<E> entityClass, final PropertyQuery query, final Limit limit) {
 		return findDAO(entityClass).getEntities(limit, query);
 	}
 

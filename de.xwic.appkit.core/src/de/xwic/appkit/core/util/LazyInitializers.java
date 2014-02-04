@@ -150,24 +150,4 @@ public class LazyInitializers {
 		}
 	};
 
-	/**
-	 * Create a Lazy initializer that returns a Map (TreeMap)
-	 * @param comparator
-	 * @return
-	 */
-	public static final <K, V> LazyInit<Map> createTreeMapInitializer(final Comparator<? super K> comparator) {
-		if (comparator == null) {
-			return MAP_TREEMAP;
-		}
-		return new LazyInit<Map>() {
-
-			/* (non-Javadoc)
-			 * @see java.util.concurrent.Callable#call()
-			 */
-			@Override
-			public Map call() throws Exception {
-				return new TreeMap<K, V>(comparator);
-			}
-		};
-	}
 }
