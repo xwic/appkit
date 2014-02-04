@@ -6,6 +6,7 @@ package de.xwic.appkit.core.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -94,23 +95,41 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * @param collection
+	 * @param maxElements
+	 * @return
+	 */
+	public static <O> List<Collection<O>> breakInSets(final Collection<O> collection, final int maxElements) {
+		return breakCollection(collection, maxElements, Type.HASHSET);
+	}
+
+	/**
+	 * @param collection
+	 * @param maxElements
+	 * @return
+	 */
+	public static <O> List<Collection<O>> breakInLists(final Collection<O> collection, final int maxElements) {
+		return breakCollection(collection, maxElements, Type.ARRAYLIST);
+	}
+
+	/**
 	 * used to break a large collection into smaller collection
 	 * @param collection
 	 * @param maxElements
-	 * @param clazz
+	 * @param type
 	 * @return
 	 */
-	public static <O, C extends Object & Collection> List<Collection<O>> breakCollection(Collection<O> collection, int maxElements, Class<C> clazz) {
+	public static <O> List<Collection<O>> breakCollection(final Collection<O> collection, final int maxElements, final Type type) {
 		final List<Collection<O>> result = new ArrayList<Collection<O>>();
 		if (collection == null){
 			return result;
 		}
-		C step = instantiate(clazz);
+		Collection<O> step = type.create();
 		final Iterator<O> iterator = collection.iterator();
 		while (iterator.hasNext()) {
 			if (step.size() == maxElements) {
 				result.add(step);
-				step = instantiate(clazz);
+				step = type.create();
 			}
 			step.add(iterator.next());
 		}
@@ -119,6 +138,7 @@ public class CollectionUtil {
 		}
 		return result;
 	}
+
 
 	/**
 	 * @param collection
@@ -157,14 +177,24 @@ public class CollectionUtil {
 	}
 
 	/**
-	 * @param clazz
-	 * @return
+	 * @author Alexandru Bledea
+	 * @since Feb 4, 2014
 	 */
-	public static <C extends Object & Collection> C instantiate(final Class<C> clazz) {
-		try {
-			return clazz.newInstance();
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Cannot instantiate " + clazz.getName());
-		}
+	public static enum Type {
+		HASHSET {
+			@Override
+			<E> Collection<E> create() {
+				return new HashSet<E>();
+			}
+		},
+		ARRAYLIST {
+			@Override
+			<E> Collection<E> create() {
+				return new ArrayList<E>();
+			}
+		};
+
+		abstract <E> Collection<E> create();
 	}
+
 }

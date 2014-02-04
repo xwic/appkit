@@ -597,7 +597,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 */
 	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
-		List<? extends Collection<?>> sets = CollectionUtil.breakCollection(processCollection(values), 1000, HashSet.class);
+		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(processCollection(values), 1000);
 		PropertyQuery subQuery = new PropertyQuery();
 		for (Collection ids : sets) {
 			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
