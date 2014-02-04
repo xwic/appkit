@@ -38,7 +38,7 @@ public interface DAOFactory {
 	 * @param daoClass The specific DAO Interface class
 	 * @param daoImplementation The implementation of the specific DAO Interface
 	 */
-	public void registerDao(Class<? extends DAO> daoClass, DAO daoImplementation);
+	public <D extends DAO<?>> void registerDao(Class<D> daoClass, D daoImplementation);
 	
 	/**
 	 * Register an additional Query to the System. <p>
