@@ -216,7 +216,7 @@ public final class EntityUtil {
 	 * @param clasz
 	 * @return
 	 */
-	private static boolean isSatisfactoryEntityType(final Class clasz) {
+	private static boolean isSatisfactoryEntityType(final Class<?> clasz) {
 		if (!INVALID_TYPES.contains(clasz)) {
 			return IEntity.class.isAssignableFrom(clasz);
 		}
