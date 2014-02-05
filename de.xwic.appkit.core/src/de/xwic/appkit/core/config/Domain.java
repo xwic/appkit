@@ -180,7 +180,9 @@ public class Domain {
 							top = top.getLinkedBundle();
 						}
 						// link language with default bundle.
-						top.setLinkedBundle(defaultBundle);
+						if (!top.equals(defaultBundle)) {
+							top.setLinkedBundle(defaultBundle);
+						}
 					}
 				}
 			}
