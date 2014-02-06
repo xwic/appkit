@@ -148,7 +148,7 @@ public class CollectionUtil {
 	 * @return
 	 */
 	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator, String emptyMessage) {
-		final List<String> strings = new ArrayList();
+		final List<String> strings = new ArrayList<String>();
 		createCollection(collection, evaluator, strings);
 
 		final Iterator<String> iterator = strings.iterator();

@@ -109,7 +109,13 @@ public class URemoteAccessClient {
 			wr.flush();
 			wr.close();
 
+			int responseCode = connection.getResponseCode();
+			if (responseCode != HttpURLConnection.HTTP_OK) {
+				throw new RemoteDataAccessException(connection.getResponseMessage());
+			}
 			return connection.getInputStream();
+		} catch (RemoteDataAccessException re) {
+			throw re;
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);
 		}
