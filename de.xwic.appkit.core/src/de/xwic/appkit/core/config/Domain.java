@@ -53,16 +53,17 @@ public class Domain {
 	 */
 	public void addBundle(String langId, Bundle bundle, boolean mergeIfExists) {
 		Bundle currBundle = bundles.get(langId);
-		if (currBundle == null) {
-			bundles.put(langId, bundle);
-		} else {
+		if (currBundle != null) {			
 			// merge is different than link, merge overrides common values while link
 			// simply adds to the existing set			
 			if (mergeIfExists) {
 				currBundle.merge(bundle);
-			} else {			
+			} else {
 				bundle.setLinkedBundle(currBundle);
+				bundles.put(langId, bundle);
 			}
+		} else {		
+			bundles.put(langId, bundle);
 		}
 	}
 	

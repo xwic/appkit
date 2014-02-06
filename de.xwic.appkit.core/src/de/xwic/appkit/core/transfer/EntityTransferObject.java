@@ -29,7 +29,6 @@ import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.ISecurityManager;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**

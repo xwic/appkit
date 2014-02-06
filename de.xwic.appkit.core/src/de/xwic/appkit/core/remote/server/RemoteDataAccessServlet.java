@@ -26,10 +26,14 @@ import org.dom4j.Element;
 import de.xwic.appkit.core.access.AccessHandler;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
+import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
+import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoSerializer;
@@ -240,7 +244,23 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			}
 		}
 
-		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
+		// we need to send the type of the entities in the collection, not the type of the parent entity
+		// if the collection is empty, it doesn't matter what type we send
+		String type = entityType;
+		if (!list.isEmpty()) {
+			// this method is used to fetch collection of entities, so this is safe
+			Object o = list.get(0);
+			if (o instanceof EntityTransferObject) {
+				DAO dao = DAOSystem.findDAOforEntity(((EntityTransferObject) o).getEntityClass().getName()); 
+				type = dao.getEntityClass().getName();
+			} else if (o instanceof IEntity){
+				type = EntityUtil.type((IEntity) o).getName();
+			} else {
+				throw new DataAccessException("Collection is not composed of entities, but of " + o.getClass().getName()); 
+			}
+		}
+		
+		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(type);
 		XmlEntityTransport et = new XmlEntityTransport();
 		et.write(pwOut, list, entityDescriptor);
 	}
