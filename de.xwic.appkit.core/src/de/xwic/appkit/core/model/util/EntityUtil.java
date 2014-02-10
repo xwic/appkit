@@ -235,4 +235,20 @@ public final class EntityUtil {
 		}
 		return false;
 	}
+
+	/**
+	 * Checks if the specified entity exists and is saved
+	 * @param entity the entity to be checked
+	 * @throws NullPointerException if the entity is null
+	 * @throws IllegalStateException if the entity was not saved
+	 */
+	public static void checkEntityExists(final IEntity entity) throws NullPointerException, IllegalStateException {
+		if (entity == null) {
+			throw new NullPointerException("Entity argument is null!");
+		}
+		if (entity.getId() < LOWEST_POSSIBLE_ID) {
+			throw new IllegalStateException("Entity argument is not saved!");
+		}
+	}
+
 }
