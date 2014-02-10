@@ -128,6 +128,19 @@ public final class EntityUtil {
 	}
 
 	/**
+	 * @param entities
+	 * @return
+	 */
+	public static <E extends IEntity, C extends Collection<E>> C update(final C entities) {
+		if (entities != null) {
+			for (E entity : entities) {
+				update(entity);
+			}
+		}
+		return entities;
+	}
+
+	/**
 	 * @param entityClass
 	 * @param action
 	 * @return
