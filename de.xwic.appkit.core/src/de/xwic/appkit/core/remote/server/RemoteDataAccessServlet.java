@@ -69,6 +69,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String ACTION_EXECUTE_USE_CASE = "euc";
 	public final static String ACTION_FILE_HANDLE = "fh";
 	public final static String ACTION_GET_USER_RIGHTS = "gur";
+	public final static String ACTION_FUNCTION_CALL_HANDLE = "fc";
 
 	public final static String ELM_RESPONSE = "resp";
 	public final static String PARAM_VALUE = "value";
@@ -98,6 +99,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		aux.add(new RemoteFileAccessHandler());
 		aux.add(new UseCaseHandler());
 		aux.add(new UserRightsHandler());
+		aux.add(new RemoteFunctionCallHandler());
 
 		handlers = new HashMap<String, IRequestHandler>();
 		for (IRequestHandler ha : aux) {
