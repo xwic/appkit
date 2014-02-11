@@ -22,7 +22,7 @@ public class RemoteFunctionCallSerializer {
 	 * @throws TransportException
 	 */
 	public static String serialize(IRemoteFunctionCallConditions conditions) throws TransportException {
-		return XmlBeanSerializer.serializeToXML("conditions", conditions);
+		return XmlBeanSerializer.serializeToXML("conditions", conditions, true);
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class RemoteFunctionCallSerializer {
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
 			Object o =  new XmlBeanSerializer().deserializeBean(root.element("bean"));
-			return (IRemoteFunctionCallConditions)o;
+			return (IRemoteFunctionCallConditions) o;
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);
 		}
