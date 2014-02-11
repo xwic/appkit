@@ -78,7 +78,7 @@ public class Domain {
 		if (bundle == null) {
 			bundle = bundles.get(setup.getDefaultLangId());
 			if (bundle == null) {
-				throw new ConfigurationException("No bundle registered for the specified language");
+				throw new ConfigurationException("Missing fallback bundle for domain " + id);
 			}
 		}
 		return bundle;
