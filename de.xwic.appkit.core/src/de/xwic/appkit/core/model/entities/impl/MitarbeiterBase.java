@@ -38,7 +38,6 @@ public class MitarbeiterBase extends Entity implements IMitarbeiter {
     
     // AI 09-Dec-2013: this is used for the accounts created from nPulse
     private boolean specialAccount;
-    private String specialAccountInfo;
 
     private boolean info1 = false;
     
@@ -276,19 +275,5 @@ public class MitarbeiterBase extends Entity implements IMitarbeiter {
 	 */
 	public void setSpecialAccount(boolean specialAccount) {
 		this.specialAccount = specialAccount;
-	}
-
-	/**
-	 * @return the specialAccountInfo
-	 */
-	public String getSpecialAccountInfo() {
-		return specialAccountInfo;
-	}
-
-	/**
-	 * @param specialAccountInfo the specialAccountInfo to set
-	 */
-	public void setSpecialAccountInfo(String specialAccountInfo) {
-		this.specialAccountInfo = specialAccountInfo;
 	}
 }

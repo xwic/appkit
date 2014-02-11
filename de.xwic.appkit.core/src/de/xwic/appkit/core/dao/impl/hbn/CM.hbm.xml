@@ -59,10 +59,6 @@
         <property name="specialAccount" type="boolean">
 			<column name="SPECIAL_ACCOUNT" default="0"/>
 		</property>
-		
-		<property name="specialAccountInfo">
-        	<column name="SPECIAL_ACCOUNT_INFO" length="200"/>
-        </property>
 
 		<!-- Relations of type SalesTeam -->
 		<many-to-one name="salesTeam" class="de.xwic.appkit.core.model.entities.impl.SalesTeam" column="SALES_TEAM"/>

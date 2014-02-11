@@ -149,14 +149,4 @@ public interface IMitarbeiter extends IEntity {
 	 * @param specialAccount the specialAccount to set
 	 */
 	public void setSpecialAccount(boolean specialAccount);
-	
-	/**
-	 * @return the specialAccountInfo
-	 */
-	public String getSpecialAccountInfo();
-
-	/**
-	 * @param specialAccountInfo the specialAccountInfo to set
-	 */
-	public void setSpecialAccountInfo(String specialAccountInfo);
 }
