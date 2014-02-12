@@ -368,6 +368,13 @@ public class WizardContainerFix {
 	}
 
 	/**
+	 * @return the currentPage
+	 */
+	protected final WizardPage getCurrentPage() {
+		return currentPage;
+	}
+
+	/**
 	 * @return the container
 	 */
 	public ControlContainer getContainer() {
