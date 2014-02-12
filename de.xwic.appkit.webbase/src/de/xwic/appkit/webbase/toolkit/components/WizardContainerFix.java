@@ -202,8 +202,16 @@ public class WizardContainerFix {
 		btAbort.setTitle("Close"); // messages.getString("wizard.button.abort"));
 		btAbort.addSelectionListener(navContr);
 
+		addMoreButtons(winContainer);
+
 		activatePage(currentPage);
 		
+	}
+
+	/**
+	 * @param toolbar
+	 */
+	protected void addMoreButtons(final IControlContainer toolbar) {
 	}
 
 	/**
