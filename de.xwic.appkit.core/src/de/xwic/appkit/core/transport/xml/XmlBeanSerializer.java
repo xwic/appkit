@@ -83,6 +83,7 @@ public class XmlBeanSerializer {
 	private List<ICustomObjectSerializer> customSerializer = new ArrayList<ICustomObjectSerializer>();
 	private Set<String> skipPropertyNames = new HashSet<String>();
 	
+	private boolean serializeEntity = false;
 	/**
 	 * Add a custom serializer
 	 * @param serializer
@@ -106,7 +107,17 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public static String serializeToXML(String rootElement, Object bean) throws TransportException {
-		return serializeCollectionToXML(rootElement, Arrays.asList(bean));
+		return serializeToXML(rootElement, bean, false);
+	}
+	
+	/**
+	 * @param rootElement
+	 * @param bean
+	 * @return
+	 * @throws TransportException
+	 */
+	public static String serializeToXML(String rootElement, Object bean, boolean serializeEntity) throws TransportException {
+		return serializeCollectionToXML(rootElement, Arrays.asList(bean), serializeEntity);
 	}
 	
 	/**
@@ -115,7 +126,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public static String serializeCollectionToXML(String rootElement, Collection<?> beans) throws TransportException {
+	public static String serializeCollectionToXML(String rootElement, Collection<?> beans, boolean serializeEntity) throws TransportException {
 		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 		OutputStreamWriter writer = new OutputStreamWriter(baOut);
 		
@@ -124,6 +135,7 @@ public class XmlBeanSerializer {
 			Element root = doc.addElement(rootElement);
 			
 			XmlBeanSerializer xml = new XmlBeanSerializer();
+			xml.setSerializeEntity(serializeEntity);
 			
 			for (Object bean : beans) {
 				xml.addValue(root, bean, true);				
@@ -268,7 +280,7 @@ public class XmlBeanSerializer {
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity)value;
 			typeInfo = entity.type().getName();
-			if (entity.getId() == EntityUtil.NEW_ENTITY_ID) {
+			if (entity.getId() == EntityUtil.NEW_ENTITY_ID || serializeEntity) {
 				EntityTransferObject eto = new EntityTransferObject(entity, true);
 				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
 			}
@@ -574,6 +586,21 @@ public class XmlBeanSerializer {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * If true, entity object would be serialized as well
+	 * @return the serializeEntity
+	 */
+	public boolean isSerializeEntity() {
+		return serializeEntity;
+	}
+
+	/**
+	 * @param serializeEntity the serializeEntity to set
+	 */
+	public void setSerializeEntity(boolean serializeEntity) {
+		this.serializeEntity = serializeEntity;
 	}
 
 }

@@ -86,4 +86,10 @@ public interface IRemoteDataAccessClient {
 	 * @throws TransportException
 	 */
 	public Set<ScopeActionKey> getUserRights(int userId) throws TransportException;
+	
+	/**
+	 * @return
+	 * @throws TransportException 
+	 */
+	public Object executeRemoteFunctionCall(IRemoteFunctionCallConditions conditions) throws TransportException;
 }
