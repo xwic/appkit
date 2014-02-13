@@ -58,4 +58,11 @@ public class DefaultLanguageProvider implements ILanguageProvider {
 		return languages.get(id);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.toolkit.util.bundles.ILanguageProvider#hasLanguage(java.lang.String)
+	 */
+	@Override
+	public boolean hasLanguage(String langId) {
+		return languages.containsKey(langId);
+	}
 }
