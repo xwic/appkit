@@ -61,6 +61,18 @@ public final class EntityUtil {
 
 	/**
 	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Integer id) {
+		if (id == null || id < LOWEST_POSSIBLE_ID) {
+			return createEntity(entityClass);
+		}
+		return getEntity(entityClass, id);
+	}
+
+	/**
+	 * @param entityClass
 	 * @return
 	 */
 	public static <E extends IEntity> E createEntity(final Class<E> entityClass) {
