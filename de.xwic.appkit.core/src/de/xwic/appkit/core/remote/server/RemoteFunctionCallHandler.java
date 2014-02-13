@@ -5,16 +5,13 @@ package de.xwic.appkit.core.remote.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.servlet.http.HttpServletResponse;
 
-import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.remote.client.IRemoteFunctionCallConditions;
 import de.xwic.appkit.core.transport.xml.RemoteFunctionCallSerializer;
 import de.xwic.appkit.core.transport.xml.TransportException;
-import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
 import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 
 /**
