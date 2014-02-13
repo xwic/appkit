@@ -56,7 +56,19 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Integer id) {
-		return id == null ? null : (E) findDAO(entityClass).getEntity(id);
+		return id == null ? null : (E) findDAO(entityClass).getEntity(id.intValue());
+	}
+
+	/**
+	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Integer id) {
+		if (id == null || id.intValue() < LOWEST_POSSIBLE_ID) {
+			return createEntity(entityClass);
+		}
+		return getEntity(entityClass, id);
 	}
 
 	/**
