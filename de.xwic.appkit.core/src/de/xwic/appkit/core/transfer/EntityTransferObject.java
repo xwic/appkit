@@ -134,7 +134,6 @@ public class EntityTransferObject {
 					Method mRead = descriptor.getReadMethod();
 					
 					if (mRead == null) {
-						// TODO AI investigate some more
 						// if we have a Boolean field, the java sepcification is that the getter starts with
 						// 'get', not 'is', therefore the read method is not located
 						// by instantiating the property descriptor manually, the read method is located successfully
