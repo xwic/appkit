@@ -8,11 +8,14 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
+import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.model.daos.IAnhangDAO;
 import de.xwic.appkit.core.model.entities.IAnhang;
 import de.xwic.appkit.core.model.entities.impl.Anhang;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
+import de.xwic.appkit.core.model.util.EntityUtil;
 
 /**
  * DAO implementation for the Anhang object. <p>
@@ -55,4 +58,17 @@ public class AnhangDAO extends AbstractDAO<IAnhang, Anhang> implements IAnhangDA
 
 		return result;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.daos.IAnhangDAO#getByEntity(de.xwic.appkit.core.dao.IEntity)
+	 */
+	@Override
+	public EntityList<IAnhang> getByEntity(final IEntity entity) {
+		EntityUtil.checkEntityExists(entity);
+		PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("entityType", entity.type().getName());
+		pq.addEquals("entityID", entity.getId());
+		return getEntities(null, pq);
+	}
+
 }
