@@ -58,7 +58,8 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 		
 		for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext(); ) {
 			Element elmProp = itP.next();
-			Property prop = descr.getProperty(elmProp.getName());
+			String x = elmProp.getName();
+			Property prop = descr.getProperty(x);
 			if (prop != null) {
 				
 				
@@ -88,14 +89,14 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 					} else {
 						pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
 					}
-					
-					if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
-						pv.setModified(true);
-					}
-					
-					if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
-						pv.setEntityType(true);
-					}
+				}
+				
+				if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
+					pv.setModified(true);
+				}
+				
+				if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
+					pv.setEntityType(true);
 				}
 				
 				values.put(elmProp.getName(), pv);
