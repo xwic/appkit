@@ -8,12 +8,10 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.util.AIMap;
 import de.xwic.appkit.core.util.ILazyEval;
 import de.xwic.appkit.core.util.MapUtil;
 
@@ -59,8 +57,7 @@ final class PropertyDescriptorFromClass implements ILazyEval<Class<IEntity>, Map
 	 * @return
 	 */
 	public static Map<Class<IEntity>, Map<String, PropertyDescriptor>> createMapGenerator() {
-		final Map<Class<IEntity>, Map<String, PropertyDescriptor>> temp = new HashMap<Class<IEntity>, Map<String, PropertyDescriptor>>();
-		return AIMap.wrap(temp, new PropertyDescriptorFromClass());
+		return MapUtil.aiMap(new PropertyDescriptorFromClass());
 	}
 
 }

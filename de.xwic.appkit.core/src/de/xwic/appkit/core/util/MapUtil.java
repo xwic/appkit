@@ -6,6 +6,7 @@ package de.xwic.appkit.core.util;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
@@ -103,5 +104,24 @@ public class MapUtil {
 		final V call = (V) initializer.evaluate(initValue);
 		map.put(key, call);
 		return call;
+	}
+
+	/**
+	 * Wraps a Map into a {@link AIMap} <br>
+	 * @param map
+	 * @param initializer
+	 * @return
+	 */
+	public final static <K, X, I, V extends X> Map<K, V> wrapAI(final Map<K, V> map, final ILazyEval<I, X> initializer) {
+		return new AIMap<K, X, I, V>(map, initializer);
+	}
+
+	/**
+	 * Wraps a {@link LinkedHashMap} into a {@link AIMap} <br>
+	 * @param initializer
+	 * @return
+	 */
+	public final static <K, X, I, V extends X> Map<K, V> aiMap(final ILazyEval<I, X> initializer) {
+		return wrapAI(new LinkedHashMap<K, V>(), initializer);
 	}
 }

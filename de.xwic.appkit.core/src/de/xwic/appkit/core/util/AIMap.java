@@ -9,7 +9,7 @@ import java.util.Set;
  * @author Alexandru Bledea
  * @since Oct 19, 2013
  */
-public final class AIMap<K, X, I, V extends X> implements Map<K, V> {
+final class AIMap<K, X, I, V extends X> implements Map<K, V> {
 
 	private final Map<K, V> map;
 	private final ILazyEval<I, X> initializer;
