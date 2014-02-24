@@ -81,32 +81,6 @@ public class MapUtil {
 	}
 
 	/**
-	 * equivallent to<br>
-	 * if (<b>map</b>.contains(<b>key</b>){<br>
-	 * &nbsp;&nbsp;return <b>map</b>.get(<b>key</b>);<br>
-	 * }<br>
-	 * ? x = <b>initializer</b>.evaluate(<b>initValue</b>); // init something that should be mapped to the <b>key</b><br>
-	 * <b>map</b>.put(<b>key</b>, x);<br>
-	 * return x;<br>
-	 *
-	 * @deprecated consider using AIMap instead
-	 * @param map
-	 * @param key
-	 * @param initValue
-	 * @param initializer
-	 * @return
-	 */
-	@Deprecated
-	public static <K, X, I, V extends X> V get(final Map<K, V> map, final K key, final I initValue, final ILazyEval<I, X> initializer) {
-		if (map.containsKey(key)) {
-			return map.get(key);
-		}
-		final V call = (V) initializer.evaluate(initValue);
-		map.put(key, call);
-		return call;
-	}
-
-	/**
 	 * Wraps a map into a Auto-Initializing Map. If the map does not contain the requested key
 	 * the evaluator is called to compute the value. <br>
 	 * @param map
