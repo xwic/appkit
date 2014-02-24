@@ -29,9 +29,15 @@ public class EntityProxyFactory {
 //		i think that the classloader that contains IEntity would be a better idea
 //		since etoClass is bound to have IEntity in it, the system classloader isn't
 //		return (IEntity) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(),
-		return (IEntity) Proxy.newProxyInstance(IEntity.class.getClassLoader(),
+		Object obj = Proxy.newProxyInstance(IEntity.class.getClassLoader(),
 				interfaces,
 				handler);
+		try{
+			return (IEntity) obj;
+		}catch (ClassCastException e) {
+			throw new RuntimeException("Cannot cast to IEntity. It might be that required interface is not " +
+					"defined on the Entity Impl. class: " + obj.getClass());
+		}
 	}
 
 }

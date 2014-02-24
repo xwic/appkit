@@ -23,5 +23,10 @@ public interface ILanguageProvider {
 	 * @return
 	 */
 	public Language getLanguageById(String id);
-	
+
+	/**
+	 * @param langId
+	 * @return
+	 */
+	public boolean hasLanguage(String langId);	
 }

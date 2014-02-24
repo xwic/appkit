@@ -214,20 +214,23 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 				value = element.getObject();
 			}
 			if (isPicklistEntry && value != null && value instanceof Integer) {
-				IPicklisteDAO dao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
+				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 				value = dao.getPickListEntryByID((Integer)value);
 			}
 			return value;
 		} catch (InvocationTargetException ite) {
+			log.error("Failed to render column", ite);
 			if (ite.getTargetException() instanceof SecurityException) {
 				return "[N/A]";
 			}
-			return "ERR: " + ite.getTargetException();
+			return "ERR: Failed to render column!";
 		} catch (Exception e) {
-			return "ERR: " + e;
+			log.error("Failed to render column", e);
+			return "ERR: Failed to render column!";
 		}
 		
 	}
+
 	/**
 	 * @param myProperty2
 	 * @param element

@@ -56,7 +56,19 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Integer id) {
-		return id == null ? null : (E) findDAO(entityClass).getEntity(id);
+		return id == null ? null : (E) findDAO(entityClass).getEntity(id.intValue());
+	}
+
+	/**
+	 * @param entityClass
+	 * @param id
+	 * @return
+	 */
+	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Integer id) {
+		if (id == null || id.intValue() < LOWEST_POSSIBLE_ID) {
+			return createEntity(entityClass);
+		}
+		return getEntity(entityClass, id);
 	}
 
 	/**
@@ -125,6 +137,19 @@ public final class EntityUtil {
 			findDAO(entity.getClass()).update(entity);
 		}
 		return entity;
+	}
+
+	/**
+	 * @param entities
+	 * @return
+	 */
+	public static <E extends IEntity, C extends Collection<E>> C update(final C entities) {
+		if (entities != null) {
+			for (E entity : entities) {
+				update(entity);
+			}
+		}
+		return entities;
 	}
 
 	/**
@@ -216,10 +241,26 @@ public final class EntityUtil {
 	 * @param clasz
 	 * @return
 	 */
-	private static boolean isSatisfactoryEntityType(final Class clasz) {
+	private static boolean isSatisfactoryEntityType(final Class<?> clasz) {
 		if (!INVALID_TYPES.contains(clasz)) {
 			return IEntity.class.isAssignableFrom(clasz);
 		}
 		return false;
 	}
+
+	/**
+	 * Checks if the specified entity exists and is saved
+	 * @param entity the entity to be checked
+	 * @throws NullPointerException if the entity is null
+	 * @throws IllegalStateException if the entity was not saved
+	 */
+	public static void checkEntityExists(final IEntity entity) throws NullPointerException, IllegalStateException {
+		if (entity == null) {
+			throw new NullPointerException("Entity argument is null!");
+		}
+		if (entity.getId() < LOWEST_POSSIBLE_ID) {
+			throw new IllegalStateException("Entity argument is not saved!");
+		}
+	}
+
 }

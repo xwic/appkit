@@ -29,7 +29,6 @@ import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.ISecurityManager;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
@@ -135,7 +134,6 @@ public class EntityTransferObject {
 					Method mRead = descriptor.getReadMethod();
 					
 					if (mRead == null) {
-						// TODO AI investigate some more
 						// if we have a Boolean field, the java sepcification is that the getter starts with
 						// 'get', not 'is', therefore the read method is not located
 						// by instantiating the property descriptor manually, the read method is located successfully

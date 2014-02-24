@@ -8,6 +8,8 @@
 package de.xwic.appkit.core.model.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.entities.IAnhang;
 
 /**
@@ -17,4 +19,9 @@ import de.xwic.appkit.core.model.entities.IAnhang;
  */
 public interface IAnhangDAO extends DAO<IAnhang> {
 
+	/**
+	 * @param entity
+	 * @return
+	 */
+	EntityList<IAnhang> getByEntity(IEntity entity);
 }

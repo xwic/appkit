@@ -53,18 +53,18 @@ public class Domain {
 	 */
 	public void addBundle(String langId, Bundle bundle, boolean mergeIfExists) {
 		Bundle currBundle = bundles.get(langId);
-		if (currBundle != null) {
-			
+		if (currBundle != null) {			
 			// merge is different than link, merge overrides common values while link
 			// simply adds to the existing set			
 			if (mergeIfExists) {
 				currBundle.merge(bundle);
-			} else {			
+			} else {
 				bundle.setLinkedBundle(currBundle);
+				bundles.put(langId, bundle);
 			}
+		} else {		
+			bundles.put(langId, bundle);
 		}
-		
-		bundles.put(langId, bundle);
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class Domain {
 		if (bundle == null) {
 			bundle = bundles.get(setup.getDefaultLangId());
 			if (bundle == null) {
-				throw new ConfigurationException("No bundle registered for the specified language");
+				throw new ConfigurationException("Missing fallback bundle for domain " + id);
 			}
 		}
 		return bundle;
@@ -180,7 +180,9 @@ public class Domain {
 							top = top.getLinkedBundle();
 						}
 						// link language with default bundle.
-						top.setLinkedBundle(defaultBundle);
+						if (!top.equals(defaultBundle)) {
+							top.setLinkedBundle(defaultBundle);
+						}
 					}
 				}
 			}

@@ -21,6 +21,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
+import de.xwic.appkit.core.remote.server.RemoteFunctionCallHandler;
 import de.xwic.appkit.core.remote.server.UseCaseHandler;
 import de.xwic.appkit.core.remote.server.UserRightsHandler;
 import de.xwic.appkit.core.security.ScopeActionKey;
@@ -29,6 +30,7 @@ import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoEntityNodeParser;
 import de.xwic.appkit.core.transport.xml.EtoSerializer;
 import de.xwic.appkit.core.transport.xml.ObjectArrayEntityNodeParser;
+import de.xwic.appkit.core.transport.xml.RemoteFunctionCallSerializer;
 import de.xwic.appkit.core.transport.xml.TransportException;
 import de.xwic.appkit.core.transport.xml.UseCaseSerializer;
 import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
@@ -200,6 +202,27 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Set<ScopeActionKey> result = (Set<ScopeActionKey>) xml.deserializeBean(root);
 		
 		return result;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#executeRemoteFunctionCall(de.xwic.appkit.core.remote.client.IRemoteFunctionCallConditions)
+	 */
+	@Override
+	public Object executeRemoteFunctionCall(IRemoteFunctionCallConditions conditions)
+			throws TransportException {
+		Map<String, String> param = new HashMap<String, String>();
+
+		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_FUNCTION_CALL_HANDLE);
+		param.put(RemoteFunctionCallHandler.PARAM_FUNCTION_CALL, RemoteFunctionCallSerializer.serialize(conditions));
+
+		Document doc = postRequest(param);
+		Element root = doc.getRootElement();
+		
+		XmlBeanSerializer xml = new XmlBeanSerializer();
+		
+		Object x = xml.readValue(null, root, null);
+		
+		return x;
 	}
 	
 	/**

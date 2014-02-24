@@ -135,6 +135,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 			if (!Equals.equal(pv.getValue(), newValue)) {
 				pv.setValue(args[0]);
 				pv.setModified(true);
+				pv.setLoaded(true);
 				eto.setModified(true);
 			}
 		}
@@ -152,7 +153,6 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 
 		if (methodName.length() > prefixLength) {
 
-			// TODO AI make this nicer!
 			if (IPicklistEntry.class.isAssignableFrom(eto.getEntityClass()) && methodName.equals("getBezeichnung")) {
 				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 
