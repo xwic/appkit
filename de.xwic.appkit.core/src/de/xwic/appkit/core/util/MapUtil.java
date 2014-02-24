@@ -107,7 +107,8 @@ public class MapUtil {
 	}
 
 	/**
-	 * Wraps a Map into a {@link AIMap} <br>
+	 * Wraps a map into a Auto-Initializing Map. If the map does not contain the requested key
+	 * the evaluator is called to compute the value. <br>
 	 * @param map
 	 * @param initializer
 	 * @return
@@ -117,7 +118,8 @@ public class MapUtil {
 	}
 
 	/**
-	 * Wraps a {@link LinkedHashMap} into a {@link AIMap} <br>
+	 * Wraps a {@link LinkedHashMap} into a Auto-Initializing Map. If the map does not contain the requested key
+	 * the evaluator is called to compute the value.  <br>
 	 * @param initializer
 	 * @return
 	 */
