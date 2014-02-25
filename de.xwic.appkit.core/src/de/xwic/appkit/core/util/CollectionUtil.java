@@ -134,7 +134,7 @@ public class CollectionUtil {
 	 * @param type
 	 * @return
 	 */
-	public static <O> List<Collection<O>> breakCollection(final Collection<O> collection, final int maxElements, final Type type) {
+	private static <O> List<Collection<O>> breakCollection(final Collection<O> collection, final int maxElements, final Type type) {
 		final List<Collection<O>> result = new ArrayList<Collection<O>>();
 		if (collection == null){
 			return result;
@@ -195,7 +195,7 @@ public class CollectionUtil {
 	 * @author Alexandru Bledea
 	 * @since Feb 4, 2014
 	 */
-	public static enum Type {
+	private static enum Type {
 		HASHSET {
 			@Override
 			<E> Collection<E> create() {
