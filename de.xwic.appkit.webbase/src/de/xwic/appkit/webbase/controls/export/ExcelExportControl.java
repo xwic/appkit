@@ -26,6 +26,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -205,6 +206,9 @@ public class ExcelExportControl extends Button implements IResourceControl {
 					}
 					
 					String columnText = label.text;
+					if (columnText != null){
+						columnText = StringEscapeUtils.unescapeHtml(label.text);
+					}
 					cell.setCellValue(columnText);
 				} catch (Throwable t) {
 					cell.setCellValue(t.getMessage());
