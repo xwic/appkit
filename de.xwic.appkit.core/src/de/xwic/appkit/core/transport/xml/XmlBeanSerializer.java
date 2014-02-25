@@ -75,7 +75,10 @@ public class XmlBeanSerializer {
 	 * 
 	 */
 	public static final String ELM_BEAN = "bean";
-	
+	/**
+	 * 
+	 */
+	private static final String NEW_LINE_PLACEHOLDER = "<nl_ph>";
 
 	private final static Object[] NO_ARGS = new Object[0];
 	protected static final Log log = LogFactory.getLog(XmlBeanSerializer.class);
@@ -252,7 +255,8 @@ public class XmlBeanSerializer {
 		if (value == null) {
 			elm.addAttribute(ELM_NULL, ATTRVALUE_TRUE);
 		} else if (value instanceof String) {
-			elm.setText((String)value);
+			String newValue = ((String) value).replaceAll("(\n\r)|\n", NEW_LINE_PLACEHOLDER);
+			elm.setText(newValue);
 		} else if (value instanceof Integer) {
 			elm.setText(value.toString());
 		} else if (value instanceof Boolean) {
@@ -552,7 +556,11 @@ public class XmlBeanSerializer {
 				// basic type
 				String text = elProp.getText();
 				if (String.class.equals(type)) {
-					value = text;
+					if (text == null) {
+						value = null;
+					} else {
+						value = text.replaceAll(NEW_LINE_PLACEHOLDER, "\n");
+					}
 				} else if (int.class.equals(type) || Integer.class.equals(type)) {
 					value = new Integer(text);
 				} else if (long.class.equals(type) || Long.class.equals(type)) {
