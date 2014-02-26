@@ -191,6 +191,7 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @return the btFinish
 	 */
 	public Button getBtFinish() {
+//		exposing the buttons is a very bad idea, we are losing access of the actions perfomed
 		return btFinish;
 	}
 
@@ -198,6 +199,7 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @return the btAbort
 	 */
 	public Button getBtAbort() {
+//		exposing the buttons is a very bad idea, we are losing access of the actions perfomed
 		return btAbort;
 	}
 
