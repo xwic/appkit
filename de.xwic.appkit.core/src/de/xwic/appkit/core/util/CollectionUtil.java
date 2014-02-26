@@ -6,6 +6,7 @@ package de.xwic.appkit.core.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -189,6 +190,26 @@ public class CollectionUtil {
 		if (element != null) {
 			collection.add(element);
 		}
+	}
+
+	/**
+	 * Converts the elements to a list of elements. <br> Null elements are not included. Returns an unmodifiable view of the specified array.
+	 * This method allows modules to provide users with "read-only" access to the list.
+	 * Query operations on the returned list "read through" to the specified list, and attempts to modify the returned list, whether direct or via its iterator,
+	 * result in an {@link UnsupportedOperationException}.
+	 *
+	 * @param the array for which an unmodifiable view is to be returned.
+	 * @return an unmodifiable view of the generated list
+	 */
+	public static <E> List<E> convertToList(final E... elements) {
+		if (elements == null || elements.length == 0) {
+			return Collections.emptyList();
+		}
+		final List<E> list = new ArrayList<E>();
+		for (E e : elements) {
+			addIfNotNull(e, list);
+		}
+		return Collections.unmodifiableList(list);
 	}
 
 	/**
