@@ -73,26 +73,27 @@ public class AddAttachmentDialog extends  Dialog {
 		btFinish.setIconEnabled(ImageLibrary.ICON_SAVECLOSE_ACTIVE);
 		btFinish.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
 //		btFinish.setSubmitButton(true);
-		btFinish.addSelectionListener(new SelectionListener() {
-			public void objectSelected(SelectionEvent event) {
-				boolean erg = validate();
-				if (erg) {
-					finish();
-				}
-			}
-		});
+//		this button already has a listener, I will move this code inside onOk
+//		btFinish.addSelectionListener(new SelectionListener() {
+//			public void objectSelected(SelectionEvent event) {
+//				boolean erg = validate();
+//				if (erg) {
+//					finish();
+//				}
+//			}
+//		});
 	
 		btAbort = this.btCancel;
 		btAbort.setTitle("Cancel");
 		btAbort.setVisible(true);
 		btAbort.setIconDisabled(ImageLibrary.ICON_ABORT_INACTIVE);
 		btAbort.setIconEnabled(ImageLibrary.ICON_ABORT_ACTIVE);
-		
-		btAbort.addSelectionListener(new SelectionListener() {
-			public void objectSelected(SelectionEvent event) {
-				abort();
-			}
-		});
+//		this button already has a listener, I will move this code inside onCancel
+//		btAbort.addSelectionListener(new SelectionListener() {
+//			public void objectSelected(SelectionEvent event) {
+//				abort();
+//			}
+//		});
 	}
 	
 	@Override
@@ -200,5 +201,25 @@ public class AddAttachmentDialog extends  Dialog {
 		return btAbort;
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#onCancel()
+	 */
+	@Override
+	protected final void onCancel() {
+//		super.onCancel();
+		abort();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#onOk()
+	 */
+	@Override
+	protected final void onOk() {
+//		super.onOk();
+		boolean erg = validate();
+		if (erg) {
+			finish();
+		}
+	}
+
 }
