@@ -18,7 +18,7 @@
         <dependency>
             <groupId>de.xwic.appkit</groupId>
             <artifactId>appkit-core</artifactId>
-            <version>5.2-SNAPSHOT</version>
+            <version>5.2.0-SNAPSHOT</version>
         </dependency>
 
 		<!-- jWic dependencies -->
