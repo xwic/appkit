@@ -4,14 +4,14 @@
     <parent>
         <groupId>de.xwic.appkit</groupId>
         <artifactId>appkit</artifactId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Appkit::Core</name>
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit-core</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -41,14 +41,14 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
         </dependency>
-			<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate</artifactId>
-</dependency>
-<dependency>
-    <groupId>javax.transaction</groupId>
-    <artifactId>jta</artifactId>
-</dependency>
+		<dependency>
+		    <groupId>org.hibernate</groupId>
+		    <artifactId>hibernate</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>javax.transaction</groupId>
+		    <artifactId>jta</artifactId>
+		</dependency>
 			<dependency>
 				<groupId>org.apache.james</groupId>
 				<artifactId>apache-mime4j</artifactId>
@@ -61,18 +61,18 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
 			</dependency>
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi</artifactId>
-</dependency>			
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml</artifactId>
-</dependency>			
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml-schemas</artifactId>
-</dependency>
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi</artifactId>
+			</dependency>			
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi-ooxml</artifactId>
+			</dependency>			
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi-ooxml-schemas</artifactId>
+			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
