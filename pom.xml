@@ -367,35 +367,35 @@
 				<artifactId>httpmime</artifactId>
 				<version>4.0</version>
 			</dependency>
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi</artifactId>
-    <version>3.6</version>
-</dependency>			
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml</artifactId>
-    <version>3.6</version>
-</dependency>			
-<dependency>
-    <groupId>org.apache.poi</groupId>
-    <artifactId>poi-ooxml-schemas</artifactId>
-    <version>3.6</version>
-</dependency>
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi</artifactId>
+			    <version>3.6</version>
+			</dependency>			
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi-ooxml</artifactId>
+			    <version>3.6</version>
+			</dependency>			
+			<dependency>
+			    <groupId>org.apache.poi</groupId>
+			    <artifactId>poi-ooxml-schemas</artifactId>
+			    <version>3.6</version>
+			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
-				<version>5.2.0</version>
+				<version>5.2.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
-				<version>5.2.0</version>
+				<version>5.2.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-compatibility</artifactId>
-				<version>5.2.0</version>
+				<version>5.2.1-SNAPSHOT</version>
 			</dependency>			
 			<dependency>
 				<groupId>de.xwic.cube</groupId>
