@@ -11,7 +11,6 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 
 import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.SystemSecurityManager;
 import de.xwic.appkit.core.remote.server.RemoteDataAccessServlet;
 import de.xwic.appkit.core.security.IUser;
 

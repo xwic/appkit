@@ -7,6 +7,7 @@ import static java.util.Collections.EMPTY_MAP;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public final class ParameterProvider implements IParameterProvider {
 
 	private final HttpServletRequest request;
 
-	private final Map<String, String> multiPartParams;
+	private final Map<String, List<String>> multiPartParams;
 	private final Map<String, UploadFile> files;
 
 	private final boolean multipart;
@@ -79,7 +80,10 @@ public final class ParameterProvider implements IParameterProvider {
 	@Override
 	public String getParameter(final String name) {
 		if (multipart) {
-			return multiPartParams.get(name);
+			List<String> params = multiPartParams.get(name);
+			if(params == null)
+				return null;
+			return params.get(0);
 		}
 		return request.getParameter(name);
 	}

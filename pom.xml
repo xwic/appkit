@@ -385,17 +385,17 @@
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
-				<version>5.2-SNAPSHOT</version>
+				<version>5.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
-				<version>5.2-SNAPSHOT</version>
+				<version>5.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-compatibility</artifactId>
-				<version>5.2-SNAPSHOT</version>
+				<version>5.2.0</version>
 			</dependency>			
 			<dependency>
 				<groupId>de.xwic.cube</groupId>

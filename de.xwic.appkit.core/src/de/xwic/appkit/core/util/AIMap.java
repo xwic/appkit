@@ -61,7 +61,12 @@ final class AIMap<K, X, I, V extends X> implements Map<K, V> {
 	@SuppressWarnings ("deprecation")
 	@Override
 	public V get(Object key) {
-		return MapUtil.get(map, (K) key, (I) key, initializer);
+		if (map.containsKey(key)) {
+			return map.get(key);
+		}
+		final V call = (V) initializer.evaluate((I) key);
+		map.put((K) key, call);
+		return call;
 	}
 
 	/* (non-Javadoc)
