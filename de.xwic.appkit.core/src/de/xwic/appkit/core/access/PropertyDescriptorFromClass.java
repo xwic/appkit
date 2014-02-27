@@ -58,8 +58,14 @@ final class PropertyDescriptorFromClass implements ILazyEval<Class<IEntity>, Map
 	 * @return
 	 */
 	public static Map<Class<IEntity>, Map<String, PropertyDescriptor>> createMapGenerator() {
-		Map<Class<IEntity>, Map<String, PropertyDescriptor>> aiMap = MapUtil.wrapAI(new HashMap<Class<IEntity>, Map<String, PropertyDescriptor>>(), new PropertyDescriptorFromClass());
-		return aiMap;
+		Map<String, String> map = newHashMap();//testing
+		return MapUtil.wrapAI(new HashMap<Class<IEntity>, Map<String, PropertyDescriptor>>(), new PropertyDescriptorFromClass());
 	}
 
+	/**
+	 * @return
+	 */
+	private static<K,V> Map<K,V> newHashMap(){
+		return new HashMap<K, V>();
+	}
 }
