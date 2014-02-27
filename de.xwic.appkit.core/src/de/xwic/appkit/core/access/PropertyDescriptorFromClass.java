@@ -8,6 +8,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ final class PropertyDescriptorFromClass implements ILazyEval<Class<IEntity>, Map
 	 * @return
 	 */
 	public static Map<Class<IEntity>, Map<String, PropertyDescriptor>> createMapGenerator() {
-		Map<Class<IEntity>, Map<String, PropertyDescriptor>> aiMap = MapUtil.aiMap(new PropertyDescriptorFromClass());
+		Map<Class<IEntity>, Map<String, PropertyDescriptor>> aiMap = MapUtil.wrapAI(new HashMap<Class<IEntity>, Map<String, PropertyDescriptor>>(), new PropertyDescriptorFromClass());
 		return aiMap;
 	}
 
