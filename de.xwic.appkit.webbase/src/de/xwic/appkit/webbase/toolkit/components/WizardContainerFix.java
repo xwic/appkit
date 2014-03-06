@@ -40,10 +40,10 @@ public class WizardContainerFix {
 	private ControlContainer container;
 	private List listeners = null;
 	
-	private Button btBack = null;
-	private Button btNext = null;
-	private Button btFinish = null;
-	private Button btAbort = null;
+	protected Button btBack = null;
+	protected Button btNext = null;
+	protected Button btFinish = null;
+	protected Button btAbort = null;
 	
 	private Label lblPageTitle = null;
 	private Label lblPageSubTitle = null;

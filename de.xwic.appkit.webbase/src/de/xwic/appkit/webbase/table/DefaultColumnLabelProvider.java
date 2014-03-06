@@ -147,7 +147,8 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			cell.object = value; 
 		} else {
 			cell.text = toString(value);
-			
+			cell.object = value;
+
 			if (value instanceof Number) {
 				cell.cssClass = "plvalue";
 			}

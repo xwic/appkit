@@ -6,6 +6,7 @@ package de.xwic.appkit.core.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -134,7 +135,7 @@ public class CollectionUtil {
 	 * @param type
 	 * @return
 	 */
-	public static <O> List<Collection<O>> breakCollection(final Collection<O> collection, final int maxElements, final Type type) {
+	private static <O> List<Collection<O>> breakCollection(final Collection<O> collection, final int maxElements, final Type type) {
 		final List<Collection<O>> result = new ArrayList<Collection<O>>();
 		if (collection == null){
 			return result;
@@ -192,10 +193,30 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * Converts the elements to a list of elements. <br> Null elements are not included. Returns an unmodifiable view of the specified array.
+	 * This method allows modules to provide users with "read-only" access to the list.
+	 * Query operations on the returned list "read through" to the specified list, and attempts to modify the returned list, whether direct or via its iterator,
+	 * result in an {@link UnsupportedOperationException}.
+	 *
+	 * @param the array for which an unmodifiable view is to be returned.
+	 * @return an unmodifiable view of the generated list
+	 */
+	public static <E> List<E> convertToList(final E... elements) {
+		if (elements == null || elements.length == 0) {
+			return Collections.emptyList();
+		}
+		final List<E> list = new ArrayList<E>();
+		for (E e : elements) {
+			addIfNotNull(e, list);
+		}
+		return Collections.unmodifiableList(list);
+	}
+
+	/**
 	 * @author Alexandru Bledea
 	 * @since Feb 4, 2014
 	 */
-	public static enum Type {
+	private static enum Type {
 		HASHSET {
 			@Override
 			<E> Collection<E> create() {
