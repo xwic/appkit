@@ -48,9 +48,13 @@ public class MapUtil {
 	 * @param initializer the map initializer
 	 * @return a unmodifiable {@link java.util.HashMap} containting the values that were set using the <b>initializer</b>
 	 */
-	public static <Key, Obj> Map<Key, Obj> unmodifiableMap(final IMapInitializer<Key, Obj> initializer) {
-		final Map<Key, Obj> map = new HashMap<Key, Obj>();
+	public static <K, V> Map<K, V> unmodifiableMap(final IMapInitializer<K, V> initializer) {
+		Map<K, V> map = new HashMap<K, V>();
 		initializer.initMap(map);
+
+//		the user may have saved the map from initMap, let's make a defensive copy
+		map = new HashMap<K, V>(map);
+
 		return Collections.unmodifiableMap(map);
 	}
 
