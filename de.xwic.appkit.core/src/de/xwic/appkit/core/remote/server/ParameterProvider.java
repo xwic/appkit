@@ -47,15 +47,16 @@ public final class ParameterProvider implements IParameterProvider {
 		multipart = isMultipart(request);
 
 		if (multipart) {
-			int maxPostSize = 1024 * 5120; // 5mb
+			int maxPostSize = Integer.MAX_VALUE; // 2gb
+//			int maxPostSize = 1024 * 5120; // 5mb
 			int memoryUsage = 1024 * 1024;
 
 			Upload upload = new Upload(request, getUploadDir(), maxPostSize, memoryUsage);
 			multiPartParams = unmodifiable(upload.getParams());
 			files = unmodifiable(upload.getFiles());
 		} else {
-			multiPartParams = EMPTY_MAP;
-			files = EMPTY_MAP;
+			multiPartParams = Collections.emptyMap();
+			files = Collections.emptyMap();
 		}
 	}
 
@@ -81,8 +82,9 @@ public final class ParameterProvider implements IParameterProvider {
 	public String getParameter(final String name) {
 		if (multipart) {
 			List<String> params = multiPartParams.get(name);
-			if(params == null)
+			if(params == null) {
 				return null;
+			}
 			return params.get(0);
 		}
 		return request.getParameter(name);
