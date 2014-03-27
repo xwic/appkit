@@ -12,7 +12,9 @@ import org.apache.commons.logging.LogFactory;
 
 import de.jwic.base.SessionContext;
 import de.xwic.appkit.core.config.Bundle;
+import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
+import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.webbase.toolkit.util.BundleAccessor;
 
 /**
@@ -64,7 +66,24 @@ public class BundleProvider implements IBundleProvider {
 		Language langFromProvider = languageProvider.getLanguageById(langId);
 		langId = langFromProvider != null ? langFromProvider.getId() : langId;
 		
-		return bundles.get(langId);		
+		if (bundles.containsKey(langId)) {
+			return bundles.get(langId);
+		} else {
+			// fall back on the default language if the langId is not supported
+			
+			String defaultLangId = "";
+			
+			Setup setup = ConfigurationManager.getSetup();
+			if (setup != null) {
+				defaultLangId = setup.getDefaultLangId();
+			}
+			
+			if (defaultLangId == null || defaultLangId.trim().isEmpty()) {
+				defaultLangId = "en";
+			}
+			
+			return bundles.get(defaultLangId);
+		}		
 	}
 	
 	/**
