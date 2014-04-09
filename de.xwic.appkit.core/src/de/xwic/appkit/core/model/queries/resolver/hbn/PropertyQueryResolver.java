@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -32,6 +34,7 @@ import de.xwic.appkit.core.model.queries.QueryElement;
  */
 public class PropertyQueryResolver extends QueryResolver {
 
+	private final Log log = LogFactory.getLog(getClass());
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.resolver.hbn.QueryResolver#resolve(java.lang.Class, de.xwic.appkit.core.dao.EntityQuery, boolean)
@@ -61,7 +64,17 @@ public class PropertyQueryResolver extends QueryResolver {
 //		System.out.println(hsql);
 		
 		Session session = HibernateUtil.currentSession();
-		Query q = session.createQuery(hsql);
+		Query q;
+		try {
+			q = session.createQuery(hsql);
+		} catch (NullPointerException npe){
+			String qts = "null";
+			if (query != null){
+				qts = query.toString();
+			}
+			log.error(String.format("Failed to create Query!\nPQ: %s\nHSQL: %s\n", qts, hsql), npe);
+			throw npe;
+		}
 
 		// add values
 		int idx = 0;
