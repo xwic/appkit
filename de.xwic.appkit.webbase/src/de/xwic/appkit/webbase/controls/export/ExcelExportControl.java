@@ -35,6 +35,13 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import de.jwic.base.IControlContainer;
 import de.jwic.base.IResourceControl;
@@ -105,9 +112,9 @@ public class ExcelExportControl extends Button implements IResourceControl {
 	 */
 	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
 		try {
-			String filename = "export.xls";
-			HSSFWorkbook wb = createWorkBook();
 			
+			Workbook wb = createWorkBook();
+			String filename = "export.xlsx";
 			res.setContentType(MimeTypeUtil.getMimeTypeForFileName(filename));
 			res.setHeader("Content-Disposition", "attachment; filename=" + filename);
 			wb.write(res.getOutputStream());
@@ -117,22 +124,22 @@ public class ExcelExportControl extends Button implements IResourceControl {
 		}
 	}
 
-	private HSSFWorkbook createWorkBook() {
-		HSSFWorkbook wb = new HSSFWorkbook();
-		HSSFSheet sheet = wb.createSheet("Sheet");
-		HSSFRow row = sheet.createRow(0);
+	private Workbook createWorkBook() {
+		Workbook wb = new SXSSFWorkbook(100);
+		Sheet sheet = wb.createSheet("Sheet");
+		Row row = sheet.createRow(0);
 
 		// Style for title cells
-		HSSFFont font = wb.createFont();
+		Font font = wb.createFont();
 		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 		font.setColor(HSSFColor.BLUE.index);
 
-		HSSFCellStyle styleTitle = wb.createCellStyle();
+		CellStyle styleTitle = wb.createCellStyle();
 		styleTitle.setFont(font);
 
 		// Style for data date cells
 		font = wb.createFont();
-		HSSFCellStyle styleDate = wb.createCellStyle();
+		CellStyle styleDate = wb.createCellStyle();
 		styleDate.setDataFormat(HSSFDataFormat.getBuiltinFormat("m/d/yy"));
 
 		short col = 0;
@@ -146,7 +153,7 @@ public class ExcelExportControl extends Button implements IResourceControl {
 				continue;
 			}
 			sheet.setColumnWidth(col, (short) (column.getWidth() * 40));
-			HSSFCell cell = row.createCell(col++);
+			Cell cell = row.createCell(col++);
 			cell.setCellValue(column.getTitle());
 			cell.setCellStyle(styleTitle);
 		}
@@ -165,11 +172,11 @@ public class ExcelExportControl extends Button implements IResourceControl {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void renderRows(Iterator<?> iter, int level, TableModel model, HSSFSheet sheet, HSSFCellStyle styleDate) {
+	protected void renderRows(Iterator<?> iter, int level, TableModel model, Sheet sheet, CellStyle styleDate) {
 		while (iter.hasNext()) {
 			short col = 0;
 			Object inputObj = iter.next();
-			HSSFRow row = sheet.createRow(sheet.getLastRowNum() + 1);
+			Row row = sheet.createRow(sheet.getLastRowNum() + 1);
 
 			IContentProvider contentProvider = model.getContentProvider();
 			for (Iterator<TableColumn> it = model.getColumnIterator(); it.hasNext();) {;
@@ -183,7 +190,7 @@ public class ExcelExportControl extends Button implements IResourceControl {
 				CellLabel label = null;
 				String rowKey = contentProvider.getUniqueKey(inputObj);
 				boolean expanded = model.isExpanded(rowKey);
-				HSSFCell cell = row.createCell(col++);
+				Cell cell = row.createCell(col++);
 				
 				try {
 					label = tableViewer.getTableLabelProvider().getCellLabel(inputObj, column, new RowContext(expanded, level));
