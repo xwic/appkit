@@ -51,7 +51,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
 				tableModel.getUserConfigHandler().applyConfig(ctrl.getUserViewConfiguration());
-				
+				tableModel.applyColumnReorder();
 				closeProfileWindow();
 			}
 			
@@ -76,7 +76,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 				}
 				
 				requireRedraw();
-				
+				tableModel.applyColumnReorder();
 				ctrl.destroy();
 			}
 
