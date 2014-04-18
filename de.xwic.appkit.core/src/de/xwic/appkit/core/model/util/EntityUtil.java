@@ -249,7 +249,7 @@ public final class EntityUtil {
 	 * @param entity
 	 * @return
 	 */
-	public static Integer getEntityIdOrNull(final IEntity entity) {
+	public static Integer getIdOrNull(final IEntity entity) {
 		if (entity == null) {
 			return null;
 		}
