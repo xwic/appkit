@@ -3,14 +3,14 @@
  */
 package de.xwic.appkit.core.model.util;
 
+import static de.xwic.appkit.core.dao.DAOSystem.findDAOforEntity;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import de.xwic.appkit.core.ApplicationData;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
@@ -47,7 +47,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> Set<Integer> getIds(final Collection<E> collection) {
-		return CollectionUtil.createCollection(collection, ENTITY_ID_EVALUATOR, new HashSet<Integer>());
+		return CollectionUtil.createSet(collection, ENTITY_ID_EVALUATOR);
 	}
 
 	/**
@@ -56,7 +56,10 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Integer id) {
-		return id == null ? null : (E) findDAO(entityClass).getEntity(id.intValue());
+		if (id == null || id.intValue() == NEW_ENTITY_ID){
+			return null;
+		}
+		return findDAOforEntity(entityClass).getEntity(id.intValue());
 	}
 
 	/**
@@ -76,7 +79,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E createEntity(final Class<E> entityClass) {
-		return findDAO(entityClass).createEntity();
+		return findDAOforEntity(entityClass).createEntity();
 	}
 
 	/**
@@ -87,21 +90,15 @@ public final class EntityUtil {
 		if (entity == null) {
 			return "";
 		}
-		return findDAO(entity.getClass()).buildTitle(entity);
+		return findDAOforEntity(entity.getClass()).buildTitle(entity);
 	}
 
 	/**
-	 * @param entityClass
-	 * @return
-	 */
-	public static <E extends IEntity> DAO<E> findDAO(final Class<E> entityClass) {
-		return DAOSystem.findDAOforEntity(entityClass);
-	}
-
-	/**
+	 * @deprecated only works if we use hibernate, maybe not such a good idea
 	 * @param entity
 	 * @return
 	 */
+	@Deprecated
 	public static <E extends IEntity> E refreshEntity(final E entity) {
 		if (entity != null) {
 			HibernateUtil.currentSession().refresh(entity);
@@ -125,7 +122,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> EntityList<E> getEntities(final Class<E> entityClass, final PropertyQuery query, final Limit limit) {
-		return findDAO(entityClass).getEntities(limit, query);
+		return findDAOforEntity(entityClass).getEntities(limit, query);
 	}
 
 	/**
@@ -134,7 +131,7 @@ public final class EntityUtil {
 	 */
 	public static <E extends IEntity> E update(final E entity) {
 		if (entity != null) {
-			findDAO(entity.getClass()).update(entity);
+			findDAOforEntity(entity.getClass()).update(entity);
 		}
 		return entity;
 	}
@@ -246,6 +243,17 @@ public final class EntityUtil {
 			return IEntity.class.isAssignableFrom(clasz);
 		}
 		return false;
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public static Integer getEntityIdOrNull(final IEntity entity) {
+		if (entity == null) {
+			return null;
+		}
+		return entity.getId();
 	}
 
 	/**
