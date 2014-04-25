@@ -17,8 +17,6 @@ import de.jwic.controls.RadioGroup;
 import de.jwic.controls.StackedContainer;
 import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableViewer;
-import de.jwic.events.ElementSelectedEvent;
-import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.KeyEvent;
 import de.jwic.events.KeyListener;
 import de.jwic.events.SelectionEvent;
@@ -40,6 +38,9 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 @JavaScriptSupport
 public class ColumnFilterControl extends ControlContainer implements IFilterControlListener {
 
+	private static final String ALL = "all";
+	private static final String EMPTY = "empty";
+	private static final String NOT_EMPTY = "not-empty";
 	private int positionIdx = 0;
 	private Column column = null;
 	private final EntityTableModel model;
@@ -59,8 +60,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	// make these protected so we can  hide them when we want from the custom filter
 	protected ColumnAction btSortUp;
 	protected ColumnAction btSortDown;
-
-	private RadioGroup rdToogleBlanks;
+	
+	private RadioGroup rdExcludeEmpty;
 	
 	
 	/**
@@ -114,7 +115,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		int height = 40; // base height
 		if (btSortDown.isVisible()) height += 26;
 		if (btSortUp.isVisible()) height += 26;
-		if (rdToogleBlanks.isVisible()) height += 28;
+//		if (chkExcludeEmpty.isVisible()) height += 28;
 		if (btFilterClear.isVisible()) height += 26;
 		
 		height += getFilterHeight();
@@ -161,7 +162,10 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 * 
 	 */
 	private void createButtons() {
-
+		rdExcludeEmpty = new RadioGroup(this, "chkExcludeEmpty");
+		rdExcludeEmpty.addElement("Inc. Empty", EMPTY);
+		rdExcludeEmpty.addElement("Exc. Empty", NOT_EMPTY);
+		rdExcludeEmpty.addElement("Default", ALL);
 		
 		Button btColSetup = new Button(this, "btColSetup");
 		btColSetup.setTitle("");
@@ -224,27 +228,6 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 			}
 		});
 		
-		rdToogleBlanks = new RadioGroup(this, "rdToogleBlanks");
-		rdToogleBlanks.addElement("Is Not Empty", "notNull");
-		rdToogleBlanks.addElement("Is Empty", "null");
-		rdToogleBlanks.addElement("All", "all");
-		rdToogleBlanks.setSelectedKey("all");
-		rdToogleBlanks.setChangeNotification(true);
-		rdToogleBlanks.setCssClass(".radioButton");
-		rdToogleBlanks.addElementSelectedListener(new ElementSelectedListener() {
-			
-			@Override
-			public void elementSelected(ElementSelectedEvent event) {
-				String key = rdToogleBlanks.getSelectedKey();
-				if (key.equals("null")) {
-					actionToogleNull(true);
-				} else if (key.equals("notNull")) {
-					actionToogleNull(false);
-				} else {
-					actionClearFilter();
-				}
-			}
-		});
 	}
 
 	/**
@@ -262,6 +245,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 */
 	protected void actionClearFilter() {
 		model.updateFilter(column, null);
+		rdExcludeEmpty.setSelectedKey(ALL);
 		hide();
 	}
 
@@ -300,28 +284,49 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	protected void actionOk() {
 		
 		if (currentFilter != null) {
-			model.updateFilter(column, currentFilter.getQueryElement());
+			final String state = rdExcludeEmpty.getSelectedElement().getKey();
+			final QueryElement element = currentFilter.getQueryElement();
+			if(ALL.equals(state)){//both include and exclude means the default behavior
+				model.updateFilter(column, element);
+			}else if(EMPTY.equals(state)){
+				//update the filter to include empty elements
+				//if the filter is empty it will only show empty elements
+				model.updateFilter(column, includeExcludeEmpty(element, true));
+			}else{
+				//update the filter to exclude empty elements.
+				//this is basically the same as ALL
+				//but if you select nothing for the actual filter it will show only non-empty elements
+				model.updateFilter(column, includeExcludeEmpty(element, false));
+			}
 		}
 		hide();
 		
 	}
-	
-	/**
-	 * @param isNull
-	 */
-	protected void actionToogleNull(boolean isNull) {
-		PropertyQuery query = new PropertyQuery();
-		String property = column.getListColumn().getPropertyId();
-		if (isNull) {
-			query.addEquals(property, null);
-		} else {
-			query.addNotEquals(property, null);
-		}
-		QueryElement qe = new QueryElement(QueryElement.AND, query);
-		model.updateFilter(column, qe);
-		hide();
-	}
 
+	/**
+	 * @param element - the current query element
+	 * @param include - true for include empty false for not
+	 * @return a new query element that will either include or exclude empty element based on the 'include' param
+	 */
+	private QueryElement includeExcludeEmpty(final QueryElement element, boolean include) {
+		final PropertyQuery query = new PropertyQuery();
+		final String property = column.getListColumn().getPropertyId();
+		if (element != null) {
+			query.addQueryElement(element);
+		}
+		if(include){
+			//on include its 'OR foo == null'
+			final QueryElement qe = new QueryElement(QueryElement.OR, property, QueryElement.EQUALS, null);
+			query.addQueryElement(qe);
+		}else{
+			//on exclude its 'AND foo != null'
+			final QueryElement qe = new QueryElement(QueryElement.AND, property, QueryElement.NOT_EQUALS, null);
+			query.addQueryElement(qe);
+		}
+		
+		return new QueryElement(QueryElement.AND, query);
+	}
+	
 	/**
 	 * Returns the title of the column.
 	 * @return
@@ -354,7 +359,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
 		
-		rdToogleBlanks.setVisible((column.getListColumn().getFinalProperty() != null && !column.getListColumn().getFinalProperty().isCollection() ? true : false));
+		rdExcludeEmpty.setVisible((column.getListColumn().getFinalProperty() != null && !column.getListColumn().getFinalProperty().isCollection() ? true : false));
 		initializeRadio();
 		
 		// choose the right filter
@@ -411,7 +416,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 					currentFilter = bolFilter;
 					btSortUp.setTitle("Sort False to True ");
 					btSortDown.setTitle("Sort True to False");
-					rdToogleBlanks.setVisible(false);
+//					rdToogleBlanks.setVisible(false);
 				} else if ("int".equals(entityType) || "java.lang.Integer".equals(entityType) ||
 						"long".equals(entityType) || "java.lang.Long".equals(entityType) ||
 						"double".equals(entityType) || "java.lang.Double".equals(entityType)) {
@@ -447,27 +452,6 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	}
 
 	/**
-	 * Initialize the radio button control to reflect the current filters
-	 */
-	protected void initializeRadio() {
-		QueryElement qe = column.getFilter();
-		rdToogleBlanks.setSelectedKey("all");
-		if (qe != null && qe.getSubQuery() != null) {
-			List<QueryElement> elements = qe.getSubQuery().getElements();
-			for (QueryElement elem : elements) {
-				if (QueryElement.NOT_EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
-					rdToogleBlanks.setSelectedKey("notNull");
-					break;
-				}
-				if (QueryElement.EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
-					rdToogleBlanks.setSelectedKey("null");
-					break;
-				}
-			}
-		}
-	}
-	
-	/**
 	 * @return the positionIdx
 	 */
 	public int getPositionIdx() {
@@ -499,10 +483,31 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	}
 	
 	/**
-	 * Used in vtl
+	 * User in VTL
 	 * @return
 	 */
-	public boolean canToogleBlanks() {
-		return rdToogleBlanks.isVisible();
+	public boolean isExcludeRadioVisible(){
+		return rdExcludeEmpty.isVisible();
 	}
+	
+	
+	protected void initializeRadio() {
+		QueryElement qe = column.getFilter();
+		rdExcludeEmpty.setSelectedKey(ALL);
+		if (qe != null && qe.getSubQuery() != null) {
+			List<QueryElement> elements = qe.getSubQuery().getElements();
+			for (QueryElement elem : elements) {
+				if (QueryElement.NOT_EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+					rdExcludeEmpty.setSelectedKey(NOT_EMPTY);
+					break;
+				}
+				if (QueryElement.EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+					rdExcludeEmpty.setSelectedKey(EMPTY);
+					break;
+				}
+			}
+		}
+	}
+
+	
 }

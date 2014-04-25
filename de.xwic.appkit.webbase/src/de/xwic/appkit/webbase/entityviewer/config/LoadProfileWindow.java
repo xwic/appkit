@@ -46,6 +46,7 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
 				tableModel.getUserConfigHandler().applyPublicConfig(ctrl.getUserViewConfiguration());
+				tableModel.applyColumnReorder();
 			}
 			
 			@Override
