@@ -13,7 +13,6 @@ import org.hibernate.Session;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
-import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.security.impl.User;
 import de.xwic.appkit.core.security.queries.UniqueUserQuery;
 
@@ -30,7 +29,6 @@ public class UniqueUserResolver implements IEntityQueryResolver {
 	public Object resolve(Class<? extends Object> entityClass, EntityQuery entityquery, boolean justCount) {
 		
 		UniqueUserQuery query = (UniqueUserQuery)entityquery;
-		IUser user = query.getUser();
 		
 		Session session = HibernateUtil.currentSession();
 		StringBuffer sb = new StringBuffer();
@@ -44,8 +42,8 @@ public class UniqueUserResolver implements IEntityQueryResolver {
 		  .append("obj.logonName LIKE ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, user.getId());
-		q.setString(1, user.getLogonName());
+		q.setInteger(0, query.getUserId());
+		q.setString(1, query.getUserLogonName());
 		
 		return q;
 		

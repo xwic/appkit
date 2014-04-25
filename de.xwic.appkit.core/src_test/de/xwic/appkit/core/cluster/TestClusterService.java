@@ -8,16 +8,6 @@ import java.io.Serializable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.core.cluster.AbstractClusterService;
-import de.xwic.appkit.core.cluster.ClusterEvent;
-import de.xwic.appkit.core.cluster.ClusterEventListener;
-import de.xwic.appkit.core.cluster.CommunicationException;
-import de.xwic.appkit.core.cluster.EventTimeOutException;
-import de.xwic.appkit.core.cluster.ICluster;
-import de.xwic.appkit.core.cluster.IClusterService;
-import de.xwic.appkit.core.cluster.IClusterServiceHandler;
-import de.xwic.appkit.core.cluster.IRemoteService;
-
 /**
  * Test implementation of a service that returns a number in sequence unique across the cluster.
  * @author lippisch

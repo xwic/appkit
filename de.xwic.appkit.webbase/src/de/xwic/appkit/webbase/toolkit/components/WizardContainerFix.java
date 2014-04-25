@@ -17,16 +17,16 @@ import de.jwic.base.SessionContext;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.Label;
-import de.jwic.controls.Window;
+import de.jwic.controls.StackedContainer;
 import de.jwic.controls.dialogs.DialogEvent;
 import de.jwic.controls.dialogs.DialogListener;
 import de.jwic.controls.wizard.ValidationException;
 import de.jwic.controls.wizard.Wizard;
 import de.jwic.controls.wizard.WizardPage;
-import de.jwic.controls.StackedContainer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.jwic.util.Messages;
+import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 
 /**
  * Fix, because the ecolib container did not work...
@@ -40,10 +40,10 @@ public class WizardContainerFix {
 	private ControlContainer container;
 	private List listeners = null;
 	
-	private Button btBack = null;
-	private Button btNext = null;
-	private Button btFinish = null;
-	private Button btAbort = null;
+	protected Button btBack = null;
+	protected Button btNext = null;
+	protected Button btFinish = null;
+	protected Button btAbort = null;
 	
 	private Label lblPageTitle = null;
 	private Label lblPageSubTitle = null;
@@ -156,51 +156,76 @@ public class WizardContainerFix {
 	 */
 	protected void createControls(IControlContainer container) {
 
-		Messages messages = new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
+		new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
 		
-		Window win = new Window(container);		
+		InnerPage win = new InnerPage(container, null);
 		win.setTitle(wizard.getTitle());
-		win.setTemplateName(getClass().getName());
+
+		if(wizard.getWidth() > 0){
+			win.setMaxWidth(wizard.getWidth());
+		}else {
+			// default width
+			win.setMaxWidth(900);
+		}
 		
-		lblPageTitle = new Label(win, "lblPageTitle");
+		ControlContainer winContainer = new ControlContainer(win);
+		winContainer.setTemplateName(getContainerTemplate());
+		
+		lblPageTitle = new Label(winContainer, "lblPageTitle");
 		lblPageTitle.setCssClass("title");
-		lblPageSubTitle = new Label(win, "lblPageSubTitle");
+		lblPageSubTitle = new Label(winContainer, "lblPageSubTitle");
 		lblPageSubTitle.setCssClass("subtitle");
 		
-		errorWarning = new ErrorWarning(win, "errorWarning");
+		errorWarning = new ErrorWarning(winContainer, "errorWarning");
 		errorWarning.setAutoClose(true);
 		
-		pages = new StackedContainer(win, "pages");
-		pages.setWidth(wizard.getWidth());
-		pages.setHeight(wizard.getHeight());
-		
+		pages = new StackedContainer(winContainer, "pages");
+//		pages.setWidth(wizard.getWidth());
+//		pages.setHeight(wizard.getHeight());
+//		
 		
 		NavigationController navContr = new NavigationController();
 		
-		btBack = new Button(win, "btBack");
+		btBack = new Button(winContainer, "btBack");
 		btBack.setTitle("Back"); // messages.getString("wizard.button.back"));
 		btBack.addSelectionListener(navContr);
 		
-		btNext = new Button(win, "btNext");
+		btNext = new Button(winContainer, "btNext");
 		btNext.setTitle("Next"); // messages.getString("wizard.button.next"));
 		btNext.addSelectionListener(navContr);
 
-		btFinish = new Button(win, "btFinish");
+		btFinish = new Button(winContainer, "btFinish");
 		btFinish.setTitle("Finish"); // messages.getString("wizard.button.finish"));
 		btFinish.addSelectionListener(navContr);
 
-		btAbort = new Button(win, "btAbort");
+		btAbort = new Button(winContainer, "btAbort");
 		btAbort.setTitle("Close"); // messages.getString("wizard.button.abort"));
 		btAbort.addSelectionListener(navContr);
+
+		addMoreButtons(winContainer);
 
 		activatePage(currentPage);
 		
 	}
 
 	/**
-	 * @param currentPage2
+	 * @param toolbar
+	 */
+	protected void addMoreButtons(final IControlContainer toolbar) {
+	}
+
+	/**
+	 * @return
+	 */
+	protected String getContainerTemplate() {
+		return WizardContainerFix.class.getName();
+	}
+
+	/**
+	 * @param page
 	 */
 	private void activatePage(WizardPage page) {
+		onActivatePage(errorWarning);
 		currentPage = page;
 		
 		lblPageTitle.setText(page.getTitle());
@@ -225,6 +250,14 @@ public class WizardContainerFix {
 		
 		btFinish.setEnabled(wizard.canFinish(currentPage));
 		page.activated();
+	}
+
+	/**
+	 * i'm here if you need me...
+	 *
+	 * @param errorWarning
+	 */
+	protected void onActivatePage(ErrorWarning errorWarning) {
 	}
 
 	/**
@@ -332,6 +365,13 @@ public class WizardContainerFix {
 				performAbort();
 			} 
 		}
+	}
+
+	/**
+	 * @return the currentPage
+	 */
+	protected final WizardPage getCurrentPage() {
+		return currentPage;
 	}
 
 	/**

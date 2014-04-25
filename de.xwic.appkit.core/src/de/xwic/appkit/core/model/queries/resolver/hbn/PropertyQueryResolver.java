@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -32,6 +34,7 @@ import de.xwic.appkit.core.model.queries.QueryElement;
  */
 public class PropertyQueryResolver extends QueryResolver {
 
+	private final Log log = LogFactory.getLog(getClass());
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.resolver.hbn.QueryResolver#resolve(java.lang.Class, de.xwic.appkit.core.dao.EntityQuery, boolean)
@@ -61,7 +64,17 @@ public class PropertyQueryResolver extends QueryResolver {
 //		System.out.println(hsql);
 		
 		Session session = HibernateUtil.currentSession();
-		Query q = session.createQuery(hsql);
+		Query q;
+		try {
+			q = session.createQuery(hsql);
+		} catch (NullPointerException npe){
+			String qts = "null";
+			if (query != null){
+				qts = query.toString();
+			}
+			log.error(String.format("Failed to create Query!\nPQ: %s\nHSQL: %s\n", qts, hsql), npe);
+			throw npe;
+		}
 
 		// add values
 		int idx = 0;
@@ -166,13 +179,24 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 			sb.append(" ").append(customWhere).append(" ");
 		}
+
+		// add the order by part
 		
 		String orderBy = "";
 		if (!justCount) {
 			boolean hasCriteria = size != 0 || query.isHideDeleted();
 			orderBy = addSortingClause(query, "obj", hasCriteria, sbFrom, entityClass);
 		}
-		
+			
+		if(query.isConsistentOrder() && orderBy.indexOf("obj.id") == -1) {
+			if(orderBy.length() != 0) {
+				orderBy += ", "; 
+			} else {
+				orderBy = " order by ";
+			}
+			orderBy += "obj.id asc";
+		}
+				
 		if (checkPicklistJoin) {
 			PicklistJoinQueryParser tescht = new PicklistJoinQueryParser(entityClass.getName(), sbFrom.toString(), sb.toString(), query.getLanguageId(), justCount);
 			return tescht.toString() + " " + orderBy;
@@ -182,7 +206,6 @@ public class PropertyQueryResolver extends QueryResolver {
 				sb.toString() + " " + orderBy;
 			return erg;
 		}
-		
 	}
 
 	/**
@@ -260,6 +283,11 @@ public class PropertyQueryResolver extends QueryResolver {
 						  .append(" UPPER(?)");
 					} else if (QueryElement.EQUALS.equals(qe.getOperation()) && qe.isCollectionElement()) {
 						sb.append("? IN ELEMENTS(")
+						  .append(aliasPrefix)
+						  .append(qe.getPropertyName())
+						  .append(")");
+					} else if (QueryElement.NOT_EQUALS.equals(qe.getOperation()) && qe.isCollectionElement()) {
+						sb.append("? NOT IN ELEMENTS(")
 						  .append(aliasPrefix)
 						  .append(qe.getPropertyName())
 						  .append(")");

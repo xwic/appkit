@@ -42,4 +42,14 @@ public interface IEntityAction extends IAction {
 	 * @param entity
 	 */
 	public void updateState(IEntity entity);
+	
+	/**
+	 * @return
+	 */
+	public boolean isInDropDown();
+	
+	/**
+	 * @param inDropDown
+	 */
+	public void setInDropDown(boolean inDropDown);
 }

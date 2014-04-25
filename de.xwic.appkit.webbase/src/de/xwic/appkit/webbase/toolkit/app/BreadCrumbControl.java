@@ -11,7 +11,6 @@ import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Window;
-import de.jwic.controls.Window;
 import de.xwic.appkit.webbase.toolkit.util.BundleAccessor;
 
 /**

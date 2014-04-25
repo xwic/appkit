@@ -245,6 +245,9 @@ public class XmlEntityDescriptorReader {
 	 * @return the classLoader
 	 */
 	public static ClassLoader getClassLoader() {
+		if (classLoader == null) {
+			new XmlEntityDescriptorReader(); // force initialization
+		}
 		return classLoader;
 	}
 

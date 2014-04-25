@@ -278,7 +278,7 @@ public class DefaultDAOFactory implements DAOFactory {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.IDAOFactoryAdmin#registerDao(de.xwic.appkit.core.dao.DAO)
 	 */
-	public void registerDao(Class<? extends DAO> clazz, DAO dao) {
+	public <D extends DAO<?>> void registerDao(Class<D> clazz, D dao) {
 		dao.setProvider(provider);
 		daos.put(clazz, dao);
 	}

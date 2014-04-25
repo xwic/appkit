@@ -1,19 +1,14 @@
 package de.xwic.appkit.core.transport.xml;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
-import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.dao.EntityQuery;
+import de.xwic.appkit.core.dao.Limit;
 
 /**
  * Serializes and deserializes an EntityQuery object.
@@ -28,36 +23,9 @@ public class EntityQuerySerializer {
 	 * @throws TransportException 
 	 */
 	public static String queryToString(EntityQuery query) throws TransportException {
-		
-		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
-		OutputStreamWriter writer = new OutputStreamWriter(baOut);
-		
-		try {
-			Document doc = DocumentFactory.getInstance().createDocument();
-			Element root = doc.addElement("query");
-			new XmlBeanSerializer().serializeBean(root, "bean", query);
-			
-			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
-			// this "hack" is required to preserve the LBCR's in strings... 
-			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
-				public void write(Document arg0) throws IOException {
-					//this.preserve = true;
-					super.write(arg0);
-				}
-			};
-			xmlWriter.write(doc);
-			xmlWriter.flush();
-			
-		} catch (IOException e) {
-			throw new TransportException("Unexpected IOException while serializing query.", e);
-		}
-
-		return baOut.toString();
+		return XmlBeanSerializer.serializeToXML("query", query);		
 	}
 	
-	
-
-
 	/**
 	 * Returns the EntityQuery serialized in the parameter string.
 	 * @param queryString
@@ -75,4 +43,46 @@ public class EntityQuerySerializer {
 		}
 	}
 	
+	/**
+	 * @param limit
+	 * @return
+	 */
+	public static String limitToString(Limit limit) {
+		if (limit == null) {
+			return "";
+		}
+		
+		return limit.startNo + ";" + limit.maxResults;
+	}
+	
+	/**
+	 * @param strLimit
+	 * @return
+	 */
+	public static Limit stringToLimit(String strLimit) {
+		
+		if (strLimit == null || strLimit.isEmpty()) {
+			return null;
+		}
+		
+		int separatorIndex = strLimit.indexOf(";");
+		
+		if (separatorIndex < 0) {
+			throw new IllegalArgumentException("Cannot find ';' separator: " + strLimit);
+		}
+		
+		String strStart = strLimit.substring(0, separatorIndex);
+		String strMax = strLimit.substring(separatorIndex + 1);
+		
+		Limit limit = new Limit();
+		try {
+			limit.startNo = Integer.parseInt(strStart);
+			limit.maxResults = Integer.parseInt(strMax);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Badly formatted string: " + strLimit);
+		}
+		
+		return limit;
+		
+	}
 }

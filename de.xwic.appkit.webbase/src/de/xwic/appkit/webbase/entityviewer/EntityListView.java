@@ -19,6 +19,8 @@ import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.ListBox;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
+import de.jwic.controls.ToolBarSpacer;
+import de.jwic.controls.menu.Menu;
 import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
@@ -60,7 +62,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * 
  * @author Adrian Ionescu
  */
-public class EntityListView extends ControlContainer implements IEntityProvider {
+public class EntityListView<I extends IEntity> extends ControlContainer implements IEntityProvider {
 
 	protected EntityListViewConfiguration configuration;
 	
@@ -70,7 +72,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected ToolBar toolbar;
 
 	protected int widthDecrease = 50;
-	protected int heightDecrease = 230;
+	protected int heightDecrease = 260;
 	
 	private UserConfigurationWindow userConfigWindow;
 	private Button btUserConfig;
@@ -161,6 +163,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		// remove the - All - selection and add 200 and 500 
 		ListBox lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
 		lbMaxLines.clear();
+		lbMaxLines.addElement("- Auto -", "0");
 		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
 		String msg = "%s rows per page";
 		for (int i = 0; i < choices.length; i++) {
@@ -168,7 +171,7 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 					String.format( msg, choices[i]), 
 					Integer.toString(choices[i]));
 		}
-		lbMaxLines.addElement("- Auto -", "0");
+		
 		
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
@@ -315,17 +318,46 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	protected void loadActionsFromExtensions() {
 		ToolBarGroup tg = toolbar.addGroup();
 		Site site = ExtendedApplication.getInstance(this).getSite();
-		
+	
 		Map<String, List<IEntityAction>> actionsInGroups = EntityActionsHelper.getEntityActionsInGroups(site, this, getClass().getName(), configuration.getEntityClass());
+
 		for (Entry<String, List<IEntityAction>> entry : actionsInGroups.entrySet()) {
 			List<IEntityAction> actions = entry.getValue();
-			
 			if (actions.size() > 0) {
-				tg.addSpacer();
 				
+				boolean inDropDown = false;
+				// if any action in the group is in a drop down, all actions are
 				for (IEntityAction action : actions) {
-					tg.addAction(action);
-					extensionActions.add(action);
+					if (action.isInDropDown()) {
+						inDropDown = true;
+						break;
+					}
+				}
+				
+				ToolBarSpacer spacer = tg.addSpacer();
+				
+				if (inDropDown) {
+					Menu menu = new Menu(tg.getContainer());
+					
+					for (IEntityAction action : actions) {
+						menu.addMenuItem(action);
+						extensionActions.add(action);
+					}
+					
+					Button btActions = tg.addButton();
+					btActions.setIconEnabled(ImageLibrary.ICON_APPLICATION_CASCADE);
+					btActions.setTitle(entry.getKey());
+					btActions.setMenu(menu);					
+				} else {
+					boolean isVisible = false;
+					for (IEntityAction action : actions) {
+						tg.addAction(action);
+						extensionActions.add(action);
+						isVisible = isVisible || action.isVisible();
+					}
+					if(!isVisible){
+						spacer.setVisible(false);
+					}
 				}
 			}
 		}
@@ -636,7 +668,26 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 		closeUserConfigWindow();		
 		super.destroy();
 	}
-	
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public I getEntityThrowingException() throws Exception {
+		if (!hasEntity()) {
+			return null;
+		}
+
+		String selection = getEntityKey();
+
+		if (selection.trim().length() > 0) {
+			int id = Integer.parseInt(selection);
+			return (I) dao.getEntity(id);
+		}
+
+		return null;
+	}
+
 	/**
 	 * @param listener
 	 */
@@ -659,27 +710,15 @@ public class EntityListView extends ControlContainer implements IEntityProvider 
 	 * @see de.xwic.appkit.webbase.actions.IEntityProvider#getEntity()
 	 */
 	@Override
-	public IEntity getEntity() {
-		if (!hasEntity()) {
-			return null;
-		}
-		
+	public I getEntity() {
 		try {
-			String selection = getEntityKey();
-			
-			if (selection.trim().length() > 0) {
-				DAO dao = DAOSystem.findDAOforEntity(configuration.getEntityClass());
-
-				int id = Integer.parseInt(selection);
-				return dao.getEntity(id);
-			}
-			
-			return null;
+			return getEntityThrowingException();
 		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.actions.IEntityProvider#getBaseEntity()
 	 */

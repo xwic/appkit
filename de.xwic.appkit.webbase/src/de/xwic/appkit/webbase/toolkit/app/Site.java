@@ -209,14 +209,14 @@ public class Site extends Page {
             String moduleKey = key.substring(0, idx);
             String subModuleKey = key.substring(idx + 1);
 
-            if (!moduleKey.equals(activeModuleKey) || !subModuleKey.equals(activeSubModuleKey)) {
+//            if (!moduleKey.equals(activeModuleKey) || !subModuleKey.equals(activeSubModuleKey)) {
                 //MessageDialog dirtyEditorDialog = new MessageDialog(GetContentContainer());
                 //dirtyEditorDialog.Message = "You are going to leave an Editor with unsaved changes. Continue?";
                 //dirtyEditorDialog.DialogFinished += new DialogEventHandler(dirtyEditorDialog_DialogFinished);
                 //dirtyEditorDialog.Title = "You have unsaved changes...";
                 //dirtyEditorDialog.openAsPage();
                 loadModule(moduleKey, subModuleKey);
-            }
+//            }
         }
     }
 

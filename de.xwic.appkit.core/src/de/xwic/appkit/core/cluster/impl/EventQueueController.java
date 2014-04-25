@@ -8,8 +8,8 @@ import org.apache.commons.logging.LogFactory;
 
 import de.xwic.appkit.core.cluster.ClusterEvent;
 import de.xwic.appkit.core.cluster.INode;
-import de.xwic.appkit.core.cluster.Message;
 import de.xwic.appkit.core.cluster.INode.NodeStatus;
+import de.xwic.appkit.core.cluster.Message;
 
 /**
  * Sends events to other nodes. Events are send from this centralized controller

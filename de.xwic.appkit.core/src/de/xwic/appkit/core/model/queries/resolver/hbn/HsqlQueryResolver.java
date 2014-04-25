@@ -20,7 +20,7 @@ import de.xwic.appkit.core.model.util.DateUtils;
 
 /**
  * @author Florian Lippisch
- * @author Christian Jäckel
+ * @author Christian Jackel
  */
 public class HsqlQueryResolver extends QueryResolver {
 	/** logger */

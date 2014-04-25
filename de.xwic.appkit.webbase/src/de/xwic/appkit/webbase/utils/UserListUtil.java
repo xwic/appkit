@@ -235,13 +235,13 @@ public class UserListUtil {
 		int l = name.length();
 		for (int i = 0; i < l; i++) {
 			char c = name.charAt(i);
-			if (c == 'ö' || c == 'Ö') {
+			if (c == '\u00D6' || c == '\u00F6') {
 				sb.append("OE");
-			} else if (c == 'ä' || c == 'Ä') {
+			} else if (c == '\u00C4' || c == '\u00E4') {
 				sb.append("AE");
-			} else if (c == 'ü' || c == 'Ü') {
+			} else if (c == '\u00DC' || c == '\u00FC') {
 				sb.append("UE");
-			} else if (c == 'ß') {
+			} else if (c == '\u00DF') {
 				sb.append("SS");
 			} else if (c >= 'a' && c <= 'z') {
 				sb.append((char) (c + UPPER_DIF));

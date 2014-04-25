@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -295,6 +296,36 @@ public class Setup {
 		defaultProfile.initializeConfig();
 		for (Profile profile : profiles.values()) {
 			profile.initializeConfig();
+		}
+	}
+	
+	/**
+	 * @param newSetup
+	 * @throws ConfigurationException 
+	 */
+	public void mergeSetup(Setup newSetup) throws ConfigurationException {
+
+		setId(newSetup.getId());
+		setAppTitle(newSetup.getAppTitle());
+		setVersion(newSetup.getVersion());
+		setDefaultLangId(newSetup.getDefaultLangId());
+		setLanguages(newSetup.getLanguages());
+		
+		for (Model model : newSetup.getModels()) {
+			addModel(model);
+		}
+		
+		for (Domain domain : newSetup.domains.values()) {
+			addDomain(domain);
+		}
+
+		for (Entry<String, Profile> entry: newSetup.profiles.entrySet()) {
+			addProfile(entry.getKey(), entry.getValue());
+		}
+		
+		for (Object prop : newSetup.properties.keySet()) {
+			String key = (String) prop;
+			setProperty(key, newSetup.getProperty(key));
 		}
 	}
 }

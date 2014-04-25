@@ -14,7 +14,7 @@ import de.xwic.appkit.core.security.IUserSession;
 /**
  * @author Florian Lippisch
  */
-public interface IUserSessionDAO extends DAO {
+public interface IUserSessionDAO extends DAO<IUserSession> {
 
 	/**
 	 * Returns the user session for the specified key.
@@ -22,12 +22,12 @@ public interface IUserSessionDAO extends DAO {
 	 * @return
 	 */
 	public IUserSession getUserSession(String key);
-	
+
 	/**
 	 * Create a new user session.
 	 * @param user
 	 * @return
 	 */
 	public IUserSession createUserSession(IUser user);
-	
+
 }

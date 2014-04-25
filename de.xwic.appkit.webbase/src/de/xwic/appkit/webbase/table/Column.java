@@ -46,7 +46,7 @@ public class Column implements Comparable<Column> {
 	 * @param lc
 	 */
 	@SuppressWarnings("unchecked")
-	public Column(TimeZone timeZone, Locale locale, ListColumn listColumn, Class<? extends IEntity> entityClazz) {
+	public Column(TimeZone timeZone, Locale locale, String dateFormat, String timeFormat, ListColumn listColumn, Class<? extends IEntity> entityClazz) {
 		this.listColumn = listColumn;
 		this.entityClazz = entityClazz;
 		id = listColumn.getPropertyId();
@@ -71,7 +71,7 @@ public class Column implements Comparable<Column> {
 				throw new RuntimeException("Error creating column label provider " + listColumn.getCustomLabelProviderClass() + ": " + e, e);
 			} 
 		}
-		columnLabelProvider.initialize(timeZone, locale, this);
+		columnLabelProvider.initialize(timeZone, locale, dateFormat, timeFormat, this);
 		
 	}
 

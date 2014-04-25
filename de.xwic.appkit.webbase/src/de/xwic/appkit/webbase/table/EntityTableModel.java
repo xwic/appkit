@@ -105,7 +105,7 @@ public class EntityTableModel {
 		int c = 0;
 		
 		for (ListColumn lc : listSetup.getColumns()) {
-			Column col = new Column(entityTableConfiguration.getTimeZone(), entityTableConfiguration.getLocale(), lc, entityClazz);
+			Column col = new Column(entityTableConfiguration.getTimeZone(), entityTableConfiguration.getLocale(), entityTableConfiguration.getDateFormat(), entityTableConfiguration.getTimeFormat(), lc, entityClazz);
 			col.setColumnOrder(c++);
 			columns.add(col);
 			idMapColumns.put(col.getId(), col);
@@ -327,7 +327,7 @@ public class EntityTableModel {
 	 */
 	public void buildQuery() {
 		
-		PropertyQuery q = new PropertyQuery();
+		PropertyQuery q = new PropertyQuery(true);
 		PropertyQuery userFilter = new PropertyQuery();
 		
 		// build column list

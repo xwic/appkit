@@ -10,9 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import de.xwic.appkit.core.cluster.Message;
-import de.xwic.appkit.core.cluster.Response;
-
 
 /**
  * @author lippisch

@@ -8,12 +8,20 @@
 package de.xwic.appkit.core.model.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.model.entities.IAnhang;
 
 /**
- * DAO Interface for the Anhang entity. <p> 
- * 
+ * DAO Interface for the Anhang entity. <p>
+ *
  * @author Ronny Pfretzschner
  */
-public interface IAnhangDAO extends DAO {
+public interface IAnhangDAO extends DAO<IAnhang> {
 
+	/**
+	 * @param entity
+	 * @return
+	 */
+	EntityList<IAnhang> getByEntity(IEntity entity);
 }

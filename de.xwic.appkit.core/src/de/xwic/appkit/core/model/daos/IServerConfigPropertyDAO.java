@@ -12,23 +12,23 @@ import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 
 /**
  * Interface for the Server ConfigProperty DAO. <p>
- * 
+ *
  * @author Ronny Pfretzschner
  *
  */
-public interface IServerConfigPropertyDAO extends DAO {
+public interface IServerConfigPropertyDAO extends DAO<IServerConfigProperty> {
 
 	/**
 	 * Creates a ServerConfigProperty with a boolean as value. <p>
-	 * 
+	 *
 	 * @param key The key as String
 	 * @param val The value as Boolean
 	 */
 	public void setConfigProperty(String key, boolean val);
-	
+
 	/**
 	 * Creates a ServerConfigProperty with an int as value. <p>
-	 * 
+	 *
 	 * @param key The key as String
 	 * @param val The value as int
 	 */
@@ -36,7 +36,7 @@ public interface IServerConfigPropertyDAO extends DAO {
 
 	/**
 	 * Creates a ServerConfigProperty with an double as value. <p>
-	 * 
+	 *
 	 * @param key The key as String
 	 * @param val The value as double
 	 */
@@ -44,34 +44,34 @@ public interface IServerConfigPropertyDAO extends DAO {
 
 	/**
 	 * Creates a ServerConfigProperty with a String as value. <p>
-	 * 
+	 *
 	 * @param key The key as String
 	 * @param val The value as String
 	 */
 	public void setConfigProperty(String key, String val);
-	
+
 	/**
 	 * Searches for a ServerConfigProperty with the given key and
 	 * return its value. <p>
-	 * 
+	 *
 	 * @param key of the ConfigProperty
 	 * @return value as boolean
 	 */
 	public boolean getConfigBoolean(String key);
-	
+
 	/**
 	 * Searches for a ServerConfigProperty with the given key and
 	 * return its value. <p>
-	 * 
+	 *
 	 * @param key of the ConfigProperty
 	 * @return value as int
 	 */
 	public int getConfigInteger(String key);
-	
+
 	/**
 	 * Searches for a ServerConfigProperty with the given key and
 	 * return its value. <p>
-	 * 
+	 *
 	 * @param key of the ConfigProperty
 	 * @return value as double
 	 */
@@ -80,15 +80,15 @@ public interface IServerConfigPropertyDAO extends DAO {
 	/**
 	 * Searches for a ServerConfigProperty with the given key and
 	 * return its value. <p>
-	 * 
+	 *
 	 * @param key of the ConfigProperty
 	 * @return value as String
 	 */
 	public String getConfigString(String key);
-	
+
 	/**
 	 * Returns a ServerConfigProperty with the given key. <p>
-	 * 
+	 *
 	 * @param key The key looking for
 	 * @return IServerConfigProperty
 	 */

@@ -206,6 +206,9 @@ public class UserConfigHandler {
 			return;
 		}
 		
+		// refresh first, to get the latest version, as remote deletes also look at the entity version
+		mainConfig = DAOSystem.getDAO(IUserViewConfigurationDAO.class).getEntity(mainConfig.getId());
+		
 		IUserViewConfiguration related = mainConfig.getRelatedConfiguration();
 		
 		userConfigDao.delete(mainConfig);

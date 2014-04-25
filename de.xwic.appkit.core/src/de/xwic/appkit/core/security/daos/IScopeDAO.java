@@ -8,10 +8,11 @@
 package de.xwic.appkit.core.security.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.security.IScope;
 
 /**
  * @author Florian Lippisch
  */
-public interface IScopeDAO extends DAO {
+public interface IScopeDAO extends DAO<IScope> {
 
 }

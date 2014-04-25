@@ -15,13 +15,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
 
+import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.ErrorWarning;
 import de.jwic.controls.FileUpload;
-import de.jwic.controls.Window;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.appkit.webbase.dialog.DialogContent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.components.Dialog;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
@@ -46,7 +47,6 @@ public class AddAttachmentDialog extends  Dialog {
 
 	protected ErrorWarning error = null;
 	protected FileUpload fileUpload;
-	protected Window win;
 	protected Button btFinish;
 	protected Button btAbort;
 	
@@ -63,40 +63,45 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @see de.jwic.wap.core.Dialog#createControls(de.jwic.base.IControlContainer)
 	 */
 	public void createControls(IControlContainer container) {
-		win = new Window(container, "scrollcontainer");
-		win.setTemplateName(getClass().getName());
-		win.setWidth(450);
-		win.setTitle("File Upload");
-	
-		error = new ErrorWarning(win, "error");
 		
-        fileUpload = new FileUpload(win, "fileUpload");
-        fileUpload.setWidth(53);
+		
+        fileUpload = new FileUpload(container, "fileUpload");
+//        fileUpload.setWidth(53);
         
-		btFinish = new Button(win, "Finish");
+		btFinish = this.btOk;
 		btFinish.setTitle("Upload");
 		btFinish.setIconEnabled(ImageLibrary.ICON_SAVECLOSE_ACTIVE);
 		btFinish.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
 //		btFinish.setSubmitButton(true);
-		btFinish.addSelectionListener(new SelectionListener() {
-			public void objectSelected(SelectionEvent event) {
-				boolean erg = validate();
-				if (erg) {
-					finish();
-				}
-			}
-		});
+//		this button already has a listener, I will move this code inside onOk
+//		btFinish.addSelectionListener(new SelectionListener() {
+//			public void objectSelected(SelectionEvent event) {
+//				boolean erg = validate();
+//				if (erg) {
+//					finish();
+//				}
+//			}
+//		});
 	
-		btAbort = new Button(win, "Abort");
+		btAbort = this.btCancel;
 		btAbort.setTitle("Cancel");
+		btAbort.setVisible(true);
 		btAbort.setIconDisabled(ImageLibrary.ICON_ABORT_INACTIVE);
 		btAbort.setIconEnabled(ImageLibrary.ICON_ABORT_ACTIVE);
-		
-		btAbort.addSelectionListener(new SelectionListener() {
-			public void objectSelected(SelectionEvent event) {
-				abort();
-			}
-		});
+//		this button already has a listener, I will move this code inside onCancel
+//		btAbort.addSelectionListener(new SelectionListener() {
+//			public void objectSelected(SelectionEvent event) {
+//				abort();
+//			}
+//		});
+	}
+	
+	@Override
+	protected void createContent(DialogContent content) {
+		error = new ErrorWarning(content, "error");
+		ControlContainer wrapper = new ControlContainer(content,"wrapper");
+		wrapper.setTemplateName(AddAttachmentDialog.class.getName()+"_layout");
+		this.createControls(wrapper);
 	}
 	
 	/**
@@ -121,6 +126,7 @@ public class AddAttachmentDialog extends  Dialog {
         
         return true;
 	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -185,6 +191,7 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @return the btFinish
 	 */
 	public Button getBtFinish() {
+//		exposing the buttons is a very bad idea, we are losing access of the actions perfomed
 		return btFinish;
 	}
 
@@ -192,7 +199,29 @@ public class AddAttachmentDialog extends  Dialog {
 	 * @return the btAbort
 	 */
 	public Button getBtAbort() {
+//		exposing the buttons is a very bad idea, we are losing access of the actions perfomed
 		return btAbort;
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#onCancel()
+	 */
+	@Override
+	protected final void onCancel() {
+//		super.onCancel();
+		abort();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#onOk()
+	 */
+	@Override
+	protected final void onOk() {
+//		super.onOk();
+		boolean erg = validate();
+		if (erg) {
+			finish();
+		}
+	}
+
 }

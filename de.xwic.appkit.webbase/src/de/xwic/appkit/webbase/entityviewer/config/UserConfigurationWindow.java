@@ -51,7 +51,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 			public void onConfigApplied(Event event) {
 				UserViewConfigurationControl ctrl = (UserViewConfigurationControl) event.getEventSource();
 				tableModel.getUserConfigHandler().applyConfig(ctrl.getUserViewConfiguration());
-				
+				tableModel.applyColumnReorder();
 				closeProfileWindow();
 			}
 			
@@ -76,7 +76,7 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 				}
 				
 				requireRedraw();
-				
+				tableModel.applyColumnReorder();
 				ctrl.destroy();
 			}
 
@@ -196,12 +196,12 @@ public class UserConfigurationWindow extends AbstractPopUpDialogWindow {
 		}
 		
 		// -30, in case of scrollbars.. just to be safe
-		int left = Page.findPage(this).getPageSize().width - getWidth() - 30;
+		int left = Page.findPage(this).getPageSize().width - getWidth() - 70;
 		if (left != getLeft()) {
 			setLeft(left);
 		}
 		
-		setTop(153);
+		setTop(173);
 		
 		setVisible(true);
 	}

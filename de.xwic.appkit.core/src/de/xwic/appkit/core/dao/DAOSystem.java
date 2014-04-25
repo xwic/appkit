@@ -14,6 +14,7 @@ import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Model;
+import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 
 
 
@@ -31,6 +32,7 @@ public class DAOSystem {
     private static IFileHandler fileHandler = null;
     private static ISecurityManager securityManager = null;
     private static IUseCaseService useCaseService = null;
+    private static IRemoteDataAccessClient remoteDataAccessClient = null;
     
     private static Map<String, String> shortNames = new HashMap<String, String>();
     private static boolean oracleCaseInsensitve = false;
@@ -68,10 +70,10 @@ public class DAOSystem {
      * @param daoType
      * @return
      */
-    public static DAO getDAO(Class<? extends DAO> daoType) {
+    public static <D extends DAO> D getDAO(Class<D> daoType) {
     	
     	if (daoFactory != null) {
-    		DAO dao = (DAO)daoFactory.getDAO(daoType);
+    		D dao = (D)daoFactory.getDAO(daoType);
     		if (dao == null) {
     			throw new IllegalArgumentException("A DAO for the specified type is not registered: " + daoType.getName());
     		}
@@ -86,13 +88,8 @@ public class DAOSystem {
      * @param daoType
      * @return
      */
-    public static DAO findDAOforEntity(Class<? extends IEntity> entityClass) {
-    	
-    	if (daoFactory != null) {
-    		return (DAO)daoFactory.findDAOforEntity(entityClass.getName());
-    	}
-    	return null;
-    	
+    public static <I extends IEntity> DAO<I> findDAOforEntity(Class<I> entityClass) {
+		return findDAOforEntity(entityClass.getName());
     }
 
 	/**
@@ -232,6 +229,20 @@ public class DAOSystem {
 	 */
 	public static void setOracleCaseInsensitve(boolean oracleCaseInsensitve) {
 		DAOSystem.oracleCaseInsensitve = oracleCaseInsensitve;
+	}
+
+	/**
+	 * @return the remoteDataAccessClient
+	 */
+	public static IRemoteDataAccessClient getRemoteDataAccessClient() {
+		return remoteDataAccessClient;
+	}
+
+	/**
+	 * @param remoteDataAccessClient the remoteDataAccessClient to set
+	 */
+	public static void setRemoteDataAccessClient(IRemoteDataAccessClient remoteDataAccessClient) {
+		DAOSystem.remoteDataAccessClient = remoteDataAccessClient;
 	}
 	
 }

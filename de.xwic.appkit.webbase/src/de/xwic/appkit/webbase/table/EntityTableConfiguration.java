@@ -21,6 +21,8 @@ public class EntityTableConfiguration {
 	private PropertyQuery defaultFilter = null;
 	private Locale locale;
 	private TimeZone timeZone;
+	private String dateFormat;
+	private String timeFormat;
 	
 	/**
 	 * 
@@ -108,5 +110,33 @@ public class EntityTableConfiguration {
 	 */
 	public void setTimeZone(TimeZone timeZone) {
 		this.timeZone = timeZone;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	/**
+	 * @param dateFormat
+	 */
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getTimeFormat() {
+		return timeFormat;
+	}
+
+	/**
+	 * @param timeFormat
+	 */
+	public void setTimeFormat(String timeFormat) {
+		this.timeFormat = timeFormat;
 	}
 }

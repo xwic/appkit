@@ -25,14 +25,22 @@ public abstract class AbstractEntityEditorCreator implements IEntityEditorCreato
 	 * @return
 	 */
 	protected EditorModel getEditorModel(IEntity entity, IEntity baseEntity) {
-		EditorModel editorModel = new EditorModel(entity);
+		EditorModel editorModel = createEditorModel(entity);
 		if (baseEntity != null) {
 			editorModel.setBaseEntity(baseEntity);
 		}
 		
 		return editorModel;
 	}
-	
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	protected EditorModel createEditorModel(IEntity entity) {
+		return new EditorModel(entity);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see com.netapp.pulse.basegui.editors.IEntityEditorCreator#createAndOpenEditor(de.xwic.appkit.webbase.toolkit.app.Site, de.xwic.appkit.core.dao.IEntity, de.xwic.appkit.core.dao.IEntity)

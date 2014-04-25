@@ -139,4 +139,14 @@ public interface IMitarbeiter extends IEntity {
 	 * @param info1 the info1 to set
 	 */
 	public void setInfo1(boolean info1);
+	
+	/**
+	 * @return the specialAccount
+	 */
+	public boolean isSpecialAccount();
+
+	/**
+	 * @param specialAccount the specialAccount to set
+	 */
+	public void setSpecialAccount(boolean specialAccount);
 }

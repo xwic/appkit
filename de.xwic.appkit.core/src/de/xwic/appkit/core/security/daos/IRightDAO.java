@@ -17,8 +17,8 @@ import de.xwic.appkit.core.security.IScope;
 /**
  * @author Florian Lippisch
  */
-public interface IRightDAO extends DAO {
-	
+public interface IRightDAO extends DAO<IRight> {
+
 	/**
 	 * Returns the list of rights assigned to the specified role.
 	 * @param role
@@ -34,5 +34,5 @@ public interface IRightDAO extends DAO {
 	 * @return
 	 */
 	public IRight createRight(IRole role, IScope scope, IAction action);
-	
+
 }

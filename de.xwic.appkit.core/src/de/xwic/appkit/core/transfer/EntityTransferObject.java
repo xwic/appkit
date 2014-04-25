@@ -29,7 +29,6 @@ import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.ISecurityManager;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
@@ -41,11 +40,12 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  */
 public class EntityTransferObject {
 	
-	private Class<? extends IEntity> entityClass = null;
-	private int entityId = 0;
-	private long entityVersion = 0;
+	private final Class<? extends IEntity> entityClass;
+	private int entityId;
+	private long entityVersion;
+
 	private boolean modified = false;
-	private Map<String, PropertyValue> propertyValues = new HashMap<String, PropertyValue>();
+	private final Map<String, PropertyValue> propertyValues = new HashMap<String, PropertyValue>();
 	
 	private final static Set<String> EXTRA_PROPERTIES = new HashSet<String>();
 	static {
@@ -55,10 +55,14 @@ public class EntityTransferObject {
 	}
 	
 	/**
-	 * Default Constructor.
+	 * @param entityId
+	 * @param entityVersion
+	 * @param entityClass
 	 */
-	public EntityTransferObject() {
-		
+	public EntityTransferObject(final String entityId, final String entityVersion, final Class<? extends IEntity> entityClass) {
+		this.entityId = Integer.parseInt(entityId);
+		this.entityVersion = Integer.parseInt(entityVersion);
+		this.entityClass = entityClass;
 	}
 	
 	/**
@@ -81,17 +85,21 @@ public class EntityTransferObject {
 		if (entity == null) {
 			throw new NullPointerException("Entity must not be null");
 		}
-		
+		final Class<? extends IEntity> clasz;
 		if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
-			entityClass = (Class<? extends IEntity>) entity.getClass().getSuperclass();
+			clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
 		} else if (Proxy.isProxyClass(entity.getClass())) {
 			InvocationHandler ih = Proxy.getInvocationHandler(entity);
 			if (ih instanceof IEntityInvocationHandler) {
-				entityClass = (Class<? extends IEntity>)((IEntityInvocationHandler)ih).getEntityImplClass();
+				clasz = (Class<? extends IEntity>)((IEntityInvocationHandler)ih).getEntityImplClass();
+			} else {
+				clasz = null;
 			}
 		} else {
-			entityClass = entity.getClass();
+			clasz = entity.getClass();
 		}
+
+		entityClass = clasz;
 		entityId = entity.getId();
 		entityVersion = entity.getVersion();
 		
@@ -111,18 +119,29 @@ public class EntityTransferObject {
 		try {
 			BeanInfo bi = Introspector.getBeanInfo(entity.getClass());
 			PropertyDescriptor descriptors[] = bi.getPropertyDescriptors();
-			ISecurityManager secMan = DAOSystem.getSecurityManager();
 			EntityDescriptor entityDescr = DAOSystem.getEntityDescriptor(entity.type().getName());
-			String scope = entity.type().getName();
+			
+//			ISecurityManager secMan = DAOSystem.getSecurityManager();
+//			String scope = entity.type().getName();
 			
 			// read the properties
 			for (int i = 0; i < descriptors.length; i++) {
-				if (!descriptors[i].getName().equals("class")) {
-					Property property = entityDescr.getProperty(descriptors[i].getName());
-					Class<?> type = descriptors[i].getPropertyType();
-					Method mRead = descriptors[i].getReadMethod();
+				PropertyDescriptor descriptor = descriptors[i];
+				
+				if (!descriptor.getName().equals("class")) {
+					Property property = entityDescr.getProperty(descriptor.getName());
+					Class<?> type = descriptor.getPropertyType();
+					Method mRead = descriptor.getReadMethod();
 					
-					if (property == null && !EXTRA_PROPERTIES.contains(descriptors[i].getName())) {
+					if (mRead == null) {
+						// if we have a Boolean field, the java sepcification is that the getter starts with
+						// 'get', not 'is', therefore the read method is not located
+						// by instantiating the property descriptor manually, the read method is located successfully
+						PropertyDescriptor pd = new PropertyDescriptor(descriptor.getName(), entity.getClass());
+						mRead = pd.getReadMethod();
+					}
+					
+					if (property == null && !EXTRA_PROPERTIES.contains(descriptor.getName())) {
 						// if the property is not specified by the entity and it
 						// is not a special extra property, it is skiped.
 						continue;
@@ -132,9 +151,10 @@ public class EntityTransferObject {
 					value.setType(type);
 					value.setModified(loadCollections);
 					
-					// check rights
-					value.setAccess(secMan.getAccess(scope, descriptors[i].getName()));
-					if (value.getAccess() != ISecurityManager.NONE) {
+					// do not check the rights.. the checks are already done on the server
+//					value.setAccess(secMan.getAccess(scope, descriptor.getName()));
+//					if (value.getAccess() != ISecurityManager.NONE) {
+					
 						Object data = mRead.invoke(entity, (Object[]) null);
 						
 						if (IEntity.class.isAssignableFrom(type)) {
@@ -195,8 +215,10 @@ public class EntityTransferObject {
 						} else {
 							value.setValue(data);
 						}
-					}
-					propertyValues.put(descriptors[i].getName(), value);
+						
+//					}
+						
+					propertyValues.put(descriptor.getName(), value);
 				}
 			}
 			
@@ -240,24 +262,10 @@ public class EntityTransferObject {
 	}
 
 	/**
-	 * @param entityClass The entityClass to set.
-	 */
-	public void setEntityClass(Class<? extends IEntity> entityClass) {
-		this.entityClass = entityClass;
-	}
-
-	/**
 	 * @return Returns the entityId.
 	 */
 	public int getEntityId() {
 		return entityId;
-	}
-
-	/**
-	 * @param entityId The entityId to set.
-	 */
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
 	}
 
 	/**
@@ -268,24 +276,10 @@ public class EntityTransferObject {
 	}
 
 	/**
-	 * @param entityVersion The entityVersion to set.
-	 */
-	public void setEntityVersion(long entityVersion) {
-		this.entityVersion = entityVersion;
-	}
-
-	/**
 	 * @return Returns the propertyValues.
 	 */
 	public Map<String, PropertyValue> getPropertyValues() {
 		return propertyValues;
-	}
-
-	/**
-	 * @param propertyValues The propertyValues to set.
-	 */
-	public void setPropertyValues(Map<String, PropertyValue> propertyValues) {
-		this.propertyValues = propertyValues;
 	}
 
 	/* (non-Javadoc)
@@ -346,12 +340,11 @@ public class EntityTransferObject {
 			throw new IllegalArgumentException("The entity ID is not the same.");
 		}
 		
-		if (response.entityVersion > entityVersion) {
-			// update
-			entityVersion = response.entityVersion;
-			propertyValues = response.propertyValues;
-		}
-		
+		// update
+		entityId = response.entityId;
+		entityVersion = response.entityVersion;
+		propertyValues.clear();
+		propertyValues.putAll(response.propertyValues);
 	}
 
 	/**

@@ -103,9 +103,27 @@ public abstract class ExtendedApplication extends Application implements INaviga
 	 * @return
 	 */
     public static ExtendedApplication getInstance(Control control) {
+        return getInstance(control.getSessionContext());
+    }
 
-        return (ExtendedApplication)control.getSessionContext().getApplication();
+    /**
+	 * Static access to the application.
+	 *
+	 * @param control
+	 * @return
+	 */
+    public static ExtendedApplication getInstance(final SessionContext sessionContext) {
+		return (ExtendedApplication)sessionContext.getApplication();
+    }
 
+    /**
+	 * Static access to the site.
+	 *
+	 * @param control
+	 * @return
+	 */
+    public static Site getSite(final SessionContext sessionContext) {
+		return getInstance(sessionContext).getSite();
     }
 
     /*
@@ -168,13 +186,18 @@ public abstract class ExtendedApplication extends Application implements INaviga
         IUser currentUser = DAOSystem.getSecurityManager().getCurrentUser();
         startedByUser = currentUser != null ? currentUser.getLogonName() : null;
         
-        // default language = en
-        Locale locale = LocaleFactory.getLocaleForLanguage("en"); 
+        Locale locale = null; 
         if (null != currentUser && null != currentUser.getLanguage()) {
         	locale = LocaleFactory.getLocaleForLanguage(currentUser.getLanguage());
-        } 
+        }
+        
+        if (locale == null) {
+        	// default language = en
+        	locale = LocaleFactory.getLocaleForLanguage("en");
+        }
         
         site.getSessionContext().setLocale(locale);
+        
         // now load the application
         loadApp(site);
     }

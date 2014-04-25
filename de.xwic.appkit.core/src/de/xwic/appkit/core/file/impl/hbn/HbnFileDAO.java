@@ -66,10 +66,10 @@ public class HbnFileDAO implements IFileHandler {
 		return hFile.getId();
 	}
 	
-	/**
-	 * Delete the file with the specified id.
-	 * @param id
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
 	 */
+	@Override
 	public void deleteFile(final int id) {
 		Session session = HibernateUtil.currentSession();
 		Transaction tx = HibernateUtil.currentSession().beginTransaction();
@@ -81,6 +81,10 @@ public class HbnFileDAO implements IFileHandler {
 		tx.commit();
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)
+	 */
+	@Override
 	public File loadFile(int id, String destination) throws DataAccessException {
 		throw new DataAccessException("This method is not supported on the server.");
 	}
@@ -107,6 +111,10 @@ public class HbnFileDAO implements IFileHandler {
 		return stream;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFileInUC(java.lang.String)
+	 */
+	@Override
 	public int storeFileInUC(final String fileName) throws DataAccessException {
 		final HbnFile hFile = new HbnFile();
 
@@ -137,6 +145,10 @@ public class HbnFileDAO implements IFileHandler {
 		return hFile.getId();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFileInUC(int)
+	 */
+	@Override
 	public void deleteFileInUC(final int id) {
 		Session session = HibernateUtil.currentSession();
 		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Integer(id));

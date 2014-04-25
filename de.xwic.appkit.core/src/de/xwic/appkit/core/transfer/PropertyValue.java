@@ -7,6 +7,8 @@
  */
 package de.xwic.appkit.core.transfer;
 
+import de.xwic.appkit.core.dao.IEntity;
+
 /**
  * Encapsulates the value of a property. 
  * 
@@ -156,8 +158,20 @@ public class PropertyValue {
 	/**
 	 * @param value The value to set.
 	 */
-	public void setValue(Object value) {
+	public void setValue(Object value) {		
 		this.value = value;
+		
+		if (isEntityType()) {
+			if (value == null) {
+				entityId = 0;
+			} else {
+				if (IEntity.class.isAssignableFrom(value.getClass())) {
+					entityId = ((IEntity) value).getId();
+				} else {
+					throw new IllegalArgumentException("Not an Entity!");
+				}
+			}
+		}
 	}
 
 	/**

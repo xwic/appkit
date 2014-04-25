@@ -15,34 +15,58 @@ import de.xwic.appkit.core.security.IUser;
  */
 public class UniqueUserQuery extends EntityQuery {
 
-	private IUser user = null;
+	private String userLogonName;
+	private int userId;
 	
 	/**
-	 * Default Constructor.
+	 * Used for deserializing!
 	 */
 	public UniqueUserQuery() {
 		
 	}
-
+	
 	/**
 	 * 
 	 */
-	public UniqueUserQuery(IUser user ) {
-		this.user = user;
+	public UniqueUserQuery(IUser user) {
+		this.userLogonName = user.getLogonName();
+		this.userId = user.getId();
+	}
+	
+	/**
+	 * @param userLogonName
+	 * @param userId
+	 */
+	public UniqueUserQuery(String userLogonName, int userId) {
+		this.userLogonName = userLogonName;
+		this.userId = userId;
 	}
 
 	/**
-	 * @return Returns the action.
+	 * @return the logonName
 	 */
-	public IUser getUser() {
-		return user;
+	public String getUserLogonName() {
+		return userLogonName;
+	}
+	
+	/**
+	 * @param userLogonName the userLogonName to set
+	 */
+	public void setUserLogonName(String userLogonName) {
+		this.userLogonName = userLogonName;
 	}
 
 	/**
-	 * @param action The action to set.
+	 * @return the id
 	 */
-	public void setUser(IUser user) {
-		this.user = user;
+	public int getUserId() {
+		return userId;
 	}
-
+	
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 }

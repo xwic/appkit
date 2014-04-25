@@ -11,7 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.ISecurityManager;
+import de.xwic.appkit.core.security.daos.IUserDAO;
 
 /**
  * Contains the user and his rights. Used as a container to transfer the
@@ -39,7 +41,9 @@ public class UserCredential {
 	 */
 	public UserCredential(IUser user) {
 		this.user = user;
-		this.rights = user.buildAllRights();
+		
+		IUserDAO userDAO = (IUserDAO)DAOSystem.getDAO(IUserDAO.class);
+		this.rights = userDAO.buildAllRights(user);
 	}
 
 	/**

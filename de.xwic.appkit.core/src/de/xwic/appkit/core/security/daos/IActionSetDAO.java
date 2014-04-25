@@ -8,10 +8,11 @@
 package de.xwic.appkit.core.security.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.security.IActionSet;
 
 /**
  * @author Florian Lippisch
  */
-public interface IActionSetDAO extends DAO {
+public interface IActionSetDAO extends DAO<IActionSet> {
 
 }

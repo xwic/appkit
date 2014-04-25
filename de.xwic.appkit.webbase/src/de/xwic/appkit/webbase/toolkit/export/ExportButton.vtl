@@ -1,8 +1,4 @@
-#if($control.plain)
-	#parse("de/jwic/controls/ButtonControl.vtl")
-#else
-	#parse("de/jwic/controls/ButtonControl_Action.vtl")
-#end
+#parse("de/jwic/controls/Button.vtl")
 
 <iframe id="iframe_$control.controlID" src="blank.html" style="visibility: hidden; position:absolute; left: 0px; top: 0px;"></iframe>
 #if($control.showDownload) 

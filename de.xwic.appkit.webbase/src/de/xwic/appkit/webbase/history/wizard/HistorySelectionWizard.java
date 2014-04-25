@@ -37,7 +37,7 @@ public class HistorySelectionWizard extends Wizard {
 		setTitle(model.getResourceString("historySelWiz.title"));
 		
 		setHeight(400);
-		setWidth(950);
+		//setWidth(950);
 	}
 	
 	@Override

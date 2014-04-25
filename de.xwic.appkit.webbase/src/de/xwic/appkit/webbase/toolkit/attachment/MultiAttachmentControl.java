@@ -37,6 +37,7 @@ import de.xwic.appkit.core.file.uc.AttachmentWrapper;
 import de.xwic.appkit.core.file.uc.IAttachmentWrapper;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.editor.EditorModel;
+import de.xwic.appkit.webbase.utils.MimeTypeUtil;
 
 /**
  * Single Attachment control for one attachment.
@@ -147,8 +148,7 @@ public class MultiAttachmentControl extends Control implements
 		if (attachment != null) {
 			String filename = attachment.getFileName();
 			
-			//res.setContentType("application/octet-stream"); // force download (otherwise application/xls)
-			res.setContentType("application/x-msdownload");
+			res.setContentType(MimeTypeUtil.getMimeTypeForFileName(filename));
 			res.setHeader ("Content-Disposition","attachment; filename=\"" + filename + "\"");
 //		  	res.setContentLength((int)attachment.getContentLength());
 
@@ -292,10 +292,12 @@ public class MultiAttachmentControl extends Control implements
 	 * @return
 	 */
 	public boolean hasAttachments() {
-		for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
-			IAttachmentWrapper attachment = (IAttachmentWrapper) iterator.next();
-			if (attachment != null && !attachment.isDeleted()) {
-				return true;
+		if (attachments != null){
+			for (Iterator iterator = attachments.iterator(); iterator.hasNext();) {
+				IAttachmentWrapper attachment = (IAttachmentWrapper) iterator.next();
+				if (attachment != null && !attachment.isDeleted()) {
+					return true;
+				}
 			}
 		}
 		return false;

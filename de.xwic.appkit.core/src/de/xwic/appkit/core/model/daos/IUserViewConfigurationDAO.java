@@ -14,16 +14,16 @@ import de.xwic.appkit.core.model.entities.IUserViewConfiguration;
 /**
  * @author Adrian Ionescu
  */
-public interface IUserViewConfigurationDAO extends DAO {
+public interface IUserViewConfigurationDAO extends DAO<IUserViewConfiguration> {
 
 	/**
-	 * @param owner 
+	 * @param owner
 	 * @param entityClassName
 	 * @param viewId
 	 * @return
 	 */
 	public IUserViewConfiguration getMainConfigurationForView(IMitarbeiter owner, String entityClassName, String viewId);
-	
+
 	/**
 	 * @param owner
 	 * @param entityClassName
@@ -39,7 +39,7 @@ public interface IUserViewConfigurationDAO extends DAO {
 	 * @return
 	 */
 	public List<IUserViewConfiguration> getPublicUserConfigurationsForView(IMitarbeiter currentUser, String entityClassName, String viewId);
-	
+
 	/**
 	 * @param owner
 	 * @param entityClassName

@@ -16,11 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.CheckBox;
 import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.util.CollectionUtil;
+import de.xwic.appkit.core.util.ILazyStringEval;
 
 /**
  * Custom control for displaying picklist entries from a pickliste using
@@ -68,7 +69,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 		super(container, name);
 
 		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
-		setTemplateName(CheckBox.class.getName());
+		setTemplateName(CheckBoxGroup.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
 
@@ -135,12 +136,12 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	 */
 	public void selectEntries(List<IPicklistEntry> plEntries) {
 		if (null != plEntries) {
-			String key = "";
-			for (IPicklistEntry entry : plEntries) {
-				key += entry.getKey() != null ? entry.getKey() : new Integer(entry.getId()).toString();
-				key +=";";
-			}
-			
+			String key = CollectionUtil.join(plEntries, new ILazyStringEval<IPicklistEntry>() {
+				@Override
+				public String evaluate(IPicklistEntry obj) {
+					return obj.getKey();
+				}
+			}, ";");
 			setSelectedKey(key);
 		}
 	}
@@ -151,14 +152,14 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	public List<IPicklistEntry> getSelectedEntries() {
 		List<IPicklistEntry> selectedEntries = new ArrayList<IPicklistEntry>();
 		String[] keys = getSelectedKeys();
-
-		for (String key : keys) {
-			IPicklistEntry entry = entries.get(key);
-			if (null != entry) {
-				selectedEntries.add(entry);
+		if (keys != null) {
+			for (String key : keys) {
+				IPicklistEntry entry = entries.get(key);
+				if (null != entry) {
+					selectedEntries.add(entry);
+				}
 			}
 		}
-
 		return selectedEntries;
 	}
 

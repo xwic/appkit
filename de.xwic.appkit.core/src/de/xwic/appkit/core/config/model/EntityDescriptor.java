@@ -12,8 +12,8 @@ import java.beans.PropertyDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,9 +76,12 @@ public class EntityDescriptor {
 	private void buildPropertyList(Class<?> clazz) throws IntrospectionException {
 		
 		properties = new HashMap<String, Property>();
-		Set<Class<?>> interfaces = new HashSet<Class<?>>();
-		interfaces.add(clazz);
+		// AI 08-Jan-2013: make it linked, the order counts (see below)
+		Set<Class<?>> interfaces = new LinkedHashSet<Class<?>>();
 		addAllInterfaces(clazz, interfaces);
+		// AI 08-Jan-2013: add the current interface last, in case it overrides methods from higher interfaces
+		// it can happen when we play with generics
+		interfaces.add(clazz);
 		for (Iterator<Class<?>> it = interfaces.iterator(); it.hasNext(); ) {
 			Class<?> cl = it.next();
 			BeanInfo bi = Introspector.getBeanInfo(cl);

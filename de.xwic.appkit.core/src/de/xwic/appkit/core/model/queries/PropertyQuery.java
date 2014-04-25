@@ -14,10 +14,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.util.CollectionUtil;
 
 /**
  * Generic query definition based upon entity properties. 
@@ -31,6 +32,12 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	private boolean joinPicklistEntries = false;
 	private List<QueryElement> elements = new ArrayList<QueryElement>();
 	private Map<String, String> leftOuterJoinProperties = new LinkedHashMap<String, String>();
+	
+	/**
+	 * If set to true then the results should be sorted by id to maintain order consistency.
+	 * If a sort field already exists then the id is set as a second sort column.
+	 */
+	private boolean consistentOrder = false;
 	
 	private String wildcardPreferenceSetting = null;
 	
@@ -64,6 +71,15 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	public PropertyQuery() {
 		
+	}
+	
+	/**
+	 * Constructor. Allows initializing the consistentOrder property at instantiation.
+	 * 
+	 * @param consistentOrder
+	 */
+	public PropertyQuery(boolean consistentOrder) {
+		this.consistentOrder = consistentOrder;
 	}
 	
 	/**
@@ -581,29 +597,15 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 */
 	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
-		values = processCollection(values);
-		Set<Set> sets = new HashSet<Set>();
-		Set set = new HashSet();
-		Iterator iterator = values.iterator();
-		while (iterator.hasNext()) {
-			if (set.size() == 1000) {
-				sets.add(set);
-				set = new HashSet<Integer>();
-			}
-			set.add(iterator.next());
-		}
-		if (!set.isEmpty()) {
-			sets.add(set);
-		}
+		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(processCollection(values), 1000);
 		PropertyQuery subQuery = new PropertyQuery();
-		for (Set ids : sets) {
+		for (Collection ids : sets) {
 			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
 		}
 		if (sets.isEmpty()) {
-			addEquals("id", null);
-		} else {
-			addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+			subQuery.addEquals("id", null);
 		}
+		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
 	}
 
 	/**
@@ -612,25 +614,27 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	private static Collection<?> processCollection(Collection<?> collection) {
 		if (collection == null) {
-			collection = new ArrayList<Integer>();
+			collection = new HashSet();
 		} else if (!collection.isEmpty()) {
 			if (collection.iterator().next() instanceof IEntity) {
-				collection = getIds((Collection<IEntity>) collection);
+				collection = EntityUtil.getIds((Collection<? extends IEntity>) collection);
 			}
 		}
-		return collection;
+		return collection instanceof HashSet ? collection : new HashSet(collection);
 	}
 
 	/**
-	 * @param collection
-	 * @return
+	 * @return consistentOrder
 	 */
-	private static Collection<?> getIds(Collection<IEntity> collection) {
-		Set<Integer> ids = new HashSet<Integer>();
-		for (IEntity iEntity : collection) {
-			ids.add(iEntity.getId());
-		}
-		return ids;
+	public boolean isConsistentOrder() {
+		return consistentOrder;
+	}
+
+	/**
+	 * @param consistentOrder the value to set for consistentOrder
+	 */
+	public void setConsistentOrder(boolean consistentOrder) {
+		this.consistentOrder = consistentOrder;
 	}
 
 	/* (non-Javadoc)

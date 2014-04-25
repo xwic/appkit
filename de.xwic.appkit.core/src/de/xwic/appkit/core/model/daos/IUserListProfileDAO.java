@@ -6,11 +6,12 @@
 package de.xwic.appkit.core.model.daos;
 
 import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.model.entities.IUserListProfile;
 
 /**
- * 
+ *
  * @author Aron Cotrau
  */
-public interface IUserListProfileDAO extends DAO {
+public interface IUserListProfileDAO extends DAO<IUserListProfile> {
 
 }

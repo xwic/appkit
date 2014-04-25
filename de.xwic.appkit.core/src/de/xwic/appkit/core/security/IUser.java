@@ -55,6 +55,7 @@ public interface IUser extends IEntity {
 	/**
 	 * Creates a set of all Rights.
 	 * @return
+	 * @deprecated use IUserDAO.buildAllRights(IUser) instead.
 	 */
 	public Set<ScopeActionKey> buildAllRights();
 	

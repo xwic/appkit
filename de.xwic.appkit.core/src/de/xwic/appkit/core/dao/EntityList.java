@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Contains the immutable result of a query. The EntityList is a 
+ * Contains the immutable result of a query. The EntityList is a
  * standard collection that is extended by a <code>totalSize</code>
  * property wich contains the real size in the database.
  * @author Florian Lippisch
  */
-public class EntityList implements List {
+public class EntityList<E> implements List<E> {
 
-	private List<Object> list = null;
+	private List<E> list = null;
 	private Limit limit = null;
 	private int count = 0;
 
@@ -27,7 +27,7 @@ public class EntityList implements List {
 	 * @param list
 	 * @param count
 	 */
-	public EntityList(List<Object> list, Limit limit, int count) {
+	public EntityList(List<E> list, Limit limit, int count) {
 		this.list = list;
 		this.count = count;
 		this.limit = limit;
@@ -42,7 +42,7 @@ public class EntityList implements List {
 	/**
 	 * @return Returns the list.
 	 */
-	public List<Object> getList() {
+	public List<E> getList() {
 		return list;
 	}
 	/**
@@ -56,162 +56,185 @@ public class EntityList implements List {
     /* (non-Javadoc)
      * @see java.util.Collection#size()
      */
-    public int size() {
-        
+    @Override
+	public int size() {
+
         return list.size();
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#isEmpty()
      */
-    public boolean isEmpty() {
+    @Override
+	public boolean isEmpty() {
         return list.isEmpty();
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#contains(java.lang.Object)
      */
-    public boolean contains(Object o) {
+    @Override
+	public boolean contains(Object o) {
         return list.contains(o);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#iterator()
      */
-    public Iterator<Object> iterator() {
+    @Override
+	public Iterator<E> iterator() {
         return list.iterator();
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#toArray()
      */
-    public Object[] toArray() {
+    @Override
+	public Object[] toArray() {
         return list.toArray();
     }
 
     /* (non-Javadoc)
-     * @see java.util.Collection#toArray(java.lang.Object[])
-     */
-    public Object[] toArray(Object[] a) {
-        return list.toArray(a);
+	 * @see java.util.List#toArray(T[])
+	 */
+    @Override
+	public <T> T[] toArray(T[] a) {
+		return list.toArray(a);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#add(java.lang.Object)
      */
-    public boolean add(Object o) {
+    @Override
+	public boolean add(E o) {
         return list.add(o);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#remove(java.lang.Object)
      */
-    public boolean remove(Object o) {
+    @Override
+	public boolean remove(Object o) {
         return list.remove(o);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#containsAll(java.util.Collection)
      */
-    public boolean containsAll(Collection c) {
+    @Override
+	public boolean containsAll(Collection c) {
         return list.containsAll(c);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#addAll(java.util.Collection)
      */
-    public boolean addAll(Collection c) {
+    @Override
+	public boolean addAll(Collection c) {
         return list.addAll(c);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#removeAll(java.util.Collection)
      */
-    public boolean removeAll(Collection c) {
+    @Override
+	public boolean removeAll(Collection c) {
         return list.removeAll(c);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#retainAll(java.util.Collection)
      */
-    public boolean retainAll(Collection c) {
+    @Override
+	public boolean retainAll(Collection c) {
         return list.retainAll(c);
     }
 
     /* (non-Javadoc)
      * @see java.util.Collection#clear()
      */
-    public void clear() {
+    @Override
+	public void clear() {
         list.clear();
     }
 
     /* (non-Javadoc)
      * @see java.util.List#addAll(int, java.util.Collection)
      */
-    public boolean addAll(int index, Collection c) {
+    @Override
+	public boolean addAll(int index, Collection c) {
         return list.addAll(index, c);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#get(int)
      */
-    public Object get(int index) {
+    @Override
+	public E get(int index) {
         return list.get(index);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#set(int, java.lang.Object)
      */
-    public Object set(int index, Object element) {
+    @Override
+	public E set(int index, E element) {
         return list.set(index, element);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#add(int, java.lang.Object)
      */
-    public void add(int index, Object element) {
+    @Override
+	public void add(int index, E element) {
         list.add(index, element);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#remove(int)
      */
-    public Object remove(int index) {
+    @Override
+	public E remove(int index) {
         return list.remove(index);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#indexOf(java.lang.Object)
      */
-    public int indexOf(Object o) {
+    @Override
+	public int indexOf(Object o) {
         return list.indexOf(o);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#lastIndexOf(java.lang.Object)
      */
-    public int lastIndexOf(Object o) {
+    @Override
+	public int lastIndexOf(Object o) {
         return list.lastIndexOf(o);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#listIterator()
      */
-    public ListIterator<Object> listIterator() {
+    @Override
+	public ListIterator<E> listIterator() {
         return list.listIterator();
     }
 
     /* (non-Javadoc)
      * @see java.util.List#listIterator(int)
      */
-    public ListIterator<Object> listIterator(int index) {
+    @Override
+	public ListIterator<E> listIterator(int index) {
         return list.listIterator(index);
     }
 
     /* (non-Javadoc)
      * @see java.util.List#subList(int, int)
      */
-    public List<Object> subList(int fromIndex, int toIndex) {
+    @Override
+	public List<E> subList(int fromIndex, int toIndex) {
         return list.subList(fromIndex, toIndex);
     }
 
