@@ -126,6 +126,17 @@ public final class EntityUtil {
 	}
 
 	/**
+	 * @param entityClass
+	 * @param ids
+	 * @return
+	 */
+	public static <E extends IEntity> EntityList<E> getEntities(final Class<E> entityClass, final Collection<Integer> ids) {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addIn("id", ids);
+		return getEntities(entityClass, ids);
+	}
+
+	/**
 	 * @param entity
 	 * @return
 	 */
