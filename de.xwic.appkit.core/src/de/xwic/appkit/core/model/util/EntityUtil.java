@@ -8,6 +8,7 @@ import static de.xwic.appkit.core.dao.DAOSystem.findDAOforEntity;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import de.xwic.appkit.core.ApplicationData;
@@ -123,6 +124,20 @@ public final class EntityUtil {
 	 */
 	public static <E extends IEntity> EntityList<E> getEntities(final Class<E> entityClass, final PropertyQuery query, final Limit limit) {
 		return findDAOforEntity(entityClass).getEntities(limit, query);
+	}
+
+	/**
+	 * @param entityClass
+	 * @param ids
+	 * @return
+	 */
+	public static <E extends IEntity> List<E> getEntities(final Class<E> entityClass, final Collection<Integer> ids) {
+		if (CollectionUtil.isEmpty(ids)) {
+			return Collections.emptyList();
+		}
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addIn("id", ids);
+		return getEntities(entityClass, ids);
 	}
 
 	/**
