@@ -86,7 +86,20 @@ public class EditorToolkit {
 	public EditorToolkit(Object baseObj) {
 		this.baseObj = baseObj;
 	}
-	
+
+	/**
+	 * Create a control by given control type like InputBox.class
+	 * 
+	 * @param controlType the class type
+	 * @param container parent
+	 * @param propertyName of Entity
+	 * @return a control
+	 */
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, 
+			final String propertyName) {
+		return createControl(controlType, container, propertyName, null);
+	}
+
 	/**
 	 * Create a control by given control type like InputBox.class
 	 * 
