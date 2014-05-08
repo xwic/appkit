@@ -19,48 +19,23 @@
  */
 package de.xwic.appkit.webbase.controls.export;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-
+import de.jwic.async.IProcessListener;
+import de.jwic.async.ProcessEvent;
 import de.jwic.base.IControlContainer;
-import de.jwic.base.IResourceControl;
 import de.jwic.controls.Button;
-import de.jwic.controls.tableviewer.CellLabel;
-import de.jwic.controls.tableviewer.RowContext;
-import de.jwic.controls.tableviewer.TableColumn;
-import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableViewer;
-import de.jwic.data.IContentProvider;
-import de.jwic.data.Range;
-import de.xwic.appkit.webbase.utils.MimeTypeUtil;
+import de.jwic.events.SelectionEvent;
+import de.jwic.events.SelectionListener;
+import de.xwic.appkit.webbase.async.AsyncProcessDialog;
+import de.xwic.appkit.webbase.dialog.DownloadFileDialog;
+import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 
 /**
  * This control defines the ExcelExport button.
  * 
  * @author Aron Cotrau
  */
-public class ExcelExportControl extends Button implements IResourceControl {
+public class ExcelExportControl extends Button {
 	private static final long serialVersionUID = 1L;
 	private boolean showDownload = false;
 	private boolean plain = false;
@@ -89,8 +64,15 @@ public class ExcelExportControl extends Button implements IResourceControl {
 		if (null == tableViewer) {
 			throw new IllegalArgumentException("The TableViewer object is not allowed to be null !");
 		}
-
+		this.setTemplateName(Button.class.getName());
 		this.tableViewer = tableViewer;
+		this.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void objectSelected(SelectionEvent arg0) {
+				onClick();
+			}
+		});
 	}
 
 	/*
@@ -104,150 +86,6 @@ public class ExcelExportControl extends Button implements IResourceControl {
 		requireRedraw();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.jwic.base.IResourceControl#attachResource(javax.servlet.http.HttpServletRequest,
-	 *      javax.servlet.http.HttpServletResponse)
-	 */
-	public void attachResource(HttpServletRequest req, HttpServletResponse res) throws IOException {
-		try {
-			
-			Workbook wb = createWorkBook();
-			String filename = "export.xlsx";
-			res.setContentType(MimeTypeUtil.getMimeTypeForFileName(filename));
-			res.setHeader("Content-Disposition", "attachment; filename=" + filename);
-			wb.write(res.getOutputStream());
-			res.getOutputStream().close();
-		} catch (NoClassDefFoundError e) {
-			log.error("Error generating workbook:", e);
-		}
-	}
-
-	private Workbook createWorkBook() {
-		Workbook wb = new SXSSFWorkbook(100);
-		Sheet sheet = wb.createSheet("Sheet");
-		Row row = sheet.createRow(0);
-
-		// Style for title cells
-		Font font = wb.createFont();
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		font.setColor(HSSFColor.BLUE.index);
-
-		CellStyle styleTitle = wb.createCellStyle();
-		styleTitle.setFont(font);
-
-		// Style for data date cells
-		font = wb.createFont();
-		CellStyle styleDate = wb.createCellStyle();
-		styleDate.setDataFormat(HSSFDataFormat.getBuiltinFormat("m/d/yy"));
-
-		short col = 0;
-		TableModel model = tableViewer.getModel();
-		Iterator<TableColumn> it = model.getColumnIterator();
-
-		// create title in the sheet
-		while (it.hasNext()) {
-			TableColumn column = it.next();
-			if (!isColumnVisible(column)) {
-				continue;
-			}
-			sheet.setColumnWidth(col, (short) (column.getWidth() * 40));
-			Cell cell = row.createCell(col++);
-			cell.setCellValue(column.getTitle());
-			cell.setCellStyle(styleTitle);
-		}
-
-		// add the datas from the table viewer
-		IContentProvider<?> contentProvider = model.getContentProvider();
-		Iterator<?> iter = contentProvider.getContentIterator(new Range());
-
-		try {
-			renderRows(iter, 0, model, sheet, styleDate);
-		} catch (Throwable t) {
-			log.error("Error rendering rows", t);
-		}
-		
-		return wb;
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected void renderRows(Iterator<?> iter, int level, TableModel model, Sheet sheet, CellStyle styleDate) {
-		while (iter.hasNext()) {
-			short col = 0;
-			Object inputObj = iter.next();
-			Row row = sheet.createRow(sheet.getLastRowNum() + 1);
-
-			IContentProvider contentProvider = model.getContentProvider();
-			for (Iterator<TableColumn> it = model.getColumnIterator(); it.hasNext();) {;
-				TableColumn column = it.next();
-				if (!isColumnVisible(column)) {
-					// skip column, it's not visible!
-					continue;
-				}
-				// call the label provider's getCellLabel method to get the
-				// CellLabel object
-				CellLabel label = null;
-				String rowKey = contentProvider.getUniqueKey(inputObj);
-				boolean expanded = model.isExpanded(rowKey);
-				Cell cell = row.createCell(col++);
-				
-				try {
-					label = tableViewer.getTableLabelProvider().getCellLabel(inputObj, column, new RowContext(expanded, level));
-					Object obj = label.object;
-					
-					// set cell text and style
-					if (obj != null) {
-						// identify special style for Date and Number
-						if (obj instanceof Number) {
-							cell.setCellValue(((Number)obj).doubleValue());
-							continue;
-						} else if (obj instanceof Date) {
-							cell.setCellValue((Date)obj);
-							cell.setCellStyle(styleDate);
-							continue;
-						} else if (obj instanceof Boolean) {
-							cell.setCellValue((Boolean)obj ? "Y" : "N");
-							continue;
-						}
-					}
-					
-					String columnText = label.text;
-					if (columnText != null){
-						columnText = StringEscapeUtils.unescapeHtml(label.text);
-					}
-					cell.setCellValue(columnText);
-				} catch (Throwable t) {
-					cell.setCellValue(t.getMessage());
-					log.error("Error rendering column " + column.getTitle(), t);
-				}
-			}
-			// render children
-			if (contentProvider.hasChildren(inputObj)) {
-				Iterator children = contentProvider.getChildren(inputObj);
-				renderRows(children, level + 1, model, sheet, styleDate);
-			}
-		}
-	}
-
-	/**
-	 * @param column
-	 * @return
-	 */
-	protected boolean isColumnVisible(TableColumn column) {
-		return column.isVisible();
-	}
-
-	/**
-	 * Returns the URL that calls the attachResource method.
-	 * 
-	 * @return
-	 */
-	public String getDownloadURL() {
-		return getSessionContext().getCallBackURL() + "&"
-			+ URL_RESOURCE_PARAM + "=1&"
-			+ URL_CONTROLID_PARAM + "=" + getControlID();
-	}
 
 	/**
 	 * @return Returns the showDownload.
@@ -284,4 +122,63 @@ public class ExcelExportControl extends Button implements IResourceControl {
 
 		this.plain = isPlain;
 	}
+	
+	private void onClick() {
+		final ExcelExportAsyncProcess process = getExportAsyncProcess();
+		
+		final AsyncProcessDialog apd = new AsyncProcessDialog(ExtendedApplication.getInstance(this).getSite(), process);
+		apd.setTitle("Generating Excel");
+		apd.start();
+		
+		process.addProcessListener(new IProcessListener() {
+			@Override
+			public void processFinished(ProcessEvent event) {
+				
+				Object result = process.getResult();
+				if (result != null && result instanceof byte[]) {
+					byte[] generatedContent = (byte[]) result;
+					onFinish(apd, generatedContent);
+				}else if(process.isCancelled()){
+					onCancelled();
+					return;
+				}else if (result instanceof Throwable){
+					onError(apd, (Throwable) result);
+				} else {
+					String type = "null";
+					if (result != null){
+						type = result.getClass().getName();
+					}
+					log.error("Unkown result type: " + type, new IllegalStateException());
+					apd.setVisible(false);
+					throw new RuntimeException("Unknown result type");
+				}				
+				requireRedraw();
+			}
+		});
+	}
+	
+	protected void onCancelled(){
+		log.info("Export was cancelled");
+	}
+	
+	protected void onFinish(AsyncProcessDialog window, byte[] result){
+		DownloadFileDialog dialog = new DownloadFileDialog(ExtendedApplication.getInstance(ExcelExportControl.this).getSite(), result, "export.xlsx");
+		dialog.setTitle("Download Excel");
+		dialog.show();
+	}
+	
+	protected void onError(AsyncProcessDialog window, Throwable result){
+		log.error("Error occured while generating the report ", result);
+		window.setVisible(false);
+		throw new RuntimeException("Error occured while generating the report");
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	protected ExcelExportAsyncProcess getExportAsyncProcess(){
+		return new ExcelExportAsyncProcess(tableViewer.getModel(), tableViewer.getTableLabelProvider());
+	}
+	
 }

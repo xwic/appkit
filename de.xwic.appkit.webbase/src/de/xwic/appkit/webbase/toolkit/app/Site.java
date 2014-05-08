@@ -71,7 +71,17 @@ public class Site extends Page {
 
         controlStack = new StackedContainerWithEvent(this, "content");
         
-        dialogContainer = new ControlContainer(this, "dialogs");
+        dialogContainer = new ControlContainer(this, "dialogs"){
+        	@Override
+        	public Iterator<Control> getControls() {
+        		final Iterator<Control> controls = super.getControls();
+        		List<Control> ctrls = new ArrayList<Control>();
+        		while(controls.hasNext()){
+        			ctrls.add(controls.next());
+        		}
+				return ctrls.iterator();
+        	}
+        };
 
         breadCrumb = new BreadCrumbControl(this, "breadCrumb");
         breadCrumb.setControlStack(controlStack);

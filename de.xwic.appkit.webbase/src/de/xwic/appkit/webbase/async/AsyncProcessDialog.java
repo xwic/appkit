@@ -7,6 +7,8 @@ import de.jwic.async.ProcessInfo;
 import de.jwic.base.JavaScriptSupport;
 import de.xwic.appkit.webbase.dialog.AbstractDialogWindow;
 import de.xwic.appkit.webbase.dialog.DialogContent;
+import de.xwic.appkit.webbase.dialog.DialogEvent;
+import de.xwic.appkit.webbase.dialog.IDialogWindowListener;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 
 /**
@@ -35,6 +37,14 @@ public class AsyncProcessDialog extends AbstractDialogWindow {
 		this.process = process;
 		setWidth(427);
 		setHeight(180);
+	}
+	
+	@Override
+	public void actionClose() {
+		if(process != null&&process.canCancel() && !process.isFinished()){
+			process.cancel();
+		}
+		super.actionClose();
 	}
 
 	/*
