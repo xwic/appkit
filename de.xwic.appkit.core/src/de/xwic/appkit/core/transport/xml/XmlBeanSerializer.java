@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -71,6 +72,22 @@ public class XmlBeanSerializer {
 	 * 
 	 */
 	public  static final String ELM_LIST = "list";
+	/**
+	 *
+	 */
+	private static final String ELM_MAP = "map";
+	/**
+	 *
+	 */
+	private static final String ELM_MAP_ENTRY = "entry";
+	/**
+	 *
+	 */
+	private static final String ELM_MAP_KEY = "key";
+	/**
+	 *
+	 */
+	private static final String ELM_MAP_VALUE = "value";
 	/**
 	 * 
 	 */
@@ -308,6 +325,8 @@ public class XmlBeanSerializer {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
 			}
+		} else if (value instanceof Map<?, ?>) {
+			serializeMap(elm, (Map<?, ?>) value, addTypeInfo);
 		} else {
 			serializeBean(elm, ELM_BEAN, value);
 			addTypeInfo = false;
@@ -463,7 +482,8 @@ public class XmlBeanSerializer {
 			} else {
 				value = null;
 			}
-			
+		} else if (Map.class.isAssignableFrom(type)) {
+			value = deserializeMap(context, elProp);
 		} else if (IPicklistEntry.class.isAssignableFrom(type)){
 
 			IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
@@ -578,6 +598,49 @@ public class XmlBeanSerializer {
 		}
 		
 		return value;
+	}
+
+
+	/**
+	 * @param elm
+	 * @param value
+	 * @param addTypeInfo
+	 * @throws TransportException
+	 */
+	private void serializeMap(final Element elm, final Map<?, ?> map, final boolean addTypeInfo) throws TransportException {
+		final Element elmMap = elm.addElement(ELM_MAP);
+		for (final Entry<?, ?> entry : map.entrySet()) {
+			final Element element = elmMap.addElement(ELM_MAP_ENTRY);
+			final Element key = element.addElement(ELM_MAP_KEY);
+			addValue(key, entry.getKey(), addTypeInfo);
+			final Element mapValue = element.addElement(ELM_MAP_VALUE);
+			addValue(mapValue, entry.getValue(), addTypeInfo);
+		}
+	}
+
+	/**
+	 * @param context
+	 * @param elProp
+	 * @param value
+	 * @return
+	 * @throws TransportException
+	 */
+	private Map<?,?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp) throws TransportException {
+		final Element element = elProp.element(ELM_MAP);
+		if (element == null) {
+			return null;
+		}
+		final Map<Object, Object> map = new HashMap<Object, Object>();
+		final Iterator<Element> it = element.elementIterator(ELM_MAP_ENTRY);
+		while (it.hasNext()) {
+			final Element entry = it.next();
+
+			final Object key = readValue(context, entry.element(ELM_MAP_KEY), null);
+			final Object value = readValue(context, entry.element(ELM_MAP_VALUE), null);
+
+			map.put(key, value);
+		}
+		return map;
 	}
 
 	/**
