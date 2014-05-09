@@ -137,7 +137,7 @@ public final class EntityUtil {
 		}
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addIn("id", ids);
-		return getEntities(entityClass, ids);
+		return getEntities(entityClass, pq);
 	}
 
 	/**
