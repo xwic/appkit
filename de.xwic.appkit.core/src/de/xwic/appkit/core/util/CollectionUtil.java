@@ -61,6 +61,18 @@ public class CollectionUtil {
 	}
 
 	/**
+	 * @param where collection to clear and add to
+	 * @param fromWhere what to add
+	 * @throws NullPointerException if <code>where</code> is empty
+	 */
+	public static <E> void clearAndAddAll(final Collection<? super E> where, final Collection<? extends E> fromWhere) throws NullPointerException {
+		where.clear();
+		if (!isEmpty(fromWhere)) {
+			where.addAll(fromWhere);
+		}
+	}
+
+	/**
 	 * adds all not null elements to the specified collection
 	 * @param c
 	 * @param elements
