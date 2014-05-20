@@ -52,6 +52,17 @@ public final class EntityUtil {
 	}
 
 	/**
+	 * @param entity
+	 * @return
+	 */
+	public static int getId(final IEntity entity) {
+		if (entity != null) {
+			return entity.getId();
+		}
+		return NEW_ENTITY_ID;
+	}
+
+	/**
 	 * @param entityClass
 	 * @param id
 	 * @return
