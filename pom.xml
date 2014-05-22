@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
@@ -12,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.2.0-SNAPSHOT</version>
+    <version>5.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>AppKit</name>
@@ -432,25 +431,23 @@
 				<version>${mvnDependencyVersionxWicCube}</version>
 			</dependency>
 
-			<dependency>
-			    <groupId>org.hibernate</groupId>
-			    <artifactId>hibernate-core</artifactId>
-			    <version>3.2.6.ga</version>
-			</dependency>
-			
-			<!-- for JPA, use hibernate-entitymanager instead of hibernate-core -->
-			<dependency>
-			    <groupId>org.hibernate</groupId>
-			    <artifactId>hibernate-entitymanager</artifactId>
-			    <version>3.2.6.ga</version>
-			</dependency>
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>3.5.6-Final</version>
+</dependency>
 
+<!-- for JPA, use hibernate-entitymanager instead of hibernate-core -->
+<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-entitymanager</artifactId>
+    <version>3.5.6-Final</version>
+</dependency>
 			<dependency>
 			    <groupId>javax.transaction</groupId>
 			    <artifactId>jta</artifactId>
 			    <version>1.1</version>
 			</dependency>
-			
             <dependency>
                 <!-- Common Public License 1.0 -->
                 <groupId>junit</groupId>
