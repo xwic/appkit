@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.2.1-SNAPSHOT</version>
+    <version>5.2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>AppKit</name>
@@ -431,18 +431,12 @@
 				<version>${mvnDependencyVersionxWicCube}</version>
 			</dependency>
 
-<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-core</artifactId>
-    <version>3.5.6-Final</version>
-</dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.6.ga</version>
+        </dependency>
 
-<!-- for JPA, use hibernate-entitymanager instead of hibernate-core -->
-<dependency>
-    <groupId>org.hibernate</groupId>
-    <artifactId>hibernate-entitymanager</artifactId>
-    <version>3.5.6-Final</version>
-</dependency>
 			<dependency>
 			    <groupId>javax.transaction</groupId>
 			    <artifactId>jta</artifactId>

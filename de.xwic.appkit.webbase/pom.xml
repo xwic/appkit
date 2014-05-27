@@ -3,21 +3,21 @@
     <parent>
         <groupId>de.xwic.appkit</groupId>
         <artifactId>appkit</artifactId>
-        <version>5.2.1-SNAPSHOT</version>
+        <version>5.2.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Appkit::Webbase</name>
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit-webbase</artifactId>
-    <version>5.2.1-SNAPSHOT</version>
+    <version>5.2.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>de.xwic.appkit</groupId>
             <artifactId>appkit-core</artifactId>
-            <version>5.2.1-SNAPSHOT</version>
+            <version>5.2.3-SNAPSHOT</version>
         </dependency>
 
 		<!-- jWic dependencies -->
