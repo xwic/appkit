@@ -9,6 +9,7 @@ package de.xwic.appkit.core.model.queries;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -671,6 +672,22 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 				.equals(other.wildcardPreferenceSetting))
 			return false;
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addEmpty(java.lang.String)
+	 */
+	@Override
+	public void addEmpty(final String collectionProperty) {
+		elements.add(new QueryElement(collectionProperty, QueryElement.COLLECTION_EMPTY, null));
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotEmpty(java.lang.String)
+	 */
+	@Override
+	public void addNotEmpty(final String collectionProperty) {
+		elements.add(new QueryElement(collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null));
 	}
 
 }

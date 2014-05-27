@@ -148,4 +148,16 @@ public interface IPropertyQuery {
 	 */
 	public void addOrNotIn(String property, Collection<?> values);
 
+	/**
+	 * Add collection empty property.
+	 * @param collectionProperty
+	 */
+	void addEmpty(String collectionProperty);
+
+	/**
+	 * Add collection not empty property.
+	 * @param collectionProperty
+	 */
+	void addNotEmpty(String collectionProperty);
+
 }
