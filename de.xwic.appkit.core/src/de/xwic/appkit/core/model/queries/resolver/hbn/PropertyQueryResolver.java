@@ -67,7 +67,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		Query q;
 		try {
 			q = session.createQuery(hsql);
-		} catch (NullPointerException npe){
+		} catch (RuntimeException npe) {
 			String qts = "null";
 			if (query != null){
 				qts = query.toString();
