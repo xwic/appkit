@@ -263,16 +263,18 @@ public class PropertyQueryResolver extends QueryResolver {
 				
 			} else {
 				if (qe.getValue() == null) {
+					final String operation = qe.getOperation();
+					sb.append(aliasPrefix).append(qe.getPropertyName());
 					if (qe.getOperation().equals(QueryElement.EQUALS)) {
-						sb.append(aliasPrefix)
-						  .append(qe.getPropertyName())
-						  .append(" IS NULL");
+						sb.append(" IS NULL");
 					} else if (qe.getOperation().equals(QueryElement.NOT_EQUALS)) {
-						sb.append(aliasPrefix)
-						  .append(qe.getPropertyName())
-						  .append(" IS NOT NULL");
+						sb.append(" IS NOT NULL");
+					} else if (operation.equals(QueryElement.COLLECTION_EMPTY)) {
+						sb.append(" IS EMPTY");
+					} else if (operation.equals(QueryElement.COLLECTION_NOT_EMPTY)) {
+						sb.append(" IS NOT EMPTY");
 					} else {
-						throw new IllegalArgumentException("NULL values are only allowed for EQUALS and NOT_EQUALS operations.");
+						throw new IllegalArgumentException("NULL values are only allowed for EQUALS, NOT_EQUALS, IS_EMPTY or IS_NOT_EMPTY operations.");
 					}
 				} else {
 					if(DAOSystem.isOracleCaseInsensitve() && QueryElement.LIKE.equals(qe.getOperation())){
