@@ -11,6 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import de.xwic.appkit.core.dao.EntityQuery;
+import de.xwic.appkit.core.dao.EntityQueryAdapter;
 import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.entities.impl.PicklistText;
@@ -19,7 +20,7 @@ import de.xwic.appkit.core.model.queries.PicklistTextQuery;
 /**
  * @author Florian Lippisch
  */
-public class PicklistTextQueryResolver implements IEntityQueryResolver {
+public class PicklistTextQueryResolver extends EntityQueryAdapter {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)
