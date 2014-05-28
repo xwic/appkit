@@ -129,10 +129,12 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 * @return
 	 */
 	public int getWidth() {
+        int localWidth = 325;
 		if (currentFilter != null) {
-			return currentFilter.getPreferredWidth() + 40;
+            localWidth = currentFilter.getPreferredWidth() + 40;
+            if(localWidth < 296) localWidth = 296;
 		}
-		return 325;
+		return localWidth;
 	}
 
 	/**
@@ -152,10 +154,12 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 * @return
 	 */
 	public int getFilterWidth() {
+        int localWidth = 264;
 		if (currentFilter != null) {
-			return currentFilter.getPreferredWidth();
+			localWidth = currentFilter.getPreferredWidth();
+            if(localWidth < 264) localWidth = 264;
 		}
-		return 264;
+		return localWidth;
 	}
 	
 	/**
