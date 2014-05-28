@@ -109,6 +109,21 @@ public class PropertyQueryTest {
 	}
 
 	/**
+	 * 
+	 */
+	@Test
+	public void testCollectionsEmptyNotEmpty() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addEmpty("shouldbeempty");
+		pq.addNotEmpty("shouldnotbeempty");
+		pq.addOrEmpty("orshouldbeempty");
+		pq.addNotEmpty("orshouldnotbeempty");
+		final String expected = BASIC_QUERY
+				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY AND obj.orshouldnotbeempty IS NOT EMPTY ";
+		assertEquals(expected, onlyQuery(pq));
+	}
+
+	/**
 	 * @param MITARBEITER
 	 * @param query
 	 * @return

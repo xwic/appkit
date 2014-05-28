@@ -155,9 +155,21 @@ public interface IPropertyQuery {
 	void addEmpty(String collectionProperty);
 
 	/**
+	 * Add collection empty property.
+	 * @param collectionProperty
+	 */
+	void addOrEmpty(String collectionProperty);
+
+	/**
 	 * Add collection not empty property.
 	 * @param collectionProperty
 	 */
 	void addNotEmpty(String collectionProperty);
+
+	/**
+	 * Add collection not empty property.
+	 * @param collectionProperty
+	 */
+	void addOrNotEmpty(String collectionProperty);
 
 }

@@ -679,7 +679,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public void addEmpty(final String collectionProperty) {
-		elements.add(new QueryElement(collectionProperty, QueryElement.COLLECTION_EMPTY, null));
+		addAux(QueryElement.AND, collectionProperty, QueryElement.COLLECTION_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -687,7 +687,33 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public void addNotEmpty(final String collectionProperty) {
-		elements.add(new QueryElement(collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null));
+		addAux(QueryElement.AND, collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addEmpty(java.lang.String)
+	 */
+	@Override
+	public void addOrEmpty(final String collectionProperty) {
+		addAux(QueryElement.OR, collectionProperty, QueryElement.COLLECTION_EMPTY, null);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotEmpty(java.lang.String)
+	 */
+	@Override
+	public void addOrNotEmpty(final String collectionProperty) {
+		addAux(QueryElement.OR, collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null);
+	}
+
+	/**
+	 * @param linkTypeElement
+	 * @param property
+	 * @param value
+	 * @param operation
+	 */
+	private void addAux(final int linkTypeElement, final String property, final String operation, final Object value) {
+		elements.add(new QueryElement(linkTypeElement, property, operation, value));
 	}
 
 }
