@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -397,4 +398,20 @@ public class PropertyQueryResolver extends QueryResolver {
 		}
 		return i;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.EntityQueryAdapter#generateQuery(java.lang.Class, de.xwic.appkit.core.dao.EntityQuery, boolean, java.util.List, java.util.List, java.util.List, java.util.List)
+	 */
+	@Override
+	public String generateQuery(final Class<? extends Object> entityClass, final EntityQuery query, final boolean justCount,
+			final List<QueryElement> values, final List<String> customFromClauses, final List<String> customWhereClauses, 
+			final List<Object> customValues) {
+		Validate.notNull(query);
+		if (!(query instanceof PropertyQuery)) {
+			throw new IllegalArgumentException();
+		}
+
+		return createHsqlQuery(entityClass, (PropertyQuery) query, justCount, values, customFromClauses, customWhereClauses, customValues);
+	}
+
 }
