@@ -6,6 +6,7 @@ package de.xwic.appkit.core.model.queries.resolver.hbn;
 import static de.xwic.appkit.core.util.CollectionUtil.cloneToSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
+import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
@@ -124,7 +126,28 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * @param MITARBEITER
+	 * 
+	 */
+	@Test
+	public void testEntityEquals() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("supervisor.id", 10);
+
+		final Entity supervisor = new Entity();
+		supervisor.setId(20);
+		pq.addEquals("supervisor", supervisor);
+
+		final List<QueryElement> values = new ArrayList<QueryElement>();
+		final String query = generate(pq, values);
+		final String expected = BASIC_QUERY + "AND obj.supervisor.id = ? AND obj.supervisor.id = ? ";
+		assertEquals(expected, query);
+		for (final QueryElement queryElement : values) {
+			final int id = ((Integer) queryElement.getValue()).intValue();
+			assertTrue(id == 10 || id == 20);
+		}
+	}
+
+	/**
 	 * @param query
 	 * @return
 	 */
