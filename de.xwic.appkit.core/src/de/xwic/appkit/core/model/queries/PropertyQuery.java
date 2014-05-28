@@ -449,17 +449,6 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	}
 
 	/**
-	 * @param leftOuterJoinProperties the leftOuterJoinProperties to set
-	 * @deprecated use setLeftOuterJoinPropertiesMap
-	 */
-	public void setLeftOuterJoinProperties(List<String> leftOuterJoinProperties) {
-		this.leftOuterJoinProperties = new LinkedHashMap<String, String>();
-		for (String prop : leftOuterJoinProperties) {
-			this.leftOuterJoinProperties.put(prop, prop);
-		}
-	}
-	
-	/**
 	 * @return the leftOuterJoinProperties as Map
 	 */
 	public Map<String, String> getLeftOuterJoinPropertiesMap() {
