@@ -49,10 +49,10 @@ public class QueryElement {
 	public final static String NOT_IN = "NOT IN";
 
 	/** key for is empty operation */
-	public final static String COLLECTION_EMPTY = "IS EMPTY";
+	public final static String IS_EMPTY = "IS EMPTY";
 
 	/** key for is not empty operation */
-	public final static String COLLECTION_NOT_EMPTY = "IS NOT EMPTY";
+	public final static String IS_NOT_EMPTY = "IS NOT EMPTY";
 
 	private int linkType = AND;
 	private String alias = "obj";

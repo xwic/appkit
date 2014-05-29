@@ -8,6 +8,8 @@
 package de.xwic.appkit.core.model.queries;
 
 import static de.xwic.appkit.core.model.queries.QueryElement.AND;
+import static de.xwic.appkit.core.model.queries.QueryElement.IS_EMPTY;
+import static de.xwic.appkit.core.model.queries.QueryElement.IS_NOT_EMPTY;
 import static de.xwic.appkit.core.model.queries.QueryElement.LIKE;
 import static de.xwic.appkit.core.model.queries.QueryElement.OR;
 
@@ -673,32 +675,32 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addEmpty(java.lang.String)
 	 */
 	@Override
-	public void addEmpty(final String collectionProperty) {
-		addAux(QueryElement.AND, collectionProperty, QueryElement.COLLECTION_EMPTY, null);
+	public QueryElement addEmpty(final String collectionProperty) {
+		return addAux(AND, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotEmpty(java.lang.String)
 	 */
 	@Override
-	public void addNotEmpty(final String collectionProperty) {
-		addAux(QueryElement.AND, collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null);
+	public QueryElement addNotEmpty(final String collectionProperty) {
+		return addAux(AND, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addEmpty(java.lang.String)
 	 */
 	@Override
-	public void addOrEmpty(final String collectionProperty) {
-		addAux(QueryElement.OR, collectionProperty, QueryElement.COLLECTION_EMPTY, null);
+	public QueryElement addOrEmpty(final String collectionProperty) {
+		return addAux(OR, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotEmpty(java.lang.String)
 	 */
 	@Override
-	public void addOrNotEmpty(final String collectionProperty) {
-		addAux(QueryElement.OR, collectionProperty, QueryElement.COLLECTION_NOT_EMPTY, null);
+	public QueryElement addOrNotEmpty(final String collectionProperty) {
+		return addAux(OR, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/**

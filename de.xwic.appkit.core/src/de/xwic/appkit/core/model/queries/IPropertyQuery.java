@@ -152,24 +152,24 @@ public interface IPropertyQuery {
 	 * Add collection empty property.
 	 * @param collectionProperty
 	 */
-	void addEmpty(String collectionProperty);
+	QueryElement addEmpty(String collectionProperty);
 
 	/**
 	 * Add collection empty property.
 	 * @param collectionProperty
 	 */
-	void addOrEmpty(String collectionProperty);
+	QueryElement addOrEmpty(String collectionProperty);
 
 	/**
 	 * Add collection not empty property.
 	 * @param collectionProperty
 	 */
-	void addNotEmpty(String collectionProperty);
+	QueryElement addNotEmpty(String collectionProperty);
 
 	/**
 	 * Add collection not empty property.
 	 * @param collectionProperty
 	 */
-	void addOrNotEmpty(String collectionProperty);
+	QueryElement addOrNotEmpty(String collectionProperty);
 
 }

@@ -270,9 +270,9 @@ public class PropertyQueryResolver extends QueryResolver {
 						sb.append(" IS NULL");
 					} else if (qe.getOperation().equals(QueryElement.NOT_EQUALS)) {
 						sb.append(" IS NOT NULL");
-					} else if (operation.equals(QueryElement.COLLECTION_EMPTY)) {
+					} else if (operation.equals(QueryElement.IS_EMPTY)) {
 						sb.append(" IS EMPTY");
-					} else if (operation.equals(QueryElement.COLLECTION_NOT_EMPTY)) {
+					} else if (operation.equals(QueryElement.IS_NOT_EMPTY)) {
 						sb.append(" IS NOT EMPTY");
 					} else {
 						throw new IllegalArgumentException("NULL values are only allowed for EQUALS, NOT_EQUALS, IS_EMPTY or IS_NOT_EMPTY operations.");
