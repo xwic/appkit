@@ -29,7 +29,7 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public abstract void addNotEquals(String property, Object value);
+	public abstract QueryElement addNotEquals(String property, Object value);
 
 	/**
 	 * Add an OR equals option.
@@ -50,7 +50,7 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public abstract void addOrNotEquals(String property, Object value);
+	public abstract QueryElement addOrNotEquals(String property, Object value);
 
 	/**
 	 * Add a greater option.

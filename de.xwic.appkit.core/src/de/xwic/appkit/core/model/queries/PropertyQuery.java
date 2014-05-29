@@ -248,24 +248,25 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotEquals(java.lang.String, java.lang.Object)
 	 */
-	public void addNotEquals(String property, Object value) {
+	public QueryElement addNotEquals(String property, Object value) {
 		
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		elements.add(new QueryElement(property, QueryElement.NOT_EQUALS, value));
+		return addAux(QueryElement.AND, property, QueryElement.NOT_EQUALS, value);
+
 		
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrNotEquals(java.lang.String, java.lang.Object)
 	 */
-	public void addOrNotEquals(String property, Object value) {
+	public QueryElement addOrNotEquals(String property, Object value) {
 		
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		elements.add(new QueryElement(QueryElement.OR, property, QueryElement.NOT_EQUALS, value));
+		return addAux(QueryElement.OR, property, QueryElement.NOT_EQUALS, value);
 		
 	}
 
