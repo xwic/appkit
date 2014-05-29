@@ -223,7 +223,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addLikeWithWildcardSetting(java.lang.String, java.lang.String)
 	 */
-	public void addLikeWithWildcardSetting(String property, String value) {
+	public QueryElement addLikeWithWildcardSetting(String property, String value) {
 		String finalValue = null;
 		if (WILDCARD_VALUE_END.equals(wildcardPreferenceSetting)) {
 			//replace '*' with '%' per default
@@ -247,7 +247,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		else {
 			finalValue = value;
 		}
-		addLike(property, finalValue);
+		return addLike(property, finalValue);
 	}
 
 	
@@ -407,7 +407,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrLikeWithWildcardSetting(java.lang.String, java.lang.String)
 	 */
-	public void addOrLikeWithWildcardSetting(String property, String value) {
+	public QueryElement addOrLikeWithWildcardSetting(String property, String value) {
 		String finalValue = null;
 		if (WILDCARD_VALUE_END.equals(wildcardPreferenceSetting)) {
 			//replace '*' with '%' per default
@@ -432,7 +432,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			finalValue = value;
 		}
 		
-		addOrLike(property, finalValue);
+		return addOrLike(property, finalValue);
 	}
 
 	/**

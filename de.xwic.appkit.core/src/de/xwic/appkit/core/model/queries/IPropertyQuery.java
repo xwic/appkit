@@ -117,13 +117,14 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public void addLikeWithWildcardSetting(String property, String value);
+	QueryElement addLikeWithWildcardSetting(String property, String value);
 	
 	/**
 	 * @param property
 	 * @param value
 	 */
-	public void addOrLikeWithWildcardSetting(String property, String value);
+	QueryElement addOrLikeWithWildcardSetting(String property, String value);
+
 	/**
 	 * @param property
 	 * @param values
