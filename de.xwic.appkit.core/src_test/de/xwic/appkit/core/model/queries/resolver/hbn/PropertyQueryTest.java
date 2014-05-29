@@ -375,7 +375,7 @@ public class PropertyQueryTest {
 	 * @return
 	 */
 	private static String getCallerMethodName(final StackTraceElement[] stackTrace) {
-		if (STACKTRACE_POSITION > stackTrace.length) {
+		if (STACKTRACE_POSITION >= stackTrace.length) {
 			return "";
 		}
 		return stackTrace[STACKTRACE_POSITION].getMethodName();
