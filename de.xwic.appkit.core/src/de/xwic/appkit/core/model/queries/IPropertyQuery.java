@@ -22,7 +22,7 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public abstract void addLike(String property, Object value);
+	public abstract QueryElement addLike(String property, Object value);
 
 	/**
 	 * Add an equals option.
@@ -43,7 +43,7 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public abstract void addOrLike(String property, Object value);
+	public abstract QueryElement addOrLike(String property, Object value);
 
 	/**
 	 * Add an OR Not Equals option.

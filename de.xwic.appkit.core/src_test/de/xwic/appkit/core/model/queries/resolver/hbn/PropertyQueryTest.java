@@ -241,11 +241,38 @@ public class PropertyQueryTest {
 	 */
 	@Test
 	public void testSearchInCollection() {
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addEquals("collection", 3).setCollectionElement(true);
+			final String expected = BASIC_QUERY + "AND ? IN ELEMENTS(obj.collection) ";
+			assertQuery(expected, pq);
+			printQuery(generate(pq));
+		}
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addNotEquals("collection", 3).setCollectionElement(true);
+			final String expected = BASIC_QUERY + "AND ? NOT IN ELEMENTS(obj.collection) ";
+			assertQuery(expected, pq);
+			printQuery(generate(pq));
+		}
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testLike() {
 		final PropertyQuery pq = new PropertyQuery();
-		pq.addEquals("collection", 3).setCollectionElement(true);
-		final String expected = BASIC_QUERY + "AND ? IN ELEMENTS(obj.collection) ";
+		pq.addLike("logonname", "hoarse%");
+
+		final PropertyQuery sq = new PropertyQuery();
+		pq.addSubQuery(sq);
+		sq.addLike("name", "%hoarse");
+		sq.addOrLike("logonname", "%");
+
+		final String expected = BASIC_QUERY + "AND obj.logonname LIKE ? AND (obj.name LIKE ? OR obj.logonname LIKE ?) ";
 		assertQuery(expected, pq);
-		printQuery(generate(pq));
+		printQuery(expected);
 	}
 
 	/**
@@ -263,6 +290,23 @@ public class PropertyQueryTest {
 				+ "AND obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ? ";
 		assertQuery(expected, pq);
 		printQuery(expected);
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testJoins() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addLeftOuterJoinProperty("leftArm", "arm");
+		pq.addGreaterThen("arm.length", 10).usesAlias();
+
+		final String[] split = splitBasicQuery();
+
+		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND arm.length > ? ";
+		assertQuery(expected, pq);
+		printQuery(expected);
+
 	}
 
 //	/**

@@ -318,4 +318,11 @@ public class QueryElement {
 		this.isCollectionElement = isCollectionElement;
 	}
 	
+	/**
+	 * use this to flag that a query element uses a alias
+	 */
+	public void usesAlias() {
+		setAlias(null);
+	}
+
 }

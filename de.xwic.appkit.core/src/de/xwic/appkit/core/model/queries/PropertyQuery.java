@@ -7,6 +7,10 @@
  */
 package de.xwic.appkit.core.model.queries;
 
+import static de.xwic.appkit.core.model.queries.QueryElement.AND;
+import static de.xwic.appkit.core.model.queries.QueryElement.LIKE;
+import static de.xwic.appkit.core.model.queries.QueryElement.OR;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -196,21 +200,21 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addLike(java.lang.String, java.lang.Object)
 	 */
-	public void addLike(String property, Object value) {
+	public QueryElement addLike(String property, Object value) {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		elements.add(new QueryElement(property, QueryElement.LIKE, value));
+		return addAux(AND, property, LIKE, value);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrLike(java.lang.String, java.lang.Object)
 	 */
-	public void addOrLike(String property, Object value) {
+	public QueryElement addOrLike(String property, Object value) {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		elements.add(new QueryElement(QueryElement.OR, property, QueryElement.LIKE, value));
+		return addAux(OR, property, LIKE, value);
 	}
 
 	/*
