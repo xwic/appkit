@@ -158,7 +158,8 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addEquals(java.lang.String, java.lang.Object)
 	 */
-	public void addEquals(String property, Object value) {
+	@Override
+	public QueryElement addEquals(String property, Object value) {
 		if (value instanceof IEntity) {
 			// store the id instead of the entity.
 			value = new Integer(((IEntity)value).getId());
@@ -169,7 +170,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		elements.add(new QueryElement(property, QueryElement.EQUALS, value));
+		return addAux(QueryElement.AND, property, QueryElement.EQUALS, value);
 	}
 
 	/* (non-Javadoc)
@@ -700,9 +701,12 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param property
 	 * @param value
 	 * @param operation
+	 * @return 
 	 */
-	private void addAux(final int linkTypeElement, final String property, final String operation, final Object value) {
-		elements.add(new QueryElement(linkTypeElement, property, operation, value));
+	private QueryElement addAux(final int linkTypeElement, final String property, final String operation, final Object value) {
+		final QueryElement element = new QueryElement(linkTypeElement, property, operation, value);
+		elements.add(element);
+		return element;
 	}
 
 }

@@ -15,7 +15,7 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param value
 	 */
-	public abstract void addEquals(String property, Object value);
+	public abstract QueryElement addEquals(String property, Object value);
 
 	/**
 	 * Add an equals option.

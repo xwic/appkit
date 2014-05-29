@@ -227,6 +227,43 @@ public class PropertyQueryTest {
 	}
 
 	/**
+	 * 
+	 */
+	@Test (expected = IllegalArgumentException.class)
+	public void testManuallyAddedIn() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addQueryElement(new QueryElement(QueryElement.AND, "invalid", QueryElement.IN, new String[0]));
+		generate(pq);
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testEqualsNotEquals() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addOrEquals("equals", 1);
+		pq.addOrEquals("orequals", 2);
+		pq.addNotEquals("andnotequals", 3);
+		pq.addOrNotEquals("ornotequals", 4);
+		pq.addEquals("andequals", 5);
+		final String expected = BASIC_QUERY
+				+ "AND obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ? ";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
+	}
+
+//	/**
+//	 *
+//	 */
+//	@Test (expected = IllegalArgumentException.class)
+//	public void testManuallyAddedBadIn() {
+//		final PropertyQuery pq = new PropertyQuery();
+//		pq.addQueryElement(new QueryElement(QueryElement.AND, "invalid", QueryElement.IN, new Object()));
+//		printQuery(generate(pq));
+//	}
+
+	/**
 	 * @param query
 	 * @return
 	 */
