@@ -32,17 +32,20 @@ import de.xwic.appkit.core.model.queries.QueryElement;
  */
 public class PropertyQueryTest {
 
+	private static final int STACKTRACE_POSITION = getStackTracePosition();
+
 	private static final Class<IMitarbeiter> MITARBEITER = IMitarbeiter.class;
 
 	private static final IEntityQueryResolver resolver = new PropertyQueryResolver();
 	private static final String BASIC_QUERY = " FROM de.xwic.appkit.core.model.entities.IMitarbeiter AS obj \n WHERE  obj.deleted = 0 ";
-
 	/**
 	 * 
 	 */
 	@Test
 	public void testSimpleQuery() {
-		assertEquals(BASIC_QUERY + " ", onlyQuery(new PropertyQuery()));
+		final String generated = generate(new PropertyQuery());
+		assertEquals(BASIC_QUERY + " ", generated);
+		printQuery(generated);
 	}
 
 	/**
@@ -58,6 +61,7 @@ public class PropertyQueryTest {
 
 			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (?,?,?,?,?)) ";
 			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
 
 //			test arguments
 			assertSame(1, values.size());
@@ -80,6 +84,7 @@ public class PropertyQueryTest {
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
 			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (" + thousandQs + ") OR obj.id IN (?)) ";
 			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
 
 //			test arguments
 			assertSame(2, values.size());
@@ -96,9 +101,22 @@ public class PropertyQueryTest {
 	/**
 	 * 
 	 */
+	@Test
+	public void testNullNotNull() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("isnull", null);
+		pq.addNotEquals("isnotnull", null);
+		final String expected = BASIC_QUERY + "AND obj.isnull IS NULL AND obj.isnotnull IS NOT NULL ";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
+	}
+
+	/**
+	 * 
+	 */
 	@Test (expected = IllegalArgumentException.class)
 	public void testNullQuery() {
-		onlyQuery(null);
+		generate(null);
 	}
 
 	/**
@@ -106,8 +124,19 @@ public class PropertyQueryTest {
 	 */
 	@Test (expected = IllegalArgumentException.class)
 	public void testWrongQuery() {
-		onlyQuery(new EntityQuery() {
+		generate(new EntityQuery() {
 		});
+	}
+
+	/**
+	 * 
+	 */
+	@Test (expected = IllegalArgumentException.class)
+	public void testBadQueryElement() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addEmpty("something");
+		pq.addQueryElement(new QueryElement(Integer.MAX_VALUE, new PropertyQuery()));
+		generate(pq);
 	}
 
 	/**
@@ -119,10 +148,11 @@ public class PropertyQueryTest {
 		pq.addEmpty("shouldbeempty");
 		pq.addNotEmpty("shouldnotbeempty");
 		pq.addOrEmpty("orshouldbeempty");
-		pq.addNotEmpty("orshouldnotbeempty");
+		pq.addOrNotEmpty("orshouldnotbeempty");
 		final String expected = BASIC_QUERY
-				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY AND obj.orshouldnotbeempty IS NOT EMPTY ";
-		assertEquals(expected, onlyQuery(pq));
+				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY ";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
 	}
 
 	/**
@@ -141,6 +171,8 @@ public class PropertyQueryTest {
 		final String query = generate(pq, values);
 		final String expected = BASIC_QUERY + "AND obj.supervisor.id = ? AND obj.supervisor.id = ? ";
 		assertEquals(expected, query);
+		printQuery(expected);
+
 		for (final QueryElement queryElement : values) {
 			final int id = ((Integer) queryElement.getValue()).intValue();
 			assertTrue(id == 10 || id == 20);
@@ -148,10 +180,57 @@ public class PropertyQueryTest {
 	}
 
 	/**
+	 * 
+	 */
+	@Test
+	public void testColumnsOnly() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.setColumns(Collections.singletonList("name"));
+		final String actual = generate(pq);
+		assertEquals("select obj.id, obj.name" + BASIC_QUERY + " ", actual);
+		printQuery(actual);
+	}
+
+	/**
+	 * 
+	 */
+	@Test (expected = IllegalArgumentException.class)
+	public void testBadNullElement() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addLike("null", null);
+		generate(pq);
+	}
+
+	@Test
+	public void testAutoJoin() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.setSortField("ilon.paiva");
+
+		final String[] split = splitBasicQuery();
+
+		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.ilon " + "\n" + split[1] + "  order by obj.ilon.paiva asc";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testIgnoreEmptyColumns() {
+		final PropertyQuery pq = new PropertyQuery();
+		List<String> emptyList = Collections.emptyList();
+		pq.setColumns(emptyList);
+		final String expected = "select obj.id" + BASIC_QUERY + " ";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
+	}
+
+	/**
 	 * @param query
 	 * @return
 	 */
-	private static String onlyQuery(final EntityQuery query) {
+	private static String generate(final EntityQuery query) {
 		return generate(query, new ArrayList<QueryElement>());
 	}
 
@@ -169,4 +248,52 @@ public class PropertyQueryTest {
 		return resolver.generateQuery(MITARBEITER, query, false, values, customFromClauses, customWhereClauses, customValues);
 	}
 
+	/**
+	 * 
+	 */
+	private static void printQuery(final String query) {
+		final StringBuilder sb = new StringBuilder("=== ");
+
+//		find the name of the first method in the stack trace that belongs
+//		to this class but isn't the current method
+		sb.append(getCallerMethodName(Thread.currentThread().getStackTrace()));
+		sb.append(" ===\n");
+		sb.append(query).append("\n");
+		System.out.println(sb.append("\n"));
+	}
+
+	/**
+	 * @return
+	 */
+	private static String[] splitBasicQuery() {
+		return BASIC_QUERY.split("\n");
+	}
+
+	/**
+	 * @param stackTrace
+	 * @return
+	 */
+	private static String getCallerMethodName(final StackTraceElement[] stackTrace) {
+		if (STACKTRACE_POSITION > stackTrace.length) {
+			return "";
+		}
+		return stackTrace[STACKTRACE_POSITION].getMethodName();
+	}
+
+	/**
+	 * searches the stacktrace for the first element that
+	 * belongs to this class and returns that element + 1
+	 * or Integer.MAX_VALUE if this class is not found in the stacktrace
+	 * @return
+	 */
+	private static int getStackTracePosition() {
+		final String thisClassName = PropertyQueryTest.class.getName();
+		final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		for (int i = 0; i < stackTrace.length; i++) {
+			if (thisClassName.equals(stackTrace[i].getClassName())) {
+				return i + 1; // we generally want the element that is a level above the called method
+			}
+		}
+		return Integer.MAX_VALUE;
+	}
 }
