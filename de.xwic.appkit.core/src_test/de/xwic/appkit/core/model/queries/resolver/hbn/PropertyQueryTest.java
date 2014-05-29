@@ -43,9 +43,9 @@ public class PropertyQueryTest {
 	 */
 	@Test
 	public void testSimpleQuery() {
-		final String generated = generate(new PropertyQuery());
-		assertEquals(BASIC_QUERY + " ", generated);
-		printQuery(generated);
+		final String expected = BASIC_QUERY + " ";
+		assertQuery(expected, new PropertyQuery());
+		printQuery(expected);
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class PropertyQueryTest {
 		pq.addEquals("isnull", null);
 		pq.addNotEquals("isnotnull", null);
 		final String expected = BASIC_QUERY + "AND obj.isnull IS NULL AND obj.isnotnull IS NOT NULL ";
-		assertEquals(expected, generate(pq));
+		assertQuery(expected, pq);
 		printQuery(expected);
 	}
 
@@ -151,7 +151,7 @@ public class PropertyQueryTest {
 		pq.addOrNotEmpty("orshouldnotbeempty");
 		final String expected = BASIC_QUERY
 				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY ";
-		assertEquals(expected, generate(pq));
+		assertQuery(expected, pq);
 		printQuery(expected);
 	}
 
@@ -186,9 +186,9 @@ public class PropertyQueryTest {
 	public void testColumnsOnly() {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.setColumns(Collections.singletonList("name"));
-		final String actual = generate(pq);
-		assertEquals("select obj.id, obj.name" + BASIC_QUERY + " ", actual);
-		printQuery(actual);
+		final String expected = "select obj.id, obj.name" + BASIC_QUERY + " ";
+		assertEquals(expected, generate(pq));
+		printQuery(expected);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public class PropertyQueryTest {
 		final String[] split = splitBasicQuery();
 
 		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.ilon " + "\n" + split[1] + "  order by obj.ilon.paiva asc";
-		assertEquals(expected, generate(pq));
+		assertQuery(expected, pq);
 		printQuery(expected);
 	}
 
@@ -222,7 +222,7 @@ public class PropertyQueryTest {
 		List<String> emptyList = Collections.emptyList();
 		pq.setColumns(emptyList);
 		final String expected = "select obj.id" + BASIC_QUERY + " ";
-		assertEquals(expected, generate(pq));
+		assertQuery(expected, pq);
 		printQuery(expected);
 	}
 
@@ -240,6 +240,18 @@ public class PropertyQueryTest {
 	 * 
 	 */
 	@Test
+	public void testSearchInCollection() {
+		final PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("collection", 3).setCollectionElement(true);
+		final String expected = BASIC_QUERY + "AND ? IN ELEMENTS(obj.collection) ";
+		assertQuery(expected, pq);
+		printQuery(generate(pq));
+	}
+
+	/**
+	 * 
+	 */
+	@Test
 	public void testEqualsNotEquals() {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addOrEquals("equals", 1);
@@ -249,7 +261,7 @@ public class PropertyQueryTest {
 		pq.addEquals("andequals", 5);
 		final String expected = BASIC_QUERY
 				+ "AND obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ? ";
-		assertEquals(expected, generate(pq));
+		assertQuery(expected, pq);
 		printQuery(expected);
 	}
 
@@ -262,6 +274,14 @@ public class PropertyQueryTest {
 //		pq.addQueryElement(new QueryElement(QueryElement.AND, "invalid", QueryElement.IN, new Object()));
 //		printQuery(generate(pq));
 //	}
+
+	/**
+	 * @param expectedQuery
+	 * @param query
+	 */
+	private static void assertQuery(final String expectedQuery, final EntityQuery query) {
+		assertEquals(expectedQuery, generate(query));
+	}
 
 	/**
 	 * @param query
