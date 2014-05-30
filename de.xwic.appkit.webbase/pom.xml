@@ -6,7 +6,7 @@
         <version>5.2.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <name>Appkit::Webbase</name>
+    <name>APPKIT::WEBBASE</name>
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit-webbase</artifactId>
