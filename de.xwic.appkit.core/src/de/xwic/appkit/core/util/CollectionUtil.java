@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 
 
 /**
@@ -26,6 +27,25 @@ public class CollectionUtil {
 	 *
 	 */
 	private CollectionUtil() {
+	}
+
+	/**
+	 * @param collection
+	 * @param resultClass
+	 * @return
+	 */
+	public static boolean isOf(final Collection<?> collection, final Class<?> resultClass) {
+		Validate.notNull(resultClass, "No result class provided.");
+		Validate.notNull(collection, "No collection provided.");
+		if (collection.isEmpty()) {
+			return true;
+		}
+		for (final Object cal : collection) {
+			if (cal != null && !resultClass.isInstance(cal)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
