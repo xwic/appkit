@@ -21,6 +21,7 @@ import de.jwic.events.KeyEvent;
 import de.jwic.events.KeyListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.appkit.core.config.list.ListColumn;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
@@ -290,6 +291,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		if (currentFilter != null) {
 			final String state = rdExcludeEmpty.getSelectedElement().getKey();
 			final QueryElement element = currentFilter.getQueryElement();
+			if(element != null)
+				System.out.println(element.isCollectionElement());
 			if(ALL.equals(state)){//both include and exclude means the default behavior
 				model.updateFilter(column, element);
 			}else if(EMPTY.equals(state)){
@@ -314,18 +317,29 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 */
 	private QueryElement includeExcludeEmpty(final QueryElement element, boolean include) {
 		final PropertyQuery query = new PropertyQuery();
-		final String property = column.getListColumn().getPropertyId();
+		final ListColumn listColumn = column.getListColumn();
+		final Property finalProperty = listColumn.getFinalProperty();
+		final String property = listColumn.getPropertyId();
 		if (element != null) {
 			query.addQueryElement(element);
 		}
 		if(include){
 			//on include its 'OR foo == null'
-			final QueryElement qe = new QueryElement(QueryElement.OR, property, QueryElement.EQUALS, null);
-			query.addQueryElement(qe);
+			if(finalProperty != null && finalProperty.isCollection()){
+				query.addLeftOuterJoinProperty(property);
+				query.addOrEmpty(property);
+			}else{
+				final QueryElement qe = new QueryElement(QueryElement.OR, property, QueryElement.EQUALS, null);
+				query.addQueryElement(qe);
+			}
 		}else{
 			//on exclude its 'AND foo != null'
-			final QueryElement qe = new QueryElement(QueryElement.AND, property, QueryElement.NOT_EQUALS, null);
-			query.addQueryElement(qe);
+			if(finalProperty != null && finalProperty.isCollection()){
+				query.addNotEmpty(property);
+			}else{
+				final QueryElement qe = new QueryElement(QueryElement.AND, property, QueryElement.NOT_EQUALS, null);
+				query.addQueryElement(qe);
+			}
 		}
 		
 		return new QueryElement(QueryElement.AND, query);
@@ -363,13 +377,13 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
 		
-		rdExcludeEmpty.setVisible((column.getListColumn().getFinalProperty() != null && !column.getListColumn().getFinalProperty().isCollection() ? true : false));
+		final Property finalProperty = column.getListColumn().getFinalProperty();
+		rdExcludeEmpty.setVisible( finalProperty != null );
 		initializeRadio();
 		
 		// choose the right filter
 		currentFilter = null;
 		//if (column.getPropertyIds() != null && column.getPropertyIds().length > 0) {
-			Property finalProperty = column.getListColumn().getFinalProperty();
 			
 			if (finalProperty == null) {
 				return;
