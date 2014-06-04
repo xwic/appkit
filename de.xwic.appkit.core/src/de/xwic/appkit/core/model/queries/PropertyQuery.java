@@ -716,4 +716,15 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		return element;
 	}
 
+	/**
+	 * @param alias
+	 * @return
+	 */
+	public String getAliasMapping(final String alias) {
+		if (leftOuterJoinProperties == null) {
+			return null;
+		}
+		return leftOuterJoinProperties.get(alias);
+	}
+
 }
