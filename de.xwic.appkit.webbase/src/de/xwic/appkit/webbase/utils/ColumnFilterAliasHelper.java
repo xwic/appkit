@@ -1,13 +1,11 @@
 package de.xwic.appkit.webbase.utils;
 
-import de.xwic.appkit.core.model.queries.PropertyQuery;
-import de.xwic.appkit.core.model.queries.QueryElement;
 
 /**
  * @author Alexandru Bledea
  * @since Jun 2, 2014
  */
-public class ColumnFilterAliasHelper {
+public final class ColumnFilterAliasHelper {
 
 	private final String property;
 	private final boolean requiresAlias;
@@ -17,7 +15,7 @@ public class ColumnFilterAliasHelper {
 	 * @param property
 	 * @return
 	 */
-	public static ColumnFilterAliasHelper of(final String property) {
+	public static ColumnFilterAliasHelper from(final String property) {
 		if (property == null) {
 			return new ColumnFilterAliasHelper(property, null);
 		}
@@ -33,14 +31,6 @@ public class ColumnFilterAliasHelper {
 	}
 
 	/**
-	 * @param element
-	 * @param leftJoins
-	 */
-	public ColumnFilterAliasHelper(final QueryElement element, final PropertyQuery leftJoins) {
-		this(element.getPropertyName(), leftJoins.getAliasMapping(element.getAlias()));
-	}
-
-	/**
 	 * @param property
 	 * @param joinProperty
 	 */
@@ -48,16 +38,6 @@ public class ColumnFilterAliasHelper {
 		this.property = property;
 		this.joinProperty = joinProperty;
 		this.requiresAlias = joinProperty != null;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getInitialProperty() {
-		if (joinProperty == null) {
-			return property;
-		}
-		return joinProperty + '.' + property;
 	}
 
 	/**

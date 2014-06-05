@@ -445,15 +445,15 @@ public class EntityTableModel {
 		if (!QueryElement.IS_EMPTY.equals(operation) && !QueryElement.IS_NOT_EMPTY.equals(operation)){
 			return; // currently, only aliasing sets with is empty or is not empty
 		}
-		final ColumnFilterAliasHelper of = ColumnFilterAliasHelper.of(property);
-		if (!of.isRequiresAlias()) {
+		final ColumnFilterAliasHelper helper = ColumnFilterAliasHelper.from(property);
+		if (!helper.isRequiresAlias()) {
 			return; // pretty obvious
 		}
 		final String nextAlias = aliasProvider.nextAlias();
 		element.setAlias(nextAlias);
-		userFilter.addLeftOuterJoinProperty(of.getJoinProperty(), nextAlias);
+		userFilter.addLeftOuterJoinProperty(helper.getJoinProperty(), nextAlias);
 
-		element.setPropertyName(of.getProperty());
+		element.setPropertyName(helper.getProperty());
 	}
 
 	/**
