@@ -16,7 +16,6 @@ import static de.xwic.appkit.core.model.queries.QueryElement.OR;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -586,57 +585,6 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	@Override
 	public QueryElement addOrNotIn(final String property, final Collection<?> values) {
 		return addInAux(OR, property, QueryElement.NOT_IN, values);
-	}
-
-	/**
-	 * @param property
-	 * @param values
-	 */
-	public void oldaddIn(final String property, final Collection<?> values) {
-		oldaddInAux(property, values, QueryElement.AND, QueryElement.OR, QueryElement.IN);
-	}
-
-	/**
-	 * @param property
-	 * @param values
-	 */
-	public void oldaddNotIn(final String property, final Collection<?> values) {
-		oldaddInAux(property, values, QueryElement.AND, QueryElement.AND, QueryElement.NOT_IN);
-	}
-
-	/**
-	 * @param property
-	 * @param values
-	 */
-	public void oldaddOrIn(final String property, final Collection<?> values) {
-		oldaddInAux(property, values, QueryElement.OR, QueryElement.OR, QueryElement.IN);
-	}
-
-	/**
-	 * @param property
-	 * @param values
-	 */
-	public void oldaddOrNotIn(final String property, final Collection<?> values) {
-		oldaddInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
-	}
-
-	/**
-	 * @param property
-	 * @param values
-	 * @param linkTypeSubQuery
-	 * @param linkTypeElement
-	 * @param operation
-	 */
-	private void oldaddInAux(final String property, final Collection<?> values, final int linkTypeSubQuery, final int linkTypeElement, final String operation) {
-		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(idsIfEntities(values), 1000);
-		PropertyQuery subQuery = new PropertyQuery();
-		for (Collection ids : sets) {
-			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
-		}
-		if (sets.isEmpty()) {
-			subQuery.addEquals("id", null);
-		}
-		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
 	}
 
 	/**
