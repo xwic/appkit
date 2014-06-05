@@ -225,9 +225,15 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param joinMap
 	 * @param rewrittenJoins
 	 */
-	private void add(String property, String alias, Map<String, String> joinMap, Map<String, String> remappedJoins) {
-		joinMap.put(property, alias);
+	private void add(final String property, final String alias, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
+		final String currentAlias = joinMap.get(property);
+		if (isAliasRelevant(property, currentAlias)) {
+			remappedJoins.put(alias, currentAlias);
+		} else {
+			joinMap.put(property, alias);
+		}
 	}
+
 	/**
 	 * @param joinMap
 	 * @param sortField
