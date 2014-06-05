@@ -326,7 +326,6 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		if(include){
 			//on include its 'OR foo == null'
 			if(finalProperty != null && finalProperty.isCollection()){
-				query.addLeftOuterJoinProperty(property);
 				query.addOrEmpty(property);
 			}else{
 				final QueryElement qe = new QueryElement(QueryElement.OR, property, QueryElement.EQUALS, null);
