@@ -243,11 +243,27 @@ public class PropertyQueryResolver extends QueryResolver {
 		while ((idx = s.lastIndexOf('.')) != -1) { 
 			s= s.substring(0, idx);
 			if (!joinMap.containsKey(s)) {
-				joinMap.put(s, null);
+				add(s, null, joinMap, remappedJoins);
 			}
 		}
 	}
 
+	/**
+	 * @param element
+	 * @param remappedJoins
+	 * @return
+	 */
+	private static String getAliasPrefix(final QueryElement element, final Map<String, String> remappedJoins) {
+		String alias = element.getAlias();
+		final String renamedAlias = remappedJoins.get(alias);
+		if (renamedAlias != null) {
+			alias = renamedAlias;
+		}
+		if (alias == null) {
+			return "";
+		}
+		return alias + ".";
+	}
 	/**
 	 * @param sb
 	 * @param values
@@ -259,12 +275,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		
 		for (final QueryElement qe : query.getElements()) {
 
-			String aliasPrefix = null;
-			if (qe.getAlias() != null) {
-				aliasPrefix = qe.getAlias() + ".";
-			} else {
-				aliasPrefix = "";
-			}
+			final String aliasPrefix = getAliasPrefix(qe, remappedJoins);
 			
 			if (first) {
 				first = false;
