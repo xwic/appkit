@@ -54,6 +54,9 @@ public class QueryElement {
 	/** key for is not empty operation */
 	public final static String IS_NOT_EMPTY = "IS NOT EMPTY";
 
+	/** the maximum number of elements allowed in {@link #IN} or {@link #NOT_IN}*/
+	public final static int MAXIMUM_ELEMENTS_IN = 1000;
+
 	private int linkType = AND;
 	private String alias = "obj";
 	private String propertyName = null;
