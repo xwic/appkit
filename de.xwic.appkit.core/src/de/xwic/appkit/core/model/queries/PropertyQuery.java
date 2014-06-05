@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
@@ -619,6 +620,20 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			}
 		}
 		return collection instanceof HashSet ? collection : new HashSet(collection);
+	}
+
+	/**
+	 * @param collection
+	 * @return
+	 */
+	private static Set<?> idsIfEntities(final Collection<?> collection) {
+		if (CollectionUtil.isEmpty(collection)) {
+			return Collections.emptySet();
+		}
+		if (CollectionUtil.isOf(collection, IEntity.class)) {
+			return EntityUtil.getIds((Collection<? extends IEntity>) collection);
+		}
+		return CollectionUtil.cloneToSet(collection);
 	}
 
 	/**
