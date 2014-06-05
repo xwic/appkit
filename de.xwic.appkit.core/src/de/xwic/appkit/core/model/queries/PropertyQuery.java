@@ -596,7 +596,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 */
 	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
-		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(processCollection(values), 1000);
+		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(idsIfEntities(values), 1000);
 		PropertyQuery subQuery = new PropertyQuery();
 		for (Collection ids : sets) {
 			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
@@ -605,21 +605,6 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			subQuery.addEquals("id", null);
 		}
 		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
-	}
-
-	/**
-	 * @param collection
-	 * @return
-	 */
-	private static Collection<?> processCollection(Collection<?> collection) {
-		if (collection == null) {
-			collection = new HashSet();
-		} else if (!collection.isEmpty()) {
-			if (collection.iterator().next() instanceof IEntity) {
-				collection = EntityUtil.getIds((Collection<? extends IEntity>) collection);
-			}
-		}
-		return collection instanceof HashSet ? collection : new HashSet(collection);
 	}
 
 	/**
