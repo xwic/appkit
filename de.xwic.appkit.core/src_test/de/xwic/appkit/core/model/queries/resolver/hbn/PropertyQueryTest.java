@@ -75,10 +75,7 @@ public class PropertyQueryTest {
 		{
 			final List<QueryElement> values = new ArrayList<QueryElement>();
 			final PropertyQuery pq = new PropertyQuery();
-			final List<Integer> ids = new ArrayList<Integer>();
-			for (int i = 0; i < 1001; i++) {
-				ids.add(i);
-			}
+			final List<Integer> ids = countTo(1001);
 			pq.addIn("id", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
@@ -96,6 +93,51 @@ public class PropertyQueryTest {
 			}
 			assertEquals(cloneToSet(ids), ints);
 		}
+
+		{
+			final List<QueryElement> values = new ArrayList<QueryElement>();
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("life", null);
+			pq.addOrIn("gf", null);
+
+			final String expectedQuery = BASIC_QUERY + "AND (obj.id IS NULL OR obj.id IS NULL) ";
+			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
+		}
+
+		{
+			final List<QueryElement> values = new ArrayList<QueryElement>();
+			final PropertyQuery pq = new PropertyQuery();
+			final List<Integer> ids = countTo(1001);
+			pq.addNotIn("comfortLevel", ids);
+
+			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
+			final String expectedQuery = BASIC_QUERY + "AND ((obj.comfortLevel NOT IN (" + thousandQs + ") AND obj.comfortLevel NOT IN (?))) ";
+			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
+
+//			test arguments
+			assertSame(2, values.size());
+
+//			test arguments
+			final Set<Integer> ints = new HashSet<Integer>();
+			for (final QueryElement integer : values) {
+				ints.addAll((Collection<Integer>) integer.getValue());
+			}
+			assertEquals(cloneToSet(ids), ints);
+		}
+	}
+
+	/**
+	 * @param to
+	 * @return
+	 */
+	private List<Integer> countTo(final int to) {
+		final List<Integer> ids = new ArrayList<Integer>();
+		for (int i = 0; i < to; i++) {
+			ids.add(i);
+		}
+		return ids;
 	}
 
 	/**
@@ -299,7 +341,7 @@ public class PropertyQueryTest {
 	public void testJoins() {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addLeftOuterJoinProperty("leftArm", "arm");
-		pq.addGreaterThen("arm.length", 10).usesAlias();
+		pq.addGreaterThen("length", 10).setAlias("arm");
 
 		final String[] split = splitBasicQuery();
 

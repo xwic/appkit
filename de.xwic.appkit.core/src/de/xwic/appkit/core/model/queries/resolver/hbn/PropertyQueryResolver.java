@@ -29,6 +29,7 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
+import de.xwic.appkit.core.util.CollectionUtil;
 
 /**
  * @author Florian Lippisch
@@ -278,8 +279,8 @@ public class PropertyQueryResolver extends QueryResolver {
 		if (requiresWrapping) {
 			sb.append("(");
 		}
-		for (final QueryElement qe : elements) {
-
+		for (final QueryElement raw : elements) {
+			final QueryElement qe = maybeRewrite(raw);
 			final String aliasPrefix = getAliasPrefix(qe, remappedJoins);
 			
 			if (first) {
