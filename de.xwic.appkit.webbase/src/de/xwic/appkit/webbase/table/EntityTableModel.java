@@ -421,10 +421,7 @@ public class EntityTableModel {
 		if (customQuickFilter != null && customQuickFilter.size() > 0) {
 			q.addSubQuery(customQuickFilter);
 		}
-//		hack, workaround for 'PropertyQueryResolver cares about order'
-		final PropertyQuery hack = new PropertyQuery();
-		hack.addSubQuery(q);
-		query = hack;
+		query = q;
 	}
 
 
