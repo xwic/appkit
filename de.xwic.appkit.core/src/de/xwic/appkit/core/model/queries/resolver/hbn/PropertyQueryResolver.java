@@ -483,26 +483,26 @@ public class PropertyQueryResolver extends QueryResolver {
 	 */
 	private static QueryElement rewriteIn(final QueryElement element) {
 		final Collection<?> collection = (Collection<?>) element.getValue();
-		final String propertyName = element.getPropertyName();
 
 		final PropertyQuery subQuery = new PropertyQuery();
 		if (collection.isEmpty()) {
-//			cancel element
-			element.setPropertyName("id");
-			element.setValue("null");
+			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
+		}
+		if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
 			return element;
-//		} else if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
-//			subQuery.addIn(propertyName, collection).setRewriteIn(false);
-		} else { // we're going to prevent that sql exception
-			final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
-			final boolean in = QueryElement.IN.equals(element.getOperation());
-			for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
-				if (in) {
-					subQuery.addOrIn(propertyName, safeCollection).setRewriteIn(false);
-				} else {
-					subQuery.addNotIn(propertyName, safeCollection).setRewriteIn(false);
-				}
-			}
+		}
+		final String operation = element.getOperation();
+
+//		if you want to search in 1000 elements you want "if x is in () or in ()"
+//		if you want to search not in 100 elements, you want "if x not in () and not in ()"
+		final int link = QueryElement.IN.equals(operation) ? QueryElement.OR : QueryElement.AND;
+
+		final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
+		for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
+			final QueryElement clome = element.cloneElement();
+			clome.setLinkType(link);
+			clome.setValue(safeCollection);
+			subQuery.addQueryElement(clome);
 		}
 		return new QueryElement(element.getLinkType(), subQuery);
 	}

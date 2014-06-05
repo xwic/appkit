@@ -156,7 +156,7 @@ public interface IPropertyQuery {
 	QueryElement addEmpty(String collectionProperty);
 
 	/**
-	 * Add collection empty property.
+	 * Add or collection empty property.
 	 * @param collectionProperty
 	 */
 	QueryElement addOrEmpty(String collectionProperty);
@@ -168,7 +168,7 @@ public interface IPropertyQuery {
 	QueryElement addNotEmpty(String collectionProperty);
 
 	/**
-	 * Add collection not empty property.
+	 * Add or collection not empty property.
 	 * @param collectionProperty
 	 */
 	QueryElement addOrNotEmpty(String collectionProperty);
