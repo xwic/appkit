@@ -129,7 +129,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		for (Map.Entry<String, String> entry : joinPropertiesMap.entrySet()) {
 			String alias = entry.getKey();
 			String property = entry.getValue();
-			joinMap.put(property, alias);
+			add(property, alias, joinMap, remappedJoins);
 		}
 		
 		// add all columns that are a referenced entity
