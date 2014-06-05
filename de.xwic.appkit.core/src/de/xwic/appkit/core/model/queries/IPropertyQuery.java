@@ -58,40 +58,40 @@ public interface IPropertyQuery {
 	 * @param value
 	 */
 	public QueryElement addGreaterThen(String property, Object value);
-	
+
 	/**
 	 * Add a greater equals option.
 	 * @param property
 	 * @param value
 	 */
 	public QueryElement addGreaterEqualsThen(String property, Object value);
-	
+
 	/**
 	 * Add a lower option.
 	 * @param property
 	 * @param value
 	 */
 	public QueryElement addLowerThen(String property, Object value);
-	
+
 	/**
 	 * Add a lower equals option.
 	 * @param property
 	 * @param value
 	 */
 	public QueryElement addLowerEqualsThen(String property, Object value);
-	
+
 	/**
 	 * Add a query element.
 	 * @param element
 	 */
 	public void addQueryElement(QueryElement element);
-	
+
 	/**
 	 * Returns the number of elements.
 	 * @return
 	 */
 	public abstract int size();
-	
+
 	/**
 	 * Removes all elements.
 	 *
@@ -107,7 +107,7 @@ public interface IPropertyQuery {
 	 * @param hideDeleted the hideDeleted to set
 	 */
 	public abstract void setHideDeleted(boolean hideDeleted);
-	
+
 	/**
 	 * Same as <code>addLike(..)</code> but with checking clients wildcard preferences
 	 * for String searches. <p>
@@ -118,7 +118,7 @@ public interface IPropertyQuery {
 	 * @param value
 	 */
 	QueryElement addLikeWithWildcardSetting(String property, String value);
-	
+
 	/**
 	 * @param property
 	 * @param value
@@ -129,25 +129,25 @@ public interface IPropertyQuery {
 	 * @param property
 	 * @param values
 	 */
-	public void addIn(String property, Collection<?> values);
+	QueryElement addIn(String property, Collection<?> values);
 
 	/**
 	 * @param property
 	 * @param values
 	 */
-	public void addNotIn(String property, Collection<?> values);
+	QueryElement addNotIn(String property, Collection<?> values);
 
 	/**
 	 * @param property
 	 * @param values
 	 */
-	public void addOrIn(String property, Collection<?> values);
+	QueryElement addOrIn(String property, Collection<?> values);
 
 	/**
 	 * @param property
 	 * @param values
 	 */
-	public void addOrNotIn(String property, Collection<?> values);
+	QueryElement addOrNotIn(String property, Collection<?> values);
 
 	/**
 	 * Add collection empty property.

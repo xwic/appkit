@@ -560,32 +560,64 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.AND, QueryElement.OR, QueryElement.IN);
+	public QueryElement addIn(final String property, final Collection<?> values) {
+		return addInAux(AND, property, QueryElement.IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addNotIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.AND, QueryElement.AND, QueryElement.NOT_IN);
+	public QueryElement addNotIn(final String property, final Collection<?> values) {
+		return addInAux(AND, property, QueryElement.NOT_IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addOrIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.OR, QueryElement.OR, QueryElement.IN);
+	public QueryElement addOrIn(final String property, final Collection<?> values) {
+		return addInAux(OR, property, QueryElement.IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrNotIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addOrNotIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
+	public QueryElement addOrNotIn(final String property, final Collection<?> values) {
+		return addInAux(OR, property, QueryElement.NOT_IN, values);
+	}
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void oldaddIn(final String property, final Collection<?> values) {
+		oldaddInAux(property, values, QueryElement.AND, QueryElement.OR, QueryElement.IN);
+	}
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void oldaddNotIn(final String property, final Collection<?> values) {
+		oldaddInAux(property, values, QueryElement.AND, QueryElement.AND, QueryElement.NOT_IN);
+	}
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void oldaddOrIn(final String property, final Collection<?> values) {
+		oldaddInAux(property, values, QueryElement.OR, QueryElement.OR, QueryElement.IN);
+	}
+
+	/**
+	 * @param property
+	 * @param values
+	 */
+	public void oldaddOrNotIn(final String property, final Collection<?> values) {
+		oldaddInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
 	}
 
 	/**
@@ -595,7 +627,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param linkTypeElement
 	 * @param operation
 	 */
-	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
+	private void oldaddInAux(final String property, final Collection<?> values, final int linkTypeSubQuery, final int linkTypeElement, final String operation) {
 		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(idsIfEntities(values), 1000);
 		PropertyQuery subQuery = new PropertyQuery();
 		for (Collection ids : sets) {
@@ -605,6 +637,19 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			subQuery.addEquals("id", null);
 		}
 		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+	}
+
+	/**
+	 * @param linkTypeElement
+	 * @param property
+	 * @param operation
+	 * @param values
+	 * @return
+	 */
+	private QueryElement addInAux(final int linkTypeElement, final String property, final String operation, final Collection<?> values) {
+		final QueryElement addAux = addAux(linkTypeElement, property, operation, idsIfEntities(values));
+		addAux.setRewriteIn(true);
+		return addAux;
 	}
 
 	/**

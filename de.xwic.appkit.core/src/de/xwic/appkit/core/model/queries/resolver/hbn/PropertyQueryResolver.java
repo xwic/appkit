@@ -454,4 +454,56 @@ public class PropertyQueryResolver extends QueryResolver {
 		return createHsqlQuery(entityClass, (PropertyQuery) query, justCount, values, customFromClauses, customWhereClauses, customValues);
 	}
 
+	/**
+	 * @param element
+	 * @return
+	 */
+	private static QueryElement maybeRewrite(final QueryElement element) {
+		final Object value = element.getValue();
+		if (!element.isRewriteIn() || value == null) {
+			return element;
+		}
+		final String operation = element.getOperation();
+		if (operation == null) {
+			return element;
+		}
+		if (!QueryElement.IN.equals(operation) && !QueryElement.NOT_IN.equals(operation)) {
+			return element;
+		}
+		if (!Collection.class.isAssignableFrom(value.getClass())) {
+			return element;
+		}
+		return rewriteIn(element);
+	}
+
+	/**
+	 * @param element
+	 * @return
+	 */
+	private static QueryElement rewriteIn(final QueryElement element) {
+		final Collection<?> collection = (Collection<?>) element.getValue();
+		final String propertyName = element.getPropertyName();
+
+		final PropertyQuery subQuery = new PropertyQuery();
+		if (collection.isEmpty()) {
+//			cancel element
+			element.setPropertyName("id");
+			element.setValue("null");
+			return element;
+//		} else if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
+//			subQuery.addIn(propertyName, collection).setRewriteIn(false);
+		} else { // we're going to prevent that sql exception
+			final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
+			final boolean in = QueryElement.IN.equals(element.getOperation());
+			for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
+				if (in) {
+					subQuery.addOrIn(propertyName, safeCollection).setRewriteIn(false);
+				} else {
+					subQuery.addNotIn(propertyName, safeCollection).setRewriteIn(false);
+				}
+			}
+		}
+		return new QueryElement(element.getLinkType(), subQuery);
+	}
+
 }
