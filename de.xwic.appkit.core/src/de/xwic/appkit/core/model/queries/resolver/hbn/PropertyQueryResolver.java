@@ -168,7 +168,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		// build query
 		//System.out.println(sb);
 		
-		buildQuery(sb, values, query);
+		buildQuery(sb, values, query, remappedJoins);
 		
 		int size = query.size();
 
@@ -215,7 +215,7 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param alias
 	 * @return
 	 */
-	private boolean isAliasRelevant(String property, String alias) {
+	private static boolean isAliasRelevant(String property, String alias) {
 		return alias != null && !alias.equals(property);
 	}
 
@@ -225,7 +225,7 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param joinMap
 	 * @param rewrittenJoins
 	 */
-	private void add(final String property, final String alias, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
+	private static void add(final String property, final String alias, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
 		final String currentAlias = joinMap.get(property);
 		if (isAliasRelevant(property, currentAlias)) {
 			remappedJoins.put(alias, currentAlias);
@@ -238,7 +238,7 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param joinMap
 	 * @param sortField
 	 */
-	private void addToJoin(String s, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
+	private static void addToJoin(String s, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
 		int idx;
 		while ((idx = s.lastIndexOf('.')) != -1) { 
 			s= s.substring(0, idx);
@@ -253,7 +253,7 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param values
 	 * @param query
 	 */
-	private void buildQuery(StringBuffer sb, List<QueryElement> values, PropertyQuery query) {
+	private void buildQuery(StringBuffer sb, List<QueryElement> values, PropertyQuery query, final Map<String, String> remappedJoins) {
 
 		boolean first = true;
 		
@@ -284,7 +284,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			if (qe.getSubQuery() != null) {
 				
 				sb.append("(");
-				buildQuery(sb, values, qe.getSubQuery());
+				buildQuery(sb, values, qe.getSubQuery(), remappedJoins);
 				sb.append(")");
 				
 			} else {
