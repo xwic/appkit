@@ -513,12 +513,13 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		rdExcludeEmpty.setSelectedKey(ALL);
 		if (qe != null && qe.getSubQuery() != null) {
 			List<QueryElement> elements = qe.getSubQuery().getElements();
-			for (QueryElement elem : elements) {
-				if (QueryElement.NOT_EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+			for (final QueryElement elem : elements) {
+				final String operation = elem.getOperation();
+				if ((QueryElement.NOT_EQUALS.equals(operation) || QueryElement.IS_NOT_EMPTY.equals(operation)) && elem.getValue() == null) {
 					rdExcludeEmpty.setSelectedKey(NOT_EMPTY);
 					break;
 				}
-				if (QueryElement.EQUALS.equals(elem.getOperation()) && elem.getValue() == null) {
+				if ((QueryElement.EQUALS.equals(operation) || QueryElement.IS_EMPTY.equals(operation)) && elem.getValue() == null) {
 					rdExcludeEmpty.setSelectedKey(EMPTY);
 					break;
 				}
