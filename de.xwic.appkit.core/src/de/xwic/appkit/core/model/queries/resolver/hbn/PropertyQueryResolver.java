@@ -120,7 +120,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		String sortField = query.getSortField();
 		if (null != sortField && sortField.indexOf('.') > 0) {
 			// add the property to the left outer join properties
-			addToJoin(joinMap, sortField, remappedJoins);
+			addToJoin(sortField, joinMap, remappedJoins);
 		}
 		
 		sbFrom.append(createFrom(query, entityClass, justCount));
@@ -135,7 +135,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		// add all columns that are a referenced entity
 		if (query.getColumns() != null && !query.getColumns().isEmpty()) {
 			for (String prop : query.getColumns()) {
-				addToJoin(joinMap, prop, remappedJoins);
+				addToJoin(prop, joinMap, remappedJoins);
 			}
 		}
 
@@ -232,7 +232,7 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @param joinMap
 	 * @param sortField
 	 */
-	private void addToJoin(Map<String, String> joinMap, String s, final Map<String, String> remappedJoins) {
+	private void addToJoin(String s, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
 		int idx;
 		while ((idx = s.lastIndexOf('.')) != -1) { 
 			s= s.substring(0, idx);
