@@ -502,6 +502,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			final QueryElement clome = element.cloneElement();
 			clome.setLinkType(link);
 			clome.setValue(safeCollection);
+			clome.setRewriteIn(false); // no need to try again
 			subQuery.addQueryElement(clome);
 		}
 		return new QueryElement(element.getLinkType(), subQuery);
