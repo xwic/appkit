@@ -63,7 +63,8 @@ public class QueryElement {
 	private PropertyQuery subQuery = null;
 	
 	private boolean isCollectionElement = false;
-	
+	private boolean rewriteIn;
+
 	/**
 	 * Constructor.
 	 */
@@ -219,9 +220,11 @@ public class QueryElement {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+		result = prime * result + (isCollectionElement ? 1231 : 1237);
 		result = prime * result + linkType;
 		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
 		result = prime * result + ((propertyName == null) ? 0 : propertyName.hashCode());
+		result = prime * result + (rewriteIn ? 1231 : 1237);
 		result = prime * result + ((subQuery == null) ? 0 : subQuery.hashCode());
 		result = prime * result + (timestamp ? 1231 : 1237);
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -233,42 +236,63 @@ public class QueryElement {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof QueryElement)) {
 			return false;
+		}
 		QueryElement other = (QueryElement) obj;
 		if (alias == null) {
-			if (other.alias != null)
+			if (other.alias != null) {
 				return false;
-		} else if (!alias.equals(other.alias))
+			}
+		} else if (!alias.equals(other.alias)) {
 			return false;
-		if (linkType != other.linkType)
+		}
+		if (isCollectionElement != other.isCollectionElement) {
 			return false;
+		}
+		if (linkType != other.linkType) {
+			return false;
+		}
 		if (operation == null) {
-			if (other.operation != null)
+			if (other.operation != null) {
 				return false;
-		} else if (!operation.equals(other.operation))
+			}
+		} else if (!operation.equals(other.operation)) {
 			return false;
+		}
 		if (propertyName == null) {
-			if (other.propertyName != null)
+			if (other.propertyName != null) {
 				return false;
-		} else if (!propertyName.equals(other.propertyName))
+			}
+		} else if (!propertyName.equals(other.propertyName)) {
 			return false;
+		}
+		if (rewriteIn != other.rewriteIn) {
+			return false;
+		}
 		if (subQuery == null) {
-			if (other.subQuery != null)
+			if (other.subQuery != null) {
 				return false;
-		} else if (!subQuery.equals(other.subQuery))
+			}
+		} else if (!subQuery.equals(other.subQuery)) {
 			return false;
-		if (timestamp != other.timestamp)
+		}
+		if (timestamp != other.timestamp) {
 			return false;
+		}
 		if (value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!value.equals(other.value))
+			}
+		} else if (!value.equals(other.value)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -285,6 +309,7 @@ public class QueryElement {
 		clone.timestamp = timestamp;
 		clone.value = value;
 		clone.isCollectionElement = isCollectionElement;
+		clone.rewriteIn = rewriteIn;
 		if (subQuery != null){
 			clone.subQuery = subQuery.cloneQuery();
 		}
@@ -324,6 +349,20 @@ public class QueryElement {
 	 */
 	public void usesAlias() {
 		setAlias(null);
+	}
+
+	/**
+	 * @return the rewriteIn
+	 */
+	public boolean isRewriteIn() {
+		return rewriteIn;
+	}
+
+	/**
+	 * @param rewriteIn the rewriteIn to set
+	 */
+	public void setRewriteIn(boolean rewriteIn) {
+		this.rewriteIn = rewriteIn;
 	}
 
 }
