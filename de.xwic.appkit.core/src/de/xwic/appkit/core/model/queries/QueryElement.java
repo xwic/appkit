@@ -284,6 +284,7 @@ public class QueryElement {
 		clone.propertyName = propertyName;
 		clone.timestamp = timestamp;
 		clone.value = value;
+		clone.isCollectionElement = isCollectionElement;
 		if (subQuery != null){
 			clone.subQuery = subQuery.cloneQuery();
 		}
