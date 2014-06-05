@@ -59,7 +59,7 @@ public class PropertyQueryTest {
 			final List<Integer> ids = Arrays.asList(1, 2, 3, 4, 5);
 			pq.addIn("id", ids);
 
-			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (?,?,?,?,?)) ";
+			final String expectedQuery = BASIC_QUERY + "AND ((obj.id IN (?,?,?,?,?))) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -82,7 +82,7 @@ public class PropertyQueryTest {
 			pq.addIn("id", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
-			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (" + thousandQs + ") OR obj.id IN (?)) ";
+			final String expectedQuery = BASIC_QUERY + "AND ((obj.id IN (" + thousandQs + ") OR obj.id IN (?))) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -106,7 +106,7 @@ public class PropertyQueryTest {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addEquals("isnull", null);
 		pq.addNotEquals("isnotnull", null);
-		final String expected = BASIC_QUERY + "AND obj.isnull IS NULL AND obj.isnotnull IS NOT NULL ";
+		final String expected = BASIC_QUERY + "AND (obj.isnull IS NULL AND obj.isnotnull IS NOT NULL) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -150,7 +150,7 @@ public class PropertyQueryTest {
 		pq.addOrEmpty("orshouldbeempty");
 		pq.addOrNotEmpty("orshouldnotbeempty");
 		final String expected = BASIC_QUERY
-				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY ";
+				+ "AND (obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -169,7 +169,7 @@ public class PropertyQueryTest {
 
 		final List<QueryElement> values = new ArrayList<QueryElement>();
 		final String query = generate(pq, values);
-		final String expected = BASIC_QUERY + "AND obj.supervisor.id = ? AND obj.supervisor.id = ? ";
+		final String expected = BASIC_QUERY + "AND (obj.supervisor.id = ? AND obj.supervisor.id = ?) ";
 		assertEquals(expected, query);
 		printQuery(expected);
 
@@ -244,14 +244,14 @@ public class PropertyQueryTest {
 		{
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addEquals("collection", 3).setCollectionElement(true);
-			final String expected = BASIC_QUERY + "AND ? IN ELEMENTS(obj.collection) ";
+			final String expected = BASIC_QUERY + "AND (? IN ELEMENTS(obj.collection)) ";
 			assertQuery(expected, pq);
 			printQuery(generate(pq));
 		}
 		{
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addNotEquals("collection", 3).setCollectionElement(true);
-			final String expected = BASIC_QUERY + "AND ? NOT IN ELEMENTS(obj.collection) ";
+			final String expected = BASIC_QUERY + "AND (? NOT IN ELEMENTS(obj.collection)) ";
 			assertQuery(expected, pq);
 			printQuery(generate(pq));
 		}
@@ -270,7 +270,7 @@ public class PropertyQueryTest {
 		sq.addLike("name", "%hoarse");
 		sq.addOrLike("logonname", "%");
 
-		final String expected = BASIC_QUERY + "AND obj.logonname LIKE ? AND (obj.name LIKE ? OR obj.logonname LIKE ?) ";
+		final String expected = BASIC_QUERY + "AND (obj.logonname LIKE ? AND (obj.name LIKE ? OR obj.logonname LIKE ?)) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -287,7 +287,7 @@ public class PropertyQueryTest {
 		pq.addOrNotEquals("ornotequals", 4);
 		pq.addEquals("andequals", 5);
 		final String expected = BASIC_QUERY
-				+ "AND obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ? ";
+				+ "AND (obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ?) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -303,7 +303,7 @@ public class PropertyQueryTest {
 
 		final String[] split = splitBasicQuery();
 
-		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND arm.length > ? ";
+		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND (arm.length > ?) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 

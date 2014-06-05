@@ -273,7 +273,12 @@ public class PropertyQueryResolver extends QueryResolver {
 
 		boolean first = true;
 		
-		for (final QueryElement qe : query.getElements()) {
+		final List<QueryElement> elements = query.getElements();
+		final boolean requiresWrapping = !elements.isEmpty();
+		if (requiresWrapping) {
+			sb.append("(");
+		}
+		for (final QueryElement qe : elements) {
 
 			final String aliasPrefix = getAliasPrefix(qe, remappedJoins);
 			
@@ -293,9 +298,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 			if (qe.getSubQuery() != null) {
 				
-				sb.append("(");
 				buildQuery(sb, values, qe.getSubQuery(), remappedJoins);
-				sb.append(")");
 				
 			} else {
 				if (qe.getValue() == null) {
@@ -360,7 +363,9 @@ public class PropertyQueryResolver extends QueryResolver {
 				}
 			}
 		}
-
+		if (requiresWrapping) {
+			sb.append(")");
+		}
 		
 	}
 
