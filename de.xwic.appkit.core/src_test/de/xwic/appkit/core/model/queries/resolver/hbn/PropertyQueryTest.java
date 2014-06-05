@@ -59,7 +59,7 @@ public class PropertyQueryTest {
 			final List<Integer> ids = Arrays.asList(1, 2, 3, 4, 5);
 			pq.addIn("id", ids);
 
-			final String expectedQuery = BASIC_QUERY + "AND ((obj.id IN (?,?,?,?,?))) ";
+			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (?,?,?,?,?)) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
