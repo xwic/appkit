@@ -152,7 +152,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 		}
 		
-		//add custom registered from clauses
+		//add custom registered from clauses 
 		for (int i = 0; i < customFromClauses.size(); i++) {
 			String customFrom = (String) customFromClauses.get(i);
 			sbFrom.append(" ").append(customFrom).append(" ");
@@ -257,9 +257,8 @@ public class PropertyQueryResolver extends QueryResolver {
 
 		boolean first = true;
 		
-		for (Iterator<QueryElement> it = query.getElements().iterator(); it.hasNext(); ) {
-			QueryElement qe = it.next();
-			
+		for (final QueryElement qe : query.getElements()) {
+
 			String aliasPrefix = null;
 			if (qe.getAlias() != null) {
 				aliasPrefix = qe.getAlias() + ".";
