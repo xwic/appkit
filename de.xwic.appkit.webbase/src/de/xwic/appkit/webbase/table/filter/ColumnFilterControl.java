@@ -291,8 +291,6 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		if (currentFilter != null) {
 			final String state = rdExcludeEmpty.getSelectedElement().getKey();
 			final QueryElement element = currentFilter.getQueryElement();
-			if(element != null)
-				System.out.println(element.isCollectionElement());
 			if(ALL.equals(state)){//both include and exclude means the default behavior
 				model.updateFilter(column, element);
 			}else if(EMPTY.equals(state)){
