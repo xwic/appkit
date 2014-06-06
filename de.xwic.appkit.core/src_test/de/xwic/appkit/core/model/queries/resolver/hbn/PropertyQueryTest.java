@@ -351,6 +351,43 @@ public class PropertyQueryTest {
 
 	}
 
+	/**
+	 * 
+	 */
+	@Test
+	public void testCollectionInCollection() {
+		final List<String> elements = Arrays.asList("one", "two", "shoe");
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("some.collection", elements).setCollectionElement(true);
+			String expected = BASIC_QUERY
+					+ "AND (? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			QueryElement element = pq.addIn("some.collection", elements);
+			element.setCollectionElement(true);
+			element.setInLinkType(QueryElement.OR);
+			String expected = BASIC_QUERY
+					+ "AND (? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
+
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("some.collection", elements).setCollectionElement(true);
+			pq.addOrIn("some.collection", Arrays.asList(3)).setCollectionElement(true);
+			String expected = BASIC_QUERY
+					+ "AND ((? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) OR ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
+
+	}
+
 //	/**
 //	 *
 //	 */
