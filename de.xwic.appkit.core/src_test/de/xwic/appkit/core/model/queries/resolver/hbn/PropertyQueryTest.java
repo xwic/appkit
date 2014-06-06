@@ -59,7 +59,7 @@ public class PropertyQueryTest {
 			final List<Integer> ids = Arrays.asList(1, 2, 3, 4, 5);
 			pq.addIn("id", ids);
 
-			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (?,?,?,?,?)) ";
+			final String expectedQuery = BASIC_QUERY + "AND obj.id IN (?,?,?,?,?) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -79,7 +79,7 @@ public class PropertyQueryTest {
 			pq.addIn("id", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
-			final String expectedQuery = BASIC_QUERY + "AND ((obj.id IN (" + thousandQs + ") OR obj.id IN (?))) ";
+			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (" + thousandQs + ") OR obj.id IN (?)) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -112,7 +112,7 @@ public class PropertyQueryTest {
 			pq.addNotIn("comfortLevel", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
-			final String expectedQuery = BASIC_QUERY + "AND ((obj.comfortLevel NOT IN (" + thousandQs + ") AND obj.comfortLevel NOT IN (?))) ";
+			final String expectedQuery = BASIC_QUERY + "AND (obj.comfortLevel NOT IN (" + thousandQs + ") AND obj.comfortLevel NOT IN (?)) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -132,7 +132,7 @@ public class PropertyQueryTest {
 	 * @param to
 	 * @return
 	 */
-	private List<Integer> countTo(final int to) {
+	private static List<Integer> countTo(final int to) {
 		final List<Integer> ids = new ArrayList<Integer>();
 		for (int i = 0; i < to; i++) {
 			ids.add(i);
@@ -286,14 +286,14 @@ public class PropertyQueryTest {
 		{
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addEquals("collection", 3).setCollectionElement(true);
-			final String expected = BASIC_QUERY + "AND (? IN ELEMENTS(obj.collection)) ";
+			final String expected = BASIC_QUERY + "AND ? IN ELEMENTS(obj.collection) ";
 			assertQuery(expected, pq);
 			printQuery(generate(pq));
 		}
 		{
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addNotEquals("collection", 3).setCollectionElement(true);
-			final String expected = BASIC_QUERY + "AND (? NOT IN ELEMENTS(obj.collection)) ";
+			final String expected = BASIC_QUERY + "AND ? NOT IN ELEMENTS(obj.collection) ";
 			assertQuery(expected, pq);
 			printQuery(generate(pq));
 		}
@@ -345,7 +345,7 @@ public class PropertyQueryTest {
 
 		final String[] split = splitBasicQuery();
 
-		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND (arm.length > ?) ";
+		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND arm.length > ? ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 

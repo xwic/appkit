@@ -275,7 +275,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		boolean first = true;
 		
 		final List<QueryElement> elements = query.getElements();
-		final boolean requiresWrapping = !elements.isEmpty();
+		final boolean requiresWrapping = elements.size() > 1;
 		if (requiresWrapping) {
 			sb.append("(");
 		}
@@ -497,6 +497,7 @@ public class PropertyQueryResolver extends QueryResolver {
 //		if you want to search not in 100 elements, you want "if x not in () and not in ()"
 		final int link = QueryElement.IN.equals(operation) ? QueryElement.OR : QueryElement.AND;
 
+		element.setValue(null); // don't clome the value
 		final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
 		for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
 			final QueryElement clome = element.cloneElement();
