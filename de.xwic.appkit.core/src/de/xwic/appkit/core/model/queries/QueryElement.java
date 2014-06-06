@@ -226,6 +226,7 @@ public class QueryElement {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+		result = prime * result + inLinkType;
 		result = prime * result + (isCollectionElement ? 1231 : 1237);
 		result = prime * result + linkType;
 		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
@@ -257,6 +258,9 @@ public class QueryElement {
 				return false;
 			}
 		} else if (!alias.equals(other.alias)) {
+			return false;
+		}
+		if (inLinkType != other.inLinkType) {
 			return false;
 		}
 		if (isCollectionElement != other.isCollectionElement) {
@@ -316,6 +320,7 @@ public class QueryElement {
 		clone.value = value;
 		clone.isCollectionElement = isCollectionElement;
 		clone.rewriteIn = rewriteIn;
+		clone.inLinkType = inLinkType;
 		if (subQuery != null){
 			clone.subQuery = subQuery.cloneQuery();
 		}
