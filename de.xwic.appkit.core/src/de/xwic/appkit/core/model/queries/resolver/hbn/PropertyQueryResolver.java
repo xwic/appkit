@@ -470,7 +470,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
 		}
 		if (element.isCollectionElement()) {
-			return rewriteCollectionInCollection(element);
+			return rewriteCollectionInCollection(element, collection);
 		}
 		if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
 			return element;
@@ -496,10 +496,21 @@ public class PropertyQueryResolver extends QueryResolver {
 
 	/**
 	 * @param element
+	 * @param collection
 	 * @return
 	 */
-	private static QueryElement rewriteCollectionInCollection(final QueryElement element) {
-		return element;
+	private static QueryElement rewriteCollectionInCollection(final QueryElement element, final Collection<?> collection) {
+		final PropertyQuery pq = new PropertyQuery();
+		final int inLinkType = element.getInLinkType();
+		element.setValue(null); // don't clome the value
+		for (final Object object : collection) {
+			final QueryElement clome = element.cloneElement();
+			clome.setValue(object);
+			clome.setOperation(QueryElement.EQUALS);
+			clome.setLinkType(inLinkType);
+			pq.addQueryElement(clome);
+		}
+		return new QueryElement(element.getLinkType(), pq);
 	}
 
 }
