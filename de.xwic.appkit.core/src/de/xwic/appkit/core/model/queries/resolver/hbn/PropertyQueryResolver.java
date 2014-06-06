@@ -469,6 +469,9 @@ public class PropertyQueryResolver extends QueryResolver {
 		if (collection.isEmpty()) {
 			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
 		}
+		if (element.isCollectionElement()) {
+			return rewriteCollectionInCollection(element);
+		}
 		if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
 			return element;
 		}
@@ -489,6 +492,14 @@ public class PropertyQueryResolver extends QueryResolver {
 			subQuery.addQueryElement(clome);
 		}
 		return new QueryElement(element.getLinkType(), subQuery);
+	}
+
+	/**
+	 * @param element
+	 * @return
+	 */
+	private static QueryElement rewriteCollectionInCollection(final QueryElement element) {
+		return element;
 	}
 
 }
