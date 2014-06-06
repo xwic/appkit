@@ -460,31 +460,12 @@ public class PropertyQueryResolver extends QueryResolver {
 	 * @return
 	 */
 	private static QueryElement maybeRewrite(final QueryElement element) {
-		final Object value = element.getValue();
-		if (!element.isRewriteIn() || value == null) {
+		if (!element.requiresRewrite()) {
 			return element;
 		}
-		final String operation = element.getOperation();
-		if (operation == null) {
-			return element;
-		}
-		if (!QueryElement.IN.equals(operation) && !QueryElement.NOT_IN.equals(operation)) {
-			return element;
-		}
-		if (!Collection.class.isAssignableFrom(value.getClass())) {
-			return element;
-		}
-		return rewriteIn(element);
-	}
 
-	/**
-	 * @param element
-	 * @return
-	 */
-	private static QueryElement rewriteIn(final QueryElement element) {
 		final Collection<?> collection = (Collection<?>) element.getValue();
 
-		final PropertyQuery subQuery = new PropertyQuery();
 		if (collection.isEmpty()) {
 			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
 		}
@@ -492,6 +473,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			return element;
 		}
 		final String operation = element.getOperation();
+		final PropertyQuery subQuery = new PropertyQuery();
 
 //		if you want to search in 1000 elements you want "if x is in () or in ()"
 //		if you want to search not in 100 elements, you want "if x not in () and not in ()"

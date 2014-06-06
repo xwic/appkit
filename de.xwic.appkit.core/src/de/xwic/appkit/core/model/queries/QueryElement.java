@@ -7,6 +7,8 @@
  */
 package de.xwic.appkit.core.model.queries;
 
+import java.util.Collection;
+
 /**
  * Represents one element of a PropertyQuery.
  * @author Florian Lippisch
@@ -67,6 +69,7 @@ public class QueryElement {
 	
 	private boolean isCollectionElement = false;
 	private boolean rewriteIn;
+	private int inLinkType = AND;
 
 	/**
 	 * Constructor.
@@ -346,13 +349,6 @@ public class QueryElement {
 	public void setCollectionElement(boolean isCollectionElement) {
 		this.isCollectionElement = isCollectionElement;
 	}
-	
-	/**
-	 * use this to flag that a query element uses a alias
-	 */
-	public void usesAlias() {
-		setAlias(null);
-	}
 
 	/**
 	 * @return the rewriteIn
@@ -364,8 +360,37 @@ public class QueryElement {
 	/**
 	 * @param rewriteIn the rewriteIn to set
 	 */
-	public void setRewriteIn(boolean rewriteIn) {
+	public void setRewriteIn(final boolean rewriteIn) {
 		this.rewriteIn = rewriteIn;
 	}
 
+	/**
+	 * @return the inLinkType
+	 */
+	public int getInLinkType() {
+		return inLinkType;
+	}
+
+	/**
+	 * @param inLinkType the inLinkType to set
+	 */
+	public void setInLinkType(final int inLinkType) {
+		this.inLinkType = inLinkType;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean requiresRewrite() {
+		if (!rewriteIn || value == null || operation == null) {
+			return false;
+		}
+		if (!QueryElement.IN.equals(operation) && !QueryElement.NOT_IN.equals(operation)) {
+			return false;
+		}
+		if (!Collection.class.isAssignableFrom(value.getClass())) {
+			return false;
+		}
+		return true;
+	}
 }
