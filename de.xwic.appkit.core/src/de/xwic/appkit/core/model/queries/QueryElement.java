@@ -377,6 +377,11 @@ public class QueryElement {
 	}
 
 	/**
+	 * Link type for the IN operation when searching collection in collection.
+	 * This property dictates if we search for all the elements inside the 
+	 * collection or if we search for any in collection  
+	 * <pre>(? in elements(property) OR ? in elements(property))</pre> or 
+	 * <pre>(? in elements(property) AND ? in elements(property))</pre>
 	 * @param inLinkType the inLinkType to set
 	 */
 	public void setInLinkType(final int inLinkType) {
