@@ -5,6 +5,9 @@
 
 package de.xwic.appkit.webbase.table.filter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import de.jwic.base.ControlContainer;
@@ -374,10 +377,26 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
 		
+
 		final Property finalProperty = column.getListColumn().getFinalProperty();
 		rdExcludeEmpty.setVisible( finalProperty != null );
-		initializeRadio();
-		
+
+//		when this was written, this could only have 0-2 elements
+//		0 when the column filter is null
+//		1 when the column filter doesn't contain a subquery
+//		2 when the column filter contains a subquery
+//		the subquery can only contain 2 elements
+//		the first one is the specific filter
+//		and the second one is the radio filter
+		final List<QueryElement> elements = getElements();
+
+		final boolean hasActiveFilter = !elements.isEmpty();
+
+		initializeRadio(elements);
+//		the method that initializes the radio will remove 
+//		its specific element from the list
+//		the size of the list can be 0 or 1 now
+
 		// choose the right filter
 		currentFilter = null;
 		//if (column.getPropertyIds() != null && column.getPropertyIds().length > 0) {
@@ -454,13 +473,15 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		//}
 		
 		if (currentFilter != null) {
-			currentFilter.initialize(column, column.getFilter());
+			final QueryElement el = elements.isEmpty() ? null : elements.get(0);
+			currentFilter.initialize(column, el);
+
 			filterStack.setCurrentControlName(currentFilter.getName());
 		} else {
 			filterStack.setCurrentControlName(lblNoFilter.getName());
 		}
 		
-		btFilterClear.setVisible(column.getFilter() != null);
+		btFilterClear.setVisible(hasActiveFilter);
 		setVisible(true);
 		requireRedraw();
 		
@@ -504,26 +525,50 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	public boolean isExcludeRadioVisible(){
 		return rdExcludeEmpty.isVisible();
 	}
-	
-	
-	protected void initializeRadio() {
-		QueryElement qe = column.getFilter();
-		rdExcludeEmpty.setSelectedKey(ALL);
-		if (qe != null && qe.getSubQuery() != null) {
-			List<QueryElement> elements = qe.getSubQuery().getElements();
-			for (final QueryElement elem : elements) {
-				final String operation = elem.getOperation();
-				if ((QueryElement.NOT_EQUALS.equals(operation) || QueryElement.IS_NOT_EMPTY.equals(operation)) && elem.getValue() == null) {
-					rdExcludeEmpty.setSelectedKey(NOT_EMPTY);
-					break;
-				}
-				if ((QueryElement.EQUALS.equals(operation) || QueryElement.IS_EMPTY.equals(operation)) && elem.getValue() == null) {
-					rdExcludeEmpty.setSelectedKey(EMPTY);
-					break;
-				}
-			}
+
+	/**
+	 * @return
+	 */
+	private List<QueryElement> getElements() {
+		final QueryElement qe = column.getFilter();
+		if (qe == null) {
+			return Collections.emptyList();
 		}
+		final List<QueryElement> elements = new ArrayList<QueryElement>();
+		final PropertyQuery subQuery = qe.getSubQuery();
+		if (subQuery != null) {
+			elements.addAll(subQuery.getElements());
+		} else {
+			elements.add(qe);
+		}
+		return elements;
 	}
 
-	
+	/**
+	 * @param elements
+	 */
+	protected void initializeRadio(final List<QueryElement> elements) {
+		String selection = ALL;
+
+		final Iterator<QueryElement> it = elements.iterator();
+		while (it.hasNext()) {
+			final QueryElement elem = it.next();
+			final String operation = elem.getOperation();
+			if (null != elem.getValue()) {
+				continue;
+			}
+			if ((QueryElement.NOT_EQUALS.equals(operation) || QueryElement.IS_NOT_EMPTY.equals(operation))) {
+				selection = NOT_EMPTY;
+				it.remove();
+				break;
+			}
+			if ((QueryElement.EQUALS.equals(operation) || QueryElement.IS_EMPTY.equals(operation))) {
+				selection = EMPTY;
+				it.remove();
+				break;
+			}
+		}
+		rdExcludeEmpty.setSelectedKey(selection);
+	}
+
 }
