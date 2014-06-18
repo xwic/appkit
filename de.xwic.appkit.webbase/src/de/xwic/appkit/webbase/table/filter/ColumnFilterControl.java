@@ -42,7 +42,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 @JavaScriptSupport
 public class ColumnFilterControl extends ControlContainer implements IFilterControlListener {
 
-	private static final String ALL = "all";
+	private static final String DEFAULT = "all";
 	private static final String EMPTY = "empty";
 	private static final String NOT_EMPTY = "not-empty";
 	private int positionIdx = 0;
@@ -173,7 +173,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		rdExcludeEmpty = new RadioGroup(this, "chkExcludeEmpty");
 		rdExcludeEmpty.addElement("Inc. Empty", EMPTY);
 		rdExcludeEmpty.addElement("Exc. Empty", NOT_EMPTY);
-		rdExcludeEmpty.addElement("Default", ALL);
+		rdExcludeEmpty.addElement("Default", DEFAULT);
 		
 		Button btColSetup = new Button(this, "btColSetup");
 		btColSetup.setTitle("");
@@ -253,7 +253,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	 */
 	protected void actionClearFilter() {
 		model.updateFilter(column, null);
-		rdExcludeEmpty.setSelectedKey(ALL);
+		rdExcludeEmpty.setSelectedKey(DEFAULT);
 		hide();
 	}
 
@@ -294,7 +294,7 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		if (currentFilter != null) {
 			final String state = rdExcludeEmpty.getSelectedElement().getKey();
 			final QueryElement element = currentFilter.getQueryElement();
-			if(ALL.equals(state)){//both include and exclude means the default behavior
+			if(DEFAULT.equals(state)){//both include and exclude means the default behavior
 				model.updateFilter(column, element);
 			}else if(EMPTY.equals(state)){
 				//update the filter to include empty elements
@@ -381,21 +381,8 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		final Property finalProperty = column.getListColumn().getFinalProperty();
 		rdExcludeEmpty.setVisible( finalProperty != null );
 
-//		when this was written, this could only have 0-2 elements
-//		0 when the column filter is null
-//		1 when the column filter doesn't contain a subquery
-//		2 when the column filter contains a subquery
-//		the subquery can only contain 2 elements
-//		the first one is the specific filter
-//		and the second one is the radio filter
-		final List<QueryElement> elements = getElements();
-
-		final boolean hasActiveFilter = !elements.isEmpty();
-
-		initializeRadio(elements);
-//		the method that initializes the radio will remove 
-//		its specific element from the list
-//		the size of the list can be 0 or 1 now
+		final QueryElement filter = column.getFilter();
+		final QueryElement actualElement = initializeRadio(filter);
 
 		// choose the right filter
 		currentFilter = null;
@@ -473,15 +460,13 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		//}
 		
 		if (currentFilter != null) {
-			final QueryElement el = elements.isEmpty() ? null : elements.get(0);
-			currentFilter.initialize(column, el);
-
+			currentFilter.initialize(column, actualElement);
 			filterStack.setCurrentControlName(currentFilter.getName());
 		} else {
 			filterStack.setCurrentControlName(lblNoFilter.getName());
 		}
 		
-		btFilterClear.setVisible(hasActiveFilter);
+		btFilterClear.setVisible(filter != null);
 		setVisible(true);
 		requireRedraw();
 		
@@ -545,30 +530,79 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	}
 
 	/**
-	 * @param elements
+	 * @param element element to check
+	 * @return
+	 * 		<ul>
+	 * 			<li>null if the filter is null</li>
+	 *
+	 * 			<li>the filter itself if the filter doesn't have a subquery
+	 * 				or if the subquery has more than 2 elements or if none
+	 * 				of the query ellements belong to the radio</li>
+	 *
+	 * 			<li>the element that doesn't belong to the radio if the element
+	 * 				belonging to the radio is found in the subquery</li>
+	 *		</ul>
 	 */
-	protected void initializeRadio(final List<QueryElement> elements) {
-		String selection = ALL;
+	protected QueryElement initializeRadio(final QueryElement element) {
+//		make sure that we something is selected
+		rdExcludeEmpty.setSelectedKey(DEFAULT);
 
-		final Iterator<QueryElement> it = elements.iterator();
-		while (it.hasNext()) {
-			final QueryElement elem = it.next();
+//		if we have no element, return it
+		if (null == element) {
+			return null;
+		}
+
+//		if the current element doesn't have a subquery
+//		definitely not relevant to our interests
+		final PropertyQuery subQuery = element.getSubQuery();
+		if (null == subQuery) {
+			return element;
+		}
+
+		String selection = DEFAULT;
+		final List<QueryElement> elements = subQuery.getElements();
+
+//		our assumption is that the subquery can only contain 1 or 2 elements
+//		one element for the radio, the other element for the genuine filter
+		final int size = elements.size();
+		if (size > 2) {
+			return element;
+		}
+
+		for (int i = 0; i < size; i++) {
+			final QueryElement elem = elements.get(i);
+
 			final String operation = elem.getOperation();
-			if (null != elem.getValue()) {
+
+//			empty filters always have null as a value
+//			and don't have subqueries
+			if (null != elem.getValue() || null != elem.getSubQuery()) {
 				continue;
 			}
 			if ((QueryElement.NOT_EQUALS.equals(operation) || QueryElement.IS_NOT_EMPTY.equals(operation))) {
 				selection = NOT_EMPTY;
-				it.remove();
-				break;
 			}
 			if ((QueryElement.EQUALS.equals(operation) || QueryElement.IS_EMPTY.equals(operation))) {
 				selection = EMPTY;
-				it.remove();
-				break;
+			}
+
+			if (!DEFAULT.equals(selection)) {
+				rdExcludeEmpty.setSelectedKey(selection);
+				if (size == 1) {
+//					we consumed the only element in the list
+//					there is no actual column filter
+					return null;
+				}
+				if (i == 0) {
+					return elements.get(1);
+				}
+				return elements.get(0);
 			}
 		}
-		rdExcludeEmpty.setSelectedKey(selection);
+
+//		the subquery did not contain what we expected
+//		pass on the element
+		return element;
 	}
 
 }
