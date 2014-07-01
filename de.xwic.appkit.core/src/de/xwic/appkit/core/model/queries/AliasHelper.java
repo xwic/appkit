@@ -1,11 +1,11 @@
-package de.xwic.appkit.webbase.utils;
+package de.xwic.appkit.core.model.queries;
 
 
 /**
  * @author Alexandru Bledea
  * @since Jun 2, 2014
  */
-public final class ColumnFilterAliasHelper {
+final class AliasHelper {
 
 	private final String property;
 	private final boolean requiresAlias;
@@ -15,26 +15,26 @@ public final class ColumnFilterAliasHelper {
 	 * @param property
 	 * @return
 	 */
-	public static ColumnFilterAliasHelper from(final String property) {
+	public static AliasHelper from(final String property) {
 		if (property == null) {
-			return new ColumnFilterAliasHelper(property, null);
+			return new AliasHelper(property, null);
 		}
 
 		final int length = property.length();
 		final int lastIndexOf = property.lastIndexOf('.');
 		if (lastIndexOf < 1 || lastIndexOf == length - 1) { // if not found or if the property starts or ends with a dot
-			return new ColumnFilterAliasHelper(property, null);
+			return new AliasHelper(property, null);
 		}
 		final String joinProperty = property.substring(0, lastIndexOf);
 		final String prop = property.substring(lastIndexOf + 1, length);
-		return new ColumnFilterAliasHelper(prop, joinProperty);
+		return new AliasHelper(prop, joinProperty);
 	}
 
 	/**
 	 * @param property
 	 * @param joinProperty
 	 */
-	private ColumnFilterAliasHelper(final String property, final String joinProperty) {
+	private AliasHelper(final String property, final String joinProperty) {
 		this.property = property;
 		this.joinProperty = joinProperty;
 		this.requiresAlias = joinProperty != null;

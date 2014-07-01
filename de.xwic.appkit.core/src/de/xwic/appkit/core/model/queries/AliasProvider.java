@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.xwic.appkit.webbase.utils;
+package de.xwic.appkit.core.model.queries;
 
 import org.apache.commons.lang.Validate;
 

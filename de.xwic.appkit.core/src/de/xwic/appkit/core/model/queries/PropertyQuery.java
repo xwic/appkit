@@ -34,6 +34,8 @@ import de.xwic.appkit.core.util.CollectionUtil;
  */
 public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 
+	private final AliasProvider aliasProvider = new AliasProvider("impossibleToHaveThisIHope");
+
 	private boolean hideDeleted = true;
 	
 	private boolean joinPicklistEntries = false;
@@ -718,6 +720,57 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 			return null;
 		}
 		return leftOuterJoinProperties.get(alias);
+	}
+
+	/**
+	 * @param element
+	 * @param userFilter
+	 * @return
+	 */
+	public void fixAliases(final QueryElement element) {
+//		move to the property query resolver
+		final PropertyQuery subQuery = element.getSubQuery();
+		if (subQuery != null) {
+			for (final QueryElement qe : subQuery.getElements()) {
+				fixAliases(qe);
+			}
+		}
+		final String property = element.getPropertyName();
+		if (property == null) {
+			return; // probably only contains a subquery
+		}
+		final String operation = element.getOperation();
+		if (!QueryElement.IS_EMPTY.equals(operation) && !QueryElement.IS_NOT_EMPTY.equals(operation)){
+			return; // currently, only aliasing sets with is empty or is not empty
+		}
+		final AliasHelper helper = AliasHelper.from(property);
+		if (!helper.isRequiresAlias()) {
+			return; // pretty obvious
+		}
+		final String nextAlias = aliasProvider.nextAlias();
+		element.setAlias(nextAlias);
+		addLeftOuterJoinProperty(helper.getJoinProperty(), nextAlias);
+
+		element.setPropertyName(helper.getProperty());
+	}
+
+	/**
+	 * fixes the aliases in the query
+	 */
+	public void resolveAliases() {
+		final List<QueryElement> elements = getElements();
+		if (CollectionUtil.isEmpty(elements)) {
+			return;
+		}
+		final List<QueryElement> newElements = new ArrayList<QueryElement>(elements.size());
+		final Iterator<QueryElement> it = elements.iterator();
+		while (it.hasNext()) {
+			newElements.add(it.next().cloneElement());
+			it.remove();
+		}
+		for (final QueryElement qe : newElements) {
+			fixAliases(qe);
+		}
 	}
 
 }

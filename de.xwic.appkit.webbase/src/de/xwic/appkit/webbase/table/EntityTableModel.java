@@ -33,8 +33,6 @@ import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.core.util.Equals;
 import de.xwic.appkit.webbase.entityviewer.config.UserConfigHandler;
 import de.xwic.appkit.webbase.table.Column.Sort;
-import de.xwic.appkit.webbase.utils.AliasProvider;
-import de.xwic.appkit.webbase.utils.ColumnFilterAliasHelper;
 
 /**
  * Model for the EntityTable.
@@ -71,7 +69,6 @@ public class EntityTableModel {
 	private List<IEntityTableListener> listeners = new ArrayList<IEntityTableListener>();
 	
 	private UserConfigHandler userConfigHandler;
-	private final AliasProvider aliasProvider = new AliasProvider("impossibleToHaveThisIHope");
 
 	/**
 	 * @param configuration
@@ -376,7 +373,7 @@ public class EntityTableModel {
 					col.setFilter(null);
 				} else {
 					final QueryElement clonedFilter = filter.cloneElement(); // we don't want to modify the actual elements
-					fixAliases(clonedFilter, userFilter);
+					userFilter.fixAliases(clonedFilter);
 					userFilter.addQueryElement(clonedFilter);
 				}
 				
@@ -422,38 +419,6 @@ public class EntityTableModel {
 			q.addSubQuery(customQuickFilter);
 		}
 		query = q;
-	}
-
-
-	/**
-	 * @param element
-	 * @param userFilter
-	 * @return
-	 */
-	private void fixAliases(final QueryElement element, final PropertyQuery userFilter) {
-		final PropertyQuery subQuery = element.getSubQuery();
-		if (subQuery != null) {
-			for (final QueryElement qe : subQuery.getElements()) {
-				fixAliases(qe, userFilter);
-			}
-		}
-		final String property = element.getPropertyName();
-		if (property == null) {
-			return; // probably only contains a subquery
-		}
-		final String operation = element.getOperation();
-		if (!QueryElement.IS_EMPTY.equals(operation) && !QueryElement.IS_NOT_EMPTY.equals(operation)){
-			return; // currently, only aliasing sets with is empty or is not empty
-		}
-		final ColumnFilterAliasHelper helper = ColumnFilterAliasHelper.from(property);
-		if (!helper.isRequiresAlias()) {
-			return; // pretty obvious
-		}
-		final String nextAlias = aliasProvider.nextAlias();
-		element.setAlias(nextAlias);
-		userFilter.addLeftOuterJoinProperty(helper.getJoinProperty(), nextAlias);
-
-		element.setPropertyName(helper.getProperty());
 	}
 
 	/**
