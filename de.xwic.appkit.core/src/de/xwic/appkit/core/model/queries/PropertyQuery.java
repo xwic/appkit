@@ -178,7 +178,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.AND, property, QueryElement.EQUALS, value);
+		return addQueryElement(QueryElement.AND, property, QueryElement.EQUALS, value);
 	}
 
 	/* (non-Javadoc)
@@ -208,7 +208,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(AND, property, LIKE, value);
+		return addQueryElement(AND, property, LIKE, value);
 	}
 
 	/* (non-Javadoc)
@@ -218,7 +218,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(OR, property, LIKE, value);
+		return addQueryElement(OR, property, LIKE, value);
 	}
 
 	/*
@@ -261,7 +261,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.AND, property, QueryElement.NOT_EQUALS, value);
+		return addQueryElement(QueryElement.AND, property, QueryElement.NOT_EQUALS, value);
 
 		
 	}
@@ -274,7 +274,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.OR, property, QueryElement.NOT_EQUALS, value);
+		return addQueryElement(QueryElement.OR, property, QueryElement.NOT_EQUALS, value);
 		
 	}
 
@@ -597,7 +597,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @return
 	 */
 	private QueryElement addInAux(final int linkTypeElement, final String property, final String operation, final Collection<?> values) {
-		final QueryElement addAux = addAux(linkTypeElement, property, operation, idsIfEntities(values));
+		final QueryElement addAux = addQueryElement(linkTypeElement, property, operation, idsIfEntities(values));
 		addAux.setRewriteIn(true);
 		return addAux;
 	}
@@ -671,7 +671,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addEmpty(final String collectionProperty) {
-		return addAux(AND, collectionProperty, IS_EMPTY, null);
+		return addQueryElement(AND, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -679,7 +679,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addNotEmpty(final String collectionProperty) {
-		return addAux(AND, collectionProperty, IS_NOT_EMPTY, null);
+		return addQueryElement(AND, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -687,7 +687,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addOrEmpty(final String collectionProperty) {
-		return addAux(OR, collectionProperty, IS_EMPTY, null);
+		return addQueryElement(OR, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -695,7 +695,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addOrNotEmpty(final String collectionProperty) {
-		return addAux(OR, collectionProperty, IS_NOT_EMPTY, null);
+		return addQueryElement(OR, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/**
@@ -705,7 +705,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 * @return 
 	 */
-	private QueryElement addAux(final int linkTypeElement, final String property, final String operation, final Object value) {
+	private QueryElement addQueryElement(final int linkTypeElement, final String property, final String operation, final Object value) {
 		final QueryElement element = new QueryElement(linkTypeElement, property, operation, value);
 		elements.add(element);
 		return element;
