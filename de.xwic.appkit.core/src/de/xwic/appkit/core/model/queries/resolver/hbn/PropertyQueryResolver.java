@@ -467,6 +467,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		final Collection<?> collection = (Collection<?>) element.getValue();
 
 		if (collection.isEmpty()) {
+//			this is a problem when we have no id, 
 			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
 		}
 		if (element.isCollectionElement()) {
