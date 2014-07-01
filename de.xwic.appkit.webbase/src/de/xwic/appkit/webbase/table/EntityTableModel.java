@@ -372,9 +372,7 @@ public class EntityTableModel {
 				if (quickFilterExists) {
 					col.setFilter(null);
 				} else {
-					final QueryElement clonedFilter = filter.cloneElement(); // we don't want to modify the actual elements
-					userFilter.fixAliases(clonedFilter);
-					userFilter.addQueryElement(clonedFilter);
+					userFilter.addQueryElement(filter);
 				}
 				
 			}
@@ -413,6 +411,7 @@ public class EntityTableModel {
 			}
 		}
 		if (userFilter.size() > 0) {
+			userFilter.resolveAliases();
 			q.addSubQuery(userFilter);
 		}
 		if (customQuickFilter != null && customQuickFilter.size() > 0) {

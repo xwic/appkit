@@ -727,8 +727,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param userFilter
 	 * @return
 	 */
-	public void fixAliases(final QueryElement element) {
-//		move to the property query resolver
+	private void fixAliases(final QueryElement element) {
 		final PropertyQuery subQuery = element.getSubQuery();
 		if (subQuery != null) {
 			for (final QueryElement qe : subQuery.getElements()) {
@@ -770,6 +769,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		}
 		for (final QueryElement qe : newElements) {
 			fixAliases(qe);
+			addQueryElement(qe);
 		}
 	}
 
