@@ -3,14 +3,14 @@
     <parent>
         <groupId>de.xwic.appkit</groupId>
         <artifactId>appkit</artifactId>
-        <version>5.2.5</version>
+        <version>5.2.6-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>APPKIT::CORE</name>
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit-core</artifactId>
-    <version>5.2.5</version>
+    <version>5.2.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <dependencies>
