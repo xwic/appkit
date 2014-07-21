@@ -25,7 +25,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.poi.util.IOUtils;
 
 import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
 
@@ -34,6 +39,7 @@ import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
  * @version $Revision: 1.1 $
  */
 public class Storage implements IPreferenceStore {
+	private final Log log = LogFactory.getLog(getClass());
 
 	private Properties properties = null;
 	private File file = null;
@@ -57,10 +63,20 @@ public class Storage implements IPreferenceStore {
 	 * @throws IOException 
 	 * @throws  
 	 */
-	public void loadData() throws IOException {
-		
-		properties.load(new FileInputStream(file));
-		
+	private void loadData() throws IOException {
+		InputStream in = null;
+		try {
+			in = new FileInputStream(file);
+			properties.load(in);
+		} finally {
+			if (null != in) {
+				try {
+					in.close();
+				} catch (final IOException e) {
+					log.error("Failed to close stream", e);
+				}
+			}
+		}
 	}
 	
 	/**
