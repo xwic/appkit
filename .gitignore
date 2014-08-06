@@ -1,3 +1,7 @@
+.metadata/
+*/_dist/*
+*/bin/*
+
 # Eclipse
 .classpath
 .project
