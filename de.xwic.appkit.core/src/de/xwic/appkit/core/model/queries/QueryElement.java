@@ -7,6 +7,8 @@
  */
 package de.xwic.appkit.core.model.queries;
 
+import java.util.Collection;
+
 /**
  * Represents one element of a PropertyQuery.
  * @author Florian Lippisch
@@ -54,6 +56,9 @@ public class QueryElement {
 	/** key for is not empty operation */
 	public final static String IS_NOT_EMPTY = "IS NOT EMPTY";
 
+	/** the maximum number of elements allowed in {@link #IN} or {@link #NOT_IN}*/
+	public final static int MAXIMUM_ELEMENTS_IN = 1000;
+
 	private int linkType = AND;
 	private String alias = "obj";
 	private String propertyName = null;
@@ -63,7 +68,9 @@ public class QueryElement {
 	private PropertyQuery subQuery = null;
 	
 	private boolean isCollectionElement = false;
-	
+	private boolean rewriteIn;
+	private int inLinkType = AND;
+
 	/**
 	 * Constructor.
 	 */
@@ -219,9 +226,12 @@ public class QueryElement {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((alias == null) ? 0 : alias.hashCode());
+		result = prime * result + inLinkType;
+		result = prime * result + (isCollectionElement ? 1231 : 1237);
 		result = prime * result + linkType;
 		result = prime * result + ((operation == null) ? 0 : operation.hashCode());
 		result = prime * result + ((propertyName == null) ? 0 : propertyName.hashCode());
+		result = prime * result + (rewriteIn ? 1231 : 1237);
 		result = prime * result + ((subQuery == null) ? 0 : subQuery.hashCode());
 		result = prime * result + (timestamp ? 1231 : 1237);
 		result = prime * result + ((value == null) ? 0 : value.hashCode());
@@ -233,42 +243,66 @@ public class QueryElement {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof QueryElement)) {
 			return false;
+		}
 		QueryElement other = (QueryElement) obj;
 		if (alias == null) {
-			if (other.alias != null)
+			if (other.alias != null) {
 				return false;
-		} else if (!alias.equals(other.alias))
+			}
+		} else if (!alias.equals(other.alias)) {
 			return false;
-		if (linkType != other.linkType)
+		}
+		if (inLinkType != other.inLinkType) {
 			return false;
+		}
+		if (isCollectionElement != other.isCollectionElement) {
+			return false;
+		}
+		if (linkType != other.linkType) {
+			return false;
+		}
 		if (operation == null) {
-			if (other.operation != null)
+			if (other.operation != null) {
 				return false;
-		} else if (!operation.equals(other.operation))
+			}
+		} else if (!operation.equals(other.operation)) {
 			return false;
+		}
 		if (propertyName == null) {
-			if (other.propertyName != null)
+			if (other.propertyName != null) {
 				return false;
-		} else if (!propertyName.equals(other.propertyName))
+			}
+		} else if (!propertyName.equals(other.propertyName)) {
 			return false;
+		}
+		if (rewriteIn != other.rewriteIn) {
+			return false;
+		}
 		if (subQuery == null) {
-			if (other.subQuery != null)
+			if (other.subQuery != null) {
 				return false;
-		} else if (!subQuery.equals(other.subQuery))
+			}
+		} else if (!subQuery.equals(other.subQuery)) {
 			return false;
-		if (timestamp != other.timestamp)
+		}
+		if (timestamp != other.timestamp) {
 			return false;
+		}
 		if (value == null) {
-			if (other.value != null)
+			if (other.value != null) {
 				return false;
-		} else if (!value.equals(other.value))
+			}
+		} else if (!value.equals(other.value)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -284,6 +318,9 @@ public class QueryElement {
 		clone.propertyName = propertyName;
 		clone.timestamp = timestamp;
 		clone.value = value;
+		clone.isCollectionElement = isCollectionElement;
+		clone.rewriteIn = rewriteIn;
+		clone.inLinkType = inLinkType;
 		if (subQuery != null){
 			clone.subQuery = subQuery.cloneQuery();
 		}
@@ -317,12 +354,53 @@ public class QueryElement {
 	public void setCollectionElement(boolean isCollectionElement) {
 		this.isCollectionElement = isCollectionElement;
 	}
-	
+
 	/**
-	 * use this to flag that a query element uses a alias
+	 * @return the rewriteIn
 	 */
-	public void usesAlias() {
-		setAlias(null);
+	public boolean isRewriteIn() {
+		return rewriteIn;
 	}
 
+	/**
+	 * @param rewriteIn the rewriteIn to set
+	 */
+	public void setRewriteIn(final boolean rewriteIn) {
+		this.rewriteIn = rewriteIn;
+	}
+
+	/**
+	 * @return the inLinkType
+	 */
+	public int getInLinkType() {
+		return inLinkType;
+	}
+
+	/**
+	 * Link type for the IN operation when searching collection in collection.
+	 * This property dictates if we search for all the elements inside the 
+	 * collection or if we search for any in collection  
+	 * <pre>(? in elements(property) OR ? in elements(property))</pre> or 
+	 * <pre>(? in elements(property) AND ? in elements(property))</pre>
+	 * @param inLinkType the inLinkType to set
+	 */
+	public void setInLinkType(final int inLinkType) {
+		this.inLinkType = inLinkType;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean requiresRewrite() {
+		if (!rewriteIn || value == null || operation == null) {
+			return false;
+		}
+		if (!QueryElement.IN.equals(operation) && !QueryElement.NOT_IN.equals(operation)) {
+			return false;
+		}
+		if (!Collection.class.isAssignableFrom(value.getClass())) {
+			return false;
+		}
+		return true;
+	}
 }

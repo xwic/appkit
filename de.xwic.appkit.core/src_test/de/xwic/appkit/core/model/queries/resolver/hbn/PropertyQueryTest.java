@@ -59,7 +59,7 @@ public class PropertyQueryTest {
 			final List<Integer> ids = Arrays.asList(1, 2, 3, 4, 5);
 			pq.addIn("id", ids);
 
-			final String expectedQuery = BASIC_QUERY + "AND (obj.id IN (?,?,?,?,?)) ";
+			final String expectedQuery = BASIC_QUERY + "AND obj.id IN (?,?,?,?,?) ";
 			assertEquals(expectedQuery, generate(pq, values));
 			printQuery(expectedQuery);
 
@@ -75,10 +75,7 @@ public class PropertyQueryTest {
 		{
 			final List<QueryElement> values = new ArrayList<QueryElement>();
 			final PropertyQuery pq = new PropertyQuery();
-			final List<Integer> ids = new ArrayList<Integer>();
-			for (int i = 0; i < 1001; i++) {
-				ids.add(i);
-			}
+			final List<Integer> ids = countTo(1001);
 			pq.addIn("id", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
@@ -96,6 +93,51 @@ public class PropertyQueryTest {
 			}
 			assertEquals(cloneToSet(ids), ints);
 		}
+
+		{
+			final List<QueryElement> values = new ArrayList<QueryElement>();
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("life", null);
+			pq.addOrIn("gf", null);
+
+			final String expectedQuery = BASIC_QUERY + "AND (obj.id IS NULL OR obj.id IS NULL) ";
+			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
+		}
+
+		{
+			final List<QueryElement> values = new ArrayList<QueryElement>();
+			final PropertyQuery pq = new PropertyQuery();
+			final List<Integer> ids = countTo(1001);
+			pq.addNotIn("comfortLevel", ids);
+
+			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
+			final String expectedQuery = BASIC_QUERY + "AND (obj.comfortLevel NOT IN (" + thousandQs + ") AND obj.comfortLevel NOT IN (?)) ";
+			assertEquals(expectedQuery, generate(pq, values));
+			printQuery(expectedQuery);
+
+//			test arguments
+			assertSame(2, values.size());
+
+//			test arguments
+			final Set<Integer> ints = new HashSet<Integer>();
+			for (final QueryElement integer : values) {
+				ints.addAll((Collection<Integer>) integer.getValue());
+			}
+			assertEquals(cloneToSet(ids), ints);
+		}
+	}
+
+	/**
+	 * @param to
+	 * @return
+	 */
+	private static List<Integer> countTo(final int to) {
+		final List<Integer> ids = new ArrayList<Integer>();
+		for (int i = 0; i < to; i++) {
+			ids.add(i);
+		}
+		return ids;
 	}
 
 	/**
@@ -106,7 +148,7 @@ public class PropertyQueryTest {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addEquals("isnull", null);
 		pq.addNotEquals("isnotnull", null);
-		final String expected = BASIC_QUERY + "AND obj.isnull IS NULL AND obj.isnotnull IS NOT NULL ";
+		final String expected = BASIC_QUERY + "AND (obj.isnull IS NULL AND obj.isnotnull IS NOT NULL) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -150,7 +192,7 @@ public class PropertyQueryTest {
 		pq.addOrEmpty("orshouldbeempty");
 		pq.addOrNotEmpty("orshouldnotbeempty");
 		final String expected = BASIC_QUERY
-				+ "AND obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY ";
+				+ "AND (obj.shouldbeempty IS EMPTY AND obj.shouldnotbeempty IS NOT EMPTY OR obj.orshouldbeempty IS EMPTY OR obj.orshouldnotbeempty IS NOT EMPTY) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -169,7 +211,7 @@ public class PropertyQueryTest {
 
 		final List<QueryElement> values = new ArrayList<QueryElement>();
 		final String query = generate(pq, values);
-		final String expected = BASIC_QUERY + "AND obj.supervisor.id = ? AND obj.supervisor.id = ? ";
+		final String expected = BASIC_QUERY + "AND (obj.supervisor.id = ? AND obj.supervisor.id = ?) ";
 		assertEquals(expected, query);
 		printQuery(expected);
 
@@ -270,7 +312,7 @@ public class PropertyQueryTest {
 		sq.addLike("name", "%hoarse");
 		sq.addOrLike("logonname", "%");
 
-		final String expected = BASIC_QUERY + "AND obj.logonname LIKE ? AND (obj.name LIKE ? OR obj.logonname LIKE ?) ";
+		final String expected = BASIC_QUERY + "AND (obj.logonname LIKE ? AND (obj.name LIKE ? OR obj.logonname LIKE ?)) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -287,7 +329,7 @@ public class PropertyQueryTest {
 		pq.addOrNotEquals("ornotequals", 4);
 		pq.addEquals("andequals", 5);
 		final String expected = BASIC_QUERY
-				+ "AND obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ? ";
+				+ "AND (obj.equals = ? OR obj.orequals = ? AND obj.andnotequals != ? OR obj.ornotequals != ? AND obj.andequals = ?) ";
 		assertQuery(expected, pq);
 		printQuery(expected);
 	}
@@ -299,13 +341,50 @@ public class PropertyQueryTest {
 	public void testJoins() {
 		final PropertyQuery pq = new PropertyQuery();
 		pq.addLeftOuterJoinProperty("leftArm", "arm");
-		pq.addGreaterThen("arm.length", 10).usesAlias();
+		pq.addGreaterThen("length", 10).setAlias("arm");
 
 		final String[] split = splitBasicQuery();
 
 		final String expected = split[0] + "\n" + " LEFT OUTER JOIN obj.leftArm AS arm " + "\n" + split[1] + "AND arm.length > ? ";
 		assertQuery(expected, pq);
 		printQuery(expected);
+
+	}
+
+	/**
+	 * 
+	 */
+	@Test
+	public void testCollectionInCollection() {
+		final List<String> elements = Arrays.asList("one", "two", "shoe");
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("some.collection", elements).setCollectionElement(true);
+			String expected = BASIC_QUERY
+					+ "AND (? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			QueryElement element = pq.addIn("some.collection", elements);
+			element.setCollectionElement(true);
+			element.setInLinkType(QueryElement.OR);
+			String expected = BASIC_QUERY
+					+ "AND (? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
+
+		{
+			final PropertyQuery pq = new PropertyQuery();
+			pq.addIn("some.collection", elements).setCollectionElement(true);
+			pq.addOrIn("some.collection", Arrays.asList(3)).setCollectionElement(true);
+			String expected = BASIC_QUERY
+					+ "AND ((? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) OR ? IN ELEMENTS(obj.some.collection)) ";
+			assertQuery(expected, pq);
+			printQuery(expected);
+		}
 
 	}
 

@@ -69,7 +69,7 @@ public class EntityTableModel {
 	private List<IEntityTableListener> listeners = new ArrayList<IEntityTableListener>();
 	
 	private UserConfigHandler userConfigHandler;
-	
+
 	/**
 	 * @param configuration
 	 * @throws ConfigurationException
@@ -346,7 +346,8 @@ public class EntityTableModel {
 				}
 			}
 			
-			if (col.getFilter() != null) {
+			final QueryElement filter = col.getFilter();
+			if (filter != null) {
 				
 				// quick filters have priority, so if the column specifies a filter that is already specified 
 				// by the quickfilter, we remove it from the column
@@ -371,7 +372,7 @@ public class EntityTableModel {
 				if (quickFilterExists) {
 					col.setFilter(null);
 				} else {
-					userFilter.addQueryElement(col.getFilter());
+					userFilter.addQueryElement(filter);
 				}
 				
 			}
@@ -410,12 +411,12 @@ public class EntityTableModel {
 			}
 		}
 		if (userFilter.size() > 0) {
+			userFilter.resolveAliases();
 			q.addSubQuery(userFilter);
 		}
 		if (customQuickFilter != null && customQuickFilter.size() > 0) {
 			q.addSubQuery(customQuickFilter);
 		}
-		
 		query = q;
 	}
 

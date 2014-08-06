@@ -16,11 +16,11 @@ import static de.xwic.appkit.core.model.queries.QueryElement.OR;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
@@ -33,6 +33,8 @@ import de.xwic.appkit.core.util.CollectionUtil;
  * @author Florian Lippisch
  */
 public class PropertyQuery extends EntityQuery implements IPropertyQuery {
+
+	private final AliasProvider aliasProvider = new AliasProvider("impossibleToHaveThisIHope");
 
 	private boolean hideDeleted = true;
 	
@@ -176,7 +178,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.AND, property, QueryElement.EQUALS, value);
+		return addQueryElement(QueryElement.AND, property, QueryElement.EQUALS, value);
 	}
 
 	/* (non-Javadoc)
@@ -206,7 +208,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(AND, property, LIKE, value);
+		return addQueryElement(AND, property, LIKE, value);
 	}
 
 	/* (non-Javadoc)
@@ -216,7 +218,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(OR, property, LIKE, value);
+		return addQueryElement(OR, property, LIKE, value);
 	}
 
 	/*
@@ -259,7 +261,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.AND, property, QueryElement.NOT_EQUALS, value);
+		return addQueryElement(QueryElement.AND, property, QueryElement.NOT_EQUALS, value);
 
 		
 	}
@@ -272,7 +274,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 		if (property.indexOf(PICKLISTTEXT_INDICATOR) != -1) {
 			joinPicklistEntries = true;
 		}
-		return addAux(QueryElement.OR, property, QueryElement.NOT_EQUALS, value);
+		return addQueryElement(QueryElement.OR, property, QueryElement.NOT_EQUALS, value);
 		
 	}
 
@@ -559,66 +561,59 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.AND, QueryElement.OR, QueryElement.IN);
+	public QueryElement addIn(final String property, final Collection<?> values) {
+		return addInAux(AND, property, QueryElement.IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addNotIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addNotIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.AND, QueryElement.AND, QueryElement.NOT_IN);
+	public QueryElement addNotIn(final String property, final Collection<?> values) {
+		return addInAux(AND, property, QueryElement.NOT_IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addOrIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.OR, QueryElement.OR, QueryElement.IN);
+	public QueryElement addOrIn(final String property, final Collection<?> values) {
+		return addInAux(OR, property, QueryElement.IN, values);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.queries.IPropertyQuery#addOrNotIn(java.lang.String, java.util.Collection)
 	 */
 	@Override
-	public void addOrNotIn(String property, Collection<?> values) {
-		addInAux(property, values, QueryElement.OR, QueryElement.AND, QueryElement.NOT_IN);
+	public QueryElement addOrNotIn(final String property, final Collection<?> values) {
+		return addInAux(OR, property, QueryElement.NOT_IN, values);
 	}
 
 	/**
-	 * @param property
-	 * @param values
-	 * @param linkTypeSubQuery
 	 * @param linkTypeElement
+	 * @param property
 	 * @param operation
+	 * @param values
+	 * @return
 	 */
-	private void addInAux(String property, Collection<?> values, int linkTypeSubQuery, int linkTypeElement, String operation) {
-		List<? extends Collection<?>> sets = CollectionUtil.breakInSets(processCollection(values), 1000);
-		PropertyQuery subQuery = new PropertyQuery();
-		for (Collection ids : sets) {
-			subQuery.addQueryElement(new QueryElement(linkTypeElement, property, operation, ids));
-		}
-		if (sets.isEmpty()) {
-			subQuery.addEquals("id", null);
-		}
-		addQueryElement(new QueryElement(linkTypeSubQuery, subQuery));
+	private QueryElement addInAux(final int linkTypeElement, final String property, final String operation, final Collection<?> values) {
+		final QueryElement addAux = addQueryElement(linkTypeElement, property, operation, idsIfEntities(values));
+		addAux.setRewriteIn(true);
+		return addAux;
 	}
 
 	/**
 	 * @param collection
 	 * @return
 	 */
-	private static Collection<?> processCollection(Collection<?> collection) {
-		if (collection == null) {
-			collection = new HashSet();
-		} else if (!collection.isEmpty()) {
-			if (collection.iterator().next() instanceof IEntity) {
-				collection = EntityUtil.getIds((Collection<? extends IEntity>) collection);
-			}
+	private static Set<?> idsIfEntities(final Collection<?> collection) {
+		if (CollectionUtil.isEmpty(collection)) {
+			return Collections.emptySet();
 		}
-		return collection instanceof HashSet ? collection : new HashSet(collection);
+		if (CollectionUtil.isOf(collection, IEntity.class)) {
+			return EntityUtil.getIds((Collection<? extends IEntity>) collection);
+		}
+		return CollectionUtil.cloneToSet(collection);
 	}
 
 	/**
@@ -676,7 +671,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addEmpty(final String collectionProperty) {
-		return addAux(AND, collectionProperty, IS_EMPTY, null);
+		return addQueryElement(AND, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -684,7 +679,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addNotEmpty(final String collectionProperty) {
-		return addAux(AND, collectionProperty, IS_NOT_EMPTY, null);
+		return addQueryElement(AND, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -692,7 +687,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addOrEmpty(final String collectionProperty) {
-		return addAux(OR, collectionProperty, IS_EMPTY, null);
+		return addQueryElement(OR, collectionProperty, IS_EMPTY, null);
 	}
 
 	/* (non-Javadoc)
@@ -700,7 +695,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 */
 	@Override
 	public QueryElement addOrNotEmpty(final String collectionProperty) {
-		return addAux(OR, collectionProperty, IS_NOT_EMPTY, null);
+		return addQueryElement(OR, collectionProperty, IS_NOT_EMPTY, null);
 	}
 
 	/**
@@ -710,10 +705,72 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	 * @param operation
 	 * @return 
 	 */
-	private QueryElement addAux(final int linkTypeElement, final String property, final String operation, final Object value) {
+	private QueryElement addQueryElement(final int linkTypeElement, final String property, final String operation, final Object value) {
 		final QueryElement element = new QueryElement(linkTypeElement, property, operation, value);
 		elements.add(element);
 		return element;
+	}
+
+	/**
+	 * @param alias
+	 * @return
+	 */
+	public String getAliasMapping(final String alias) {
+		if (leftOuterJoinProperties == null) {
+			return null;
+		}
+		return leftOuterJoinProperties.get(alias);
+	}
+
+	/**
+	 * @param element
+	 * @param userFilter
+	 * @return
+	 */
+	private void fixAliases(final QueryElement element) {
+		final PropertyQuery subQuery = element.getSubQuery();
+		if (subQuery != null) {
+			for (final QueryElement qe : subQuery.getElements()) {
+				fixAliases(qe);
+			}
+		}
+		final String property = element.getPropertyName();
+		if (property == null) {
+			return; // probably only contains a subquery
+		}
+		final String operation = element.getOperation();
+		if (!QueryElement.IS_EMPTY.equals(operation) && !QueryElement.IS_NOT_EMPTY.equals(operation)){
+			return; // currently, only aliasing sets with is empty or is not empty
+		}
+		final AliasHelper helper = AliasHelper.from(property);
+		if (!helper.isRequiresAlias()) {
+			return; // pretty obvious
+		}
+		final String nextAlias = aliasProvider.nextAlias();
+		element.setAlias(nextAlias);
+		addLeftOuterJoinProperty(helper.getJoinProperty(), nextAlias);
+
+		element.setPropertyName(helper.getProperty());
+	}
+
+	/**
+	 * fixes the aliases in the query
+	 */
+	public void resolveAliases() {
+		final List<QueryElement> elements = getElements();
+		if (CollectionUtil.isEmpty(elements)) {
+			return;
+		}
+		final List<QueryElement> newElements = new ArrayList<QueryElement>(elements.size());
+		final Iterator<QueryElement> it = elements.iterator();
+		while (it.hasNext()) {
+			newElements.add(it.next().cloneElement());
+			it.remove();
+		}
+		for (final QueryElement qe : newElements) {
+			fixAliases(qe);
+			addQueryElement(qe);
+		}
 	}
 
 }

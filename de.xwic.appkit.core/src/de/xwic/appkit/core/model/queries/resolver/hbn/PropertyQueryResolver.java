@@ -29,6 +29,7 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
+import de.xwic.appkit.core.util.CollectionUtil;
 
 /**
  * @author Florian Lippisch
@@ -115,11 +116,12 @@ public class PropertyQueryResolver extends QueryResolver {
 		
 		//see if we try to sort for a property1.attribute1
 		Map<String, String> joinMap = new HashMap<String, String>();
+		Map<String, String> remappedJoins = new HashMap<String, String>();
 
 		String sortField = query.getSortField();
 		if (null != sortField && sortField.indexOf('.') > 0) {
 			// add the property to the left outer join properties
-			addToJoin(joinMap, sortField);
+			addToJoin(sortField, joinMap, remappedJoins);
 		}
 		
 		sbFrom.append(createFrom(query, entityClass, justCount));
@@ -128,13 +130,13 @@ public class PropertyQueryResolver extends QueryResolver {
 		for (Map.Entry<String, String> entry : joinPropertiesMap.entrySet()) {
 			String alias = entry.getKey();
 			String property = entry.getValue();
-			joinMap.put(property, alias);
+			add(property, alias, joinMap, remappedJoins);
 		}
 		
 		// add all columns that are a referenced entity
 		if (query.getColumns() != null && !query.getColumns().isEmpty()) {
 			for (String prop : query.getColumns()) {
-				addToJoin(joinMap, prop);
+				addToJoin(prop, joinMap, remappedJoins);
 			}
 		}
 
@@ -145,13 +147,13 @@ public class PropertyQueryResolver extends QueryResolver {
 			sbFrom.append("\n LEFT OUTER JOIN obj.")
 			  .append(property)
 			  .append(" ");
-			if (alias != null && !alias.equals(property)) {
+			if (isAliasRelevant(property, alias)) {
 				// add alias
 				sbFrom.append("AS ").append(alias).append(" ");
 			}
 		}
 		
-		//add custom registered from clauses
+		//add custom registered from clauses 
 		for (int i = 0; i < customFromClauses.size(); i++) {
 			String customFrom = (String) customFromClauses.get(i);
 			sbFrom.append(" ").append(customFrom).append(" ");
@@ -167,7 +169,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		// build query
 		//System.out.println(sb);
 		
-		buildQuery(sb, values, query);
+		buildQuery(sb, values, query, remappedJoins);
 		
 		int size = query.size();
 
@@ -210,37 +212,76 @@ public class PropertyQueryResolver extends QueryResolver {
 	}
 
 	/**
+	 * @param property
+	 * @param alias
+	 * @return
+	 */
+	private static boolean isAliasRelevant(String property, String alias) {
+		return alias != null && !alias.equals(property);
+	}
+
+	/**
+	 * @param property
+	 * @param alias
+	 * @param joinMap
+	 * @param rewrittenJoins
+	 */
+	private static void add(final String property, final String alias, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
+		final String currentAlias = joinMap.get(property);
+		if (isAliasRelevant(property, currentAlias)) {
+			remappedJoins.put(alias, currentAlias);
+		} else {
+			joinMap.put(property, alias);
+		}
+	}
+
+	/**
 	 * @param joinMap
 	 * @param sortField
 	 */
-	private void addToJoin(Map<String, String> joinMap, String s) {
+	private static void addToJoin(String s, final Map<String, String> joinMap, final Map<String, String> remappedJoins) {
 		int idx;
 		while ((idx = s.lastIndexOf('.')) != -1) { 
 			s= s.substring(0, idx);
 			if (!joinMap.containsKey(s)) {
-				joinMap.put(s, null);
+				add(s, null, joinMap, remappedJoins);
 			}
 		}
 	}
 
 	/**
+	 * @param element
+	 * @param remappedJoins
+	 * @return
+	 */
+	private static String getAliasPrefix(final QueryElement element, final Map<String, String> remappedJoins) {
+		String alias = element.getAlias();
+		final String renamedAlias = remappedJoins.get(alias);
+		if (renamedAlias != null) {
+			alias = renamedAlias;
+		}
+		if (alias == null) {
+			return "";
+		}
+		return alias + ".";
+	}
+	/**
 	 * @param sb
 	 * @param values
 	 * @param query
 	 */
-	private void buildQuery(StringBuffer sb, List<QueryElement> values, PropertyQuery query) {
+	private void buildQuery(StringBuffer sb, List<QueryElement> values, PropertyQuery query, final Map<String, String> remappedJoins) {
 
 		boolean first = true;
 		
-		for (Iterator<QueryElement> it = query.getElements().iterator(); it.hasNext(); ) {
-			QueryElement qe = it.next();
-			
-			String aliasPrefix = null;
-			if (qe.getAlias() != null) {
-				aliasPrefix = qe.getAlias() + ".";
-			} else {
-				aliasPrefix = "";
-			}
+		final List<QueryElement> elements = query.getElements();
+		final boolean requiresWrapping = elements.size() > 1;
+		if (requiresWrapping) {
+			sb.append("(");
+		}
+		for (final QueryElement raw : elements) {
+			final QueryElement qe = maybeRewrite(raw);
+			final String aliasPrefix = getAliasPrefix(qe, remappedJoins);
 			
 			if (first) {
 				first = false;
@@ -258,9 +299,7 @@ public class PropertyQueryResolver extends QueryResolver {
 			}
 			if (qe.getSubQuery() != null) {
 				
-				sb.append("(");
-				buildQuery(sb, values, qe.getSubQuery());
-				sb.append(")");
+				buildQuery(sb, values, qe.getSubQuery(), remappedJoins);
 				
 			} else {
 				if (qe.getValue() == null) {
@@ -325,7 +364,9 @@ public class PropertyQueryResolver extends QueryResolver {
 				}
 			}
 		}
-
+		if (requiresWrapping) {
+			sb.append(")");
+		}
 		
 	}
 
@@ -412,6 +453,65 @@ public class PropertyQueryResolver extends QueryResolver {
 		}
 
 		return createHsqlQuery(entityClass, (PropertyQuery) query, justCount, values, customFromClauses, customWhereClauses, customValues);
+	}
+
+	/**
+	 * @param element
+	 * @return
+	 */
+	private static QueryElement maybeRewrite(final QueryElement element) {
+		if (!element.requiresRewrite()) {
+			return element;
+		}
+
+		final Collection<?> collection = (Collection<?>) element.getValue();
+
+		if (collection.isEmpty()) {
+//			this is a problem when we have no id, 
+			return new QueryElement(element.getLinkType(), "id", QueryElement.EQUALS, null); // this kills this element
+		}
+		if (element.isCollectionElement()) {
+			return rewriteCollectionInCollection(element, collection);
+		}
+		if (collection.size() <= QueryElement.MAXIMUM_ELEMENTS_IN) {
+			return element;
+		}
+		final String operation = element.getOperation();
+		final PropertyQuery subQuery = new PropertyQuery();
+
+//		if you want to search in 1000 elements you want "if x is in () or in ()"
+//		if you want to search not in 100 elements, you want "if x not in () and not in ()"
+		final int link = QueryElement.IN.equals(operation) ? QueryElement.OR : QueryElement.AND;
+
+		element.setValue(null); // don't clome the value
+		final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
+		for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
+			final QueryElement clome = element.cloneElement();
+			clome.setLinkType(link);
+			clome.setValue(safeCollection);
+			clome.setRewriteIn(false); // no need to try again
+			subQuery.addQueryElement(clome);
+		}
+		return new QueryElement(element.getLinkType(), subQuery);
+	}
+
+	/**
+	 * @param element
+	 * @param collection
+	 * @return
+	 */
+	private static QueryElement rewriteCollectionInCollection(final QueryElement element, final Collection<?> collection) {
+		final PropertyQuery pq = new PropertyQuery();
+		final int inLinkType = element.getInLinkType();
+		element.setValue(null); // don't clome the value
+		for (final Object object : collection) {
+			final QueryElement clome = element.cloneElement();
+			clome.setValue(object);
+			clome.setOperation(QueryElement.EQUALS);
+			clome.setLinkType(inLinkType);
+			pq.addQueryElement(clome);
+		}
+		return new QueryElement(element.getLinkType(), pq);
 	}
 
 }
