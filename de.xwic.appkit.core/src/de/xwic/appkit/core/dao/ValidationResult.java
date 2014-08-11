@@ -8,7 +8,11 @@
 package de.xwic.appkit.core.dao;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+
+import de.xwic.appkit.core.cluster.INode;
 
 /**
  * Validation result object for checking Entities. <p>
@@ -35,7 +39,7 @@ public class ValidationResult {
 	
 	private Map<String, String> valErrorMap = new HashMap<String, String>();
 	private Map<String, String> valWarningMap = new HashMap<String, String>();
-	
+	private Map<String, List<Object>> valErrorInfoMap = new HashMap<String, List<Object>>();
 	
 	private String entityType = null;
 	
@@ -99,9 +103,19 @@ public class ValidationResult {
 	 * 
 	 * @param property the attribute, which has errors 
 	 * @param errorKey the resource string key
+	 * @param infoProps the additional properties info to be added to the error message.
 	 */
-	public void addError(String property, String errorKey) {
+	public void addError(String property, String errorKey, Object... infoProps) {
 		valErrorMap.put(property, errorKey);
+		if(!valErrorInfoMap.containsKey(property)){
+			valErrorInfoMap.put(property, new LinkedList<Object>());
+		}
+		
+		if(infoProps != null){
+			for (Object infoProp : infoProps) {
+				valErrorInfoMap.get(property).add(infoProp);
+			}
+		}
 	}
 	
 	/**
@@ -112,6 +126,14 @@ public class ValidationResult {
 	 */
 	public Map<String, String> getErrorMap() {
 		return new HashMap<String, String>(valErrorMap);
+	}
+	
+	/**
+	 * Returns the Map with additional error informations for error properties
+	 * @return
+	 */
+	public Map<String, List<Object>> getValErrorInfoMap() {
+		return valErrorInfoMap;
 	}
 	
 	/**

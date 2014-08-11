@@ -364,7 +364,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 						
 						// is it longer than maxLength ? return an error
 						if (str.length() > property.getMaxLength()) {
-							result.addError(keyPropName, ValidationResult.FIELD_TOO_LONG);
+							result.addError(keyPropName, ValidationResult.FIELD_TOO_LONG, property.getMaxLength());
 						}
 					}
 				}
