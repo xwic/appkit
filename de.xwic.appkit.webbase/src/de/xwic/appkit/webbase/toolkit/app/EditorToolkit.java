@@ -407,9 +407,18 @@ public class EditorToolkit {
 					if (value.getClass().equals(String.class)) {
 						// convert int to String
 						String s = (String) value;
-						value = Integer.valueOf(s);
-					} else if (value.getClass().equals(Double.class)) {
-						value = ((Double) value);
+						if(s == null || s.length() == 0){
+							Class<?> propertyType = propInfo.getPropertyType();
+							if(propertyType.equals(Integer.class)){
+								value = null;
+							}else {
+								value = 0;
+							}
+						}else {
+							value = Integer.valueOf(s);
+						}
+					} else if (value.getClass().equals(Integer.class)) {
+						value = ((Integer) value);
 					}
 				}
 				if (propInfo.getPropertyType().equals(Double.class)
@@ -417,8 +426,13 @@ public class EditorToolkit {
 					if (value.getClass().equals(String.class)) {
 						// convert String to decimal
 						String s = ((String) value).trim();
-						if (s.length() == 0) {
-							value = new Double(0);
+						if(s == null || s.length() == 0){
+							Class<?> propertyType = propInfo.getPropertyType();
+							if(propertyType.equals(Double.class)){
+								value = null;
+							}else {
+								value = new Double(0);
+							}
 						} else {
 							value = Double.valueOf(s);
 						}
