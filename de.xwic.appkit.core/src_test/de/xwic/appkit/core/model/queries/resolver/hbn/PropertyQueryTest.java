@@ -20,8 +20,6 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import de.xwic.appkit.core.dao.Entity;
-import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
@@ -36,10 +34,10 @@ public class PropertyQueryTest {
 
 	private static final Class<IMitarbeiter> MITARBEITER = IMitarbeiter.class;
 
-	private static final IEntityQueryResolver resolver = new PropertyQueryResolver();
+	private static final PropertyQueryResolver resolver = new PropertyQueryResolver();
 	private static final String BASIC_QUERY = " FROM de.xwic.appkit.core.model.entities.IMitarbeiter AS obj \n WHERE  obj.deleted = 0 ";
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testSimpleQuery() {
@@ -49,7 +47,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testInQuery() {
@@ -141,7 +139,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testNullNotNull() {
@@ -154,24 +152,15 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = NullPointerException.class)
 	public void testNullQuery() {
 		generate(null);
 	}
 
 	/**
-	 * 
-	 */
-	@Test (expected = IllegalArgumentException.class)
-	public void testWrongQuery() {
-		generate(new EntityQuery() {
-		});
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	@Test (expected = IllegalArgumentException.class)
 	public void testBadQueryElement() {
@@ -182,7 +171,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testCollectionsEmptyNotEmpty() {
@@ -198,7 +187,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testEntityEquals() {
@@ -222,7 +211,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testColumnsOnly() {
@@ -234,7 +223,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test (expected = IllegalArgumentException.class)
 	public void testBadNullElement() {
@@ -256,12 +245,12 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testIgnoreEmptyColumns() {
 		final PropertyQuery pq = new PropertyQuery();
-		List<String> emptyList = Collections.emptyList();
+		final List<String> emptyList = Collections.emptyList();
 		pq.setColumns(emptyList);
 		final String expected = "select obj.id" + BASIC_QUERY + " ";
 		assertQuery(expected, pq);
@@ -269,7 +258,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test (expected = IllegalArgumentException.class)
 	public void testManuallyAddedIn() {
@@ -279,7 +268,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testSearchInCollection() {
@@ -300,7 +289,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testLike() {
@@ -318,7 +307,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testEqualsNotEquals() {
@@ -335,7 +324,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testJoins() {
@@ -352,7 +341,7 @@ public class PropertyQueryTest {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	@Test
 	public void testCollectionInCollection() {
@@ -360,17 +349,17 @@ public class PropertyQueryTest {
 		{
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addIn("some.collection", elements).setCollectionElement(true);
-			String expected = BASIC_QUERY
+			final String expected = BASIC_QUERY
 					+ "AND (? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) ";
 			assertQuery(expected, pq);
 			printQuery(expected);
 		}
 		{
 			final PropertyQuery pq = new PropertyQuery();
-			QueryElement element = pq.addIn("some.collection", elements);
+			final QueryElement element = pq.addIn("some.collection", elements);
 			element.setCollectionElement(true);
 			element.setInLinkType(QueryElement.OR);
-			String expected = BASIC_QUERY
+			final String expected = BASIC_QUERY
 					+ "AND (? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection) OR ? IN ELEMENTS(obj.some.collection)) ";
 			assertQuery(expected, pq);
 			printQuery(expected);
@@ -380,7 +369,7 @@ public class PropertyQueryTest {
 			final PropertyQuery pq = new PropertyQuery();
 			pq.addIn("some.collection", elements).setCollectionElement(true);
 			pq.addOrIn("some.collection", Arrays.asList(3)).setCollectionElement(true);
-			String expected = BASIC_QUERY
+			final String expected = BASIC_QUERY
 					+ "AND ((? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection) AND ? IN ELEMENTS(obj.some.collection)) OR ? IN ELEMENTS(obj.some.collection)) ";
 			assertQuery(expected, pq);
 			printQuery(expected);
@@ -402,7 +391,7 @@ public class PropertyQueryTest {
 	 * @param expectedQuery
 	 * @param query
 	 */
-	private static void assertQuery(final String expectedQuery, final EntityQuery query) {
+	private static void assertQuery(final String expectedQuery, final PropertyQuery query) {
 		assertEquals(expectedQuery, generate(query));
 	}
 
@@ -410,7 +399,7 @@ public class PropertyQueryTest {
 	 * @param query
 	 * @return
 	 */
-	private static String generate(final EntityQuery query) {
+	private static String generate(final PropertyQuery query) {
 		return generate(query, new ArrayList<QueryElement>());
 	}
 
@@ -421,15 +410,15 @@ public class PropertyQueryTest {
 	 * @param customFromClauses
 	 * @param customValues
 	 */
-	private static String generate(final EntityQuery query, final List<QueryElement> values) {
+	private static String generate(final PropertyQuery query, final List<QueryElement> values) {
 		final List<String> customWhereClauses = new ArrayList<String>();
 		final List<String> customFromClauses = new ArrayList<String>();
 		final List<Object> customValues = new ArrayList<Object>();
-		return resolver.generateQuery(MITARBEITER, query, false, values, customFromClauses, customWhereClauses, customValues);
+		return resolver.createHsqlQuery(MITARBEITER, query, false, values, customFromClauses, customWhereClauses, customValues);
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static void printQuery(final String query) {
 		final StringBuilder sb = new StringBuilder("=== ");

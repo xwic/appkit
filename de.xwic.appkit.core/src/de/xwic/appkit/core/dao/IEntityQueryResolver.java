@@ -7,9 +7,6 @@
  */
 package de.xwic.appkit.core.dao;
 
-import java.util.List;
-
-import de.xwic.appkit.core.model.queries.QueryElement;
 
 
 /**
@@ -28,18 +25,5 @@ public interface IEntityQueryResolver {
 	 * @return
 	 */
 	public Object resolve(Class<? extends Object> entityClass, EntityQuery query, boolean justCount);
-
-	/**
-	 * @param entityClass
-	 * @param query
-	 * @param justCount
-	 * @param values
-	 * @param customFromClauses
-	 * @param customWhereClauses
-	 * @param customValues
-	 * @return
-	 */
-	String generateQuery(Class<? extends Object> entityClass, EntityQuery query, boolean justCount, List<QueryElement> values,
-			List<String> customFromClauses, List<String> customWhereClauses, List<Object> customValues);
 
 }
