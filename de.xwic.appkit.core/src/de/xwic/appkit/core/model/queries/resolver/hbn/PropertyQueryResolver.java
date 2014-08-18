@@ -6,7 +6,6 @@
  *
  */
 package de.xwic.appkit.core.model.queries.resolver.hbn;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -15,8 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -61,6 +60,8 @@ public class PropertyQueryResolver extends QueryResolver {
 	protected Object resolve(Class<? extends Object> entityClass, EntityQuery entityQuery, boolean justCount, List<String> customFromClauses, List<String> customWhereClauses, List<Object> customValues) {
 		PropertyQuery query = (PropertyQuery)entityQuery;
 
+		rewriteQueryElements(query);
+
 		List<QueryElement> values = new ArrayList<QueryElement>();
 		String hsql = createHsqlQuery(entityClass, query, justCount, values, customFromClauses, customWhereClauses, customValues);
 //		System.out.println(hsql);
@@ -97,7 +98,30 @@ public class PropertyQueryResolver extends QueryResolver {
 		return q;
 	}
 	
-	
+	/**
+	 * @param elements
+	 */
+	private static void rewriteQueryElements(final PropertyQuery query) {
+		if (null == query) {
+			return;
+		}
+		final List<QueryElement> elements = query.getElements();
+		final Map<Integer, QueryElement> rewrites = new HashMap<Integer, QueryElement>();
+		for (int i = 0, to = elements.size(); i < to; i++) {
+			final QueryElement existingElement = elements.get(i);
+			final QueryElement maybeRewrite = maybeRewrite(existingElement);
+			if (existingElement != maybeRewrite) {
+				rewrites.put(i, maybeRewrite);
+			}
+		}
+		for (final Entry<Integer, QueryElement> entry : rewrites.entrySet()) {
+			elements.set(entry.getKey(), entry.getValue());
+		}
+		for (final QueryElement queryElement : elements) {
+			rewriteQueryElements(queryElement.getSubQuery());
+		}
+	}
+
 	/**
 	 * @param entityClass
 	 * @param query
