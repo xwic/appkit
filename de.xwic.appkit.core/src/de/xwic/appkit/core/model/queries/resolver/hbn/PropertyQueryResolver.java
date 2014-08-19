@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,8 +59,6 @@ public class PropertyQueryResolver extends QueryResolver {
 	protected Object resolve(Class<? extends Object> entityClass, EntityQuery entityQuery, boolean justCount, List<String> customFromClauses, List<String> customWhereClauses, List<Object> customValues) {
 		PropertyQuery query = (PropertyQuery)entityQuery;
 
-		rewriteQueryElements(query);
-
 		List<QueryElement> values = new ArrayList<QueryElement>();
 		String hsql = createHsqlQuery(entityClass, query, justCount, values, customFromClauses, customWhereClauses, customValues);
 //		System.out.println(hsql);
@@ -96,30 +93,6 @@ public class PropertyQueryResolver extends QueryResolver {
 			idx += setValues(query, q, (QueryElement)value, idx);
 		}
 		return q;
-	}
-	
-	/**
-	 * @param elements
-	 */
-	private static void rewriteQueryElements(final PropertyQuery query) {
-		if (null == query) {
-			return;
-		}
-		final List<QueryElement> elements = query.getElements();
-		final Map<Integer, QueryElement> rewrites = new HashMap<Integer, QueryElement>();
-		for (int i = 0, to = elements.size(); i < to; i++) {
-			final QueryElement existingElement = elements.get(i);
-			final QueryElement maybeRewrite = maybeRewrite(existingElement);
-			if (existingElement != maybeRewrite) {
-				rewrites.put(i, maybeRewrite);
-			}
-		}
-		for (final Entry<Integer, QueryElement> entry : rewrites.entrySet()) {
-			elements.set(entry.getKey(), entry.getValue());
-		}
-		for (final QueryElement queryElement : elements) {
-			rewriteQueryElements(queryElement.getSubQuery());
-		}
 	}
 
 	/**
@@ -492,7 +465,6 @@ public class PropertyQueryResolver extends QueryResolver {
 //		if you want to search not in 100 elements, you want "if x not in () and not in ()"
 		final int link = QueryElement.IN.equals(operation) ? QueryElement.OR : QueryElement.AND;
 
-		element.setValue(null); // don't clome the value
 		final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
 		for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
 			final QueryElement clome = element.cloneElement();
@@ -512,7 +484,6 @@ public class PropertyQueryResolver extends QueryResolver {
 	private static QueryElement rewriteCollectionInCollection(final QueryElement element, final Collection<?> collection) {
 		final PropertyQuery pq = new PropertyQuery();
 		final int inLinkType = element.getInLinkType();
-		element.setValue(null); // don't clome the value
 		for (final Object object : collection) {
 			final QueryElement clome = element.cloneElement();
 			clome.setValue(object);
