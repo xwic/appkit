@@ -246,7 +246,7 @@ public class CollectionUtil {
 	 * @param emptyMessage
 	 * @return
 	 */
-	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator, String emptyMessage) {
+	public static <O> String join(final Collection<O> collection, final ILazyEval<O, String> evaluator, final String separator, final String emptyMessage) {
 		final List<String> strings = new ArrayList<String>();
 		createCollection(collection, evaluator, strings);
 
@@ -262,7 +262,7 @@ public class CollectionUtil {
 	 * @param evaluator
 	 * @return an empty string if no values
 	 */
-	public static <O> String join(Collection<O> collection, ILazyStringEval<O> evaluator, String separator) {
+	public static <O> String join(final Collection<O> collection, final ILazyEval<O, String> evaluator, final String separator) {
 		return join(collection, evaluator, separator, "");
 	}
 
