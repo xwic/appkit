@@ -11,7 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.EntityQueryAdapter;
+import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.security.IRight;
 import de.xwic.appkit.core.security.impl.Right;
@@ -22,7 +22,7 @@ import de.xwic.appkit.core.security.queries.UniqueRightQuery;
  *  
  * @author Florian Lippisch
  */
-public class UniqueRightResolver extends EntityQueryAdapter {
+public class UniqueRightResolver implements IEntityQueryResolver {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)
