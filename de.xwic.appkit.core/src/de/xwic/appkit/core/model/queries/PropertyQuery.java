@@ -452,13 +452,6 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	}
 
 	/**
-	 * @return the leftOuterJoinProperties as List
-	 */
-	public List<String> getLeftOuterJoinProperties() {
-		return new ArrayList<String>(leftOuterJoinProperties.values());
-	}
-
-	/**
 	 * @return the leftOuterJoinProperties as Map
 	 */
 	public Map<String, String> getLeftOuterJoinPropertiesMap() {
