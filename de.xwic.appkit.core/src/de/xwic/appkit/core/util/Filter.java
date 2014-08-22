@@ -3,7 +3,6 @@
  */
 package de.xwic.appkit.core.util;
 
-import de.xwic.appkit.core.util.IFilter;
 
 /**
  * @author bogdan
@@ -14,7 +13,7 @@ public abstract class Filter<E> implements IFilter<E> {
 	/**
 	 * 
 	 */
-	public Filter() {
+	private Filter() {
 	}
 
 	/**
@@ -69,6 +68,20 @@ public abstract class Filter<E> implements IFilter<E> {
 	 */
 	private Filter<E> getThis(){
 		return this;
+	}
+	
+	/**
+	 * Wraps an IFilter instance
+	 * @param wrapped
+	 * @return
+	 */
+	public static <T> Filter<T> of(final IFilter<T> wrapped){
+		return new Filter<T>(){
+			@Override
+			public boolean keep(T element) {
+				return wrapped.keep(element);
+			};
+		};
 	}
 
 }
