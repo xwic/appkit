@@ -3,7 +3,7 @@
     <parent>
         <groupId>de.xwic.appkit</groupId>
         <artifactId>appkit</artifactId>
-        <version>5.2.8-SNAPSHOT</version>
+        <version>5.2.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>APPKIT::WEBBASE</name>
@@ -15,7 +15,7 @@
         <dependency>
             <groupId>de.xwic.appkit</groupId>
             <artifactId>appkit-core</artifactId>
-            <version>5.2.8-SNAPSHOT</version>
+            <version>5.2.8</version>
         </dependency>
 
 		<!-- jWic dependencies -->
