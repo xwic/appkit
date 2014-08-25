@@ -149,7 +149,10 @@ public class NumberFilter extends AbstractFilterControl {
 		
 		Object from = getNumber(type, fromText);
 		Object to = getNumber(type, toText);
-		
+		if (null == from && null == to) {
+			return null; // bail here, we don't want something like number is null
+		}
+
 		if ("in".equals(logic)) {
 			if (to == null && from != null) {
 				logic = "gte";
