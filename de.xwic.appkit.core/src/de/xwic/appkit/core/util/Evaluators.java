@@ -16,7 +16,7 @@ public final class Evaluators {
 	}
 
 	@SuppressWarnings ("rawtypes")
-	private static ILazyEval IDENTITY_EVALUATOR = new ILazyEval() {
+	private static Function IDENTITY_EVALUATOR = new Function() {
 
 		@Override
 		public Object evaluate(final Object obj) {
@@ -28,7 +28,7 @@ public final class Evaluators {
 	 * @return
 	 */
 	@SuppressWarnings ("unchecked")
-	public static <E> ILazyEval<E, E> identity() {
+	public static <E> Function<E, E> identity() {
 		return IDENTITY_EVALUATOR;
 	}
 

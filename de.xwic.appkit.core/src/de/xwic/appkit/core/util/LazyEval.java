@@ -9,7 +9,7 @@ package de.xwic.appkit.core.util;
  * @author boogie
  * @since  Aug 18, 2014
  */
-public abstract class LazyEval<A, B> implements ILazyEval<A, B> {
+public abstract class LazyEval<A, B> implements Function<A, B> {
 
 	private LazyEval() {
 	}
@@ -29,7 +29,7 @@ public abstract class LazyEval<A, B> implements ILazyEval<A, B> {
 	 * @param next - the next evaluator in the chain
 	 * @return a new LazyEval instance representing a sequence call of this and next
 	 */
-	public <C> LazyEval<A, C> andThen(final ILazyEval<B, C> next){
+	public <C> LazyEval<A, C> andThen(final Function<B, C> next){
 		return new LazyEval<A, C>() {
 			@Override
 			public C evaluate(A obj) {
@@ -47,7 +47,7 @@ public abstract class LazyEval<A, B> implements ILazyEval<A, B> {
 	 * @param eval
 	 * @return
 	 */
-	public static <A, B> LazyEval<A, B> of(final ILazyEval<A, B> eval){
+	public static <A, B> LazyEval<A, B> of(final Function<A, B> eval){
 		return new LazyEval<A, B>() {
 			@Override
 			public B evaluate(A obj) {

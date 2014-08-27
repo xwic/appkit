@@ -34,7 +34,7 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
-import de.xwic.appkit.core.util.ILazyEval;
+import de.xwic.appkit.core.util.Function;
 import de.xwic.appkit.core.util.MapUtil;
 
 /**
@@ -158,7 +158,7 @@ public final class EtoSerializer {
 	private static Map<String, PropertyDescriptor> getMap(final Object o) throws IntrospectionException {
 		final BeanInfo beanInfo = Introspector.getBeanInfo(o.getClass(), Introspector.USE_ALL_BEANINFO);
 		final List<PropertyDescriptor> asList = Arrays.asList(beanInfo.getPropertyDescriptors());
-		final Map<String, PropertyDescriptor> map = MapUtil.generateMap(asList, new ILazyEval<PropertyDescriptor, String>() {
+		final Map<String, PropertyDescriptor> map = MapUtil.generateMap(asList, new Function<PropertyDescriptor, String>() {
 
 			@Override
 			public String evaluate(final PropertyDescriptor obj) {

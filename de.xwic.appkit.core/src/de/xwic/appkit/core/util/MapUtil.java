@@ -30,7 +30,7 @@ public final class MapUtil {
 	 * @param generator the key generator
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(final Collection<? extends Obj> items, final ILazyEval<Obj, Key> generator) {
+	public static <Key, Obj> Map<Key, Obj> generateMap(final Collection<? extends Obj> items, final Function<Obj, Key> generator) {
 		return generateMap(items, generator, Evaluators.<Obj> identity());
 	}
 
@@ -44,7 +44,7 @@ public final class MapUtil {
 	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
 	public static <K, V, X> Map<K, V> generateMap(final Collection<? extends X> items,
-			final ILazyEval<X, K> keyGenerator, final ILazyEval<X, V> valueGenerator) {
+			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
 		final Map<K, V> map = new HashMap<K, V>();
 
 		if (items == null) {
@@ -93,7 +93,7 @@ public final class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public abstract static class LazyInit<V> implements ILazyEval<Object, V>, Callable<V> {
+	public abstract static class LazyInit<V> implements Function<Object, V>, Callable<V> {
 
 		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
@@ -115,7 +115,7 @@ public final class MapUtil {
 	 * @param initializer
 	 * @return
 	 */
-	public final static <K, X, I, V extends X> Map<K, V> wrapAI(final Map<K, V> map, final ILazyEval<I, X> initializer) {
+	public final static <K, X, I, V extends X> Map<K, V> wrapAI(final Map<K, V> map, final Function<I, X> initializer) {
 		return new AIMap<K, X, I, V>(map, initializer);
 	}
 
@@ -125,7 +125,7 @@ public final class MapUtil {
 	 * @param initializer
 	 * @return
 	 */
-	public final static <K, X, I, V extends X> Map<K, V> aiMap(final ILazyEval<I, X> initializer) {
+	public final static <K, X, I, V extends X> Map<K, V> aiMap(final Function<I, X> initializer) {
 		return wrapAI(new LinkedHashMap<K, V>(), initializer);
 	}
 }
