@@ -14,12 +14,13 @@ package de.xwic.appkit.core.util;
  * @author Alexandru Bledea
  * @since Jul 9, 2013
  */
-public interface ILazyEval<O, R> extends ExceptionalFunction<O, R> {
+public interface ExceptionalFunction<O, R> {
 
-	/* (non-Javadoc)
-	 * @see com.notbed.util.map.IEvaluatorWithException#evaluate(java.lang.Object)
+	/**
+	 * @param obj
+	 * @return
+	 * @throws Exception
 	 */
-	@Override
-	R evaluate(O obj);
+	R evaluate(O obj) throws Exception;
 
 }
