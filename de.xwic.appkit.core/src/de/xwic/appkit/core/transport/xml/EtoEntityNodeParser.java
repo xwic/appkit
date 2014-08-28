@@ -3,6 +3,7 @@
  */
 package de.xwic.appkit.core.transport.xml;
 
+import java.beans.IntrospectionException;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -35,14 +36,21 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 			throw new TransportException("Missing id and version.");
 		}
 		
+//		etoClass can differ, this means that the descriptor can also differ, friend
+		EntityDescriptor descriptor = descr;
 		Class etoClass = entityClass;
-		
+
 		String sType = elmEntity.attributeValue("type");
 		if (etoClass != null && !etoClass.getName().equals(sType) && sType != null && sType.length() != 0) {
 			try {
 				etoClass = DAOSystem.getModelClassLoader().loadClass(sType);
+				if (requiresNewDescriptor(entityClass, etoClass)) {
+					descriptor = new EntityDescriptor(etoClass);
+				}
 			} catch (ClassNotFoundException e) {
-				throw new TransportException("Wront type specified" + sType, e);
+				throw new TransportException("Wront type specified " + sType, e);
+			} catch (final IntrospectionException e) {
+				throw new TransportException("Failed to read type " + sType, e);
 			}
 		}
 		
@@ -59,10 +67,8 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 		for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext(); ) {
 			Element elmProp = itP.next();
 			String x = elmProp.getName();
-			Property prop = descr.getProperty(x);
+			Property prop = descriptor.getProperty(x);
 			if (prop != null) {
-				
-				
 				Class<?> propertyType = prop.getDescriptor().getPropertyType();
 				boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
 				boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
@@ -104,6 +110,18 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 		}
 		
 		return eto;
+	}
+
+	/**
+	 * @param entityClass
+	 * @param etoClass
+	 * @return
+	 */
+	private static boolean requiresNewDescriptor(final Class<?> entityClass, final Class<?> etoClass) {
+		if (etoClass == null) {
+			return false;
+		}
+		return !etoClass.getName().equals(entityClass.getName());
 	}
 
 }
