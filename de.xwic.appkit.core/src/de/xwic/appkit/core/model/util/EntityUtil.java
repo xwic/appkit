@@ -20,7 +20,7 @@ import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.util.CollectionUtil;
-import de.xwic.appkit.core.util.ILazyEval;
+import de.xwic.appkit.core.util.Function;
 
 /**
  * @author Alexandru Bledea
@@ -34,7 +34,7 @@ public final class EntityUtil {
 	private static final Collection<Class<? extends IEntity>> INVALID_TYPES =
 			Collections.unmodifiableCollection(Arrays.asList(IEntity.class, IHistory.class));
 
-	public final static ILazyEval<IEntity, Integer> ENTITY_ID_EVALUATOR = new ILazyEval<IEntity, Integer>() {
+	public final static Function<IEntity, Integer> ENTITY_ID_EVALUATOR = new Function<IEntity, Integer>() {
 
 		@Override
 		public Integer evaluate(final IEntity obj) {

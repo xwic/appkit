@@ -10,7 +10,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.EntityQueryAdapter;
+import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.model.queries.PicklistQuery;
@@ -21,7 +21,7 @@ import de.xwic.appkit.core.model.queries.PicklistQuery;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class PickListQueryResolver extends EntityQueryAdapter {
+public class PickListQueryResolver implements IEntityQueryResolver {
 
 	
 	/* (non-Javadoc)

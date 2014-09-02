@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.EntityQueryAdapter;
+import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
@@ -24,7 +24,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * @author Ronny Pfretzschner
  *
  */
-public abstract class QueryResolver extends EntityQueryAdapter {
+public abstract class QueryResolver implements IEntityQueryResolver {
 
 	private final static String ORDER_PROP_NAME = "pentry";
 	private final static int TYPE_PROPERTY = 0;

@@ -11,7 +11,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.EntityQueryAdapter;
+import de.xwic.appkit.core.dao.IEntityQueryResolver;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 import de.xwic.appkit.core.security.impl.User;
 import de.xwic.appkit.core.security.queries.UserQuery;
@@ -19,7 +19,7 @@ import de.xwic.appkit.core.security.queries.UserQuery;
 /**
  * @author Florian Lippisch
  */
-public class UserQueryResolver extends EntityQueryAdapter {
+public class UserQueryResolver implements IEntityQueryResolver {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)

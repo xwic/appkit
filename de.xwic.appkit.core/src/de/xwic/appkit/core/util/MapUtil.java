@@ -14,7 +14,13 @@ import java.util.concurrent.Callable;
  * @author Alexandru Bledea
  * @since Jul 9, 2013
  */
-public class MapUtil {
+public final class MapUtil {
+
+	/**
+	 *
+	 */
+	private MapUtil() {
+	}
 
 	/**
 	 * Used to generate a map from the collection if <b>items</b> by using a <b>evaluator</b>. <br>
@@ -24,20 +30,38 @@ public class MapUtil {
 	 * @param generator the key generator
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <Key, Obj> Map<Key, Obj> generateMap(final Collection<? extends Obj> items, final ILazyEval<Obj, Key> generator) {
-		final Map<Key, Obj> map = new HashMap<Key, Obj>();
+	public static <Key, Obj> Map<Key, Obj> generateMap(final Collection<? extends Obj> items, final Function<Obj, Key> generator) {
+		return generateMap(items, generator, Evaluators.<Obj> identity());
+	}
+
+	/**
+	 * Used to generate a map from the collection if <b>items</b> by using <b>evaluators</b>. <br>
+	 * If there are two objects with the same key, the latest entry will override the previous entry<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
+	 * @param items the collection from which we create the map
+	 * @param keyGenerator the key generator
+	 * @param valueGenerator the value generator
+	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
+	 */
+	public static <K, V, X> Map<K, V> generateMap(final Collection<? extends X> items,
+			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
+		final Map<K, V> map = new HashMap<K, V>();
 
 		if (items == null) {
 			return map;
 		}
 
-		for (final Obj obj : items) {
+		for (final X obj : items) {
 			if (obj == null) {
 				continue;
 			}
-			final Key key = generator.evaluate(obj);
-			if (key != null) {
-				map.put(key, obj);
+			final K key = keyGenerator.evaluate(obj);
+			if (null == key) {
+				continue;
+			}
+			final V value = valueGenerator.evaluate(obj);
+			if (null != value){
+				map.put(key, value);
 			}
 		}
 
@@ -69,7 +93,7 @@ public class MapUtil {
 	 * @param <V>
 	 *
 	 */
-	public abstract static class LazyInit<V> implements ILazyEval<Object, V>, Callable<V> {
+	public abstract static class LazyInit<V> implements Function<Object, V>, Callable<V> {
 
 		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.IEvaluator#evaluate(java.lang.Object)
@@ -78,7 +102,7 @@ public class MapUtil {
 		public final V evaluate(final Object ignoreThis) {
 			try {
 				return call();
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				throw new IllegalStateException("Error creating new object", e);
 			}
 		}
@@ -91,7 +115,7 @@ public class MapUtil {
 	 * @param initializer
 	 * @return
 	 */
-	public final static <K, X, I, V extends X> Map<K, V> wrapAI(final Map<K, V> map, final ILazyEval<I, X> initializer) {
+	public final static <K, X, I, V extends X> Map<K, V> wrapAI(final Map<K, V> map, final Function<I, X> initializer) {
 		return new AIMap<K, X, I, V>(map, initializer);
 	}
 
@@ -101,7 +125,7 @@ public class MapUtil {
 	 * @param initializer
 	 * @return
 	 */
-	public final static <K, X, I, V extends X> Map<K, V> aiMap(final ILazyEval<I, X> initializer) {
+	public final static <K, X, I, V extends X> Map<K, V> aiMap(final Function<I, X> initializer) {
 		return wrapAI(new LinkedHashMap<K, V>(), initializer);
 	}
 }

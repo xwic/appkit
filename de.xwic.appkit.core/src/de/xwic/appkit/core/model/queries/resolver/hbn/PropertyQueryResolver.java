@@ -6,7 +6,6 @@
  *
  */
 package de.xwic.appkit.core.model.queries.resolver.hbn;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -16,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -96,8 +94,7 @@ public class PropertyQueryResolver extends QueryResolver {
 		}
 		return q;
 	}
-	
-	
+
 	/**
 	 * @param entityClass
 	 * @param query
@@ -440,21 +437,6 @@ public class PropertyQueryResolver extends QueryResolver {
 		return i;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.EntityQueryAdapter#generateQuery(java.lang.Class, de.xwic.appkit.core.dao.EntityQuery, boolean, java.util.List, java.util.List, java.util.List, java.util.List)
-	 */
-	@Override
-	public String generateQuery(final Class<? extends Object> entityClass, final EntityQuery query, final boolean justCount,
-			final List<QueryElement> values, final List<String> customFromClauses, final List<String> customWhereClauses, 
-			final List<Object> customValues) {
-		Validate.notNull(query);
-		if (!(query instanceof PropertyQuery)) {
-			throw new IllegalArgumentException();
-		}
-
-		return createHsqlQuery(entityClass, (PropertyQuery) query, justCount, values, customFromClauses, customWhereClauses, customValues);
-	}
-
 	/**
 	 * @param element
 	 * @return
@@ -483,7 +465,6 @@ public class PropertyQueryResolver extends QueryResolver {
 //		if you want to search not in 100 elements, you want "if x not in () and not in ()"
 		final int link = QueryElement.IN.equals(operation) ? QueryElement.OR : QueryElement.AND;
 
-		element.setValue(null); // don't clome the value
 		final int max = QueryElement.MAXIMUM_ELEMENTS_IN;
 		for (final Collection<?> safeCollection : CollectionUtil.breakInSets(collection, max)) {
 			final QueryElement clome = element.cloneElement();
@@ -503,7 +484,6 @@ public class PropertyQueryResolver extends QueryResolver {
 	private static QueryElement rewriteCollectionInCollection(final QueryElement element, final Collection<?> collection) {
 		final PropertyQuery pq = new PropertyQuery();
 		final int inLinkType = element.getInLinkType();
-		element.setValue(null); // don't clome the value
 		for (final Object object : collection) {
 			final QueryElement clome = element.cloneElement();
 			clome.setValue(object);

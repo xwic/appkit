@@ -12,13 +12,13 @@ import java.util.Set;
 final class AIMap<K, X, I, V extends X> implements Map<K, V> {
 
 	private final Map<K, V> map;
-	private final ILazyEval<I, X> initializer;
+	private final Function<I, X> initializer;
 
 	/**
 	 * @param map
 	 * @param initializer
 	 */
-	public AIMap(Map<K, V> map, ILazyEval<I, X> initializer) {
+	public AIMap(Map<K, V> map, Function<I, X> initializer) {
 		this.map = map;
 		this.initializer = initializer;
 	}
@@ -139,7 +139,7 @@ final class AIMap<K, X, I, V extends X> implements Map<K, V> {
 	 * @param initializer
 	 * @return
 	 */
-	public final static <K, X, I, V extends X> Map<K, V> wrap(Map<K, V> map, ILazyEval<I, X> initializer) {
+	public final static <K, X, I, V extends X> Map<K, V> wrap(Map<K, V> map, Function<I, X> initializer) {
 		return new AIMap<K, X, I, V>(map, initializer);
 	}
 }
