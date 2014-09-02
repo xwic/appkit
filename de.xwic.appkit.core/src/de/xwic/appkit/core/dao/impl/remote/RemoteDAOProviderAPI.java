@@ -148,6 +148,10 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 */
 	@Override
 	public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId) {
-		throw new UnsupportedOperationException();
+        try {
+            return client.getETOCollection(entityImplClass.getName(), entityId, propertyId);
+        } catch (Exception e) {
+            throw new DataAccessException("Error getting collection property: " + entityImplClass.getName() + " -> " + entityId, e);
+        }
 	}
 }
