@@ -333,6 +333,21 @@ public final class CollectionUtil {
 	}
 
 	/**
+	 * @param iterable
+	 * @return null if the iterable element is null or if there are no elements in it or the first element if it does
+	 */
+	public static <E> E first(final Iterable<E> iterable) {
+		if (null == iterable) {
+			return null;
+		}
+		final Iterator<E> it = iterable.iterator();
+		if (!it.hasNext()) {
+			return null;
+		}
+		return it.next();
+	}
+
+	/**
 	 * @author Alexandru Bledea
 	 * @since Feb 4, 2014
 	 */
