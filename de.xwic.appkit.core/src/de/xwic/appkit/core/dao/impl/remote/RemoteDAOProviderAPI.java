@@ -15,8 +15,6 @@ import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
-import de.xwic.appkit.core.model.entities.IPicklistEntry;
-import de.xwic.appkit.core.model.entities.IPicklistText;
 import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
@@ -147,9 +145,15 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
 	 */
 	@Override
-	public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId) {
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
         try {
-            return client.getETOCollection(entityImplClass.getName(), entityId, propertyId);
+            Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);
+            List<EntityTransferObject> entityTransferObjects = (List<EntityTransferObject>) client.getETOCollection(trueClass.getName(), entityId, propertyId);
+            List<IEntity> entities = new ArrayList<IEntity>(entityTransferObjects.size());
+            for(EntityTransferObject entityTransferObject : entityTransferObjects) {
+                entities.add(EntityProxyFactory.createEntityProxy(entityTransferObject));
+            }
+            return entities;
         } catch (Exception e) {
             throw new DataAccessException("Error getting collection property: " + entityImplClass.getName() + " -> " + entityId, e);
         }
