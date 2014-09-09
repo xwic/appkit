@@ -291,7 +291,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
      * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
      */
 	@Override
-    public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId) {
+    public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
     	
     	String hql = "select elements(obj." + propertyId + ") from " + entityImplClass.getName() + " obj where obj.id = ?";
     	Query query = session.createQuery(hql);

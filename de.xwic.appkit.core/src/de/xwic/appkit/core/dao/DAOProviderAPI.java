@@ -68,6 +68,6 @@ public interface DAOProviderAPI {
 	 * @param propertyId
 	 * @return
 	 */
-	public Collection<?> getCollectionProperty(Class<? extends Entity> entityImplClass, int entityId, String propertyId);
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId);
 
 }
