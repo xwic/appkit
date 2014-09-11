@@ -370,7 +370,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	/**
 	 * @return the currentPage
 	 */
-	protected final WizardPage getCurrentPage() {
+	protected final WP getCurrentPage() {
 		return currentPage;
 	}
 
