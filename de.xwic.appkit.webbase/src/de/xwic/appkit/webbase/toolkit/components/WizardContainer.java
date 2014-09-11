@@ -38,7 +38,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 
 	private IControlContainer parent;
 	private ControlContainer container;
-	private List listeners;
+	private List<DialogListener> listeners;
 	
 	protected Button btBack;
 	protected Button btNext;
@@ -72,7 +72,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	 */
 	public synchronized void addDialogListener(DialogListener listener) {
 		if (listeners == null) {
-			listeners = new ArrayList();
+			listeners = new ArrayList<DialogListener>();
 		}
 		listeners.add(listener);
 	}
@@ -103,8 +103,8 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	public void finish() {
 		if (listeners != null) {
 			DialogEvent event = new DialogEvent(this);
-			for (Iterator it = listeners.iterator(); it.hasNext(); ) {
-				DialogListener listener = (DialogListener)it.next();
+			for (Iterator<DialogListener> it = listeners.iterator(); it.hasNext(); ) {
+				DialogListener listener = it.next();
 				listener.dialogFinished(event);
 			}
 		}
@@ -118,8 +118,8 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	public void abort() {
 		if (listeners != null) {
 			DialogEvent event = new DialogEvent(this);
-			for (Iterator it = listeners.iterator(); it.hasNext(); ) {
-				DialogListener listener = (DialogListener)it.next();
+			for (Iterator<DialogListener> it = listeners.iterator(); it.hasNext(); ) {
+				DialogListener listener = it.next();
 				listener.dialogAborted(event);
 			}
 		}
