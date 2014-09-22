@@ -211,12 +211,14 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	/**
 	 * @param toolbar
 	 */
+	@SuppressWarnings ("unused")
 	protected void addMoreButtons(final IControlContainer toolbar) {
 	}
 
 	/**
 	 * @return
 	 */
+	@SuppressWarnings ("static-method")
 	protected String getContainerTemplate() {
 		return WizardContainer.class.getName();
 	}
