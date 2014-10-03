@@ -21,7 +21,6 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.util.CollectionUtil;
-import de.xwic.appkit.core.util.ILazyStringEval;
 
 /**
  * Custom control for displaying picklist entries from a pickliste using
@@ -68,7 +67,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 			Comparator<IPicklistEntry> comparator, int colsNr) {
 		super(container, name);
 
-		plDao = (IPicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
+		plDao = DAOSystem.getDAO(IPicklisteDAO.class);
 		setTemplateName(CheckBoxGroup.class.getName());
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
@@ -110,7 +109,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 
 			// add entries
 			for (int i = 0; i < entryList.size(); i++) {
-				IPicklistEntry entry = (IPicklistEntry) entryList.get(i);
+				IPicklistEntry entry = entryList.get(i);
 				if (!entry.isVeraltet()) {
 					Object key = entry.getKey() != null ? entry.getKey() : new Integer(entry.getId());
 					addElement(entry.getBezeichnung(lang), key.toString());
@@ -136,12 +135,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	 */
 	public void selectEntries(List<IPicklistEntry> plEntries) {
 		if (null != plEntries) {
-			String key = CollectionUtil.join(plEntries, new ILazyStringEval<IPicklistEntry>() {
-				@Override
-				public String evaluate(IPicklistEntry obj) {
-					return obj.getKey();
-				}
-			}, ";");
+			String key = CollectionUtil.join(plEntries, Picklists.GET_KEY, ";");
 			setSelectedKey(key);
 		}
 	}
