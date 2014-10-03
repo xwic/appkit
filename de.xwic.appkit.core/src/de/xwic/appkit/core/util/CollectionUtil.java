@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -49,12 +50,20 @@ public final class CollectionUtil {
 	}
 
 	/**
-	 * @param c
-	 * @return
-	 */
-	public static boolean isEmpty(final Collection<?> c) {
-		return c == null || c.isEmpty();
-	}
+     * @param c
+     * @return
+     */
+    public static boolean isEmpty(final Collection<?> c) {
+        return c == null || c.isEmpty();
+    }
+
+    /**
+     * @param c
+     * @return
+     */
+    public static boolean isEmpty(final Map<?, ?> c) {
+        return c == null || c.isEmpty();
+    }
 
 	/**
 	 * for defensive copying
@@ -81,16 +90,29 @@ public final class CollectionUtil {
 	}
 
 	/**
-	 * @param where collection to clear and add to
-	 * @param fromWhere what to add
-	 * @throws NullPointerException if <code>where</code> is empty
-	 */
-	public static <E> void clearAndAddAll(final Collection<? super E> where, final Collection<? extends E> fromWhere) throws NullPointerException {
-		where.clear();
-		if (!isEmpty(fromWhere)) {
-			where.addAll(fromWhere);
-		}
-	}
+     * @param where collection to clear and add to
+     * @param fromWhere what to add
+     * @throws NullPointerException if <code>where</code> is empty
+     */
+    public static <E> void clearAndAddAll(final Collection<? super E> where, final Collection<? extends E> fromWhere) throws NullPointerException {
+        where.clear();
+        if (!isEmpty(fromWhere)) {
+            where.addAll(fromWhere);
+        }
+    }
+
+    /**
+     * @param where map to clear and add to
+     * @param fromWhere what to add
+     * @throws NullPointerException if <code>where</code> is empty
+     */
+    public static <K, V> void clearAndAddAll(final Map<? super K, ? super V> where,
+            final Map<? extends K, ? extends V> fromWhere) throws NullPointerException {
+        where.clear();
+        if (!isEmpty(fromWhere)) {
+            where.putAll(fromWhere);
+        }
+    }
 
 	/**
 	 * adds all not null elements to the specified collection
@@ -248,9 +270,7 @@ public final class CollectionUtil {
 	 * @return
 	 */
 	public static <O> String join(final Collection<O> collection, final Function<O, String> evaluator, final String separator, final String emptyMessage) {
-		final List<String> strings = new ArrayList<String>();
-		createCollection(collection, evaluator, strings);
-
+		final List<String> strings = createList(collection, evaluator);
 		final Iterator<String> iterator = strings.iterator();
 		if (iterator.hasNext()) {
 			return StringUtils.join(iterator, separator);
