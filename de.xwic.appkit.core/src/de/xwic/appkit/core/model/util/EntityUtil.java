@@ -248,8 +248,7 @@ public final class EntityUtil {
 		// but extends IEntity
 		Class<?> clasz = myClass;
 		while (clasz != null) {
-			Class<?>[] interfaces = clasz.getInterfaces();
-			for (Class<?> current : interfaces) {
+			for (Class<?> current : clasz.getInterfaces()) {
 				if (isSatisfactoryEntityType(current)) {
 					return (Class<? extends IEntity>) current;
 				}
@@ -257,7 +256,7 @@ public final class EntityUtil {
 			clasz = clasz.getSuperclass();
 		}
 
-		throw new IllegalStateException("Can't determine entity type.");
+		throw new IllegalStateException("Can't determine entity type for " + myClass);
 	}
 
 	/**
