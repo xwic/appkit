@@ -106,7 +106,7 @@ public final class CollectionUtil {
      * @param fromWhere what to add
      * @throws NullPointerException if <code>where</code> is empty
      */
-    public static <K, V> void clearAndAddAll(final Map<? super K, ? super V> where,
+    public static <K, V> void clearAndPutAll(final Map<? super K, ? super V> where,
             final Map<? extends K, ? extends V> fromWhere) throws NullPointerException {
         where.clear();
         if (!isEmpty(fromWhere)) {
