@@ -306,7 +306,7 @@ public class XmlBeanSerializer {
 				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
 			}
 			elm.addAttribute("id", Integer.toString(entity.getId()));
-			DAO dao = DAOSystem.findDAOforEntity(entity.type());
+			DAO<?> dao = DAOSystem.findDAOforEntity(entity.type());
 			elm.setText(dao.buildTitle(entity));
 			
 		} else if (value instanceof Set) {
@@ -367,7 +367,7 @@ public class XmlBeanSerializer {
 		}
 		
 		// instanciate bean
-		Class beanType;
+		Class<?> beanType;
 		Object bean;
 		try {
 			beanType = Class.forName(strTypeClass);
@@ -462,8 +462,6 @@ public class XmlBeanSerializer {
 					set.add(readValue(context, elSetElement, null));
 				}
 				value = set;
-			} else {
-				value = null;
 			}
 		} else if (List.class.isAssignableFrom(type)) {
 			Element elSet = elProp.element(ELM_LIST);
@@ -474,14 +472,12 @@ public class XmlBeanSerializer {
 					list.add(readValue(context, elSetElement, null));
 				}
 				value = list;
-			} else {
-				value = null;
 			}
 		} else if (Map.class.isAssignableFrom(type)) {
 			value = deserializeMap(context, elProp);
 		} else if (IPicklistEntry.class.isAssignableFrom(type)){
 
-			IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+			IPicklisteDAO plDAO = DAOSystem.getDAO(IPicklisteDAO.class);
 			IPicklistEntry entry = null;
 			
 			String picklistId = elProp.attributeValue("picklistid");
@@ -550,7 +546,7 @@ public class XmlBeanSerializer {
 					refId = newId.intValue();
 				}
 			}
-			DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
+			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 			final IEntity refEntity;
 			if (refId == EntityUtil.NEW_ENTITY_ID) {
 				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
@@ -571,9 +567,7 @@ public class XmlBeanSerializer {
 				// basic type
 				String text = elProp.getText();
 				if (String.class.equals(type)) {
-					if (text == null) {
-						value = null;
-					} else {
+					if (text != null) {
 						value = text.replaceAll(NEW_LINE_PLACEHOLDER, "\n");
 					}
 				} else if (int.class.equals(type) || Integer.class.equals(type)) {
@@ -643,7 +637,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException if the class is not found
 	 */
-	private Class<?> getType(final String typeName) throws TransportException {
+	private static Class<?> getType(final String typeName) throws TransportException {
 		if (typeName != null) {
 			try {
 				return Class.forName(typeName);
