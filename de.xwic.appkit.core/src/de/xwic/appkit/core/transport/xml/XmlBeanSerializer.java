@@ -438,25 +438,20 @@ public class XmlBeanSerializer {
 				Element elBean = elProp.element(ELM_BEAN);
 				if (elBean != null) {
 					return deserializeBean(elBean, context);
-				} else {
-					throw new TransportException("Can't deserialize element '" + elProp.getName() + "' - no type informations available.");
 				}
-			}
-		}
-		
-		
-		Object value = null;
-		
-		// check custom object serializers first.
-		for (ICustomObjectSerializer cos : customSerializer) {
-			if (cos.handlesType(type)) {
-				value = cos.deserialize(elProp);
-				
-				// found a custom serializer, directly return the value, even if null
-				return value;
+				throw new TransportException("Can't deserialize element '" + elProp.getName() + "' - no type informations available.");
 			}
 		}
 
+		// check custom object serializers first.
+		for (ICustomObjectSerializer cos : customSerializer) {
+			if (cos.handlesType(type)) {
+				// found a custom serializer, directly return the value, even if null
+			    return cos.deserialize(elProp);
+			}
+		}
+
+		Object value = null;
 		if (Set.class.isAssignableFrom(type)) {
 			// a set.
 			Element elSet = elProp.element(ELM_SET);
