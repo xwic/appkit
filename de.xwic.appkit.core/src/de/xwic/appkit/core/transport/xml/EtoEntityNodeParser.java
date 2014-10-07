@@ -7,6 +7,8 @@ import java.beans.IntrospectionException;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
@@ -23,7 +25,9 @@ import de.xwic.appkit.core.transfer.PropertyValue;
 /**
  * @author Adrian Ionescu
  */
-public class EtoEntityNodeParser implements IEntityNodeParser {
+public final class EtoEntityNodeParser implements IEntityNodeParser {
+
+	private static final Log log = LogFactory.getLog(EtoEntityNodeParser.class);
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.transport.xml.IEntityNodeParser#parseElement(org.dom4j.Element, java.util.Map, de.xwic.appkit.core.config.model.EntityDescriptor, de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
@@ -68,7 +72,10 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 			Element elmProp = itP.next();
 			String x = elmProp.getName();
 			Property prop = descriptor.getProperty(x);
-			if (prop != null) {
+			if (null == prop) {
+				log.debug("Unrecognized property: " + x);
+				continue;
+			}
 				Class<?> propertyType = prop.getDescriptor().getPropertyType();
 				boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
 				boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
@@ -106,7 +113,6 @@ public class EtoEntityNodeParser implements IEntityNodeParser {
 				}
 				
 				values.put(elmProp.getName(), pv);
-			}
 		}
 		
 		return eto;
