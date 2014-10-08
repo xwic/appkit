@@ -26,12 +26,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.util.IOUtils;
 
+import de.xwic.appkit.core.util.StreamUtil;
 import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
 
 /**
@@ -58,26 +60,20 @@ public class Storage implements IPreferenceStore {
 		
 	}
 
-	/**
-	 * Load the data from disk.
-	 * @throws IOException 
-	 * @throws  
-	 */
-	private void loadData() throws IOException {
-		InputStream in = null;
-		try {
-			in = new FileInputStream(file);
-			properties.load(in);
-		} finally {
-			if (null != in) {
-				try {
-					in.close();
-				} catch (final IOException e) {
-					log.error("Failed to close stream", e);
-				}
-			}
-		}
-	}
+    /**
+     * Load the data from disk.
+     * @throws IOException
+     */
+    private void loadData() throws IOException {
+        @SuppressWarnings ("resource")
+        InputStream in = null;
+        try {
+            in = new FileInputStream(file);
+            properties.load(in);
+        } finally {
+            StreamUtil.close(log, in);
+        }
+    }
 	
 	/**
 	 * Returns the string value for the given key.
@@ -110,13 +106,21 @@ public class Storage implements IPreferenceStore {
 		return isDirty;
 	}
 	
-	/**
-	 * Write changes to disk.
-	 * @throws IOException
-	 */
-	public void flush() throws IOException {
-		properties.store(new FileOutputStream(file), "jWic WAP PreferenceStore");
-	}
+    /**
+     * Write changes to disk.
+     * @throws IOException
+     */
+    @Override
+    public void flush() throws IOException {
+        @SuppressWarnings ("resource")
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(file);
+            properties.store(out, "jWic WAP PreferenceStore");
+        } finally {
+            StreamUtil.close(log, out);
+        }
+    }
 
 	/* (non-Javadoc)
 	 * @see de.jwic.wap.platform.IPreferenceStore#isReadonly()
