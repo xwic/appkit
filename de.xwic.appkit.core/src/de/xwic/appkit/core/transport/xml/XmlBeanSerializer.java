@@ -92,6 +92,12 @@ public class XmlBeanSerializer {
 	 * 
 	 */
 	public static final String ELM_BEAN = "bean";
+
+	/**
+	 *
+	 */
+	public static final String ELM_ENUM = "enum-name";
+
 	/**
 	 * 
 	 */
@@ -268,7 +274,12 @@ public class XmlBeanSerializer {
 		if (typeInfo == null) {
 			typeInfo = value != null ? value.getClass().getName() : null;
 		}
-		
+
+		if (value instanceof Enum<?>) {
+			serializeEnum(elm, (Enum<?>) value);
+			return;
+		}
+
 		if (value == null) {
 			elm.addAttribute(ELM_NULL, ATTRVALUE_TRUE);
 		} else if (value instanceof String) {
@@ -452,6 +463,11 @@ public class XmlBeanSerializer {
 		}
 
 		Object value = null;
+
+		if (Enum.class.isAssignableFrom(type)) {
+			return deserializeEnum(type, elProp);
+		}
+
 		if (Set.class.isAssignableFrom(type)) {
 			// a set.
 			Element elSet = elProp.element(ELM_SET);
@@ -661,6 +677,24 @@ public class XmlBeanSerializer {
 	 */
 	public void setSerializeEntity(boolean serializeEntity) {
 		this.serializeEntity = serializeEntity;
+	}
+
+	/**
+	 * @param element
+	 * @param value
+	 */
+	private static <T extends Enum<T>> void serializeEnum(final Element element, final Enum<T> value) {
+		element.addElement(ELM_ENUM).setText(value.name());
+	}
+
+	/**
+	 * @param beanType
+	 * @param element
+	 * @return
+	 */
+	@SuppressWarnings ({"unchecked", "rawtypes"})
+	private static Object deserializeEnum(final Class beanType, final Element element) {
+		return Enum.valueOf(beanType, element.elementText(ELM_ENUM));
 	}
 
 }
