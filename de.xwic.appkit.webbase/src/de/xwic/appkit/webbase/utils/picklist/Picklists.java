@@ -3,6 +3,8 @@
  */
 package de.xwic.appkit.webbase.utils.picklist;
 
+import java.util.Comparator;
+
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.util.Function;
 
@@ -19,6 +21,8 @@ public final class Picklists {
     }
 
     public static final Function<IPicklistEntry, String> GET_KEY = new PicklistKeyExtractor();
+
+    public static final Comparator<IPicklistEntry> COMPARE_INDEX = new PicklistEntryByIndexComparator();
 
     /**
      * @author Alexandru Bledea
