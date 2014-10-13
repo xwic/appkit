@@ -20,6 +20,7 @@ import de.jwic.controls.CheckBoxGroup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.model.entities.util.Picklists;
 import de.xwic.appkit.core.util.CollectionUtil;
 
 /**

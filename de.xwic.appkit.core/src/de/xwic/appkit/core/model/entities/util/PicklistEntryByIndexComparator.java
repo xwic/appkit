@@ -9,7 +9,7 @@
  * 
  * @author Ronny Pfretzschner
  */
-package de.xwic.appkit.webbase.utils.picklist;
+package de.xwic.appkit.core.model.entities.util;
 
 import java.util.Comparator;
 

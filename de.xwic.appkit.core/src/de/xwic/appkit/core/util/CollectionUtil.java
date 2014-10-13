@@ -353,6 +353,24 @@ public final class CollectionUtil {
 	}
 
 	/**
+	 * Used to transform a element <b>objects</b> into another<br>
+	 * if the object is <b>null</b> or that evaluate to <b>null</b>, we will return the third parameter
+	 * @param the object to be evaluated
+	 * @param evaluator the evaluator
+	 * @return a list filled with the evaluated values, if an object evaluates to null, it is not added to the collection
+	 */
+	public static <E, O> E evaluate(final O object, final Function<O, E> evaluator, final E whatIfNull) {
+		if (null == object) {
+			return whatIfNull;
+		}
+		final E evaluate = evaluator.evaluate(object);
+		if (null == evaluate) {
+			return whatIfNull;
+		}
+		return evaluate;
+	}
+
+	/**
 	 * @param iterable
 	 * @return null if the iterable element is null or if there are no elements in it or the first element if it does
 	 */
