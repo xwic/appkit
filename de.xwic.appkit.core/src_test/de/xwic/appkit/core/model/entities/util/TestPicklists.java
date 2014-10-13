@@ -27,6 +27,9 @@ public class TestPicklists {
 	private static final String KEY3 = "key3";
 	private static final String KEY4 = "key4";
 
+	private static final String LANG1 = "lang1";
+	private static final String LANG2 = "lang2";
+
 	/**
 	 *
 	 */
@@ -34,11 +37,11 @@ public class TestPicklists {
 	public void testGetKeys() {
 		assertEquals(null, Picklists.getKey(null));
 
-		final IPicklistEntry key3 = createEntry(KEY3);
+		final IPicklistEntry key3 = createWithKey(KEY3);
 		assertEquals(KEY3, Picklists.getKey(key3));
 
-		final IPicklistEntry key1 = createEntry(KEY1);
-		final IPicklistEntry key2 = createEntry(KEY2);
+		final IPicklistEntry key1 = createWithKey(KEY1);
+		final IPicklistEntry key2 = createWithKey(KEY2);
 		final List<IPicklistEntry> entries = Arrays.asList(key1, key2, key3);
 		assertEquals(Arrays.asList(KEY1, KEY2, KEY3), Picklists.getKeys(entries));
 
@@ -48,12 +51,39 @@ public class TestPicklists {
 	}
 
 	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetTextEn() throws Exception {
+		final IPicklistEntry withNull = createWithText(null);
+		assertEquals("", Picklists.getTextEn(withNull));
+
+		final IPicklistEntry lang1 = createWithText(LANG1);
+		assertEquals(LANG1, Picklists.getTextEn(lang1));
+
+		final IPicklistEntry lang2 = createWithText(LANG2);
+		final List<IPicklistEntry> langs = Arrays.asList(lang1, lang2);
+		assertEquals(Arrays.asList(LANG1, LANG2), Picklists.getTextEn(langs));
+	}
+
+	/**
 	 * @param key
 	 * @return
 	 */
-	private static IPicklistEntry createEntry(final String key) {
+	private static IPicklistEntry createWithKey(final String key) {
 		final IPicklistEntry mock = Mockito.mock(IPicklistEntry.class);
 		Mockito.when(mock.getKey()).thenReturn(key);
 		return mock;
 	}
+
+	/**
+	 * @param key
+	 * @return
+	 */
+	private static IPicklistEntry createWithText(final String text) {
+		final IPicklistEntry mock = Mockito.mock(IPicklistEntry.class);
+		Mockito.when(mock.getBezeichnung("en")).thenReturn(text);
+		return mock;
+	}
+
 }

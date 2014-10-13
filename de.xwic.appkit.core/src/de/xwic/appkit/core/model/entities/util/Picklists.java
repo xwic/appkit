@@ -6,6 +6,7 @@ package de.xwic.appkit.core.model.entities.util;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.util.CollectionUtil;
@@ -18,6 +19,7 @@ import de.xwic.appkit.core.util.Function;
 public final class Picklists {
 
 	public static final Function<IPicklistEntry, String> GET_KEY = new PicklistKeyExtractor();
+	public static final Function<IPicklistEntry, String> GET_TEXT_EN = new PicklistTextEnExtractor();
 
 	public static final Comparator<IPicklistEntry> COMPARE_INDEX = new PicklistEntryByIndexComparator();
 
@@ -27,6 +29,9 @@ public final class Picklists {
 	private Picklists() {
 	}
 
+	public static final String getTextEn(final IPicklistEntry entry) {
+		return CollectionUtil.evaluate(entry, GET_TEXT_EN, "");
+	}
 	/**
 	 * @param entry
 	 * @return
@@ -45,6 +50,14 @@ public final class Picklists {
 
 	/**
 	 * @param entries
+	 * @return
+	 */
+	public static final List<String> getTextEn(final Collection<IPicklistEntry> entries) {
+		return CollectionUtil.createList(entries, GET_TEXT_EN);
+	}
+
+	/**
+	 * @param entries
 	 * @param key
 	 * @return
 	 */
@@ -58,9 +71,7 @@ public final class Picklists {
 	 */
 	private static class PicklistKeyExtractor implements Function<IPicklistEntry, String> {
 
-		/*
-		 * (non-Javadoc)
-		 *
+		/* (non-Javadoc)
 		 * @see de.xwic.appkit.core.util.Function#evaluate(java.lang.Object)
 		 */
 		@Override
@@ -70,4 +81,22 @@ public final class Picklists {
 
 	}
 
+	/**
+	 * @author Alexandru Bledea
+	 * @since Oct 13, 2014
+	 */
+	private static class PicklistTextEnExtractor implements Function<IPicklistEntry, String> {
+
+		private final String english = Locale.ENGLISH.getLanguage();
+
+		/* (non-Javadoc)
+		 * @see de.xwic.appkit.core.util.Function#evaluate(java.lang.Object)
+		 */
+		@Override
+		public String evaluate(final IPicklistEntry obj) {
+			return obj.getBezeichnung(english);
+		}
+
+
+	}
 }
