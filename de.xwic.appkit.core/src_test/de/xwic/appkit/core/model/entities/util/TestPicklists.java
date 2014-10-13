@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -82,7 +83,7 @@ public class TestPicklists {
 	 */
 	private static IPicklistEntry createWithText(final String text) {
 		final IPicklistEntry mock = Mockito.mock(IPicklistEntry.class);
-		Mockito.when(mock.getBezeichnung("en")).thenReturn(text);
+		Mockito.when(mock.getBezeichnung(Locale.ENGLISH.getLanguage())).thenReturn(text);
 		return mock;
 	}
 
