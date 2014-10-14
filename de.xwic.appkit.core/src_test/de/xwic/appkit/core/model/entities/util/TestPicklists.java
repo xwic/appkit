@@ -49,6 +49,23 @@ public class TestPicklists {
 		assertFalse(Picklists.containsKey(entries, KEY4));
 		assertTrue(Picklists.containsKey(entries, KEY3));
 
+		assertFalse(Picklists.isPicklistKey(key3, KEY4));
+		assertTrue(Picklists.isPicklistKey(key3, KEY3));
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	@Test
+	public void testStrangeKeys() throws Exception {
+		final IPicklistEntry plNull = createWithKey(null);
+		assertTrue(Picklists.isPicklistKey(plNull, null));
+		assertFalse(Picklists.isPicklistKey(plNull, ""));
+
+		final IPicklistEntry horse = createWithKey("horse");
+		assertFalse(Picklists.isPicklistKey(horse, ""));
+		assertFalse(Picklists.isPicklistKey(horse, null));
+		assertFalse(Picklists.isPicklistKey(null, null));
 	}
 
 	/**

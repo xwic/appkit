@@ -29,14 +29,14 @@ public final class Picklists {
 	private Picklists() {
 	}
 
-	public static final String getTextEn(final IPicklistEntry entry) {
+	public static String getTextEn(final IPicklistEntry entry) {
 		return CollectionUtil.evaluate(entry, GET_TEXT_EN, "");
 	}
 	/**
 	 * @param entry
 	 * @return
 	 */
-	public static final String getKey(final IPicklistEntry entry) {
+	public static String getKey(final IPicklistEntry entry) {
 		return CollectionUtil.evaluate(entry, GET_KEY, null);
 	}
 
@@ -44,7 +44,7 @@ public final class Picklists {
 	 * @param entries
 	 * @return
 	 */
-	public static final List<String> getKeys(final Collection<IPicklistEntry> entries) {
+	public static List<String> getKeys(final Collection<IPicklistEntry> entries) {
 		return CollectionUtil.createList(entries, GET_KEY);
 	}
 
@@ -52,8 +52,24 @@ public final class Picklists {
 	 * @param entries
 	 * @return
 	 */
-	public static final List<String> getTextEn(final Collection<IPicklistEntry> entries) {
+	public static List<String> getTextEn(final Collection<IPicklistEntry> entries) {
 		return CollectionUtil.createList(entries, GET_TEXT_EN);
+	}
+
+	/**
+	 * @param entry
+	 * @param key
+	 * @return
+	 */
+	public static boolean isPicklistKey(final IPicklistEntry entry, final String key) {
+		if (null == entry) {
+			return false;
+		}
+		final String entryKey = entry.getKey();
+		if (null == key) {
+			return null == entryKey;
+		}
+		return key.equals(entryKey);
 	}
 
 	/**
@@ -61,7 +77,7 @@ public final class Picklists {
 	 * @param key
 	 * @return
 	 */
-	public static final boolean containsKey(final Collection<IPicklistEntry> entries, final String key) {
+	public static boolean containsKey(final Collection<IPicklistEntry> entries, final String key) {
 		return getKeys(entries).contains(key);
 	}
 
