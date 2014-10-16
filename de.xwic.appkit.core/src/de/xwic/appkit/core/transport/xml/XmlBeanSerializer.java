@@ -337,7 +337,7 @@ public class XmlBeanSerializer {
 				addValue(entry, o, true);
 			}
 		} else if (value instanceof Map<?, ?>) {
-			serializeMap(elm, (Map<?, ?>) value, addTypeInfo);
+			serializeMap(elm, (Map<?, ?>) value);
 		} else {
 			serializeBean(elm, ELM_BEAN, value);
 			addTypeInfo = false;
@@ -612,14 +612,14 @@ public class XmlBeanSerializer {
 	 * @param addTypeInfo
 	 * @throws TransportException
 	 */
-	private void serializeMap(final Element elm, final Map<?, ?> map, final boolean addTypeInfo) throws TransportException {
+	private void serializeMap(final Element elm, final Map<?, ?> map) throws TransportException {
 		final Element elmMap = elm.addElement(ELM_MAP);
 		for (final Entry<?, ?> entry : map.entrySet()) {
 			final Element element = elmMap.addElement(ELM_MAP_ENTRY);
 			final Element key = element.addElement(ELM_MAP_KEY);
-			addValue(key, entry.getKey(), addTypeInfo);
+			addValue(key, entry.getKey(), true);
 			final Element mapValue = element.addElement(ELM_MAP_VALUE);
-			addValue(mapValue, entry.getValue(), addTypeInfo);
+			addValue(mapValue, entry.getValue(), true);
 		}
 	}
 
