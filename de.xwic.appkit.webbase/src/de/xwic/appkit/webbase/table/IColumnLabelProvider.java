@@ -8,6 +8,8 @@ package de.xwic.appkit.webbase.table;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.poi.ss.usermodel.Cell;
+
 import de.jwic.controls.tableviewer.CellLabel;
 import de.xwic.appkit.core.config.list.ListColumn;
 
@@ -41,5 +43,14 @@ public interface IColumnLabelProvider {
 	 * @return
 	 */
 	public CellLabel getCellLabel(RowData row);
+	
+	
+	/**
+	 * Customize cell value properties during excel export.
+	 * @param cell
+	 * @param label
+	 * @return - true to continue immediately with next row instead setting value on cell.
+	 */
+	public boolean renderExcelCell(Cell cell, CellLabel label);
 	
 }

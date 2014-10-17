@@ -26,6 +26,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.ss.usermodel.Cell;
 
 import de.jwic.controls.tableviewer.CellLabel;
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -373,6 +374,16 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	 */
 	public void setDataIdx(int dataIdx) {
 		this.dataIdx = dataIdx;
+	}
+
+	/**
+	 * @param cell
+	 * @param label
+	 * @return
+	 */
+	@Override
+	public boolean renderExcelCell(Cell cell, CellLabel label) {
+		return false;
 	}
 	
 }

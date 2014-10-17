@@ -28,6 +28,7 @@ import de.jwic.controls.tableviewer.TableColumn;
 import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.data.IContentProvider;
 import de.jwic.data.Range;
+import de.xwic.appkit.webbase.table.Column;
 
 public class ExcelExportAsyncProcess extends AbstractAsyncProcess{
 
@@ -164,6 +165,15 @@ public class ExcelExportAsyncProcess extends AbstractAsyncProcess{
 				try {
 					label = this.labelProvider.getCellLabel(inputObj, column, new RowContext(expanded, level));
 					Object obj = label.object;
+					
+					if(column.getUserObject() != null && column.getUserObject() instanceof Column){
+						Column entityCol = (Column) column.getUserObject();
+						if(entityCol.getColumnLabelProvider() != null){
+							if(entityCol.getColumnLabelProvider().renderExcelCell(cell, label)){
+								continue;
+							}
+						}
+					}
 					
 					// set cell text and style
 					if (obj != null) {
