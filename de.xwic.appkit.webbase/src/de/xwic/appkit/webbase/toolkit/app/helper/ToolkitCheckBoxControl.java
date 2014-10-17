@@ -37,7 +37,7 @@ public class ToolkitCheckBoxControl implements IToolkitControlHelper<CheckBoxGro
 	 */
 	@Override
 	public void loadContent(CheckBoxGroup control, Object obj) {
-		control.setSelectedKey((Boolean) obj ? control.getName() : "");
+		control.setSelectedKey(obj != null && (Boolean) obj ? control.getName() : "");
 	}
 
 	/*
