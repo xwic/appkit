@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -78,9 +80,10 @@ public final class MapUtil {
 	 * @return
 	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <K, V, X> Map<K, Collection<V>> generateMapOfList(final Collection<? extends X> items,
+	@SuppressWarnings("unchecked")
+	public static <K, V, X> Map<K, List<V>> generateMapOfList(final Collection<? extends X> items,
 			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
-		return generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_ARRAYLIST);
+		return (Map<K, List<V>>) generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_ARRAYLIST);
 	}
 
 	/**
@@ -93,9 +96,10 @@ public final class MapUtil {
 	 * @return
 	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	public static <K, V, X> Map<K, Collection<V>> generateMapOfSet(final Collection<? extends X> items,
+	@SuppressWarnings("unchecked")
+	public static <K, V, X> Map<K, Set<V>> generateMapOfSet(final Collection<? extends X> items,
 			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
-		return generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_HASHSET);
+		return (Map<K, Set<V>>) generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_HASHSET);
 	}
 
 	/**
@@ -108,7 +112,7 @@ public final class MapUtil {
 	 * @return
 	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
-	private static <K, V, X> Map<K, Collection<V>> generateMapOfCollection(final Collection<? extends X> items,
+	private static <K, V, X> Map<K, ? extends Collection<V>> generateMapOfCollection(final Collection<? extends X> items,
 			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator,
 			@SuppressWarnings("rawtypes") final LazyInit<Collection> wrapper) {
 		final Map<K, Collection<V>> originalMap = new HashMap<K, Collection<V>>();

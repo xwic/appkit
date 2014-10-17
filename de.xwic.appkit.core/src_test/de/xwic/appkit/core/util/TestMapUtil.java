@@ -4,10 +4,10 @@
 package de.xwic.appkit.core.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,13 +33,15 @@ public final class TestMapUtil {
 		Collections.addAll(entries, new Entry(KEY_10, "0"), new Entry(KEY_10, ""), new Entry(KEY_14, "04"), new Entry(null, "0"),
 				new Entry(KEY_10, null), null, new Entry(null, null), new Entry(KEY_3, ""), new Entry(KEY_10, "0"));
 
-		final Map<Integer, Collection<String>> mapOfLists = MapUtil.generateMapOfList(entries, new IdExtractor(), new ValueExtractor());
+		final Map<Integer, List<String>> mapOfLists = MapUtil.generateMapOfList(entries, new IdExtractor(), new ValueExtractor());
 		Assert.assertFalse("Map should not be empty", mapOfLists.isEmpty());
 		Assert.assertEquals("Expecting exactly 3 entries to match the keys", 3, mapOfLists.size());
 		Assert.assertEquals("Key 3 should only have one element", 1, mapOfLists.get(KEY_3).size());
 		Assert.assertEquals("Key 10 should only have 3 elements", 3, mapOfLists.get(KEY_10).size());
+		final List<String> value = mapOfLists.values().iterator().next();
+		Assert.assertNotNull("This should not class cast exception", value.get(0));
 
-		final Map<Integer, Collection<String>> mapOfSets = MapUtil.generateMapOfSet(entries, new IdExtractor(), new ValueExtractor());
+		final Map<Integer, Set<String>> mapOfSets = MapUtil.generateMapOfSet(entries, new IdExtractor(), new ValueExtractor());
 		Assert.assertFalse("Map should not be empty", mapOfSets.isEmpty());
 		Assert.assertEquals("Expecting exactly 3 entries to match the keys", 3, mapOfSets.size());
 		Assert.assertEquals("Key 3 should only have one element", 1, mapOfSets.get(KEY_3).size());
