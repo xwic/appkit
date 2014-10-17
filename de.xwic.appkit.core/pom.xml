@@ -3,7 +3,7 @@
     <parent>
         <groupId>de.xwic.appkit</groupId>
         <artifactId>appkit</artifactId>
-        <version>5.2.12-SNAPSHOT</version>
+        <version>5.2.20-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>APPKIT::CORE</name>
@@ -74,6 +74,14 @@
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
 			</dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <!-- Common Public License 1.0 -->
             <groupId>junit</groupId>

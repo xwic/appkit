@@ -9,7 +9,6 @@ package de.xwic.appkit.core.access;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -316,8 +315,8 @@ public class AccessHandler {
     	
     	try {
 	    	// extract property value
-	    	PropertyDescriptor descr = new PropertyDescriptor(property, entity.getClass());
-	    	Object value = descr.getReadMethod().invoke(entity, (Object[]) null);
+	    	ReflectionHelper helper = new ReflectionHelper();
+	    	Object value = helper.getValue(entity, property);
 	    	if (!(value instanceof Collection)) {
 	    		throw new DataAccessException("Property '" + property + "' is not a collection");
 	    	}
