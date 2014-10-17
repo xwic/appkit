@@ -1,17 +1,12 @@
-/*
- * Copyright (c) NetApp Inc. - All Rights Reserved
+/**
  *
- * Unauthorized copying of this file, via any medium is strictly prohibited.
- * Proprietary and confidential.
- *
- * src.de.xwic.appkit.core.security.util.Rights
  */
 package de.xwic.appkit.core.security.util;
-
-import de.xwic.appkit.core.security.IAction;
+import de.xwic.appkit.core.security.IAction;
 import de.xwic.appkit.core.security.IRight;
 import de.xwic.appkit.core.security.IRole;
 import de.xwic.appkit.core.util.Function;
+
 
 /**
  * @author Alexandru Bledea

@@ -69,6 +69,70 @@ public final class MapUtil {
 	}
 
 	/**
+	 * Used to generate a map from the collection if <b>items</b> by using <b>evaluators</b>. <br>
+	 * If there are two objects with the same key, the latest entry will override the previous entry<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
+	 * @param items the collection from which we create the map
+	 * @param keyGenerator the key generator
+	 * @param valueGenerator the value generator
+	 * @return
+	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
+	 */
+	public static <K, V, X> Map<K, Collection<V>> generateMapOfList(final Collection<? extends X> items,
+			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
+		return generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_ARRAYLIST);
+	}
+
+	/**
+	 * Used to generate a map from the collection if <b>items</b> by using <b>evaluators</b>. <br>
+	 * If there are two objects with the same key, the latest entry will override the previous entry<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
+	 * @param items the collection from which we create the map
+	 * @param keyGenerator the key generator
+	 * @param valueGenerator the value generator
+	 * @return
+	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
+	 */
+	public static <K, V, X> Map<K, Collection<V>> generateMapOfSet(final Collection<? extends X> items,
+			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator) {
+		return generateMapOfCollection(items, keyGenerator, valueGenerator, LazyInitializers.COLLECTION_HASHSET);
+	}
+
+	/**
+	 * Used to generate a map from the collection if <b>items</b> by using <b>evaluators</b>. <br>
+	 * If there are two objects with the same key, the latest entry will override the previous entry<br>
+	 * If there are <b>null</b> values in the collection and objects that evaluate to <b>null</b> they are skipped<br>
+	 * @param items the collection from which we create the map
+	 * @param keyGenerator the key generator
+	 * @param valueGenerator the value generator
+	 * @return
+	 * @return a map created from the items using the generator, if the key or value evaluate to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
+	 */
+	private static <K, V, X> Map<K, Collection<V>> generateMapOfCollection(final Collection<? extends X> items,
+			final Function<X, K> keyGenerator, final Function<X, V> valueGenerator,
+			@SuppressWarnings("rawtypes") final LazyInit<Collection> wrapper) {
+		final Map<K, Collection<V>> originalMap = new HashMap<K, Collection<V>>();
+		if (items == null) {
+			return originalMap;
+		}
+		final Map<K, Collection<V>> output = wrapAI(originalMap, wrapper);
+		for (final X obj : items) {
+			if (obj == null) {
+				continue;
+			}
+			final K key = keyGenerator.evaluate(obj);
+			if (null == key) {
+				continue;
+			}
+			final V value = valueGenerator.evaluate(obj);
+			if (null != value){
+				output.get(key).add(value);
+			}
+		}
+		return originalMap;
+	}
+
+	/**
 	 * @param initializer the map initializer
 	 * @return a unmodifiable {@link java.util.HashMap} containting the values that were set using the <b>initializer</b>
 	 */
