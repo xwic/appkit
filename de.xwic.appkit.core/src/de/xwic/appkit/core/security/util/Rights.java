@@ -14,9 +14,9 @@ import de.xwic.appkit.core.util.Function;
  */
 public final class Rights {
 
-	public static final Function<IRight, IRole> EXTRACT_ROLE = new ExtractRoleFromRight();
+	public static final Function<IRight, IRole> GET_ROLE = new ExtractRoleFromRight();
 
-	public static final Function<IRight, IAction> EXTRACT_ACTION = new ExtractActionFromRight();
+	public static final Function<IRight, IAction> GET_ACTION = new ExtractActionFromRight();
 
 	/**
 	 *

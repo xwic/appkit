@@ -30,10 +30,10 @@ public class TestRights {
 		final IAction action = Mockito.mock(IAction.class);
 		final IRole role = Mockito.mock(IRole.class);
 		final IRight createRight = createRight(action, role);
-		final IAction actualAction = CollectionUtil.evaluate(createRight, Rights.EXTRACT_ACTION, null);
+		final IAction actualAction = CollectionUtil.evaluate(createRight, Rights.GET_ACTION, null);
 		Assert.assertSame(action, actualAction);
 
-		final IRole actualRole = CollectionUtil.evaluate(createRight, Rights.EXTRACT_ROLE, null);
+		final IRole actualRole = CollectionUtil.evaluate(createRight, Rights.GET_ROLE, null);
 		Assert.assertSame(role, actualRole);
 	}
 
