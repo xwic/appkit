@@ -225,7 +225,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getAllEntriesToList(de.xwic.appkit.core.model.entities.IPickliste)
      */
     @Override
-	public EntityList getAllEntriesToList(final IPickliste list) {
+	public EntityList<IPicklistEntry> getAllEntriesToList(final IPickliste list) {
     	if (list == null) {
     		throw new IllegalArgumentException("Picklist is null!");
     	}
@@ -255,7 +255,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 
 		}
 
-		EntityList copy = new EntityList(new ArrayList<Object>(), erg.getLimit(), erg.getTotalSize());
+		EntityList<IPicklistEntry> copy = new EntityList<IPicklistEntry>(new ArrayList<IPicklistEntry>(), erg.getLimit(), erg.getTotalSize());
 		copy.addAll(erg);
 		return copy;
     }
@@ -265,15 +265,14 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getAllEntriesToList(java.lang.String)
      */
     @Override
-	public EntityList getAllEntriesToList(String pickListKey) {
+	public EntityList<IPicklistEntry> getAllEntriesToList(String pickListKey) {
     	if (pickListKey == null || pickListKey.length() < 1) {
     		throw new IllegalArgumentException("Picklist-Key is null or not set correctly!");
     	}
 
     	IPickliste pl = getPicklisteByKey(pickListKey);
     	if (pl == null) {
-
-    		return new EntityList(new ArrayList<Object>(), null, 0);
+    		return new EntityList<IPicklistEntry>(new ArrayList<IPicklistEntry>(), null, 0);
 
     		//throw new IllegalArgumentException("Picklist with given key: " + pickListKey + " not found in system!");
     	}

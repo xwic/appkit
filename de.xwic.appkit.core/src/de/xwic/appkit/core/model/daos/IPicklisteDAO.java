@@ -70,7 +70,7 @@ public interface IPicklisteDAO extends DAO<IPickliste> {
      * @param list
      * @return EntityList
      */
-    public EntityList getAllEntriesToList(IPickliste list);
+    public EntityList<IPicklistEntry> getAllEntriesToList(IPickliste list);
 
     /**
      * Get all entries to a List by Picklistkey. <p>
@@ -78,7 +78,7 @@ public interface IPicklisteDAO extends DAO<IPickliste> {
      * @param pickListKey as a String
      * @return all Entries to the list
      */
-    public EntityList getAllEntriesToList(String pickListKey);
+    public EntityList<IPicklistEntry> getAllEntriesToList(String pickListKey);
 
     /**
      * This methode should be used, when you want to search for PickListEntries. <p>
