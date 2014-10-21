@@ -160,19 +160,6 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
         // we will do the user config init after the QuickFilterPanel is created
 		entityTable = new EntityTable(this, "entityTable", configuration, false);
 
-		// remove the - All - selection and add 200 and 500 
-		ListBox lbMaxLines = entityTable.getTableViewer().getStatusBar().getMaxLinesControl();
-		lbMaxLines.clear();
-		lbMaxLines.addElement("- Auto -", "0");
-		int[] choices = {5, 10, 15, 25, 50, 100, 200, 500};
-		String msg = "%s rows per page";
-		for (int i = 0; i < choices.length; i++) {
-			lbMaxLines.addElement(
-					String.format( msg, choices[i]), 
-					Integer.toString(choices[i]));
-		}
-		
-		
 		if (configuration.getQuickFilterPanelCreator() != null) {
 			quickFilterPanel = configuration.getQuickFilterPanelCreator().createQuickFilterPanel(this, entityTable.getModel());
 		}
