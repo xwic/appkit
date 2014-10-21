@@ -27,23 +27,14 @@ public abstract class Functions<A, B> implements Function<A, B> {
 	 * The new evaluator will return null of any of the evaluators returns null
 	 * 
 	 * @param next - the next evaluator in the chain
-	 * @return a new LazyEval instance representing a sequence call of this and next
+	 * @return a new Function instance representing a sequence call of this and next
 	 */
 	public <C> Functions<A, C> andThen(final Function<B, C> next){
-		return new Functions<A, C>() {
-			@Override
-			public C evaluate(A obj) {
-				final B evaluate = Functions.this.evaluate(obj);
-				if(evaluate == null){
-					return null;
-				}
-				return next.evaluate(evaluate);
-			}
-		};
+		return compose(this, next);
 	}
 	
 	/**
-	 * Wraps an ILazyEval
+	 * Wraps a Function
 	 * @param eval
 	 * @return
 	 */
@@ -55,5 +46,95 @@ public abstract class Functions<A, B> implements Function<A, B> {
 			}
 		};
 	}
+
+
+	/**
+	 * Represents the neutral operation for function composition: f(x) = x
+	 *
+	 * @return a function that returns its parameter
+	 */
+	@SuppressWarnings ("unchecked")
+	public static <E> Function<E, E> identity() {
+		return IdentityFunction.INSTANCE;
+	}
+
+	private static enum IdentityFunction implements Function{
+		INSTANCE;
+		@Override
+		public Object evaluate(Object obj) {
+			return obj;
+		}
+
+		@Override
+		public String toString() {
+			return "identity";
+		}
+	}
+	@SuppressWarnings ("unchecked")
+	public static <E> Function<E, String> toStringFunction() {
+		return ToStringFunction.INSTANCE;
+	}
+
+	private static enum ToStringFunction implements Function{
+		INSTANCE;
+
+		@Override
+		public Object evaluate(Object obj) {
+			return String.valueOf(obj);
+		}
+
+		@Override
+		public String toString() {
+			return "toString";
+		}
+	}
+
+	/**
+	 * Composes 2 functions
+	 * @param f
+	 * @param g
+	 * @param <A>
+	 * @param <B>
+	 * @param <C>
+	 * @return
+	 */
+	public static <A,B,C> Functions<A,C> compose(Function<A,B> f, Function<B,C> g){
+		return new FunctionComposition<A,B,C>(f,g);
+	}
+
+	/**
+	 * A function composition of 2 functions (f: A->B).(g: B->C) = f.g:A -> C
+	 * @param <A>
+	 * @param <B>
+	 * @param <C>
+	 */
+	private static final class FunctionComposition<A,B,C> extends Functions<A,C>{
+		private final Function<A,B> f;
+		private final Function<B,C> g;
+
+		private FunctionComposition(Function<A, B> f, Function<B, C> g) {
+			this.f = f;
+			this.g = g;
+		}
+
+		@Override
+		public C evaluate(A obj) {
+			if(obj == null){
+				return null;
+			}
+			final B evaluate = f.evaluate(obj);
+			if(evaluate == null){
+				return null;
+			}
+			return g.evaluate(evaluate);
+		}
+
+		@Override
+		public String toString() {
+			return  g + "(" + f + ")";
+		}
+	}
+
+
 
 }

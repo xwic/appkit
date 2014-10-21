@@ -23,14 +23,26 @@ public abstract class Filter<E> implements IFilter<E> {
 	 * @return
 	 */
 	public Filter<E> and(final IFilter<E> next){
-		return new Filter<E>(){
+		return new AndFilter<E>(this, next);
+	}
+	private static final class AndFilter<E> extends Filter<E>{
+		private final IFilter<E> a;
+		private final IFilter<E> b;
 
-			@Override
-			public boolean keep(E element) {
-				return getThis().keep(element) && next.keep(element);
-			}
-			
-		};
+		private AndFilter(IFilter<E> a, IFilter<E> b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public boolean keep(E element) {
+			return a.keep(element) && b.keep(element);
+		}
+
+		@Override
+		public String toString() {
+			return a+ " && " + b;
+		}
 	}
 	
 	/**
@@ -40,12 +52,26 @@ public abstract class Filter<E> implements IFilter<E> {
 	 * @return
 	 */
 	public Filter<E> or(final IFilter<E> next){
-		return new Filter<E> (){
-			@Override
-			public boolean keep(E element) {
-				return getThis().keep(element) || next.equals(element);
-			}
-		};
+		return new OrFilter<E>(this, next);
+	}
+	private static final class OrFilter<E> extends Filter<E>{
+		private final IFilter<E> a;
+		private final IFilter<E> b;
+
+		private OrFilter(IFilter<E> a, IFilter<E> b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public boolean keep(E element) {
+			return a.keep(element) && b.keep(element);
+		}
+
+		@Override
+		public String toString() {
+			return a+ " || " + b;
+		}
 	}
 	
 	/**
@@ -55,12 +81,24 @@ public abstract class Filter<E> implements IFilter<E> {
 	 * @return
 	 */
 	public Filter<E> negate(){
-		return new Filter<E> (){
-			@Override
-			public boolean keep(E element) {
-				return !getThis().keep(element);
-			}
-		};
+		return new NotFilter<E>(this);
+	}
+	private static final class NotFilter<E> extends Filter<E>{
+		private final IFilter<E> a;
+
+		private NotFilter(IFilter<E> a) {
+			this.a = a;
+		}
+
+		@Override
+		public boolean keep(E element) {
+			return !a.keep(element);
+		}
+
+		@Override
+		public String toString() {
+			return "!" + a;
+		}
 	}
 	
 	/**
@@ -82,6 +120,24 @@ public abstract class Filter<E> implements IFilter<E> {
 				return wrapped.keep(element);
 			};
 		};
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <E> Filter<E> notNullFilter(){
+		return NotNullFilter.INSTANCE;
+	}
+
+	private static final class NotNullFilter extends Filter{
+		static final NotNullFilter INSTANCE = new NotNullFilter();
+		@Override
+		public boolean keep(Object element) {
+			return element != null;
+		}
+
+		@Override
+		public String toString() {
+			return "notNullFilter";
+		}
 	}
 
 }
