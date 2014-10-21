@@ -239,9 +239,6 @@
                                 <goal>jar</goal>
                                 <goal>test-jar</goal>
                             </goals>
-                            <configuration>
-                                <includePom>true</includePom>
-                            </configuration>
                         </execution>
                     </executions>
                     <configuration>
