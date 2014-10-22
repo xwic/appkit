@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.2.21-SNAPSHOT</version>
+    <version>5.2.23-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - AppKit</name>
@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.2.6</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.2.8</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.5</mvnDependencyVersionxWicCube>   		
     </properties>
 
@@ -239,9 +239,6 @@
                                 <goal>jar</goal>
                                 <goal>test-jar</goal>
                             </goals>
-                            <configuration>
-                                <includePom>true</includePom>
-                            </configuration>
                         </execution>
                     </executions>
                     <configuration>

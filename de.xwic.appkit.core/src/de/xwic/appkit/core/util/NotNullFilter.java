@@ -7,7 +7,9 @@ package de.xwic.appkit.core.util;
  * By default it returns all elements that are not null, you can override the keepNotNull method for more filtering
  * @author Alexandru Bledea
  * @since Jan 6, 2014
+ * @deprecated - use de.xwic.appkit.core.util.Filter#notNullFilter() - instead
  */
+@Deprecated
 public class NotNullFilter<E> implements IFilter<E> {
 
 	/* (non-Javadoc)

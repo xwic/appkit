@@ -87,7 +87,7 @@ public class EntityTable extends ControlContainer {
 			}
 		});
 		
-		createTableViewer();
+		createTableViewer(configuration);
 		createColumnFilter();
 
 		if (initUserConfig) {
@@ -176,7 +176,7 @@ public class EntityTable extends ControlContainer {
 	/**
 	 * 
 	 */
-	private void createTableViewer() {
+	private void createTableViewer(EntityTableConfiguration config) {
 		
 		DAO dao = DAOSystem.findDAOforEntity(model.getEntityClass());
 		
@@ -192,6 +192,7 @@ public class EntityTable extends ControlContainer {
 		tblViewer.setSelectableColumns(true);
 		tblViewer.setShowStatusBar(true);
 		tblViewer.setRowHeightHint(19);
+		tblViewer.setShowAllInRangeSelector(config.isShowAllInRangeSelector());
 
 		// Inject a Trace-enabled table renderer to trace table rendering time.
 		tblViewer.setTableRenderer(new DefaultTableRenderer() {

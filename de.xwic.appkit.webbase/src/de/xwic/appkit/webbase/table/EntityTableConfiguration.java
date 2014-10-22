@@ -23,6 +23,8 @@ public class EntityTableConfiguration {
 	private TimeZone timeZone;
 	private String dateFormat;
 	private String timeFormat;
+
+	private boolean showAllInRangeSelector = false;
 	
 	/**
 	 * 
@@ -138,5 +140,21 @@ public class EntityTableConfiguration {
 	 */
 	public void setTimeFormat(String timeFormat) {
 		this.timeFormat = timeFormat;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public boolean isShowAllInRangeSelector() {
+		return showAllInRangeSelector;
+	}
+
+	/**
+	 *
+	 * @param showAllInRangeSelector
+	 */
+	public void setShowAllInRangeSelector(boolean showAllInRangeSelector) {
+		this.showAllInRangeSelector = showAllInRangeSelector;
 	}
 }
