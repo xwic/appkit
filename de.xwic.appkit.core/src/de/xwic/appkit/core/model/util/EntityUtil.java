@@ -18,6 +18,7 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
+import de.xwic.appkit.core.dao.util.Entities;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.util.CollectionUtil;
 import de.xwic.appkit.core.util.Function;
@@ -28,11 +29,7 @@ import de.xwic.appkit.core.util.Function;
  */
 public final class EntityUtil {
 
-	public static final int NEW_ENTITY_ID = 0;
-	public static final int LOWEST_POSSIBLE_ID = 1;
-
-	private static final Collection<Class<? extends IEntity>> INVALID_TYPES =
-			Collections.unmodifiableCollection(Arrays.asList(IEntity.class, IHistory.class));
+	private static final Collection<Class<? extends IEntity>> INVALID_TYPES = Arrays.asList(IEntity.class, IHistory.class);
 
 	public final static Function<IEntity, Integer> ENTITY_ID_EVALUATOR = new Function<IEntity, Integer>() {
 
@@ -59,7 +56,7 @@ public final class EntityUtil {
 		if (entity != null) {
 			return entity.getId();
 		}
-		return NEW_ENTITY_ID;
+		return Entities.NEW_ENTITY_ID;
 	}
 
 	/**
@@ -68,7 +65,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Integer id) {
-		if (id == null || id.intValue() == NEW_ENTITY_ID){
+		if (id == null || id.intValue() == Entities.NEW_ENTITY_ID){
 			return null;
 		}
 		return findDAOforEntity(entityClass).getEntity(id.intValue());
@@ -80,7 +77,7 @@ public final class EntityUtil {
 	 * @return
 	 */
 	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Integer id) {
-		if (id == null || id.intValue() < LOWEST_POSSIBLE_ID) {
+		if (id == null || id.intValue() < Entities.LOWEST_POSSIBLE_ID) {
 			return createEntity(entityClass);
 		}
 		return getEntity(entityClass, id);
@@ -291,7 +288,7 @@ public final class EntityUtil {
 		if (entity == null) {
 			throw new NullPointerException("Entity argument is null!");
 		}
-		if (entity.getId() < LOWEST_POSSIBLE_ID) {
+		if (entity.getId() < Entities.LOWEST_POSSIBLE_ID) {
 			throw new IllegalStateException("Entity argument is not saved!");
 		}
 	}
