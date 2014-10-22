@@ -5,6 +5,9 @@
  */
 package de.xwic.appkit.core.model.daos;
 
+import java.util.Collection;
+import java.util.List;
+
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
@@ -90,6 +93,12 @@ public interface IPicklisteDAO extends DAO<IPickliste> {
      * @return IPicklistEntry
      */
     public IPicklistEntry getPickListEntryByID(int id);
+
+    /**
+     * @param id
+     * @return
+     */
+    List<IPicklistEntry> getPicklistEntriesByID(Collection<Integer> id);
 
     /**
      * Returns the picklistText object with the specified id.

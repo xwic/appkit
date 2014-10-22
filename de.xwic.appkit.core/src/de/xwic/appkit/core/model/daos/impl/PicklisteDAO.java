@@ -6,6 +6,7 @@
 package de.xwic.appkit.core.model.daos.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -28,6 +29,7 @@ import de.xwic.appkit.core.model.entities.impl.Pickliste;
 import de.xwic.appkit.core.model.queries.PicklistEntryQuery;
 import de.xwic.appkit.core.model.queries.PicklistQuery;
 import de.xwic.appkit.core.model.queries.PicklistTextQuery;
+import de.xwic.appkit.core.util.CollectionUtil;
 
 /**
  * DAO implementation for the Pickliste object.
@@ -308,6 +310,21 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
     		}
         });
     }
+
+    /* (non-Javadoc)
+     * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPicklistEntriesByID(java.util.Collection)
+     */
+	@Override
+	public List<IPicklistEntry> getPicklistEntriesByID(final Collection<Integer> id) {
+		final List<IPicklistEntry> entries = new ArrayList<IPicklistEntry>();
+		for (final Integer integer : id) {
+			if (null == integer) {
+				continue;
+			}
+			CollectionUtil.addIfNotNull(getPickListEntryByID(integer), entries);
+		}
+		return entries;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPicklisteByKey(java.lang.String)
