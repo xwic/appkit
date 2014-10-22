@@ -29,6 +29,7 @@ import de.xwic.appkit.core.util.Function;
  */
 public final class EntityUtil {
 
+	@SuppressWarnings("unchecked")
 	private static final Collection<Class<? extends IEntity>> INVALID_TYPES = Arrays.asList(IEntity.class, IHistory.class);
 
 	public final static Function<IEntity, Integer> ENTITY_ID_EVALUATOR = new Function<IEntity, Integer>() {

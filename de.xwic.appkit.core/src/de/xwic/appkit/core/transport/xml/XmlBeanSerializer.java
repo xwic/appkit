@@ -38,11 +38,11 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.dao.util.Entities;
 import de.xwic.appkit.core.export.XmlExport;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPickliste;
-import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
@@ -170,6 +170,7 @@ public class XmlBeanSerializer {
 			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
 			// this "hack" is required to preserve the LBCR's in strings... 
 			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
+				@Override
 				public void write(Document arg0) throws IOException {
 					//this.preserve = true;
 					super.write(arg0);
@@ -312,7 +313,7 @@ public class XmlBeanSerializer {
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity)value;
 			typeInfo = entity.type().getName();
-			if (entity.getId() == EntityUtil.NEW_ENTITY_ID || serializeEntity) {
+			if (entity.getId() == Entities.NEW_ENTITY_ID || serializeEntity) {
 				EntityTransferObject eto = new EntityTransferObject(entity, true);
 				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
 			}
@@ -323,16 +324,14 @@ public class XmlBeanSerializer {
 		} else if (value instanceof Set) {
 			Set<?> set = (Set<?>)value;
 			Element elmSet = elm.addElement(ELM_SET);
-			for (Iterator<?> it = set.iterator(); it.hasNext(); ) {
-				Object o = it.next();
+			for (Object o : set) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
 			}
 		} else if (value instanceof List) {
 			List<?> list = (List<?>)value;
 			Element elmSet = elm.addElement(ELM_LIST);
-			for (Iterator<?> it = list.iterator(); it.hasNext(); ) {
-				Object o = it.next();
+			for (Object o : list) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
 			}
@@ -525,8 +524,7 @@ public class XmlBeanSerializer {
 				// not found, try by title
 				if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
 					List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
-					for (Iterator<IPicklistEntry> it = lst.iterator(); it.hasNext(); ) {
-						IPicklistEntry pe = it.next();
+					for (IPicklistEntry pe : lst) {
 						if (text.equals(pe.getBezeichnung(langid))) {
 							entry = pe;
 							break;
@@ -544,8 +542,7 @@ public class XmlBeanSerializer {
 					entry.setPickliste(plist);
 					plDAO.update(entry);
 					
-					for(Iterator<Language> it = ConfigurationManager.getSetup().getLanguages().iterator(); it.hasNext(); ) {
-						Language lang = it.next();
+					for (Language lang : ConfigurationManager.getSetup().getLanguages()) {
 						plDAO.createBezeichnung(entry, lang.getId(), text);
 					}
 				}
@@ -564,7 +561,7 @@ public class XmlBeanSerializer {
 			}
 			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 			final IEntity refEntity;
-			if (refId == EntityUtil.NEW_ENTITY_ID) {
+			if (refId == Entities.NEW_ENTITY_ID) {
 				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
 			} else {
 				refEntity = refDAO.getEntity(refId);
