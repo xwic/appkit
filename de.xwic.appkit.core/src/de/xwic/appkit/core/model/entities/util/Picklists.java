@@ -22,6 +22,7 @@ public final class Picklists {
 	public static final Function<IPicklistEntry, String> GET_TEXT_EN = new PicklistTextEnExtractor();
 
 	public static final Comparator<IPicklistEntry> COMPARE_INDEX = new PicklistEntryByIndexComparator();
+	public static final Comparator<IPicklistEntry> COMPARE_TEXT_EN = new PicklistByTextEnComparator();
 
 	/**
 	 *
@@ -79,6 +80,24 @@ public final class Picklists {
 	 */
 	public static boolean containsKey(final Collection<IPicklistEntry> entries, final String key) {
 		return getKeys(entries).contains(key);
+	}
+
+	/**
+	 * @author Alexandru Bledea
+	 * @since Oct 21, 2014
+	 */
+	private static class PicklistByTextEnComparator extends NotNullStringComparator<IPicklistEntry> {
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see de.xwic.appkit.core.model.entities.util.NotNullComparator#extractNotNull(java.lang.Object)
+		 */
+		@Override
+		protected String extractNotNull(final IPicklistEntry possiblyNull) {
+			return getTextEn(possiblyNull);
+		}
+
 	}
 
 	/**
