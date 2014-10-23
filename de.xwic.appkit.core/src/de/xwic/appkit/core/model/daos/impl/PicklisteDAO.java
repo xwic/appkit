@@ -7,7 +7,9 @@ package de.xwic.appkit.core.model.daos.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
@@ -315,8 +317,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPicklistEntriesByID(java.util.Collection)
      */
 	@Override
-	public List<IPicklistEntry> getPicklistEntriesByID(final Collection<Integer> id) {
-		final List<IPicklistEntry> entries = new ArrayList<IPicklistEntry>();
+	public Set<IPicklistEntry> getPicklistEntriesByID(final Collection<Integer> id) {
+		final Set<IPicklistEntry> entries = new LinkedHashSet<IPicklistEntry>();
 		for (final Integer integer : id) {
 			if (null == integer) {
 				continue;
