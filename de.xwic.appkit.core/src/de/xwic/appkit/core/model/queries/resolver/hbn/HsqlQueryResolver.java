@@ -22,7 +22,7 @@ import de.xwic.appkit.core.model.util.DateUtils;
  * @author Florian Lippisch
  * @author Christian Jackel
  */
-public class HsqlQueryResolver extends QueryResolver {
+public class HsqlQueryResolver extends QueryResolver<Object> {
 	/** logger */
 	protected final Log log = LogFactory.getLog(getClass());
 

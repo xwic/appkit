@@ -24,7 +24,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * @author Ronny Pfretzschner
  *
  */
-public abstract class QueryResolver implements IEntityQueryResolver {
+public abstract class QueryResolver<T> implements IEntityQueryResolver {
 
 	private final static String ORDER_PROP_NAME = "pentry";
 	private final static int TYPE_PROPERTY = 0;
@@ -34,7 +34,7 @@ public abstract class QueryResolver implements IEntityQueryResolver {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(java.lang.Class, de.xwic.appkit.core.dao.EntityQuery)
 	 */
-	public abstract Object resolve(Class<? extends Object> entityClass, EntityQuery query, boolean justCount);
+	public abstract T resolve(Class<? extends Object> entityClass, EntityQuery query, boolean justCount);
 
 	
 	/**

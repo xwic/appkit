@@ -24,7 +24,7 @@ import de.xwic.appkit.core.model.queries.CMFastSearchQuery;
  * @author Ronny Pfretzschner
  *
  */
-public class CMQueryShortFilterResolver extends QueryResolver {
+public class CMQueryShortFilterResolver extends QueryResolver<Object> {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)

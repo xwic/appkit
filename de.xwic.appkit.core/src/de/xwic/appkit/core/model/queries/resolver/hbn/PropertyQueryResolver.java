@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import de.xwic.appkit.core.dao.impl.mongo.EntityWrapper;
+import de.xwic.appkit.core.model.queries.resolver.mongo.MongoQueryResolver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -32,7 +34,7 @@ import de.xwic.appkit.core.util.CollectionUtil;
 /**
  * @author Florian Lippisch
  */
-public class PropertyQueryResolver extends QueryResolver {
+public class PropertyQueryResolver extends QueryResolver<Object> {
 
 	private final Log log = LogFactory.getLog(getClass());
 	
