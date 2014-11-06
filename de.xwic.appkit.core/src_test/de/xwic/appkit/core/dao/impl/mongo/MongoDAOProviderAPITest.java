@@ -48,6 +48,8 @@ public class MongoDAOProviderAPITest {
         Setup setup = new Setup();
         setup.setProperty("mongo.host", "localhost");
         setup.setProperty("mongo.db", "test");
+        setup.setProperty("mongo.user", "pulsecli");
+        setup.setProperty("mongo.password", "querty");
         ConfigurationManager.setSetup(setup);
         mongoDAOProvider = new MongoDAOProvider();
         DAOSystem.setDAOFactory(new DefaultDAOFactory(mongoDAOProvider));

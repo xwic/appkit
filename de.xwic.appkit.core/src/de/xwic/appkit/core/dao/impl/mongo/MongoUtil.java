@@ -5,9 +5,7 @@
  */
 package de.xwic.appkit.core.dao.impl.mongo;
 
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
+import com.mongodb.*;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
 import org.hibernate.cfg.Configuration;
@@ -22,6 +20,7 @@ import sun.reflect.ReflectionFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -49,7 +48,14 @@ public class MongoUtil {
     private static MongoClient createMongoPool() {
         MongoUtil.configuration = ConfigurationManager.getSetup().getProperties();
         try {
-            return new MongoClient(configuration.getProperty("mongo.host"));
+            if(configuration.getProperty("mongo.user") != null) {
+                MongoCredential credential = MongoCredential.createMongoCRCredential(configuration.getProperty("mongo.user"),
+                        configuration.getProperty("mongo.db"), configuration.getProperty("mongo.password").toCharArray());
+                return new MongoClient(new ServerAddress(configuration.getProperty("mongo.host")), Arrays.asList(credential));
+            } else {
+                return new MongoClient(configuration.getProperty("mongo.host"));
+            }
+
         } catch (UnknownHostException e) {
             throw new IllegalStateException("cant configure mongo " + e.getMessage(), e);
         }
