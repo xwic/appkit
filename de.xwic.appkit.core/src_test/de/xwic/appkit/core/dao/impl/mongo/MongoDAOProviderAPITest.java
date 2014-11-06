@@ -9,6 +9,8 @@ package de.xwic.appkit.core.dao.impl.mongo;
 
 import com.mongodb.MongoClient;
 import de.xwic.appkit.core.DefaultDAOFactory;
+import de.xwic.appkit.core.config.ConfigurationManager;
+import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.Limit;
@@ -43,13 +45,17 @@ public class MongoDAOProviderAPITest {
 
     @BeforeClass
     public static void setupClass() throws UnknownHostException {
+        Setup setup = new Setup();
+        setup.setProperty("mongo.host", "localhost");
+        setup.setProperty("mongo.db", "test");
+        ConfigurationManager.setSetup(setup);
         mongoDAOProvider = new MongoDAOProvider();
         DAOSystem.setDAOFactory(new DefaultDAOFactory(mongoDAOProvider));
     }
 
     @Before
     public void setup() throws UnknownHostException {
-        mongoClient = new MongoClient("localhost");
+        mongoClient = MongoUtil.currentSession();
         mongoClient.getDB("test").dropDatabase();
     }
 
