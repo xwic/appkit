@@ -21,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -35,6 +36,7 @@ import static org.junit.Assert.*;
  *
  * @author Vitaliy Zhovtyuk
  */
+@Ignore("Runs on running mongo instance. Integration test.")
 public class MongoDAOProviderAPITest {
     private static MongoDAOProvider mongoDAOProvider;
     private MongoClient mongoClient;

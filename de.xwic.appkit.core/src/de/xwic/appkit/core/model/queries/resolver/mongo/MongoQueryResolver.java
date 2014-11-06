@@ -7,55 +7,51 @@
  */
 package de.xwic.appkit.core.model.queries.resolver.mongo;
 
-import com.mongodb.MongoClient;
 import de.xwic.appkit.core.dao.EntityQuery;
-import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
-import de.xwic.appkit.core.dao.impl.mongo.EntityWrapper;
 import de.xwic.appkit.core.dao.impl.mongo.MongoUtil;
-import de.xwic.appkit.core.model.queries.HsqlQuery;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.core.model.queries.resolver.hbn.QueryResolver;
-import de.xwic.appkit.core.model.util.DateUtils;
 import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.util.CollectionUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.Session;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.FieldCriteria;
 import org.mongodb.morphia.query.Query;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
- * @author Florian Lippisch
- * @author Christian Jackel
+ * @author Vitaliy Zhovtyuk
  */
 public class MongoQueryResolver extends QueryResolver<Query> {
-	/** logger */
-	protected final Log log = LogFactory.getLog(getClass());
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)
-	 */
-	public Query resolve(Class<? extends Object> entityClass, EntityQuery entityQuery, boolean justCount) {
+    @Override
+    public Query resolve(Class<? extends Object> entityClass, EntityQuery entityQuery, boolean justCount) {
         Query q = MongoUtil.createQuery(EntityUtil.type(entityClass));
         PropertyQuery propertyQuery = (PropertyQuery) entityQuery;
-        List<QueryElement> queryElementList =  propertyQuery.getElements();
-        for(QueryElement queryElement : queryElementList) {
-            q.filter("entity." + queryElement.getPropertyName(), queryElement.getValue());
-        }
+        resolveFilter(q, propertyQuery);
         List<String> columnsList = propertyQuery.getColumns();
-        if(!CollectionUtil.isEmpty(columnsList)) {
+        if (!CollectionUtil.isEmpty(columnsList)) {
             final String[] columns = new String[columnsList.size()];
             columnsList.toArray(columns);
             q.retrievedFields(false, columns);
         }
 
         return q;
-	}
+    }
+
+    /**
+     * Resolve nested queries to mongo query filter.
+     *
+     * @param q             mongo query
+     * @param propertyQuery property query
+     */
+    private void resolveFilter(Query q, PropertyQuery propertyQuery) {
+        List<QueryElement> queryElementList = propertyQuery.getElements();
+        for (QueryElement queryElement : queryElementList) {
+            if (queryElement.getSubQuery() != null) {
+                resolveFilter(q, queryElement.getSubQuery());
+            }
+            if (queryElement.getPropertyName() != null) {
+                q.filter("entity." + queryElement.getPropertyName(), queryElement.getValue());
+            }
+        }
+    }
 }
