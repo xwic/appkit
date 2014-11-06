@@ -50,7 +50,7 @@ public class MongoQueryResolver extends QueryResolver<Query> {
                 resolveFilter(q, queryElement.getSubQuery());
             }
             if (queryElement.getPropertyName() != null) {
-                q.filter("entity." + queryElement.getPropertyName(), queryElement.getValue());
+                q.filter("entity." + queryElement.getPropertyName() + " " + queryElement.getOperation(), queryElement.getValue());
             }
         }
     }
