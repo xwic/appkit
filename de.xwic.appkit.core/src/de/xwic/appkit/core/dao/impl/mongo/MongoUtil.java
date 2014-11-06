@@ -5,19 +5,23 @@
  */
 package de.xwic.appkit.core.dao.impl.mongo;
 
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import org.hibernate.cfg.Configuration;
+import org.mongodb.morphia.AdvancedDatastore;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.mapping.DefaultCreator;
-import org.mongodb.morphia.mapping.Mapper;
-import org.mongodb.morphia.mapping.MappingException;
+import org.mongodb.morphia.mapping.*;
+import org.mongodb.morphia.mapping.cache.EntityCache;
 import org.mongodb.morphia.query.Query;
 import sun.reflect.ReflectionFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Florian Lippisch
@@ -148,24 +152,26 @@ public class MongoUtil {
 	}
 
 
-    public static Datastore getDatastore(Class<? extends Object> clazz, MongoClient mongoClient) {
+    public static AdvancedDatastore getDatastore(Class<? extends Object> clazz, MongoClient mongoClient) {
         Morphia morphia = new Morphia();
         Mapper mapper = morphia.getMapper();
         mapper.getOptions().objectFactory = new CustomMorphiaObjectFactory();
+        mapper.getOptions().setActLikeSerializer(true);
+        mapper.getOptions().setStoreEmpties(true);
         morphia.map(EntityWrapper.class);
         if(mongoClient == null) {
             mongoClient = createMongoPool();
         }
-        return morphia.createDatastore(mongoClient, "test");
+        return (AdvancedDatastore) morphia.createDatastore(mongoClient, "test");
     }
 
     public static Query createQuery(Class<? extends Object> entityClass) {
         MongoClient mongoClient = MongoUtil.currentSession();
-        Datastore datastore = MongoUtil.getDatastore(entityClass, mongoClient);
-        return datastore.createQuery(entityClass).disableValidation();
+        AdvancedDatastore datastore = MongoUtil.getDatastore(entityClass, mongoClient);
+        return datastore.createQuery(entityClass.getName(), EntityWrapper.class).disableValidation();
     }
 
-    public static class CustomMorphiaObjectFactory extends DefaultCreator {
+    private static class CustomMorphiaObjectFactory extends DefaultCreator {
         @Override
         public Object createInstance(Class clazz) {
             try {

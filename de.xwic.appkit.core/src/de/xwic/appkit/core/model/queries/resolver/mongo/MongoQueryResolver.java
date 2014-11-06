@@ -17,6 +17,7 @@ import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.model.queries.QueryElement;
 import de.xwic.appkit.core.model.queries.resolver.hbn.QueryResolver;
 import de.xwic.appkit.core.model.util.DateUtils;
+import de.xwic.appkit.core.model.util.EntityUtil;
 import de.xwic.appkit.core.util.CollectionUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +43,7 @@ public class MongoQueryResolver extends QueryResolver<Query> {
 	 * @see de.xwic.appkit.core.dao.IEntityQueryResolver#resolve(de.xwic.appkit.core.dao.EntityQuery)
 	 */
 	public Query resolve(Class<? extends Object> entityClass, EntityQuery entityQuery, boolean justCount) {
-        Query q = MongoUtil.createQuery(EntityWrapper.class);
+        Query q = MongoUtil.createQuery(EntityUtil.type(entityClass));
         PropertyQuery propertyQuery = (PropertyQuery) entityQuery;
         List<QueryElement> queryElementList =  propertyQuery.getElements();
         for(QueryElement queryElement : queryElementList) {

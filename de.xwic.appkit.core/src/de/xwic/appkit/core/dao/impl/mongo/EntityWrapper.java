@@ -6,7 +6,6 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.annotations.Embedded;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.PrePersist;
-import org.mongodb.morphia.annotations.Transient;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.UpdateOperations;
 
@@ -50,8 +49,7 @@ public class EntityWrapper<T extends IEntity> extends Entity implements IEntityW
                 '}';
     }
 
-    @Transient
-     protected final Datastore ds;
+    protected transient final Datastore ds;
 
     @PrePersist
     void prePersist(){
