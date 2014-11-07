@@ -12,6 +12,8 @@ package de.xwic.appkit.webbase.utils;
  */
 public class StringUtils {
 
+	public static final String[] EMPTY_STRING_ARRAY = new String[0];
+
 	/**
 	 * @param all
 	 * @param what
