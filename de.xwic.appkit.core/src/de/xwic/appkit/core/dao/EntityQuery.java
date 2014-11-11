@@ -5,6 +5,7 @@
  */
 package de.xwic.appkit.core.dao;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -115,6 +116,13 @@ public abstract class EntityQuery {
 		if (columns != null) {
 			returnEntity = false;
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public void setFetchIdsOnly() {
+		setColumns(Collections.<String>emptyList());
 	}
 
 	/**
