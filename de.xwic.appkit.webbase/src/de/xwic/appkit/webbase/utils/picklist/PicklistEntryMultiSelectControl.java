@@ -101,7 +101,7 @@ public class PicklistEntryMultiSelectControl extends PicklistEntryControl implem
 	 */
 	@Override
 	public void selectEntries(Set<IPicklistEntry> entities) {
-		HashSet<String> keys = CollectionUtil.createCollection(entities, entityToKey, new HashSet<String>());
+		final Set<String> keys = CollectionUtil.createSet(entities, entityToKey);
 		setSelectedKey(StringUtils.join(keys.iterator(), ';'));
 	}
 }
