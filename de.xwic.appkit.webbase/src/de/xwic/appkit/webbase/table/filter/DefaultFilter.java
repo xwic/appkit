@@ -78,24 +78,24 @@ public class DefaultFilter extends AbstractFilterControl {
 					qe = new QueryElement();
 					qe.setLinkType(QueryElement.AND);
 					qe.setPropertyName(propIds[0]);
-					if ("eq".equals(logic)) {
-						qe.setOperation(QueryElement.EQUALS);
-					} else if ("neq".equals(logic)) {
-						qe.setOperation(QueryElement.NOT_EQUALS);
-					} else{
-						if(("sw".equals(logic) || "c".equals(logic))){
-							qe.setOperation(QueryElement.LIKE);
-						}else if("nc".equals(logic)){
-							qe.setOperation(QueryElement.NOT_LIKE);
-						}
-						if (("sw".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.endsWith("%")) {
-							search = search + "%";
-						} 
-						if (("ew".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.startsWith("%")) {
-							search = "%" + search;
-						}
-						
+					
+					if(("eq".equals(logic) || "sw".equals(logic) || "c".equals(logic))){
+						qe.setOperation(QueryElement.LIKE);
+					}else if("neq".equals(logic) ||"nc".equals(logic)){
+						qe.setOperation(QueryElement.NOT_LIKE);
 					}
+					if (("sw".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.endsWith("%")) {
+						search = search + "%";
+					} 
+					if (("ew".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.startsWith("%")) {
+						search = "%" + search;
+					}
+					
+					// in case it's equal we should not trim the seaerch string
+					if("eq".equals(logic) || "neq".equals(logic)){
+						search = inpText.getText();
+					}
+					
 					qe.setValue(search);
 				}
 			}
@@ -142,13 +142,17 @@ public class DefaultFilter extends AbstractFilterControl {
 					ddLogic.selectedByKey("eq");
 				}
 			}else if(QueryElement.NOT_LIKE.equals(queryElement.getOperation())){
+				boolean contains = false;
 				if(search.startsWith("%")){
 					search = search.substring(1);
+					contains = true;
 				}
 				if(search.endsWith("%")){
 					search = search.substring(0,search.length()-1);
+					contains = true;
 				}
-				ddLogic.selectedByKey("nc");
+				
+				ddLogic.selectedByKey(contains ? "nc" : "neq");
 			}
 			inpText.setText(search);
 		}

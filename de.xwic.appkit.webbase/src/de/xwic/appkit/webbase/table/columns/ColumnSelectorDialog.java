@@ -68,12 +68,19 @@ public class ColumnSelectorDialog extends AbstractDialogWindow {
 			if (column.getListColumn().getProperty() != null) {
 				for (Property p : column.getListColumn().getProperty()) {
 					String name = bundle.getString(p.getEntityDescriptor().getClassname());
+					String info = bundle.getString(p.getEntityDescriptor().getClassname() + "." + p.getName() + "_info");
 					if (!name.startsWith("!")) {
 						if (sbDesc.length() != 0) {
 							sbDesc.append(" : ");
 						}
 						sbDesc.append(name);
+						
+						if(!info.startsWith("!")){
+							sbDesc.append("<br/><b>Field Description</b>: ");
+							sbDesc.append(info);
+						}
 					}
+					
 				}
 			} else {
 				sbDesc.append("- Custom Column -");
