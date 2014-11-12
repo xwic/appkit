@@ -50,17 +50,6 @@ public final class EntityUtil {
 	}
 
 	/**
-	 * @param entity
-	 * @return
-	 */
-	public static int getId(final IEntity entity) {
-		if (entity != null) {
-			return entity.getId();
-		}
-		return Entities.NEW_ENTITY_ID;
-	}
-
-	/**
 	 * @param entityClass
 	 * @param id
 	 * @return
@@ -266,17 +255,6 @@ public final class EntityUtil {
 			return IEntity.class.isAssignableFrom(clasz);
 		}
 		return false;
-	}
-
-	/**
-	 * @param entity
-	 * @return
-	 */
-	public static Integer getIdOrNull(final IEntity entity) {
-		if (entity == null) {
-			return null;
-		}
-		return entity.getId();
 	}
 
 	/**

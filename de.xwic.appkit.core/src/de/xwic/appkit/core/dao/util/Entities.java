@@ -3,6 +3,8 @@
  */
 package de.xwic.appkit.core.dao.util;
 
+import de.xwic.appkit.core.dao.IEntity;
+
 
 /**
  * @author Alexandru Bledea
@@ -17,6 +19,28 @@ public class Entities {
 	 *
 	 */
 	private Entities() {
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public static Integer getIdOrNull(final IEntity entity) {
+		if (entity == null) {
+			return null;
+		}
+		return entity.getId();
+	}
+
+	/**
+	 * @param entity
+	 * @return
+	 */
+	public static int getId(final IEntity entity) {
+		if (entity != null) {
+			return entity.getId();
+		}
+		return Entities.NEW_ENTITY_ID;
 	}
 
 }
