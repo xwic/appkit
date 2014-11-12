@@ -314,7 +314,7 @@ public class PropertyQueryResolver extends QueryResolver {
 						throw new IllegalArgumentException("NULL values are only allowed for EQUALS, NOT_EQUALS, IS_EMPTY or IS_NOT_EMPTY operations.");
 					}
 				} else {
-					if(DAOSystem.isOracleCaseInsensitve() && QueryElement.LIKE.equals(qe.getOperation())){
+					if(DAOSystem.isOracleCaseInsensitve() && (QueryElement.LIKE.equals(qe.getOperation()) || QueryElement.NOT_LIKE.equals(qe.getOperation()))){
 						sb.append("UPPER(").append(aliasPrefix)
 						  .append(qe.getPropertyName())
 						  .append(") ")
