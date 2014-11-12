@@ -40,6 +40,7 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
+import de.xwic.appkit.webbase.utils.StringUtils;
 
 /**
  * Holds information about a column in a table and transforms a property 
@@ -62,23 +63,22 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	protected PropertyEditor propertyEditor = null;
 	protected int dataIdx = 0;
 
-	private TimeZone timeZone = null;
 	protected Locale locale = null;
 	
 	protected String myProperty = null;
 	protected boolean isPicklistEntry = false;
 	protected boolean isCollection = false;
-	protected DAO collFetchDAO = null;
+	protected DAO<?> collFetchDAO = null;
 	
 	protected DateFormat dateFormatter;
 
 	private Class<? extends IEntity> entityClass;
+	private boolean customProperty;
 
 	/**
 	 * 
 	 */
 	public DefaultColumnLabelProvider() {
-		timeZone = TimeZone.getDefault();
 		locale = Locale.getDefault();
 	}
 	
@@ -87,15 +87,20 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	 */
 	@Override
 	public void initialize(TimeZone timeZone, Locale locale, String dateFormat, String timeFormat, Column col) {
-		this.timeZone = timeZone;
 		this.locale = locale;
 		this.column = col.getListColumn();
 		this.entityClass = col.getEntityClass();
-		if (column.getFinalProperty().isEntity() && column.getFinalProperty().getEntityType().equals(IPicklistEntry.class.getName())) {
+		this.customProperty = column.getPropertyId().startsWith("#");
+
+		final Property finalProperty = column.getFinalProperty();
+		if (customProperty && null == finalProperty) {
+			return;
+		}
+		if (finalProperty.isEntity() && finalProperty.getEntityType().equals(IPicklistEntry.class.getName())) {
 			isPicklistEntry = true;
 		}
 
-		switch (column.getFinalProperty().getDateType()) {
+		switch (finalProperty.getDateType()) {
 		case Property.DATETYPE_DATETIME:
 			if(dateFormat != null && timeFormat != null){
 				dateFormatter = new SimpleDateFormat(dateFormat + " " + timeFormat);
@@ -163,6 +168,9 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	@Override
 	public String[] getRequiredProperties(ListColumn listColumn, String propertyId) {
 		myProperty = propertyId;
+		if (customProperty) {
+			return StringUtils.EMPTY_STRING_ARRAY;
+		}
 		Property prop = listColumn.getFinalProperty();
 		if (prop.isEntity()) {
 			
@@ -281,7 +289,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			text = ((IPicklistEntry)value).getBezeichnung(locale.getLanguage());
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity)value;
-			DAO dao = DAOSystem.findDAOforEntity(entity.type());
+			DAO<?> dao = DAOSystem.findDAOforEntity(entity.type());
 			text = dao.buildTitle(entity);
 		} else if (value instanceof Collection<?>) {
 			// set of picklist entries
