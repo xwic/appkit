@@ -187,14 +187,16 @@ public class PropertyQueryResolver extends QueryResolver {
 			boolean hasCriteria = size != 0 || query.isHideDeleted();
 			orderBy = addSortingClause(query, "obj", hasCriteria, sbFrom, entityClass);
 		}
-			
-		if(query.isConsistentOrder() && orderBy.indexOf("obj.id") == -1) {
-			if(orderBy.length() != 0) {
-				orderBy += ", "; 
-			} else {
-				orderBy = " order by ";
+
+		if ((query.getColumns() == null || sbFrom.indexOf("obj.id") >= 0) && !justCount) { //sql server fix: you can have a column in "order by" only if it's present in the select clause
+			if (query.isConsistentOrder() && orderBy.indexOf("obj.id") == -1) {
+				if (orderBy.length() != 0) {
+					orderBy += ", ";
+				} else {
+					orderBy = " order by ";
+				}
+				orderBy += "obj.id asc";
 			}
-			orderBy += "obj.id asc";
 		}
 				
 		if (checkPicklistJoin) {
