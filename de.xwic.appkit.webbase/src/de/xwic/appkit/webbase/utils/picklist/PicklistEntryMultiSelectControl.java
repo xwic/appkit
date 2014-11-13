@@ -3,7 +3,7 @@
  */
 package de.xwic.appkit.webbase.utils.picklist;
 
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -84,7 +84,7 @@ public class PicklistEntryMultiSelectControl extends PicklistEntryControl implem
 	 */
 	@Override
 	public Set<IPicklistEntry> getSelectedEntries() {
-		return CollectionUtil.createCollection(getSelectedKeys(), keyToEntity, new HashSet<IPicklistEntry>());
+		return CollectionUtil.createSet(Arrays.asList(getSelectedKeys()), keyToEntity);
 	}
 
 	/* (non-Javadoc)
