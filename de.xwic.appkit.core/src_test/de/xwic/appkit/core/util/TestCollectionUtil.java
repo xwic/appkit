@@ -25,7 +25,7 @@ import org.junit.Test;
 @SuppressWarnings("static-method")
 public final class TestCollectionUtil {
 
-	private static final List<String> totallyRandomNames = Collections.unmodifiableList(Arrays.asList("Ileana", "Alexandra", "Andreia", "Maria", null, "", "Diana", "Miriam"));
+	private static final List<String> totallyRandomNames = Collections.unmodifiableList(Arrays.asList("Alexandra", "Andreia", "Maria", null, "", "Diana", "Miriam"));
 
 	/**
 	 *
@@ -33,7 +33,7 @@ public final class TestCollectionUtil {
 	@Test
 	public void testCreateSet() {
 		final Set<Character> actual = CollectionUtil.createSet(totallyRandomNames, ExtractFirstLetter.INSTANCE);
-		final List<Character> expected = Arrays.asList('I', 'A', 'M', 'D');
+		final List<Character> expected = Arrays.asList('A', 'M', 'D');
 		Assert.assertEquals(new LinkedHashSet<Character>(expected), actual);
 	}
 
@@ -43,7 +43,7 @@ public final class TestCollectionUtil {
 	@Test
 	public void testCreateList() {
 		final List<Character> actual = CollectionUtil.createList(totallyRandomNames, ExtractFirstLetter.INSTANCE);
-		final List<Character> expected = Arrays.asList('I', 'A', 'A', 'M', 'D', 'M');
+		final List<Character> expected = Arrays.asList('A', 'A', 'M', 'D', 'M');
 		Assert.assertEquals(expected, actual);
 	}
 
