@@ -155,7 +155,8 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
             }
             return entities;
         } catch (Exception e) {
-            throw new DataAccessException("Error getting collection property: " + entityImplClass.getName() + " -> " + entityId, e);
+        	throw new DataAccessException(String.format("Error getting collection property: %s of %s -> %s", propertyId,
+					entityImplClass.getName(), entityId), e);
         }
 	}
 }
