@@ -33,7 +33,7 @@ public final class MapUtil {
 	 * @return a map created from the items using the generator, if the key evaluates to null, it is not added to the map, if two items evaluate to the same key, the latest one will override any previous values
 	 */
 	public static <Key, Obj> Map<Key, Obj> generateMap(final Collection<? extends Obj> items, final Function<Obj, Key> generator) {
-		return generateMap(items, generator, Evaluators.<Obj> identity());
+		return generateMap(items, generator, Functions.<Obj> identity());
 	}
 
 	/**

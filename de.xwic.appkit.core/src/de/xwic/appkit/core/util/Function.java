@@ -14,12 +14,6 @@ package de.xwic.appkit.core.util;
  * @author Alexandru Bledea
  * @since Jul 9, 2013
  */
-public interface Function<O, R> extends ExceptionalFunction<O, R> {
-
-	/* (non-Javadoc)
-	 * @see com.notbed.util.map.IEvaluatorWithException#evaluate(java.lang.Object)
-	 */
-	@Override
-	R evaluate(O obj);
+public interface Function<O, R> extends ExceptionalFunction<O, R, RuntimeException> {
 
 }

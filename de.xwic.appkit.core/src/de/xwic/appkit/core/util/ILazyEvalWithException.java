@@ -9,6 +9,6 @@ package de.xwic.appkit.core.util;
  * @since Aug 27, 2014
  */
 @Deprecated
-public interface ILazyEvalWithException<O, R> extends ExceptionalFunction<O, R> {
+public interface ILazyEvalWithException<O, R, X extends Exception> extends ExceptionalFunction<O, R, X> {
 
 }

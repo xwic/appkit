@@ -14,13 +14,13 @@ package de.xwic.appkit.core.util;
  * @author Alexandru Bledea
  * @since Jul 9, 2013
  */
-public interface ExceptionalFunction<O, R> {
+public interface ExceptionalFunction<O, R, X extends Exception> {
 
 	/**
 	 * @param obj
 	 * @return
 	 * @throws Exception
 	 */
-	R evaluate(O obj) throws Exception;
+	R evaluate(final O obj) throws X;
 
 }
