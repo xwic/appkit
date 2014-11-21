@@ -337,7 +337,7 @@ public final class CollectionUtil {
 	 * @param evaluator the evaluator
 	 * @return a list filled with the evaluated values, if an object evaluates to null, it is not added to the collection
 	 */
-	public static <E, O> E evaluate(final O object, final Function<O, E> evaluator, final E whatIfNull) {
+	public static <E, O, X extends Exception> E evaluate(final O object, final ExceptionalFunction<O, E, X> evaluator, final E whatIfNull) throws X {
 		if (null == object) {
 			return whatIfNull;
 		}
