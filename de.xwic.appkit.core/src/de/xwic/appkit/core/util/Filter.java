@@ -65,7 +65,7 @@ public abstract class Filter<E> implements IFilter<E> {
 
 		@Override
 		public boolean keep(E element) {
-			return a.keep(element) && b.keep(element);
+			return a.keep(element) || b.keep(element);
 		}
 
 		@Override
@@ -100,26 +100,32 @@ public abstract class Filter<E> implements IFilter<E> {
 			return "!" + a;
 		}
 	}
-	
-	/**
-	 * @return
-	 */
-	private Filter<E> getThis(){
-		return this;
-	}
-	
+
 	/**
 	 * Wraps an IFilter instance
 	 * @param wrapped
 	 * @return
 	 */
 	public static <T> Filter<T> of(final IFilter<T> wrapped){
-		return new Filter<T>(){
-			@Override
-			public boolean keep(T element) {
-				return wrapped.keep(element);
-			};
-		};
+		return new Wrapper<T>(wrapped);
+	}
+	private static class Wrapper<E> extends Filter<E>{
+
+		private final IFilter<E> wrapped;
+
+		public Wrapper(IFilter<E> wrapped) {
+			this.wrapped = wrapped;
+		}
+
+		@Override
+		public boolean keep(E element) {
+			return wrapped.keep(element);
+		}
+
+		@Override
+		public String toString() {
+			return wrapped.toString();
+		}
 	}
 
 	@SuppressWarnings("unchecked")
