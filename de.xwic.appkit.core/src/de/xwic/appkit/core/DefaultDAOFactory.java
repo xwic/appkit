@@ -15,6 +15,7 @@ import de.xwic.appkit.core.dao.DAOProvider;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntityQueryResolver;
+import de.xwic.appkit.core.model.daos.IActivityDAO;
 import de.xwic.appkit.core.model.daos.IAnhangDAO;
 import de.xwic.appkit.core.model.daos.IEntityCommentDAO;
 import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
@@ -29,6 +30,7 @@ import de.xwic.appkit.core.model.daos.ISyncStateDAO;
 import de.xwic.appkit.core.model.daos.ISystemTraceStatisticDAO;
 import de.xwic.appkit.core.model.daos.IUserListProfileDAO;
 import de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO;
+import de.xwic.appkit.core.model.daos.impl.ActivityDAO;
 import de.xwic.appkit.core.model.daos.impl.AnhangDAO;
 import de.xwic.appkit.core.model.daos.impl.EntityCommentDAO;
 import de.xwic.appkit.core.model.daos.impl.MitarbeiterDAO;
@@ -220,6 +222,7 @@ public class DefaultDAOFactory implements DAOFactory {
 		
 		registerDao(IUserListProfileDAO.class, new UserListProfileDAO());
 		registerDao(IUserViewConfigurationDAO.class, new UserViewConfigurationDAO());
+		registerDao(IActivityDAO.class, new ActivityDAO());
 		
         provider.registerQuery(UserQuery.class, new UserQueryResolver());
         provider.registerQuery(RightQuery.class, new RightQueryResolver());

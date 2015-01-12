@@ -37,12 +37,4 @@ public class SchedulerManager {
 		return scheduler;
 	}
 
-	/**
-	 * Register the DAOs
-	 * 
-	 * @param factory
-	 */
-	public static void register(DAOFactory factory) {
-		factory.registerDao(IActivityDAO.class, new ActivityDAO());
-	}
 }
