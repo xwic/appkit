@@ -358,7 +358,7 @@ public class QuartzClusterScheduler extends QuartzScheduler implements ISchedule
 		if (isMaster()) {
 			boolean result = super.interruptJob(activity);
 			try {
-				cluster.sendEvent(new ClusterEvent(getClass().getName(), "runJob", entityId), true);
+				cluster.sendEvent(new ClusterEvent(getClass().getName(), "interruptJob", entityId), true);
 			} catch (EventTimeOutException e) {
 				log.warn("Error distributing addCronJob event", e);
 			}
@@ -367,7 +367,7 @@ public class QuartzClusterScheduler extends QuartzScheduler implements ISchedule
 			IRemoteService rsMaster = csHandler.getMasterService();
 			if (rsMaster != null) {
 				try {
-					Boolean result = (Boolean) rsMaster.invokeMethod("runJob",
+					Boolean result = (Boolean) rsMaster.invokeMethod("interruptJob",
 							new Serializable[] { entityId });
 					return result;
 				} catch (CommunicationException e) {
