@@ -141,16 +141,13 @@ public class ClusterServiceManager {
 	 */
 	public IClusterService getClusterService(String name) {
 		log.debug("getClusterService(String name): Before 'service' synchronize");
-		synchronized (services) {
-			log.debug("getClusterService(String name): After 'service' synchronize");
-			if (!services.containsKey(name)) {
-				throw new IllegalArgumentException("A IClusterService with the name '" + name + "' is not registered.");
-			}
-			IClusterService cs = services.get(name).getClusterService();
-			log.debug("getClusterService(String name): End 'service' synchronize");
-			return cs;
-		}
 		
+		ClusterServiceHandler csh = services.get(name);
+		if(csh == null){
+			throw new IllegalArgumentException("A IClusterService with the name '" + name + "' is not registered.");
+		}
+		log.debug("getClusterService(String name): End 'service' synchronize");
+		return csh.getClusterService();
 	}
 	
 	/* (non-Javadoc)

@@ -54,6 +54,9 @@ public class ClusterNode implements INode {
 	 * @throws CommunicationException
 	 */
 	public Response sendMessage(Message message) throws CommunicationException {
+		if(channel == null && status != NodeStatus.CONNECTED) {
+			throw new CommunicationException("Node Status is currently not connected.");
+		}
 		return channel.sendMessage(message);
 	}
 

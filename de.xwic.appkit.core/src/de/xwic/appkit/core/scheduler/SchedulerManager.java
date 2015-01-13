@@ -6,9 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.SchedulerException;
 
-import de.xwic.appkit.core.dao.DAOFactory;
-import de.xwic.appkit.core.model.daos.IActivityDAO;
-import de.xwic.appkit.core.model.daos.impl.ActivityDAO;
+import de.xwic.appkit.core.cluster.ClusterManager;
 import de.xwic.appkit.core.util.ConfigurationUtil;
 
 /**
@@ -29,7 +27,14 @@ public class SchedulerManager {
 		if (scheduler == null) {
 			try {
 				TimeZone timeZone = ConfigurationUtil.getDefaultTimeone();
-				scheduler = new QuartzScheduler(timeZone);
+				if(ConfigurationUtil.isClusterMode()){
+					QuartzClusterScheduler service =  new QuartzClusterScheduler(timeZone);
+					ClusterManager.getCluster().registerClusterService(ISchedulerClusterService.SERVICE_NAME, service);
+					scheduler = service;
+				}else {
+					scheduler =  new QuartzScheduler(timeZone);
+				}
+				
 			} catch (SchedulerException e) {
 				log.error("Cannot create the scheduler", e);
 			}

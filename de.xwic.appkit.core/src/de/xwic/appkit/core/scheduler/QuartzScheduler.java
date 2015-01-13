@@ -39,14 +39,14 @@ import de.xwic.appkit.core.util.StringUtil;
 public class QuartzScheduler implements IScheduler {
 
 	private static Log log = LogFactory.getLog(QuartzScheduler.class);
-	private IActivityDAO activityDao;
-	private IPicklisteDAO plDao;
-	private Scheduler scheduler;
+	protected IActivityDAO activityDao;
+	protected IPicklisteDAO plDao;
+	protected Scheduler scheduler;
 
-	private static final String CRON_GROUP = "Cron Group";
-	private static final String ONE_TIME_GROUP = "One Time";
+	protected static final String CRON_GROUP = "Cron Group";
+	protected static final String ONE_TIME_GROUP = "One Time";
 
-	private TimeZone tz = null;
+	protected TimeZone tz = null;
 	/**
 	 * @throws SchedulerException
 	 */
@@ -65,6 +65,9 @@ public class QuartzScheduler implements IScheduler {
 	@Override
 	public void start() {
 		try {
+			if(scheduler.isShutdown()){
+				this.scheduler = new StdSchedulerFactory().getScheduler();
+			}
 			scheduler.start();
 			init();
 		} catch (SchedulerException e) {
@@ -81,6 +84,7 @@ public class QuartzScheduler implements IScheduler {
 	public void stop() {
 		try {
 			scheduler.shutdown();
+			log.info("Scheduler has been stopped");
 		} catch (SchedulerException e) {
 			log.error("Cannot stop the scheduler", e);
 		}
@@ -89,7 +93,7 @@ public class QuartzScheduler implements IScheduler {
 	/**
 	 * 
 	 */
-	private void init() {
+	protected void init() {
 		PropertyQuery pq = new PropertyQuery();
 		pq.addNotEquals("status.key", IActivity.PE_ACTIVITY_STATUS_DISABLED);
 

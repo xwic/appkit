@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.StreamCorruptedException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +29,7 @@ import de.xwic.appkit.core.cluster.Response;
  */
 public class OutboundChannel {
 
-	//private final static int SOCKET_TIMEOUT = 10000; // 10 seconds
+	private final static int SOCKET_TIMEOUT = 6* 10000; // 60 seconds
 	
 	private final Log log = LogFactory.getLog(getClass()); 
 	
@@ -142,7 +143,7 @@ public class OutboundChannel {
 		
 		socket = new Socket(nodeAddress.getHostname(), nodeAddress.getPort());
 		
-//		socket.setSoTimeout(SOCKET_TIMEOUT);
+		socket.setSoTimeout(SOCKET_TIMEOUT);
 		
 		out = new ObjectOutputStream(socket.getOutputStream());
 		in = new ObjectInputStream(socket.getInputStream());
@@ -179,6 +180,10 @@ public class OutboundChannel {
 			cluster.nodeDisconnected(node); // notify the cluster that the node was disconnected. The cluster will attempt to reconnect
 			throw new CommunicationException("The connection to another node was corrupted and closed.");
 			
+		} catch(SocketTimeoutException ste){
+			closeConnection();
+			cluster.nodeDisconnected(node);
+			throw new CommunicationException("Socket response timed out. Message was: #" + message.getMessageId() + " Cmd: " + message.getCommand() + " Arg: " + message.getArgument());
 		} catch (SocketException se) {
 			closeConnection();
 			cluster.nodeDisconnected(node); // notify the cluster that the node was disconnected. The cluster will attempt to reconnect

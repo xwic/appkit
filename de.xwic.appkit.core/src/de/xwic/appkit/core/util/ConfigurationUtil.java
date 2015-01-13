@@ -100,6 +100,13 @@ public class ConfigurationUtil {
 	public static String getSystemName(){
 		return getConfigurationProperty("server.name", "unnamed");
 	}
+	
+	/**
+	 * @return
+	 */
+	public static boolean isClusterMode() {
+		return "true".equals(getConfigurationProperty("clustermode", "false"));
+	}
 
 	/**
 	 * @param key
