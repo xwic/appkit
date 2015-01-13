@@ -62,7 +62,7 @@ public class ClientHandler implements Runnable {
 					msgIn = (Message)oIn.readObject();
 				} catch (IOException e) {
 					// this occurs when the connection is closed
-					log.info("Client " + socket.getInetAddress() + " disconnected.");
+					log.info("Client " + socket.getInetAddress() + ":" + socket.getPort() + " disconnected.");
 					break;
 				} catch (ClassNotFoundException e) {
 					log.error("Can not handle incoming message - stream might be corrupted..", e);

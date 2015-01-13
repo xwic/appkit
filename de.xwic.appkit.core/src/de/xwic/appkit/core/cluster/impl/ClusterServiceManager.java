@@ -6,6 +6,7 @@ package de.xwic.appkit.core.cluster.impl;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class ClusterServiceManager {
 
 	private final static Log log = LogFactory.getLog(ClusterServiceManager.class);
 	
-	private Map<String, ClusterServiceHandler> services = new HashMap<String, ClusterServiceHandler>();
+	private Map<String, ClusterServiceHandler> services = Collections.synchronizedMap(new HashMap<String, ClusterServiceHandler>());
 	private Cluster cluster;
 
 	/**
@@ -47,12 +48,15 @@ public class ClusterServiceManager {
 	 */
 	public void registerClusterService(String name, IClusterService service) {
 		
+		log.debug("registerClusterService(String name, IClusterService service): Before 'service' synchronize");
+		ClusterServiceHandler csHandler = null;
 		synchronized (services) {
+			log.debug("registerClusterService(String name, IClusterService service): After 'service' synchronize");
 			if (services.containsKey(name)) {
 				throw new IllegalArgumentException("A IClusterService with the name '" + name + "' is already registered.");
 			}
 			
-			ClusterServiceHandler csHandler = new ClusterServiceHandler(service);
+			csHandler = new ClusterServiceHandler(service);
 			
 			service.onRegistration(name, cluster, csHandler);
 			services.put(name, csHandler);
@@ -104,9 +108,8 @@ public class ClusterServiceManager {
 				// there is no master service on the cluster. This means that the current service will take this role
 				service.obtainMasterRole(null); 
 			}
-			
 		}
-		
+		log.debug("registerClusterService(String name, IClusterService service): End 'service' synchronize");
 	}
 	
 	/**
@@ -137,12 +140,15 @@ public class ClusterServiceManager {
 	 * @see de.xwic.appkit.cluster.ICluster#getClusterService(java.lang.String)
 	 */
 	public IClusterService getClusterService(String name) {
-		
+		log.debug("getClusterService(String name): Before 'service' synchronize");
 		synchronized (services) {
+			log.debug("getClusterService(String name): After 'service' synchronize");
 			if (!services.containsKey(name)) {
 				throw new IllegalArgumentException("A IClusterService with the name '" + name + "' is not registered.");
 			}
-			return services.get(name).getClusterService();
+			IClusterService cs = services.get(name).getClusterService();
+			log.debug("getClusterService(String name): End 'service' synchronize");
+			return cs;
 		}
 		
 	}
@@ -164,7 +170,9 @@ public class ClusterServiceManager {
 
 		Serializable data = null;
 		
+		log.debug("takeMasterRole(String serviceName, ClusterNode remoteNode): Before 'service' synchronize");
 		synchronized (services) {
+			log.debug("takeMasterRole(String serviceName, ClusterNode remoteNode): After 'service' synchronize");
 
 			ClusterServiceHandler csWrapper = services.get(serviceName);
 			if (csWrapper != null) {
@@ -199,6 +207,7 @@ public class ClusterServiceManager {
 			}
 			
 		}
+		log.debug("takeMasterRole(String serviceName, ClusterNode remoteNode): End 'service' synchronize");
 		return data;
 	}
 
@@ -208,7 +217,9 @@ public class ClusterServiceManager {
 	 */
 	public void handleNewNode(INode node) {
 
+		log.debug(" handleNewNode(INode node): Before 'service' synchronize");
 		synchronized (services) {
+			log.debug(" handleNewNode(INode node): After 'service' synchronize");
 			for (String name : getInstalledClusterServiceNames()) {
 	
 				ClusterServiceHandler csWrapper = services.get(name);
@@ -257,7 +268,9 @@ public class ClusterServiceManager {
 						log.warn("Error retrieving service status from node " + node, ce);
 					}
 				}
+				
 			}
+			log.debug(" handleNewNode(INode node): End 'service' synchronize");
 		}
 		
 		
@@ -271,7 +284,9 @@ public class ClusterServiceManager {
 	 */
 	public void remoteSurrenderService(String serviceName, ClusterNode remoteNode, Serializable container) {
 
+		log.debug("remoteSurrenderService(String serviceName, ClusterNode remoteNode, Serializable container): Before 'service' synchronize");
 		synchronized (services) {
+			log.debug("remoteSurrenderService(String serviceName, ClusterNode remoteNode, Serializable container): After 'service' synchronize");
 			
 			ClusterServiceHandler csWrapper = services.get(serviceName);
 			if (csWrapper != null) {
@@ -288,7 +303,7 @@ public class ClusterServiceManager {
 				}
 				
 			}
-			
+			log.debug("remoteSurrenderService(String serviceName, ClusterNode remoteNode, Serializable container): End 'service' synchronize");
 		}
 		
 	}
@@ -366,7 +381,9 @@ public class ClusterServiceManager {
 	void handleDisconnectedNode(INode remoteNode) {
 		
 		int myMasterPrio = cluster.getConfig().getMasterPriority();
+		log.debug("handleDisconnectedNode(INode remoteNode): Before 'service' synchronize");
 		synchronized (services) {
+			log.debug("handleDisconnectedNode(INode remoteNode): After 'service' synchronize");
 			for (String name : getInstalledClusterServiceNames()) {
 	
 				ClusterServiceHandler csWrapper = services.get(name);
@@ -403,7 +420,7 @@ public class ClusterServiceManager {
 						
 					}
 				}
-
+				log.debug("handleDisconnectedNode(INode remoteNode): End 'service' synchronize");
 			}
 		}
 		

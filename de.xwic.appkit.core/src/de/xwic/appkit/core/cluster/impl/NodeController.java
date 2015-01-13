@@ -31,6 +31,8 @@ public class NodeController implements Runnable {
 	public NodeController(Cluster cluster) {
 		super();
 		this.cluster = cluster;
+		// check nodes one time during startup.
+		checkNodes();
 	}
 
 	/* (non-Javadoc)
@@ -56,7 +58,7 @@ public class NodeController implements Runnable {
 	 * 
 	 */
 	@SuppressWarnings("incomplete-switch")
-	private void checkNodes() {
+	public void checkNodes() {
 		
 			
 		INode[] nodes  = cluster.getNodes();

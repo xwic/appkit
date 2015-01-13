@@ -162,9 +162,11 @@ public class OutboundChannel {
 			Response response = null;
 			// need to synchronize any communication accross the socket
 			synchronized (out) {
+				log.debug("Writing message: " + message.toString());
 				out.writeObject(message);
 				
 				response = (Response)in.readObject();
+				log.debug("Reading response for message: " + message.toString());
 				if (response.getResponseTo() != 0 && response.getResponseTo() != message.getMessageId()) {
 					// the response is not the one we expected
 					throw new CommunicationException("Communication out of sync. Expected response to " + message.getMessageId() + " but received response #" + response.getResponseTo());
