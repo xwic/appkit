@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import de.xwic.appkit.core.config.ParseException;
+
 /**
  * The model contains a list of entities that are connected to each other.
  * 
@@ -39,9 +41,14 @@ public class Model {
 	/**
 	 * Add an EntityDescriptor to the model.
 	 * @param entityDescriptor
+	 * @throws ParseException 
 	 */
-	public void addEntityDescriptor(EntityDescriptor entityDescriptor) {
-		entities.put(entityDescriptor.getClassname(), entityDescriptor);
+	public void addEntityDescriptor(final EntityDescriptor entityDescriptor) throws ParseException {
+		final String classname = entityDescriptor.getClassname();
+		if (entities.containsKey(classname)) {
+			throw new ParseException(classname  + " already defined.");
+		}
+		entities.put(classname, entityDescriptor);
 	}
 	
 	/**
