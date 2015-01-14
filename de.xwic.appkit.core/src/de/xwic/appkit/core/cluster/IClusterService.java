@@ -44,4 +44,11 @@ public interface IClusterService {
 	 */
 	public void obtainMasterRole(Serializable remoteMasterData);
 	
+	/**
+	 * If true the service will be always master on node with highest prio.
+	 * Otherwise service will stay active master on first started node.
+	 * @return
+	 */
+	public boolean isSurrenderServiceByPrio();
+	
 }

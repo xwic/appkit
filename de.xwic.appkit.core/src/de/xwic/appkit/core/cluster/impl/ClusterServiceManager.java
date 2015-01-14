@@ -92,7 +92,7 @@ public class ClusterServiceManager {
 				if (rsd.getServiceStatus() == ClusterServiceStatus.ACTIVE_MASTER) {
 					foundOneMaster = true;
 					log.debug("Found a remote service that is currently master with MasterPriority (" + rsd.getNode().getMasterPriority() + ")");
-					if (rsd.getNode().getMasterPriority() < cluster.getConfig().getMasterPriority()) {
+					if (rsd.getNode().getMasterPriority() < cluster.getConfig().getMasterPriority() && csHandler.getClusterService().isSurrenderServiceByPrio()) {
 						// this node has a higher master priority. This means that we have to take over the master role
 						// from the remote node.
 						
@@ -235,7 +235,7 @@ public class ClusterServiceManager {
 								// the remote service is currently a master
 								
 								IClusterService clusterService = csWrapper.getClusterService();
-								if (clusterService.isMaster()) { // only try if we are already a master. If we are a slave, another node exists with a higher prio 
+								if (clusterService.isMaster() && clusterService.isSurrenderServiceByPrio()) { // only try if we are already a master. If we are a slave, another node exists with a higher prio 
 									if (node.getMasterPriority() < cluster.getConfig().getMasterPriority()) {
 										// this node has a higher master priority. This means that we have to take over the master role
 										// from the remote node.

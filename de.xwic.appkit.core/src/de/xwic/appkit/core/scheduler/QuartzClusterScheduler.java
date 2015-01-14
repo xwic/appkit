@@ -456,4 +456,12 @@ public class QuartzClusterScheduler extends QuartzScheduler implements ISchedule
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.cluster.IClusterService#isSurrenderServiceByPrio()
+	 */
+	@Override
+	public boolean isSurrenderServiceByPrio() {
+		return false;
+	}
+
 }

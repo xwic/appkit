@@ -55,4 +55,12 @@ public abstract class AbstractClusterService implements IClusterService {
 		master = true;
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.cluster.IClusterService#isSurrenderServiceByPrio()
+	 */
+	@Override
+	public boolean isSurrenderServiceByPrio() {
+		return true;
+	}
 }
