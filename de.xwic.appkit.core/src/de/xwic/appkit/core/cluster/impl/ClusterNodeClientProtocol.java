@@ -225,13 +225,15 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 		NodeAddress nodeAddress = new NodeAddress(socket.getInetAddress().getHostAddress(), remotePort);
 
 		log.debug("Initial Connection Attempt from " + nodeAddress + ", identified as Node '" + remoteNodeName + "'");
-		
-		remoteNode  = (ClusterNode)cluster.getNodeByName(remoteNodeName);
+
+		remoteNode  = (ClusterNode)cluster.getNodeByAddress(nodeAddress);
 		if (remoteNode  == null) { // this is a node we do not have in our list.
 			remoteNode  = new ClusterNode(nodeAddress);
 			remoteNode.setName(remoteNodeName);
 			remoteNode.setMasterPriority(remoteMasterPriority);
-			cluster.registerNode(remoteNode );
+			cluster.registerNode(remoteNode);
+		} else {
+			remoteNode.setName(remoteNodeName);
 		}
 		
 		// open the channel back
@@ -265,7 +267,7 @@ public class ClusterNodeClientProtocol implements ICommProtocol {
 		int remoteMasterPriority = data[2];
 		
 		log.info("Callback from remote node '" + remoteNodeName + "' (#" + internalNodeId + ")");
-		
+
 		remoteNode  = (ClusterNode)cluster.getNodeById(internalNodeId);
 		if (remoteNode != null) {
 			remoteNode.setName(remoteNodeName);

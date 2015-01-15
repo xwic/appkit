@@ -118,9 +118,11 @@ public class OutboundChannel {
 				}
 			}
 			
-			if (node.getStatus() == NodeStatus.DISCONNECTED || node.getStatus() == NodeStatus.NEW) {
+			if (node.getStatus() == NodeStatus.DISCONNECTED
+					|| node.getStatus() == NodeStatus.NEW
+					|| node.getStatus() == NodeStatus.DISABLED) {
 				((ClusterNode)node)._connected(this);
-				
+
 				cluster.getClusterServiceManager().handleNewNode(node);
 			}
 			

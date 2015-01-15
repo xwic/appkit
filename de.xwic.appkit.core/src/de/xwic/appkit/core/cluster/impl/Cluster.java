@@ -45,7 +45,7 @@ public class Cluster implements ICluster {
 	private ClusterConfiguration config;
 	private InboundConnectionHandler inbConHandler = null;
 	
-	private INode[] nodes = new INode[0]; 
+	volatile private INode[] nodes = new INode[0];
 	
 	private Queue<EventWrapper> eventQueue = new ConcurrentLinkedQueue<EventWrapper>();
 	private Thread tEventQueue;
@@ -171,6 +171,19 @@ public class Cluster implements ICluster {
 	public INode getNodeById(int internalNodeId) {
 		for (INode node : nodes) {
 			if (((ClusterNode)node).getInternalNumber() == internalNodeId) {
+				return node;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @param nodeAddress
+	 * @return
+	 */
+	public INode getNodeByAddress(NodeAddress nodeAddress) {
+		for (INode node : nodes) {
+			if(node.getAddress().equals(nodeAddress)) {
 				return node;
 			}
 		}
