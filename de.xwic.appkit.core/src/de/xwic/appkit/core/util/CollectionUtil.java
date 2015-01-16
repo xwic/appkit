@@ -65,6 +65,34 @@ public final class CollectionUtil {
 	}
 
 	/**
+	 * if parameter is null, set won't contain anything
+	 *
+	 * @param set
+	 * @return
+	 */
+	public static <E> Set<E> newSet(final Collection<E> collection) {
+		final Set<E> set = new LinkedHashSet<E>();
+		if (!CollectionUtil.isEmpty(collection)) {
+			set.addAll(collection);
+		}
+		return set;
+	}
+
+	/**
+	 * if parameter is null, list won't contain anything
+	 *
+	 * @param set
+	 * @return
+	 */
+	public static <E> List<E> newList(final Collection<E> collection) {
+		final List<E> set = new ArrayList<E>();
+		if (!CollectionUtil.isEmpty(collection)) {
+			set.addAll(collection);
+		}
+		return set;
+	}
+
+	/**
 	 * for defensive copying
 	 * @param set
 	 * @return
@@ -94,6 +122,9 @@ public final class CollectionUtil {
 	 * @throws NullPointerException if <code>where</code> is empty
 	 */
 	public static <E> void clearAndAddAll(final Collection<? super E> where, final Collection<? extends E> fromWhere) throws NullPointerException {
+		if (where == fromWhere) {
+			return;
+		}
 		where.clear();
 		if (!isEmpty(fromWhere)) {
 			where.addAll(fromWhere);
@@ -107,6 +138,9 @@ public final class CollectionUtil {
 	 */
 	public static <K, V> void clearAndPutAll(final Map<? super K, ? super V> where,
 			final Map<? extends K, ? extends V> fromWhere) throws NullPointerException {
+		if (where == fromWhere) {
+			return;
+		}
 		where.clear();
 		if (!isEmpty(fromWhere)) {
 			where.putAll(fromWhere);
