@@ -29,11 +29,13 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	private long lastUpdate = 0;
 
 	/**
+	 * Package private, use ClusterCollections to instantiate
+	 *
 	 * @param identifier
 	 * @param cluster
 	 * @param map
 	 */
-	public ClusterMap(String identifier, ICluster cluster, Map<K, V> map) {
+	ClusterMap(String identifier, ICluster cluster, Map<K, V> map) {
 		super(map);
 		this.identifier = identifier;
 		this.cluster = cluster;
@@ -89,6 +91,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 			lastUpdate = new Date().getTime();
 			try {
 				ClusterMapUpdateEventData data = new ClusterMapUpdateEventData(map, lastUpdate);
+				log.debug("Sending ClusterMap update for " + identifier);
 				cluster.sendEvent(new ClusterEvent(EVENT_NAMESPACE, identifier, data), true);
 			} catch (EventTimeOutException e) {
 				log.error("Unable to send cache update message for " + identifier, e);
@@ -112,6 +115,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 				if (event.getName().equals(identifier)) {
 					ClusterMapUpdateEventData data = (ClusterMapUpdateEventData) event.getData();
 					if (data.getLastUpdate() > lastUpdate) {
+						log.debug("Updating ClusterMap " + identifier);
 						map = (Map<K, V>) data.getMap();
 					}
 				}
