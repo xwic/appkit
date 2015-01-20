@@ -16,12 +16,16 @@ public class ClusterCollections {
 	private static Set<String> cacheMapIdentifiers = new HashSet<String>();
 
 	public static <K extends Serializable, V extends Serializable>
-	ClusterMap<K, V> toCacheMap(Map<K, V> map, String identifier) {
+	Map<K, V> toCacheMap(Map<K, V> map, String identifier) {
+		// in case cluster is not used we can just return given hash map.
+		if(!ConfigurationUtil.isClusterMode()){
+			return map;
+		}
 		validateCacheMapIdentifier(identifier);
 		ICluster cluster = null;
-		if(ConfigurationUtil.isClusterMode()) {
-			cluster = ClusterManager.getCluster();
-		}
+		
+		cluster = ClusterManager.getCluster();
+		
 		return new ClusterMap<K,V>(identifier, cluster, map);
 	}
 

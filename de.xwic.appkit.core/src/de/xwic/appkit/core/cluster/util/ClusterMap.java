@@ -1,16 +1,12 @@
 package de.xwic.appkit.core.cluster.util;
 
-import de.xwic.appkit.core.cluster.ClusterEvent;
-import de.xwic.appkit.core.cluster.ClusterEventListener;
-import de.xwic.appkit.core.cluster.EventTimeOutException;
-import de.xwic.appkit.core.cluster.ICluster;
-import de.xwic.appkit.core.util.AbstractMapDecorator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.Serializable;
-import java.util.Date;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+
+import de.xwic.appkit.core.cluster.ICluster;
+import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventType;
 
 /**
  * A map implementation that synchronizes over the cluster.
@@ -18,16 +14,9 @@ import java.util.Map;
  *
  * @author Razvan Pat on 1/15/2015.
  */
-public class ClusterMap<K extends Serializable, V extends Serializable> extends AbstractMapDecorator<K, V> {
+public class ClusterMap<K extends Serializable, V extends Serializable> extends AbstractClusterCollection<K, V> implements Map<K, V> {
 
-	private static final Log log = LogFactory.getLog(ClusterMap.class);
-
-	public static final String EVENT_NAMESPACE = "ClusterMapUpdate";
-
-	private String identifier;
-	private ICluster cluster;
-	private long lastUpdate = 0;
-
+	private Map<K, V> map;
 	/**
 	 * Package private, use ClusterCollections to instantiate
 	 *
@@ -36,11 +25,8 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 * @param map
 	 */
 	ClusterMap(String identifier, ICluster cluster, Map<K, V> map) {
-		super(map);
-		this.identifier = identifier;
-		this.cluster = cluster;
-
-		registerListener();
+		super(identifier, cluster);
+		this.map = map;
 	}
 
 	/**
@@ -50,8 +36,8 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 */
 	@Override
 	public V put(K key, V value) {
-		V result = super.put(key, value);
-		sendClusterUpdate();
+		V result = map.put(key, value);
+		sendClusterUpdate(new SerializableEntry<Serializable, Serializable>(key, value), EventType.ADD_ELEMENT);
 		return result;
 	}
 
@@ -60,8 +46,8 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 */
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
-		super.putAll(m);
-		sendClusterUpdate();
+		map.putAll(m);
+		sendClusterUpdate((Serializable)map, EventType.ADD_ALL);
 	}
 
 	/**
@@ -70,8 +56,10 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 */
 	@Override
 	public V remove(Object key) {
-		V result = super.remove(key);
-		sendClusterUpdate();
+		V result = map.remove(key);
+		if(result != null){
+			sendClusterUpdate((K)key, EventType.REMOVE_ELEMENT);
+		}
 		return result;
 	}
 
@@ -79,47 +67,66 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 */
 	@Override
 	public void clear() {
-		super.clear();
-		sendClusterUpdate();
+		map.clear();
+		sendClusterUpdate(null, EventType.CLEAR);
+	}
+	
+	
+	@Override public int size() {
+		return map.size();
 	}
 
-	/**
-	 * Sends update message to the cluster
-	 */
-	private void sendClusterUpdate() {
-		if (cluster != null) {
-			lastUpdate = new Date().getTime();
-			try {
-				ClusterMapUpdateEventData data = new ClusterMapUpdateEventData(map, lastUpdate);
-				log.debug("Sending ClusterMap update for " + identifier);
-				cluster.sendEvent(new ClusterEvent(EVENT_NAMESPACE, identifier, data), true);
-			} catch (EventTimeOutException e) {
-				log.error("Unable to send cache update message for " + identifier, e);
-			}
-		}
+	@Override public boolean isEmpty() {
+		return map.isEmpty();
 	}
 
-	/**
-	 * Registers the listener that checks for incoming updates
+	@Override public boolean containsKey(Object key) {
+		return map.containsKey(key);
+	}
+
+	@Override public boolean containsValue(Object value) {
+		return map.containsValue(value);
+	}
+
+	@Override public V get(Object key) {
+		return map.get(key);
+	}
+
+	@Override public Set<K> keySet() {
+		return map.keySet();
+	}
+
+	@Override public Collection<V> values() {
+		return map.values();
+	}
+
+	@Override public Set<Entry<K, V>> entrySet() {
+		return map.entrySet();
+	}
+
+	@Override public boolean equals(Object o) {
+		return map.equals(o);
+	}
+
+	@Override public int hashCode() {
+		return map.hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.util.AbstractClusterCollection#eventReceived(java.io.Serializable, de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventType)
 	 */
-	private void registerListener() {
-		if(cluster == null) {
-			return;
+	@SuppressWarnings("unchecked")
+	@Override
+	public void eventReceived(Serializable obj, EventType eventType) {
+		if(eventType == EventType.ADD_ELEMENT){
+			SerializableEntry<K, V> newElement = (SerializableEntry<K, V>) obj;
+			map.put(newElement.getKey(), newElement.getValue());
+		}else if (eventType == EventType.ADD_ALL){
+			map.putAll((Map<? extends K, ? extends V>) obj);
+		}else if (eventType == EventType.REMOVE_ELEMENT){
+			map.remove(obj);
+		}else if(eventType == EventType.CLEAR){
+			map.clear();
 		}
-
-		cluster.addEventListener(new ClusterEventListener() {
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public void receivedEvent(ClusterEvent event) {
-				if (event.getName().equals(identifier)) {
-					ClusterMapUpdateEventData data = (ClusterMapUpdateEventData) event.getData();
-					if (data.getLastUpdate() > lastUpdate) {
-						log.debug("Updating ClusterMap " + identifier);
-						map = (Map<K, V>) data.getMap();
-					}
-				}
-			}
-		}, EVENT_NAMESPACE);
 	}
 }

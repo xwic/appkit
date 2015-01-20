@@ -1,8 +1,11 @@
 package de.xwic.appkit.core.cluster.util;
 
 import de.xwic.appkit.core.cluster.*;
+import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventType;
+
 import org.junit.Test;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,19 +33,19 @@ public class ClusterMapTest  {
 		ClusterMap<String, String> clusterMap = new ClusterMap<String, String>("test", dummyCluster, new HashMap<String, String>());
 
 		clusterMap.put("1", "A");
-		assertEquals("A", dummyCluster.getLastSentEventMap().get("1"));
+		assertEquals("A", ((SerializableEntry<String, String>)dummyCluster.getLastSentEventMap()).getValue());
 		assertEquals(true, dummyCluster.eventModeSent);
 
 		clusterMap.putAll(someHashMap);
-		assertEquals(someHashMap.get(someHashMapKey), dummyCluster.getLastSentEventMap().get(someHashMapKey));
+		assertEquals(someHashMap.get(someHashMapKey), ((Map<String, String>)dummyCluster.getLastSentEventMap()).get(someHashMapKey));
 		assertEquals(true, dummyCluster.eventModeSent);
 
 		clusterMap.remove("1");
-		assertNull(dummyCluster.getLastSentEventMap().get("1"));
+		assertEquals("1", dummyCluster.getLastSentEventMap());
 		assertEquals(true, dummyCluster.eventModeSent);
 
 		clusterMap.clear();
-		assertNull(dummyCluster.getLastSentEventMap().get(someHashMapKey));
+		assertNull(dummyCluster.getLastSentEventMap());
 		assertEquals(true, dummyCluster.eventModeSent);
 	}
 
@@ -66,7 +69,7 @@ public class ClusterMapTest  {
 
 		clusterMap.put("x", "X");
 
-		long updateTime = ((ClusterMapUpdateEventData) dummyCluster.eventSent.getData()).getLastUpdate();
+		long updateTime = ((ClusterCollectionUpdateEventData) dummyCluster.eventSent.getData()).getLastUpdate();
 		long timePassed = new Date().getTime() - updateTime;
 		assertTrue(timePassed < 1000 * 60);
 	}
@@ -98,7 +101,7 @@ public class ClusterMapTest  {
 		DummyCluster dummyCluster = new DummyCluster();
 		ClusterMap<String, String> clusterMap = new ClusterMap<String, String>("testIdentifier", dummyCluster, new HashMap<String, String>());
 		clusterMap.put("x", "y"); //causes lastUpdate to be set to current date
-		ClusterMapUpdateEventData data = new ClusterMapUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60);
+		ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60, EventType.ADD_ALL);
 		ClusterEvent event = new ClusterEvent(ClusterMap.EVENT_NAMESPACE, "testIdentifier", data);
 
 		dummyCluster.addedListener.receivedEvent(event);
@@ -114,7 +117,7 @@ public class ClusterMapTest  {
 		DummyCluster dummyCluster = new DummyCluster();
 		ClusterMap<String, String> clusterMap = new ClusterMap<String, String>("testIdentifier", dummyCluster, new HashMap<String, String>());
 		clusterMap.put("x", "y"); //causes lastUpdate to be set to current date
-		ClusterMapUpdateEventData data = new ClusterMapUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60);
+		ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60, EventType.ADD_ELEMENT);
 		ClusterEvent event = new ClusterEvent(ClusterMap.EVENT_NAMESPACE, "otherIdentifier", data);
 
 		dummyCluster.addedListener.receivedEvent(event);
@@ -130,7 +133,7 @@ public class ClusterMapTest  {
 		DummyCluster dummyCluster = new DummyCluster();
 		ClusterMap<String, String> clusterMap = new ClusterMap<String, String>("testIdentifier", dummyCluster, new HashMap<String, String>());
 		clusterMap.put("x", "y"); //causes lastUpdate to be set to current date
-		ClusterMapUpdateEventData data = new ClusterMapUpdateEventData(someHashMap, new Date().getTime() - 1000 * 60);
+		ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(someHashMap, new Date().getTime() - 1000 * 60, EventType.ADD_ELEMENT);
 		ClusterEvent event = new ClusterEvent(ClusterMap.EVENT_NAMESPACE, "testIdentifier", data);
 
 		dummyCluster.addedListener.receivedEvent(event);
@@ -157,8 +160,8 @@ class DummyCluster implements ICluster {
 	ClusterEventListener addedListener;
 	String listenerNamespace;
 
-	Map getLastSentEventMap() {
-		return ((ClusterMapUpdateEventData) eventSent.getData()).getMap();
+	Serializable getLastSentEventMap() {
+		return ((ClusterCollectionUpdateEventData) eventSent.getData()).getData();
 	}
 
 	@Override
