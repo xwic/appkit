@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author Razvan Pat on 1/15/2015.
  */
 public class ClusterCollectionUpdateEventData implements Serializable {
-	public enum EventType { ADD_ELEMENT, REMOVE_ELEMENT, CLEAR, ADD_ALL }
+	public enum EventType { ADD_ELEMENT, REMOVE_ELEMENT, CLEAR, REPLACE_ALL }
 	private Serializable obj;
 	private long lastUpdate;
 	private EventType eventType;

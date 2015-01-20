@@ -47,7 +47,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
 		map.putAll(m);
-		sendClusterUpdate((Serializable)map, EventType.ADD_ALL);
+		sendClusterUpdate((Serializable)map, EventType.REPLACE_ALL);
 	}
 
 	/**
@@ -121,8 +121,8 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 		if(eventType == EventType.ADD_ELEMENT){
 			SerializableEntry<K, V> newElement = (SerializableEntry<K, V>) obj;
 			map.put(newElement.getKey(), newElement.getValue());
-		}else if (eventType == EventType.ADD_ALL){
-			map.putAll((Map<? extends K, ? extends V>) obj);
+		}else if (eventType == EventType.REPLACE_ALL){
+			map = (Map<K, V>) obj;
 		}else if (eventType == EventType.REMOVE_ELEMENT){
 			map.remove(obj);
 		}else if(eventType == EventType.CLEAR){

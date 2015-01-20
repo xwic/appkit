@@ -101,7 +101,7 @@ public class ClusterMapTest  {
 		DummyCluster dummyCluster = new DummyCluster();
 		ClusterMap<String, String> clusterMap = new ClusterMap<String, String>("testIdentifier", dummyCluster, new HashMap<String, String>());
 		clusterMap.put("x", "y"); //causes lastUpdate to be set to current date
-		ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60, EventType.ADD_ALL);
+		ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(someHashMap, new Date().getTime() + 1000 * 60, EventType.REPLACE_ALL);
 		ClusterEvent event = new ClusterEvent(ClusterMap.EVENT_NAMESPACE, "testIdentifier", data);
 
 		dummyCluster.addedListener.receivedEvent(event);
