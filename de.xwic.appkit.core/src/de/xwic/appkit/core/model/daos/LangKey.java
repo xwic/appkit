@@ -26,6 +26,12 @@ public class LangKey implements Serializable {
 	private String langID;
 
 	/**
+	 * For serialization
+	 */
+	public LangKey(){
+		
+	}
+	/**
 	 * constructor
 	 * 
 	 * @param entryID
@@ -108,5 +114,19 @@ public class LangKey implements Serializable {
 			hashDone = true;
 		}
 		return hashCode;
+	}
+
+	/**
+	 * @return the hashDone
+	 */
+	public boolean isHashDone() {
+		return hashDone;
+	}
+
+	/**
+	 * @param hashDone the hashDone to set
+	 */
+	public void setHashDone(boolean hashDone) {
+		this.hashDone = hashDone;
 	}
 }

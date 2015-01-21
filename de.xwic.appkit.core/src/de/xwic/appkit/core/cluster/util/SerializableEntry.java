@@ -14,6 +14,10 @@ public class SerializableEntry<K extends Serializable, V extends Serializable> i
 
 	private K key;
 	private V val;
+	
+	public SerializableEntry(){
+		
+	}
 	/**
 	 * 
 	 */
@@ -44,6 +48,24 @@ public class SerializableEntry<K extends Serializable, V extends Serializable> i
 	public V setValue(V value) {
 		this.val = val;
 		return val;
+	}
+	/**
+	 * @return the val
+	 */
+	public V getVal() {
+		return val;
+	}
+	/**
+	 * @param val the val to set
+	 */
+	public void setVal(V val) {
+		this.val = val;
+	}
+	/**
+	 * @param key the key to set
+	 */
+	public void setKey(K key) {
+		this.key = key;
 	}
 
 }
