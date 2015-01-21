@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import de.xwic.appkit.core.cluster.ClusterManager;
+import de.xwic.appkit.core.cluster.util.ClusterCollections;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.daos.LangKey;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
@@ -19,6 +21,7 @@ import de.xwic.appkit.core.model.entities.IPickliste;
 
 /**
  * Encapsulates the picklist entities.
+ * 
  * @author Florian Lippisch
  */
 public class PicklistCache {
@@ -27,25 +30,27 @@ public class PicklistCache {
 	/** map of all entries - is needed in local dao */
 	protected Map<Integer, IPicklistEntry> allEntries = new HashMap<Integer, IPicklistEntry>();
 	private Map<LangKey, IPicklistText> allTexts = new HashMap<LangKey, IPicklistText>();
-	private Map<String, EntityList> allListsWithEntries = new HashMap<String, EntityList>();
-	
+	private Map<String, EntityList<IPicklistEntry>> allListsWithEntries = new HashMap<String, EntityList<IPicklistEntry>>();
+	private boolean convertedToClusterMap = false;
+
 	/**
 	 * @param id
 	 * @return
 	 */
 	public IPicklistText getPicklistTextById(int id) {
-    	
-		for (Iterator<IPicklistText> it = allTexts.values().iterator(); it.hasNext(); ) {
-    		IPicklistText pt = it.next();
-    		if (pt.getId() == id) {
-    			return pt;
-    		}
-    	}
-    	return null;
+
+		for (Iterator<IPicklistText> it = allTexts.values().iterator(); it.hasNext();) {
+			IPicklistText pt = it.next();
+			if (pt.getId() == id) {
+				return pt;
+			}
+		}
+		return null;
 	}
 
 	/**
 	 * Write PicklistText.
+	 * 
 	 * @param e
 	 */
 	public void putPicklistText(IPicklistText e) {
@@ -66,7 +71,7 @@ public class PicklistCache {
 	 * @param key
 	 * @return
 	 */
-	public EntityList getEntryList(String key) {
+	public EntityList<IPicklistEntry> getEntryList(String key) {
 		return allListsWithEntries.get(key);
 	}
 
@@ -74,7 +79,7 @@ public class PicklistCache {
 	 * @param key
 	 * @param erg
 	 */
-	public void putEntryList(String key, EntityList erg) {
+	public void putEntryList(String key, EntityList<IPicklistEntry> erg) {
 		allListsWithEntries.put(key, erg);
 	}
 
@@ -83,21 +88,22 @@ public class PicklistCache {
 	 */
 	public void putPicklistEntry(IPicklistEntry e) {
 		allEntries.put(new Integer(e.getId()), e);
-		
+
 		String key = e.getPickliste().getKey();
-		EntityList sublist = allListsWithEntries.get(key);
-		// if the list does not exist, the list can not be created here. If so, a single request for an 
+		EntityList<IPicklistEntry> sublist = allListsWithEntries.get(key);
+		// if the list does not exist, the list can not be created here. If so, a single request for
+		// an
 		// entry would create a list that does not contain all entries.
-//		if (sublist == null) {
-//			sublist = new EntityList(new ArrayList(), null, 0);
-//			allListsWithEntries.put(key, sublist);
-//		}
+		// if (sublist == null) {
+		// sublist = new EntityList(new ArrayList(), null, 0);
+		// allListsWithEntries.put(key, sublist);
+		// }
 		if (null != sublist && !contains(e, sublist)) {
 			sublist.add(e);
 		}
 
 	}
-	
+
 	/**
 	 * @param e
 	 * @param sublist
@@ -109,7 +115,7 @@ public class PicklistCache {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -126,7 +132,7 @@ public class PicklistCache {
 	 * @return
 	 */
 	public IPickliste getPicklisteByKey(String key) {
-		return allLists.get(key);	
+		return allLists.get(key);
 	}
 
 	/**
@@ -152,12 +158,12 @@ public class PicklistCache {
 	public void removePicklistEntry(IPicklistEntry entry) {
 		allEntries.remove(new Integer(entry.getId()));
 		String key = entry.getPickliste().getKey();
-		EntityList sublist = allListsWithEntries.get(key);
+		EntityList<IPicklistEntry> sublist = allListsWithEntries.get(key);
 		if (sublist != null) {
 			sublist.remove(entry);
 		}
-		
-		for (Iterator<LangKey> it = allTexts.keySet().iterator(); it.hasNext(); ) {
+
+		for (Iterator<LangKey> it = allTexts.keySet().iterator(); it.hasNext();) {
 			LangKey lk = it.next();
 			if (lk.getId() == entry.getId()) {
 				it.remove();
@@ -166,5 +172,18 @@ public class PicklistCache {
 
 	}
 
-	
+	/**
+	 * 
+	 */
+	public void toClusterCache() {
+		if (!convertedToClusterMap) {
+			allLists = ClusterCollections.toCacheMap(allLists, "allPicklists");
+			allEntries = ClusterCollections.toCacheMap(allEntries, "allPicklistEntries");
+			allTexts = ClusterCollections.toCacheMap(allTexts, "allTexts");
+			allListsWithEntries = ClusterCollections.toCacheMap(allListsWithEntries,
+					"allPicklistsWithPicklistEntries");
+			convertedToClusterMap = true;
+		}
+	}
+
 }

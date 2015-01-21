@@ -5,6 +5,8 @@
  */
 package de.xwic.appkit.core.model.entities;
 
+import java.io.Serializable;
+
 import de.xwic.appkit.core.dao.IEntity;
 
 /**
@@ -12,7 +14,7 @@ import de.xwic.appkit.core.dao.IEntity;
  * 
  * @author Florian Lippisch
  */
-public interface IPickliste extends IEntity {
+public interface IPickliste extends IEntity, Serializable {
 	// global boolean pickliste will be "hidded", but still created
 	// public final static String PL_GLOBAL_BOOLEAN = "global.bool";
 	// public final static String PL_GLOBAL_BOOLEAN_PARTIALLY_YES =

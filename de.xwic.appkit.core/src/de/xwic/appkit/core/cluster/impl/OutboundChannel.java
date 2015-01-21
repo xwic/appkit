@@ -3,9 +3,12 @@
  */
 package de.xwic.appkit.core.cluster.impl;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.StreamCorruptedException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -36,7 +39,7 @@ public class OutboundChannel {
 	private Socket socket = null;
 	private NodeAddress nodeAddress;
 
-	private ObjectOutputStream out;
+	private OutputStream out;
 
 	private ObjectInputStream in;
 
@@ -146,8 +149,7 @@ public class OutboundChannel {
 		socket = new Socket(nodeAddress.getHostname(), nodeAddress.getPort());
 		
 		socket.setSoTimeout(SOCKET_TIMEOUT);
-		
-		out = new ObjectOutputStream(socket.getOutputStream());
+		out = socket.getOutputStream();
 		in = new ObjectInputStream(socket.getInputStream());
 	
 	}
@@ -166,7 +168,19 @@ public class OutboundChannel {
 			// need to synchronize any communication accross the socket
 			synchronized (out) {
 				log.debug("Writing message: " + message.toString());
-				out.writeObject(message);
+				ByteArrayOutputStream bOutput = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(bOutput);
+				oos.writeObject(message);
+				oos.close();
+				bOutput.flush();
+				byte[] byteMsg = bOutput.toByteArray();
+				bOutput.close();
+				int len = byteMsg.length;
+				DataOutputStream dos = new DataOutputStream(out);
+				dos.writeInt(len);
+				if(len > 0){
+					dos.write(byteMsg, 0, len);
+				}
 				
 				response = (Response)in.readObject();
 				log.debug("Reading response for message: " + message.toString());

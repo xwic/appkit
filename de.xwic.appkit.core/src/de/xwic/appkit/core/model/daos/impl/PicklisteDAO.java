@@ -425,7 +425,6 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 	 */
 	@Override
 	public void cacheAll() {
-
 		provider.execute(new DAOCallback() {
     		@Override
 			public Object run(DAOProviderAPI api) {
@@ -453,7 +452,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		    		cache.putPickliste(p);
 		    		// ensure list exists for auto add
 		    		if (cache.getEntryList(p.getKey()) == null) {
-		    			cache.putEntryList(p.getKey(), new EntityList(new ArrayList<Object>(), null, 0));
+		    			cache.putEntryList(p.getKey(), new EntityList<IPicklistEntry>(new ArrayList<IPicklistEntry>(), null, 0));
 		    		}
 		    		cache.putPicklistEntry(entry);
 	    			cache.putPicklistText(text);
@@ -489,7 +488,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		    	return null;
     		}
 		});
-
+		cache.toClusterCache();
 	}
 
 	/* (non-Javadoc)
@@ -510,10 +509,9 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 			throw new NullPointerException("key must not be null.");
 		}
 
-		EntityList list = getAllEntriesToList(listKey);
+		EntityList<IPicklistEntry> list = getAllEntriesToList(listKey);
         //look in cache first...
-		for (Object name : list) {
-			IPicklistEntry entry = (IPicklistEntry)name;
+		for (IPicklistEntry entry : list) {
 			if (key.equals(entry.getKey())) {
 				return entry;
 			}

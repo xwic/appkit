@@ -3,6 +3,9 @@
  */
 package de.xwic.appkit.core.cluster.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -50,16 +53,25 @@ public class ClientHandler implements Runnable {
 		
 		try {
 			
-			//socket.setSoTimeout(10000); // set the timeout to 10 seconds.
+			//socket.setSoTimeout(60000); // set the timeout to 60 seconds.
 			
-			ObjectInputStream oIn = new ObjectInputStream(socket.getInputStream());
 			ObjectOutputStream oOut = new ObjectOutputStream(socket.getOutputStream());
-			
 			
 			while (true) {
 				Message msgIn;
 				try {
-					msgIn = (Message)oIn.readObject();
+					DataInputStream dis = new DataInputStream(socket.getInputStream());
+					int len = dis.readInt();
+					
+					byte[] content = new byte[len];  
+					if (len > 0) {
+				        dis.readFully(content);
+				    }
+					ByteArrayInputStream bais = new ByteArrayInputStream( content );  
+					ObjectInputStream ois = new ObjectInputStream(bais);
+					msgIn = (Message)ois.readObject();
+					ois.close();
+					bais.close();
 				} catch (IOException e) {
 					// this occurs when the connection is closed
 					log.info("Client " + socket.getInetAddress() + ":" + socket.getPort() + " disconnected.");

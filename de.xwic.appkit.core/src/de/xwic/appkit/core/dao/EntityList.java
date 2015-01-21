@@ -5,6 +5,7 @@
  */
 package de.xwic.appkit.core.dao;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -16,8 +17,10 @@ import java.util.ListIterator;
  * property wich contains the real size in the database.
  * @author Florian Lippisch
  */
-public class EntityList<E> implements List<E> {
+public class EntityList<E> implements List<E>, Serializable {
 
+	private static final long serialVersionUID = 2641640564678329627L;
+	
 	private List<E> list = null;
 	private Limit limit = null;
 	private int count = 0;

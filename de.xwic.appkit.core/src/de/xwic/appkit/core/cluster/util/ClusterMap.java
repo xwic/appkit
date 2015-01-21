@@ -118,7 +118,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void eventReceived(Serializable obj, EventType eventType) {
+	public void eventReceived(Object obj, EventType eventType) {
 		if(eventType == EventType.ADD_ELEMENT){
 			SerializableEntry<K, V> newElement = (SerializableEntry<K, V>) obj;
 			map.put(newElement.getKey(), newElement.getValue());
