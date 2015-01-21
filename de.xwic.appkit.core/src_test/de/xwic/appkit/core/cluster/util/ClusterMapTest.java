@@ -107,11 +107,13 @@ public class ClusterMapTest  {
 		dummyCluster.addedListener.receivedEvent(event);
 
 		assertEquals(someHashMap.get(someHashMapKey), clusterMap.get(someHashMapKey));
+
+		//we expect the map gets replaced by somHashMap and x no longer exists
 		assertNull(clusterMap.get("x"));
 	}
 
 	@Test
-	public void eventIsIgnoredIfDifferendIdentifier() {
+	public void eventIsIgnoredIfDifferentIdentifier() {
 		HashMap<String, String> someHashMap = getDummyHashMap();
 		String someHashMapKey = getFirstKeyOfHashMap(someHashMap);
 		DummyCluster dummyCluster = new DummyCluster();

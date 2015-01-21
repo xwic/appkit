@@ -14,9 +14,10 @@ import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventTy
  *
  * @author Razvan Pat on 1/15/2015.
  */
-public class ClusterMap<K extends Serializable, V extends Serializable> extends AbstractClusterCollection<K, V> implements Map<K, V> {
+public class ClusterMap<K extends Serializable, V extends Serializable> extends AbstractClusterCollection implements Map<K, V> {
 
 	private Map<K, V> map;
+
 	/**
 	 * Package private, use ClusterCollections to instantiate
 	 *

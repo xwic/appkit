@@ -16,7 +16,7 @@ import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventTy
 /**
  * @author Razvan Pat on 1/15/2015.
  */
-public abstract class AbstractClusterCollection<K, V> implements Map<K, V> {
+public abstract class AbstractClusterCollection {
 	
 	protected static final Log log = LogFactory.getLog(ClusterMap.class);
 
