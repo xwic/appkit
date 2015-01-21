@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public abstract class AbstractClusterCollection<K, V> {
 		if (cluster != null) {
 			lastUpdate = new Date().getTime();
 			try {
-				String serializedObject = XmlBeanSerializer.serializeToXML("serializedObject", obj);
+				String serializedObject = XmlBeanSerializer.serializeCollectionToXML("serializedObject", Arrays.asList(obj), true);
 				ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(
 						serializedObject, lastUpdate, eventType);
 				log.debug("Sending ClusterCollection update for " + identifier);
@@ -84,7 +85,15 @@ public abstract class AbstractClusterCollection<K, V> {
 						Document doc;
 						try {
 							doc = new SAXReader().read(new StringReader(data.getSerializedObject()));
-							Element root = doc.getRootElement();
+							Element root = null;
+							root = doc.getRootElement().element("serializedObject");
+							if(root == null){
+								log.debug("Root element is null");
+								root = doc.getRootElement();
+							}
+							if(root.attributeValue("type") == null){
+								root = root.element("bean");
+							}
 							Object deserialized = new XmlBeanSerializer().deserializeBean(root);
 							eventReceived(deserialized, data.getEventType());
 						} catch (DocumentException e) {
