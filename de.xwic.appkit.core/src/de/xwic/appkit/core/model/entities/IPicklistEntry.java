@@ -5,6 +5,7 @@
  */
 package de.xwic.appkit.core.model.entities;
 
+import java.io.Serializable;
 import java.util.Set;
 
 import de.xwic.appkit.core.dao.IEntity;
@@ -13,7 +14,7 @@ import de.xwic.appkit.core.dao.IEntity;
  * PL - PicklistenEntry. Defines an entry in a Pickliste.
  * @author Florian Lippisch
  */
-public interface IPicklistEntry extends IEntity {
+public interface IPicklistEntry extends IEntity, Serializable {
 
 	/**
 	 * Returns the Pickliste this entry belongs to.

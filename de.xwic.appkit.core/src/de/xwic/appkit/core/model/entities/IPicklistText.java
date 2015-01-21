@@ -5,6 +5,8 @@
  */
 package de.xwic.appkit.core.model.entities;
 
+import java.io.Serializable;
+
 import de.xwic.appkit.core.dao.IEntity;
 
 /**
@@ -12,7 +14,7 @@ import de.xwic.appkit.core.dao.IEntity;
  * 
  * @author Florian Lippisch
  */
-public interface IPicklistText extends IEntity {
+public interface IPicklistText extends IEntity, Serializable {
 
 	/**
 	 * Returns the picklist entry
