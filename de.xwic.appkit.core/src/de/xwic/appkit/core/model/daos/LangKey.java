@@ -7,13 +7,15 @@
  */
 package de.xwic.appkit.core.model.daos;
 
+import java.io.Serializable;
+
 /**
  * Helperclass for temporarely IPicklistText entries.
  * <p>
  * 
  * @author Ronny Pfretzschner
  */
-public class LangKey {
+public class LangKey implements Serializable {
 
 	private int hashCode = 0;
 

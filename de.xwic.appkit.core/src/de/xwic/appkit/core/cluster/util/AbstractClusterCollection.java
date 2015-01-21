@@ -1,22 +1,31 @@
 package de.xwic.appkit.core.cluster.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Serializable;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.cluster.ClusterEvent;
 import de.xwic.appkit.core.cluster.ClusterEventListener;
 import de.xwic.appkit.core.cluster.EventTimeOutException;
 import de.xwic.appkit.core.cluster.ICluster;
 import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventType;
+import de.xwic.appkit.core.transport.xml.TransportException;
+import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 
 /**
  * @author Razvan Pat on 1/15/2015.
  */
-public abstract class AbstractClusterCollection<K, V> implements Map<K, V> {
+public abstract class AbstractClusterCollection<K, V> {
 	
 	protected static final Log log = LogFactory.getLog(ClusterMap.class);
 
@@ -32,19 +41,22 @@ public abstract class AbstractClusterCollection<K, V> implements Map<K, V> {
 		this.cluster = cluster;
 		registerListener();
 	}
-
+	
 	/**
 	 * Sends update message to the cluster
 	 */
-	protected void sendClusterUpdate(Serializable obj, EventType eventType) {
+	protected void sendClusterUpdate(Object obj, EventType eventType) {
 		if (cluster != null) {
 			lastUpdate = new Date().getTime();
 			try {
-				ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(obj, lastUpdate, eventType);
+				String serializedObject = XmlBeanSerializer.serializeToXML("serializedObject", obj);
+				ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(serializedObject, lastUpdate, eventType);
 				log.debug("Sending ClusterCollection update for " + identifier);
 				cluster.sendEvent(new ClusterEvent(EVENT_NAMESPACE, identifier, data), true);
 			} catch (EventTimeOutException e) {
 				log.error("Unable to send cache update message for " + identifier, e);
+			} catch (TransportException e) {
+				log.error("Serialization of the update object has failed. Unable to send cache update message for " + identifier, e);
 			}
 		}
 	}
@@ -66,12 +78,25 @@ public abstract class AbstractClusterCollection<K, V> implements Map<K, V> {
 					ClusterCollectionUpdateEventData data = (ClusterCollectionUpdateEventData) event.getData();
 					if (data.getLastUpdate() > lastUpdate) {
 						log.debug("Updating ClusterCollection " + identifier);
-						eventReceived(data.getData(), data.getEventType());
+						Document doc;
+						try {
+							doc = new SAXReader().read(new StringReader(data.getSerializedObject()));
+						
+						Element root = doc.getRootElement().element("serializedObject");
+						Object deserialized = new XmlBeanSerializer().deserializeBean(root);
+						eventReceived(deserialized, data.getEventType());
+						} catch (DocumentException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}catch (TransportException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}
 		}, EVENT_NAMESPACE);
 	}
 	
-	public abstract void eventReceived(Serializable obj, EventType eventType);
+	public abstract void eventReceived(Object obj, EventType eventType);
 }
