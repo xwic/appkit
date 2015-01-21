@@ -425,7 +425,6 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 	 */
 	@Override
 	public void cacheAll() {
-		cache.toClusterCache();
 		provider.execute(new DAOCallback() {
     		@Override
 			public Object run(DAOProviderAPI api) {
@@ -489,7 +488,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		    	return null;
     		}
 		});
-
+		cache.toClusterCache();
 	}
 
 	/* (non-Javadoc)

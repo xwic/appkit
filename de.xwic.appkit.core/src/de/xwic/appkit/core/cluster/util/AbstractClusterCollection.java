@@ -26,7 +26,7 @@ import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
  * @author Razvan Pat on 1/15/2015.
  */
 public abstract class AbstractClusterCollection<K, V> {
-	
+
 	protected static final Log log = LogFactory.getLog(ClusterMap.class);
 
 	protected static final String EVENT_NAMESPACE = "ClusterCollectionUpdate";
@@ -35,13 +35,12 @@ public abstract class AbstractClusterCollection<K, V> {
 	protected ICluster cluster;
 	protected long lastUpdate = 0;
 
-	
 	public AbstractClusterCollection(String identifier, ICluster cluster) {
 		this.identifier = identifier;
 		this.cluster = cluster;
 		registerListener();
 	}
-	
+
 	/**
 	 * Sends update message to the cluster
 	 */
@@ -50,13 +49,16 @@ public abstract class AbstractClusterCollection<K, V> {
 			lastUpdate = new Date().getTime();
 			try {
 				String serializedObject = XmlBeanSerializer.serializeToXML("serializedObject", obj);
-				ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(serializedObject, lastUpdate, eventType);
+				ClusterCollectionUpdateEventData data = new ClusterCollectionUpdateEventData(
+						serializedObject, lastUpdate, eventType);
 				log.debug("Sending ClusterCollection update for " + identifier);
 				cluster.sendEvent(new ClusterEvent(EVENT_NAMESPACE, identifier, data), true);
 			} catch (EventTimeOutException e) {
 				log.error("Unable to send cache update message for " + identifier, e);
 			} catch (TransportException e) {
-				log.error("Serialization of the update object has failed. Unable to send cache update message for " + identifier, e);
+				log.error(
+						"Serialization of the update object has failed. Unable to send cache update message for "
+								+ identifier, e);
 			}
 		}
 	}
@@ -65,7 +67,7 @@ public abstract class AbstractClusterCollection<K, V> {
 	 * Registers the listener that checks for incoming updates
 	 */
 	private void registerListener() {
-		if(cluster == null) {
+		if (cluster == null) {
 			return;
 		}
 
@@ -75,28 +77,26 @@ public abstract class AbstractClusterCollection<K, V> {
 			@Override
 			public void receivedEvent(ClusterEvent event) {
 				if (event.getName().equals(identifier)) {
-					ClusterCollectionUpdateEventData data = (ClusterCollectionUpdateEventData) event.getData();
+					ClusterCollectionUpdateEventData data = (ClusterCollectionUpdateEventData) event
+							.getData();
 					if (data.getLastUpdate() > lastUpdate) {
-						log.debug("Updating ClusterCollection " + identifier);
+						log.debug("Updating ClusterCollection " + identifier + " data: " + data.getSerializedObject());
 						Document doc;
 						try {
 							doc = new SAXReader().read(new StringReader(data.getSerializedObject()));
-						
-						Element root = doc.getRootElement().element("serializedObject");
-						Object deserialized = new XmlBeanSerializer().deserializeBean(root);
-						eventReceived(deserialized, data.getEventType());
+							Element root = doc.getRootElement();
+							Object deserialized = new XmlBeanSerializer().deserializeBean(root);
+							eventReceived(deserialized, data.getEventType());
 						} catch (DocumentException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}catch (TransportException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							log.error("Can't deserialize object: " + data.getSerializedObject(), e);
+						} catch (TransportException e) {
+							log.error("Can't deserialize object: " + data.getSerializedObject(), e);
 						}
 					}
 				}
 			}
 		}, EVENT_NAMESPACE);
 	}
-	
+
 	public abstract void eventReceived(Object obj, EventType eventType);
 }
