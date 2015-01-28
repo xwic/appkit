@@ -185,15 +185,12 @@ public class XmlBeanSerializer {
 
 		return baOut.toString();
 	}
-	
+
 	/**
-	 * @param doc
-	 * @param string
-	 * @param query
-	 * @throws IntrospectionException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
+	 * @param elm
+	 * @param elementName
+	 * @param bean
+	 * @throws TransportException
 	 */
 	public void serializeBean(Element elm, String elementName, Object bean) throws TransportException {
 		
@@ -225,11 +222,12 @@ public class XmlBeanSerializer {
 		}
 		
 	}
-	
+
 	/**
+	 * @param elm
 	 * @param value
-	 * @param value2
-	 * @throws TransportException 
+	 * @param addTypeInfo
+	 * @throws TransportException
 	 */
 	public void addValue(Element elm, Object value, boolean addTypeInfo) throws TransportException {
 
@@ -349,9 +347,9 @@ public class XmlBeanSerializer {
 	}
 
 	/**
-	 * @param root
-	 * @param string
+	 * @param elm
 	 * @return
+	 * @throws TransportException
 	 */
 	public Object deserializeBean(Element elm) throws TransportException {
 		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
@@ -366,17 +364,22 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
-		Element firstElem = (Element) elm.elementIterator().next();
-		if (firstElem != null && (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
-			return readValue(context, elm, null);
+		// If element is a list:
+		Iterator elementIterator = elm.elementIterator();
+		if(elementIterator.hasNext()) {
+			Element firstElem = (Element) elementIterator.next();
+			if (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName())) {
+				return readValue(context, elm, null);
+			}
 		}
-		
+
+		// Element must have type
 		String strTypeClass = elm.attributeValue("type");
 		if (strTypeClass == null || strTypeClass.length() == 0) {
 			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");
 		}
 		
-		// instanciate bean
+		// Instantiate bean
 		Class<?> beanType;
 		Object bean;
 		try {
@@ -424,11 +427,11 @@ public class XmlBeanSerializer {
 	}
 
 	/**
-	 * @param context 
-	 * @param elmProp
-	 * @param pd 
+	 * @param context
+	 * @param elProp
+	 * @param pd
 	 * @return
-	 * @throws TransportException 
+	 * @throws TransportException
 	 */
 	@SuppressWarnings("unchecked")
 	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd) throws TransportException {
@@ -602,11 +605,9 @@ public class XmlBeanSerializer {
 		return value;
 	}
 
-
 	/**
 	 * @param elm
-	 * @param value
-	 * @param addTypeInfo
+	 * @param map
 	 * @throws TransportException
 	 */
 	private void serializeMap(final Element elm, final Map<?, ?> map) throws TransportException {
@@ -623,7 +624,6 @@ public class XmlBeanSerializer {
 	/**
 	 * @param context
 	 * @param elProp
-	 * @param value
 	 * @return
 	 * @throws TransportException
 	 */

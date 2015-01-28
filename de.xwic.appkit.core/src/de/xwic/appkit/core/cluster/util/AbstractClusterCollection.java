@@ -1,7 +1,5 @@
 package de.xwic.appkit.core.cluster.util;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -26,7 +24,7 @@ import de.xwic.appkit.core.transport.xml.XmlBeanSerializer;
 /**
  * @author Razvan Pat on 1/15/2015.
  */
-public abstract class AbstractClusterCollection<K, V> {
+public abstract class AbstractClusterCollection {
 
 	protected static final Log log = LogFactory.getLog(ClusterMap.class);
 
