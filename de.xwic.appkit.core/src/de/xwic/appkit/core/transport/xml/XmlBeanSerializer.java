@@ -378,24 +378,28 @@ public class XmlBeanSerializer {
 		if (strTypeClass == null || strTypeClass.length() == 0) {
 			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");
 		}
-		
-		// Instantiate bean
-		Class<?> beanType;
-		Object bean;
-		try {
-			beanType = Class.forName(strTypeClass);
-			bean = beanType.newInstance();
-		} catch (InstantiationException e) {
-			throw new TransportException("Can not instantiate bean class " + strTypeClass, e);
-		} catch (IllegalAccessException e) {
-			throw new TransportException("IllegalAccessException instantiating bean class " + strTypeClass);
-		} catch (ClassNotFoundException e) {
-			throw new TransportException("The bean '" + strTypeClass + "' can not be deserialized because the class can not be found.", e);
+
+		Object value = readValue(context, elm, null);
+
+		if(value == null) {
+			// Instantiate bean
+			Class<?> beanType;
+			try {
+				beanType = Class.forName(strTypeClass);
+				value = beanType.newInstance();
+			} catch (InstantiationException e) {
+				throw new TransportException("Can not instantiate bean class " + strTypeClass, e);
+			} catch (IllegalAccessException e) {
+				throw new TransportException("IllegalAccessException instantiating bean class " + strTypeClass);
+			} catch (ClassNotFoundException e) {
+				throw new TransportException("The bean '" + strTypeClass + "' can not be deserialized because the class can not be found.",
+						e);
+			}
+
+			deserializeBean(value, elm, context);
 		}
 
-		deserializeBean(bean, elm, context);
-		
-		return bean;
+		return value;
 	}		
 	
 	/**
