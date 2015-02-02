@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.xwic.appkit.core.model.daos.impl.PicklisteDAO;
+import de.xwic.appkit.core.model.entities.IPicklistText;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -364,6 +366,10 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
+		if(elm == null) {
+			return null;
+		}
+
 		// If element is a list:
 		Iterator elementIterator = elm.elementIterator();
 		if(elementIterator.hasNext()) {
@@ -540,8 +546,9 @@ public class XmlBeanSerializer {
 				}
 			}
 
+			/*
 			if (entry == null && picklistId != null && text != null) {
-				// create?? 
+				// create??
 				IPickliste plist = plDAO.getPicklisteByKey(picklistId);
 				if (plist != null) {
 					entry = plDAO.createPicklistEntry();
@@ -553,9 +560,15 @@ public class XmlBeanSerializer {
 						plDAO.createBezeichnung(entry, lang.getId(), text);
 					}
 				}
-			}
+			}*/
+
 			value = entry;
-			
+
+		} else if (IPicklistText.class.isAssignableFrom(type)){
+			int refId = Integer.parseInt(elProp.attributeValue("id"));
+			PicklisteDAO picklisteDAO = (PicklisteDAO) DAOSystem.getDAO(IPicklisteDAO.class);
+			value = picklisteDAO.getPickListTextByID(refId);
+
 		} else if (IEntity.class.isAssignableFrom(type)){
 			// entity type
 			int refId = Integer.parseInt(elProp.attributeValue("id"));
