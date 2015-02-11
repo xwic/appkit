@@ -1,10 +1,8 @@
 package de.xwic.appkit.core.cluster.util;
 
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
