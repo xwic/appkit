@@ -9,7 +9,7 @@ import de.xwic.appkit.core.cluster.ICluster;
  * @author Razvan Pat on 2/10/2015.
  */
 @SuppressWarnings({ "EqualsWhichDoesntCheckParameterClass", "unchecked" })
-public class ClusterList<T extends Serializable> extends AbstractClusterCollection implements List<T> {
+public class ClusterList<T> extends AbstractClusterCollection implements List<T> {
 
 	final private List<T> list;
 
@@ -61,7 +61,15 @@ public class ClusterList<T extends Serializable> extends AbstractClusterCollecti
 		} else if(eventType == ClusterCollectionUpdateEventData.EventType.SET_ELEMENT) {
 			ListOperationWithIndex operation = (ListOperationWithIndex) obj;
 			list.set(operation.getIndex(), (T) operation.getObject());
+		} else if(eventType == ClusterCollectionUpdateEventData.EventType.FULL_UPDATE) {
+			list.clear();
+			list.addAll((List<T>) obj);
 		}
+	}
+
+	@Override
+	public void sendFullUpdate() {
+		sendClusterUpdate(list, ClusterCollectionUpdateEventData.EventType.FULL_UPDATE);
 	}
 
 	@Override

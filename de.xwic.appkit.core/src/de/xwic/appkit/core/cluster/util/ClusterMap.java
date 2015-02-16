@@ -14,7 +14,7 @@ import de.xwic.appkit.core.cluster.util.ClusterCollectionUpdateEventData.EventTy
  *
  * @author Razvan Pat on 1/15/2015.
  */
-public class ClusterMap<K extends Serializable, V extends Serializable> extends AbstractClusterCollection implements Map<K, V> {
+public class ClusterMap<K, V> extends AbstractClusterCollection implements Map<K, V> {
 
 	private Map<K, V> map;
 
@@ -38,7 +38,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	@Override
 	public V put(K key, V value) {
 		V result = map.put(key, value);
-		sendClusterUpdate(new SerializableEntry<Serializable, Serializable>(key, value), EventType.ADD_ELEMENT);
+		sendClusterUpdate(new SerializableEntry<Object, Object>(key, value), EventType.ADD_ELEMENT);
 		return result;
 	}
 
@@ -48,7 +48,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	@Override
 	public void putAll(Map<? extends K, ? extends V> m) {
 		map.putAll(m);
-		sendClusterUpdate((Serializable)map, EventType.REPLACE_ALL);
+		sendClusterUpdate(map, EventType.REPLACE_ALL);
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 	public V remove(Object key) {
 		V result = map.remove(key);
 		if(result != null){
-			sendClusterUpdate((K)key, EventType.REMOVE_ELEMENT);
+			sendClusterUpdate(key, EventType.REMOVE_ELEMENT);
 		}
 		return result;
 	}
@@ -122,12 +122,17 @@ public class ClusterMap<K extends Serializable, V extends Serializable> extends 
 		if(eventType == EventType.ADD_ELEMENT){
 			SerializableEntry<K, V> newElement = (SerializableEntry<K, V>) obj;
 			map.put(newElement.getKey(), newElement.getValue());
-		}else if (eventType == EventType.REPLACE_ALL){
+		}else if (eventType == EventType.REPLACE_ALL || eventType == EventType.FULL_UPDATE){
 			map = (Map<K, V>) obj;
 		}else if (eventType == EventType.REMOVE_ELEMENT){
 			map.remove(obj);
 		}else if(eventType == EventType.CLEAR){
 			map.clear();
 		}
+	}
+
+	@Override
+	public void sendFullUpdate() {
+		sendClusterUpdate(map, EventType.FULL_UPDATE);
 	}
 }

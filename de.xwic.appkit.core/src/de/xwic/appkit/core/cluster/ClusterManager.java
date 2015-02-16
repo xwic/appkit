@@ -4,7 +4,7 @@
 package de.xwic.appkit.core.cluster;
 
 import de.xwic.appkit.core.cluster.impl.Cluster;
-
+import de.xwic.appkit.core.cluster.util.ClusterCollectionsService;
 
 /**
  * Provides access to the Cluster instance.
@@ -46,5 +46,7 @@ public class ClusterManager {
 		Cluster c = new Cluster(config);
 		c.initInternal();
 		instance = c;
+
+		c.registerClusterService(ClusterCollectionsService.NAME, new ClusterCollectionsService());
 	}
 }

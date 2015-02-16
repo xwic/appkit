@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class ListOperationWithIndex implements Serializable {
 
 	private Integer index;
-	private Serializable object;
+	private Object object;
 
 	/**
 	 *
@@ -20,7 +20,7 @@ public class ListOperationWithIndex implements Serializable {
 	 * @param index
 	 * @param object
 	 */
-	public ListOperationWithIndex(Integer index, Serializable object) {
+	public ListOperationWithIndex(Integer index, Object object) {
 		this.index = index;
 		this.object = object;
 	}
@@ -42,7 +42,7 @@ public class ListOperationWithIndex implements Serializable {
 	/**
 	 * @return
 	 */
-	public Serializable getObject() {
+	public Object getObject() {
 		return object;
 	}
 

@@ -10,7 +10,7 @@ import java.util.Map.Entry;
  * @author dotto
  *
  */
-public class SerializableEntry<K extends Serializable, V extends Serializable> implements Entry<K, V>, Serializable {
+public class SerializableEntry<K, V> implements Entry<K, V>, Serializable {
 
 	private K key;
 	private V val;

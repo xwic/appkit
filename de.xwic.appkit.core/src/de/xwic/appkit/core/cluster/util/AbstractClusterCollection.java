@@ -103,5 +103,15 @@ public abstract class AbstractClusterCollection {
 		}, EVENT_NAMESPACE);
 	}
 
+	/**
+	 * @param obj
+	 * @param eventType
+	 */
 	public abstract void eventReceived(Object obj, EventType eventType);
+
+	/**
+	 *
+	 */
+	public abstract void sendFullUpdate();
+
 }
