@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.xwic.appkit.core.dao.*;
 import de.xwic.appkit.core.model.daos.impl.PicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistText;
 import org.apache.commons.logging.Log;
@@ -36,10 +37,6 @@ import org.dom4j.io.XMLWriter;
 
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
-import de.xwic.appkit.core.dao.DAO;
-import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.EntityKey;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.util.Entities;
 import de.xwic.appkit.core.export.XmlExport;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
@@ -112,6 +109,11 @@ public class XmlBeanSerializer {
 	private Set<String> skipPropertyNames = new HashSet<String>();
 	
 	private boolean serializeEntity = false;
+
+	public XmlBeanSerializer() {
+		addCustomObjectSerializer(new EntityListSerializer());
+	}
+
 	/**
 	 * Add a custom serializer
 	 * @param serializer
@@ -236,7 +238,7 @@ public class XmlBeanSerializer {
 		// check custom object serializers first.
 		for (ICustomObjectSerializer cos : customSerializer) {
 			if (cos.handlesObject(value)) {
-				cos.serialize(elm, value);
+				cos.serialize(this, elm, value);
 				return; // early exit
 			}
 		}
@@ -470,7 +472,7 @@ public class XmlBeanSerializer {
 		for (ICustomObjectSerializer cos : customSerializer) {
 			if (cos.handlesType(type)) {
 				// found a custom serializer, directly return the value, even if null
-			    return cos.deserialize(elProp);
+			    return cos.deserialize(this, context, elProp);
 			}
 		}
 

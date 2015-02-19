@@ -5,7 +5,10 @@
 
 package de.xwic.appkit.core.transport.xml;
 
+import de.xwic.appkit.core.dao.EntityKey;
 import org.dom4j.Element;
+
+import java.util.Map;
 
 /**
  * Used to perform custom serialization and de-serialization of objects.
@@ -33,13 +36,13 @@ public interface ICustomObjectSerializer {
 	 * @param elm
 	 * @param object
 	 */
-	public void serialize(Element elm, Object object) throws TransportException;
+	public void serialize(XmlBeanSerializer serializer, Element elm, Object object) throws TransportException;
 	
 	/**
 	 * Deserialize an object.
 	 * @param elm
 	 * @return
 	 */
-	public Object deserialize(Element elm) throws TransportException;
+	public Object deserialize(XmlBeanSerializer serializer, Map<EntityKey, Integer> context, Element elm) throws TransportException;
 	
 }
