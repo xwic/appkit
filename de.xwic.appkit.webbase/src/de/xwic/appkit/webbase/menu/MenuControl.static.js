@@ -1,11 +1,17 @@
 var MenuControl = (function($, JWic, undefined){
     "use strict";
+
     //some dependencies stored and some local variables
     var util = JWic.util,
         map = util.map,
         each = util.each,
         reduce = util.reduce,
         action = JWic.fireAction,
+        bindFunction = function(f, context){
+            return function(){
+                return f.apply(context, arguments);
+            };
+        },
         //TODO put the templates in the vtl file
         menuHeaderItemTemplate = '<div class="h_item" >'+
                                     '<div class="hmi_body"></div>'+
@@ -21,9 +27,6 @@ var MenuControl = (function($, JWic, undefined){
 
 
     function MenuItem(data, controlId){
-        if(!(this instanceof MenuItem)){
-            return new MenuItem(data,controlId);
-        }
         //private props
         this._controlId = controlId;
         this._key = data.key;
@@ -86,7 +89,7 @@ var MenuControl = (function($, JWic, undefined){
         this._url = data.url;
         this._title = data.title;
         this._selected = false;
-        this._children = map(data.children, function(item){
+        this._children = map(data.children || [], function(item){
             return new ExternalMenuItem(item);
         });
     }
@@ -105,7 +108,7 @@ var MenuControl = (function($, JWic, undefined){
         //set the text and the correct css classes(relevant for style only).
         textNode = node.find('.hmi_body').text(item.title());
         if(!item.hasChildren()){
-            textNode.on('click', item.activate.bind(item));//triggers a refresh of the current page
+            textNode.on('click', bindFunction(item.activate, item));//triggers a refresh of the current page
         }else{
             textNode.addClass('hmi_hasChilds');
         }
@@ -216,7 +219,7 @@ var MenuControl = (function($, JWic, undefined){
                 a.addClass('menu_selected');
             }
             if(!i.hasChildren()){
-                li.on('click',i.activate.bind(i));
+                li.on('click',bindFunction(i.activate, i));
                 a.parent().find('.ui-menu-icon').removeAttr('class');
             }
             buildMenu(i, li);

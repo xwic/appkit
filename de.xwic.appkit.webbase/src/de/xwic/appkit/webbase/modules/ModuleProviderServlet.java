@@ -4,7 +4,6 @@ import de.xwic.appkit.webbase.toolkit.app.Module;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,8 +39,6 @@ public final class ModuleProviderServlet extends HttpServlet {
 			this.moduleFactory = createFactory(this.getInitParameter(MODULE_FACTORY_INIT_PARAM));
 			this.baseUrl = this.getInitParameter(BASE_URL);
 			this.applicationName = this.getInitParameter("app-name");
-
-			System.out.println(baseUrl);
 		} catch (FactoryInstantiationException e) {
 			throw new ServletException(e);
 		}
@@ -177,12 +174,22 @@ public final class ModuleProviderServlet extends HttpServlet {
 	 * @throws JSONException
 	 */
 	private JSONObject serializeModules(List<Module> modules) throws JSONException {
-		final List<ModuleBean> allBeans = new ArrayList<ModuleBean>();
-		for (Module m : modules) {
-			allBeans.add(ModuleBean.fromModule(m, this.baseUrl));
+		final List<MenuItem> allBeans = new ArrayList<MenuItem>();
+
+		if(modules.isEmpty()){
+			return new JSONObject();
 		}
-		final ModuleBean moduleBean = new ModuleBean("", this.applicationName, allBeans, this.baseUrl);
-		return moduleBean.serialize();
+
+		for (Module m : modules) {
+			final MenuItem menuItem = MenuItem.fromModule(m, this.baseUrl);
+			final List<MenuItem> children = menuItem.getChildren();
+			if(children == null || children.isEmpty()){
+				continue;
+			}
+			allBeans.add(menuItem);
+		}
+		final MenuItem menuItem = new MenuItem("", this.applicationName, allBeans, this.baseUrl);
+		return menuItem.serialize();
 	}
 
 	private static final class FactoryInstantiationException extends Exception {

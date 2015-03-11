@@ -32,12 +32,21 @@ public final class MenuUrlRedirecter extends SessionAdapter{
 	@Override
 	public final void sessionReused(SessionEvent event) {
 		final String param = event.getParameter(REDIRECT_PARAM);
+		this.navigateTo(param);
+	}
+
+	/**
+	 * Navigate to the a given path if the path is valid
+	 *
+	 * @param menuPath
+	 */
+	public void navigateTo(String menuPath){
 		//no param, no problem. just skip this stuff
-		if(param == null || param.isEmpty()){
+		if(menuPath == null || menuPath.isEmpty()){
 			return;
 		}
 
-		final String[] split = param.split(";");
+		final String[] split = menuPath.split(";");
 		//should be a "module;submodule;..." thing
 		//so after split string length should be grater then 1
 		if(split.length <= 1){
@@ -62,9 +71,8 @@ public final class MenuUrlRedirecter extends SessionAdapter{
 		}
 
 		//otherwise, all possible tests have passed, so we activate the correct module
-		site.actionSelectMenu(param);
+		site.actionSelectMenu(menuPath);
 	}
-
 
 
 

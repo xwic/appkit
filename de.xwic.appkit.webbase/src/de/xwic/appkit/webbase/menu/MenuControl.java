@@ -14,7 +14,6 @@ import de.jwic.base.IControlContainer;
 import de.jwic.base.IncludeJsOption;
 import de.jwic.base.JavaScriptSupport;
 import de.xwic.appkit.webbase.modules.IMenuItemsProvider;
-import de.xwic.appkit.webbase.modules.ModuleBean;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.INavigationEventListener;
 import de.xwic.appkit.webbase.toolkit.app.Module;
@@ -24,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -60,7 +58,7 @@ public final class MenuControl extends ControlContainer implements INavigationEv
 	}
 
 	@IncludeJsOption
-	public List<ModuleBean> getAdditionalItems() {
+	public List<de.xwic.appkit.webbase.modules.MenuItem> getAdditionalItems() {
 		return menuAccessRetriever.fetchModuleBeans();
 	}
 

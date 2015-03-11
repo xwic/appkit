@@ -1,7 +1,7 @@
 package de.xwic.appkit.webbase.menu;
 
 import de.xwic.appkit.webbase.modules.IMenuItemsProvider;
-import de.xwic.appkit.webbase.modules.ModuleBean;
+import de.xwic.appkit.webbase.modules.MenuItem;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +16,7 @@ class NullItemsProvider implements IMenuItemsProvider {
 	private NullItemsProvider(){}
 
 	@Override
-	public List<ModuleBean> fetchModuleBeans() {
+	public List<MenuItem> fetchModuleBeans() {
 		return Collections.emptyList();
 	}
 }

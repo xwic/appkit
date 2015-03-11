@@ -1,7 +1,6 @@
 package de.xwic.appkit.webbase.modules;
 
 import de.xwic.appkit.core.util.StreamUtil;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,26 +11,27 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * Fetches additional menu items from a given url and return a single menu item entry with all items as a a child of the single item root
+ * Given URL should point to a ModuleProviderServer, or something that conforms to the same API as the ModuleProviderServlet
+ *
  * Created by boogie on 3/10/15.
  */
-public final class UrlMenuAccessRetriever implements IMenuItemsProvider {
+public final class SinglePointUrlMenuItemsProvider implements IMenuItemsProvider {
 
 	private final String baseUrl;
 	private final String user;
-	private final String itemTitle;
-	public UrlMenuAccessRetriever(String itemTitle, String baseUrl, String user) {
+
+	public SinglePointUrlMenuItemsProvider(String baseUrl, String user) {
 		this.baseUrl = baseUrl;
 		this.user = user;
-		this.itemTitle = itemTitle;
 	}
 
 	@Override
-	public List<ModuleBean> fetchModuleBeans() {
+	public List<MenuItem> fetchModuleBeans() {
 		InputStream inputStream = null;
 		BufferedInputStream inputStreamReader = null;
 		BufferedReader bufferedReader = null;
@@ -46,7 +46,7 @@ public final class UrlMenuAccessRetriever implements IMenuItemsProvider {
 				sb.append(inputLine);
 			}
 			final JSONObject rootModule = new JSONObject(sb.toString());
-			return Collections.singletonList(ModuleBean.deserialize(rootModule));
+			return Collections.singletonList(MenuItem.deserialize(rootModule));
 		} catch (MalformedURLException e) {
 			return null;
 		} catch (IOException e) {
