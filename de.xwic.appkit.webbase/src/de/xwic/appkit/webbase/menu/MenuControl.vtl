@@ -1,0 +1,10 @@
+#**
+##This is commented out
+#foreach($module in $control.getSite().getModules())
+<div class="h_item">
+    <div class="hmi_body #if($control.getSite().getActiveModuleKey() == $module.key) hmi_isSelected #end" onclick="$control.createActionURL('MainMenuClick',$module.key)  console.warn('$control.site.modules.toString()');">$module.title</div>
+</div>
+#end
+##end of comments
+**#
+<div id="$control.controlID" class="h_menu"></div>
