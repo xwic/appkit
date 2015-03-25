@@ -30,7 +30,6 @@ public class HistoryTool {
 	 * @param historyEntity
 	 * @throws DataAccessException 
 	 */
-	@SuppressWarnings("unchecked")
 	public static void createHistoryEntity(IEntity original, IHistory historyEntity) throws DataAccessException {
 		
 		// copy all
@@ -47,8 +46,9 @@ public class HistoryTool {
 	        		!descs[i].getName().equals("version") &&
 	        		!descs[i].getName().equals("callbacks")) {
 		            Method mRead = descs[i].getReadMethod();
-		            
-		            if (mRead != null && mRead.getModifiers() == Modifier.PUBLIC) {
+		            // this is the proper way to check if a method is PUBLIC
+		            // because a method can also be final (the proxy entities used by Hibernate change the public into public final)
+		            if (mRead != null && (mRead.getModifiers() & Modifier.PUBLIC) > 0) {
 			            //Method mWrite = descs[i].getWriteMethod();
 			            // create writer from 'target'
 		            	Method mWrite = null;
