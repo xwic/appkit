@@ -89,6 +89,9 @@
         <cubeUpdateVersion />
 		<mvnDependencyVersionxWicjWic>5.2.10</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.5</mvnDependencyVersionxWicCube>
+		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>				
     </properties>
 
     <build>
@@ -305,6 +308,28 @@
 					<autoDropAfterRelease>true</autoDropAfterRelease>					
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.4.201502262128</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<destFile>${sonar.jacoco.reportPath}</destFile>
+				</configuration>
+			</plugin>			
 		</plugins>        
     </build>
 
