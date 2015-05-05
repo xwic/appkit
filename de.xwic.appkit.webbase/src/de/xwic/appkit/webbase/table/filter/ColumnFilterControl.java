@@ -7,7 +7,6 @@ package de.xwic.appkit.webbase.table.filter;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import de.jwic.base.ControlContainer;
@@ -117,10 +116,16 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 	public int getHeight() {
 		
 		int height = 40; // base height
-		if (btSortDown.isVisible()) height += 26;
-		if (btSortUp.isVisible()) height += 26;
+		if (btSortDown.isVisible()) {
+			height += 26;
+		}
+		if (btSortUp.isVisible()) {
+			height += 26;
+		}
 //		if (chkExcludeEmpty.isVisible()) height += 28;
-		if (btFilterClear.isVisible()) height += 26;
+		if (btFilterClear.isVisible()) {
+			height += 26;
+		}
 		
 		height += getFilterHeight();
 		
@@ -136,7 +141,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
         int localWidth = 325;
 		if (currentFilter != null) {
             localWidth = currentFilter.getPreferredWidth() + 40;
-            if(localWidth < 296) localWidth = 296;
+            if(localWidth < 296) {
+				localWidth = 296;
+			}
 		}
 		return localWidth;
 	}
@@ -161,7 +168,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
         int localWidth = 264;
 		if (currentFilter != null) {
 			localWidth = currentFilter.getPreferredWidth();
-            if(localWidth < 264) localWidth = 264;
+            if(localWidth < 264) {
+				localWidth = 264;
+			}
 		}
 		return localWidth;
 	}
