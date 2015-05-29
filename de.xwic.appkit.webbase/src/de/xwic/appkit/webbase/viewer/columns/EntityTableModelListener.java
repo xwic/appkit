@@ -12,7 +12,7 @@ import de.jwic.controls.tableviewer.TableModel;
 import de.jwic.controls.tableviewer.TableModelAdapter;
 import de.jwic.controls.tableviewer.TableModelEvent;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
-import de.xwic.appkit.webbase.viewer.EntityTableViewer;
+import de.xwic.appkit.webbase.viewer.IEnhancedTableViewer;
 
 /**
  * This class handles the event when a column is selected. 
@@ -20,15 +20,15 @@ import de.xwic.appkit.webbase.viewer.EntityTableViewer;
  */
 public class EntityTableModelListener extends TableModelAdapter {
 
-	private EntityTableViewer entityTable = null;
+	private IEnhancedTableViewer enhancedTable = null;
 	
 	/**
 	 * c-tor
 	 * @param entityTable
 	 * @param contentProvider
 	 */
-	public EntityTableModelListener(EntityTableViewer entityTable) {
-		this.entityTable = entityTable;
+	public EntityTableModelListener(IEnhancedTableViewer entityTable) {
+		this.enhancedTable = entityTable;
 	}
 	
 	/*
@@ -45,13 +45,13 @@ public class EntityTableModelListener extends TableModelAdapter {
 	 * @param tableColumn
 	 */
 	public void handleSorting(TableColumn tableColumn) {
-		entityTable.handleSorting(tableColumn);
+		enhancedTable.handleSorting(tableColumn);
 	}
 	
 	@Override
 	public void rangeUpdated(TableModelEvent event) {
 		TableModel tableModel = (TableModel)event.getEventSource();
-		UserProfileWrapper userListProfile = entityTable.getUserListProfile();
+		UserProfileWrapper userListProfile = enhancedTable.getUserListProfile();
 		
 		if (null != userListProfile) {
 			userListProfile.setMaxRows(tableModel.getMaxLines());

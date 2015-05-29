@@ -1,18 +1,17 @@
 /*
- * (c) Copyright 2005, 2006 by pol GmbH 
+ * Copyright (c) NetApp Inc. - All Rights Reserved
  * 
- * de.xwic.appkit.webbase.viewer.base.TableViewRender
- * Created on Mar 21, 2007 by Aron Cotrau
- *
+ * Unauthorized copying of this file, via any medium is strictly prohibited.
+ * Proprietary and confidential.
+ * 
+ * com.netapp.cxed.basegui.sqltableview.SqlTable 
  */
-package de.xwic.appkit.webbase.viewer;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
+package de.xwic.appkit.webbase.sqlviewer;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,27 +35,26 @@ import de.jwic.controls.tableviewer.TableViewer;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
-import de.xwic.appkit.core.config.ConfigurationException;
-import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
 import de.xwic.appkit.core.config.list.ListColumn;
-import de.xwic.appkit.core.config.list.ListSetup;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
 import de.xwic.appkit.core.model.daos.IUserListProfileDAO;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.core.model.entities.IUserListProfile;
-import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.trace.ITraceOperation;
 import de.xwic.appkit.core.trace.Trace;
+import de.xwic.appkit.core.util.SqlStringBuilder;
 import de.xwic.appkit.webbase.controls.export.ExcelExportControl;
+import de.xwic.appkit.webbase.sqlviewer.base.ISqlDataProviderHandler;
+import de.xwic.appkit.webbase.sqlviewer.base.SqlDataContentProvider;
 import de.xwic.appkit.webbase.utils.UserConfigXmlReader;
 import de.xwic.appkit.webbase.utils.UserListUtil;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
-import de.xwic.appkit.webbase.viewer.base.DAOContentProvider;
+import de.xwic.appkit.webbase.viewer.EntityTableViewer;
+import de.xwic.appkit.webbase.viewer.IEnhancedTableViewer;
 import de.xwic.appkit.webbase.viewer.base.PropertyLabelProvider;
 import de.xwic.appkit.webbase.viewer.columns.ColumnSelector;
 import de.xwic.appkit.webbase.viewer.columns.ColumnSelector.IColumnSelectorListener;
@@ -66,37 +64,36 @@ import de.xwic.appkit.webbase.viewer.columns.UserListColumn;
 import de.xwic.appkit.webbase.viewer.columns.UserListSetup;
 import de.xwic.appkit.webbase.views.BaseBrowserView;
 
+
 /**
- * Handles table viewer's data and sets default label and content provider.
+ * @author dotto
+ * @date May 29, 2015
  * 
- * @author Aron Cotrau
  */
-public class EntityTableViewer extends ControlContainer implements IEnhancedTableViewer {
+public class SqlTableViewer extends ControlContainer implements IEnhancedTableViewer {
 
 	private static Log log = LogFactory.getLog(EntityTableViewer.class);
-
-	private DAO daoClass = null;
+	
 	private Bundle bundle = null;
-	private ListSetup listSetup = null;
-
 	private UserProfileWrapper userListProfile = null;
 	private PropertyLabelProvider labelProvider = null;
-	private DAOContentProvider contentProvider = null;
 
 	private TableViewer tableViewer = null;
-	private ExcelExportControl excelExport = null;
 	private ToolBar toolBar = null;
+	private SqlDataContentProvider contentProvider = null;
+	private ExcelExportControl excelExport = null;
 
 	private int widthDecrease = 26;
 	private int heightDecrease = 290;
 	private int maxLines = 25;
 	private boolean listSetupDirty = false;
-
+	
 	private List<TableColumnInfo> columnsList = null;
 
 	private ColumnSelector columnSelector;
-	
+	private List<ListColumn> columns;
 	private int ownerId = 0;
+	private ISqlDataProviderHandler handler;
 
 	private IColumnSelectorListener listener = new IColumnSelectorListener() {
 
@@ -125,41 +122,24 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	 * @param daoClass
 	 * @param userLS
 	 */
-	public EntityTableViewer(IControlContainer container, DAO daoClass, ListSetup lSetup, UserProfileWrapper userLS) {
+	public SqlTableViewer(IControlContainer container, List<ListColumn> columns, UserProfileWrapper userLS, Bundle bundle, ISqlDataProviderHandler handler) {
 		super(container);
-		this.daoClass = daoClass;
+		this.bundle = bundle;
 		this.userListProfile = userLS;
+		this.handler = handler;
 		
 		if (null != userLS && userLS.getMaxRows() > 0) {
 			maxLines = userLS.getMaxRows();
 		}
 		
 		setOwnerId(); 
-		this.listSetup = lSetup;
-
-		try {
-			bundle = lSetup.getEntityDescriptor().getDomain().getBundle(
-					container.getSessionContext().getLocale().getLanguage());
-		} catch (ConfigurationException e) {
-			log.error("No configuration found", e);
-		}
+		this.columns = columns;
 
 		UserAgentInfo agent = getSessionContext().getUserAgent();
 		this.setWidthDecrease(agent.isIE() && agent.getMajorVersion() < 8 ? 26 : 39);
 		initTableViewer(container);
 	}
 
-	/**
-	 * @param container
-	 * @param name
-	 * @param daoClass
-	 * @param lSetup
-	 * @param userLS
-	 */
-	public EntityTableViewer(IControlContainer container, String name, DAO daoClass, ListSetup lSetup,
-			UserProfileWrapper userLS) {
-		this(container, name, daoClass, lSetup, userLS, -1);
-	}
 
 	/**
 	 * @param container
@@ -169,27 +149,21 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	 * @param userLS
 	 * @param widthDecrease
 	 */
-	public EntityTableViewer(IControlContainer container, String name, DAO daoClass, ListSetup lSetup,
-			UserProfileWrapper userLS, int widthDecrease) {
+	public SqlTableViewer(IControlContainer container, String name, List<ListColumn> columns,
+			UserProfileWrapper userLS, int widthDecrease, Bundle bundle, ISqlDataProviderHandler handler) {
 		super(container, name);
-		this.daoClass = daoClass;
+		this.bundle = bundle;
 		this.userListProfile = userLS;
+		this.handler = handler;
 		
 		if (null != userLS && userLS.getMaxRows() > 0) {
 			maxLines = userLS.getMaxRows();
 		}
 		
-		this.listSetup = lSetup;
+		this.columns = columns;
 
 		setOwnerId();
 		
-		try {
-			bundle = lSetup.getEntityDescriptor().getDomain().getBundle(
-					container.getSessionContext().getLocale().getLanguage());
-		} catch (ConfigurationException e) {
-			log.error("No configuration found", e);
-		}
-
 		if (widthDecrease == -1) {
 			UserAgentInfo agent = getSessionContext().getUserAgent();
 			this.setWidthDecrease(agent.isIE() && agent.getMajorVersion() < 8 ? 26 : 39);
@@ -238,8 +212,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 		tableViewer = new TableViewer(container, "tableViewer");
 		labelProvider = new PropertyLabelProvider();
-		contentProvider = new DAOContentProvider(daoClass);
-		contentProvider.setEntityQuery(new PropertyQuery());
+		contentProvider = new SqlDataContentProvider(handler);
 		tableViewer.setScrollable(true);
 		tableViewer.setResizeableColumns(true);
 		tableViewer.setSelectableColumns(true);
@@ -255,7 +228,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 				ITraceOperation op = null;
 				if (Trace.isEnabled()) {
 					op = Trace.startOperation("entity-table-viewer");
-					op.setInfo("Rendering " + daoClass.getEntityDescriptor().getClassname());
+					
 				}
 				super.renderTable(renderContext, viewer, model, labelProvider);
 				if (op != null) {
@@ -341,7 +314,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 				userLS = UserConfigXmlReader.getUserColumnList(this.userListProfile.getXmlContent());
 				list = userLS.getColumns();
 			} else {
-				list = listSetup.getColumns();
+				list = columns;
 			}
 
 			columnsList = new ArrayList<TableColumnInfo>();
@@ -357,7 +330,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 				if (userLS != null) {
 					userLC = (UserListColumn) it.next();
-					lColumn = UserListUtil.getListColumn(listSetup, userLC);
+					lColumn = UserListUtil.getListColumn(columns, userLC);
 					if (lColumn == null) {
 						it.remove(); // remove the entry from the user list
 						continue; 
@@ -367,15 +340,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 				}
 
 				boolean isVisible = true;
-				Property[] properties = lColumn.getProperty();
-
-				// see if all the properties are "readable". if not, don't show
-				// the column.
-				for (int i = 0; i < properties.length && isVisible; i++) {
-					Property property = properties[i];
-					isVisible = property.hasReadAccess() && !property.isHidden();
-				}
-
+				
 				if (isVisible) {
 					String title = null;
 					if (null != bundle) {
@@ -403,7 +368,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 			labelProvider.setPropertiesList(columnsList);
 			
-			if (null != userListProfile && null != userListProfile.getSortField() && propertyExists(userListProfile.getSortField())) {
+			if (null != userListProfile && null != userListProfile.getSortField()) {
 				// sort
 				boolean up = userListProfile.getSortDirection() == EntityQuery.SORT_DIRECTION_UP;
 				sort(up, userListProfile.getSortField());
@@ -426,27 +391,6 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 			log.error("Exception occured while creating columns !", e);
 		}
 		return columnsList;
-	}
-
-	private boolean propertyExists(String propertyId) {
-		if (propertyId == null) {
-			return false;
-		}
-		
-		StringTokenizer stk = new StringTokenizer(propertyId, ".");
-		Class<?> clazz = daoClass.getEntityClass();
-		
-		for (int nr = 0; stk.hasMoreTokens(); nr++) {
-			PropertyDescriptor desc;
-			try {
-				desc = new PropertyDescriptor(stk.nextToken(), clazz);
-				clazz = desc.getPropertyType();
-			} catch (IntrospectionException e) {
-				return false;
-			}
-		}
-		
-		return true;
 	}
 	
 	/**
@@ -522,14 +466,13 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 					userLS = UserConfigXmlReader.getUserColumnList(this.userListProfile.getXmlContent());
 					lcUser = userLS.getColumns();
 				} else {
-					lcUser = listSetup.getColumns();
+					lcUser = columns;
 				}
 
 				Iterator<TableColumn> tableColumnsIterator = tableViewer.getModel().getColumnIterator();
 				UserListSetup userListSetup = new UserListSetup();
-				String lsId = userLS != null ? userLS.getListId() : listSetup.getListId();
-				userListSetup.setListId(null == lsId || "".equals(lsId) ? Setup.ID_DEFAULT : lsId);
-				userListSetup.setTypeClass(userLS != null ? userLS.getTypeClass() : listSetup.getTypeClass());
+				userListSetup.setListId(Setup.ID_DEFAULT);
+				userListSetup.setTypeClass(handler.getSqlBuilder().getFromTable());
 
 				// sets the column widths in the ListSetup
 				while (tableColumnsIterator.hasNext()) {
@@ -543,7 +486,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 						if (userLS != null) {
 							lc = (UserListColumn) iter.next();
-							column = UserListUtil.getListColumn(listSetup, lc);
+							column = UserListUtil.getListColumn(columns, lc);
 							if (column == null) {
 								continue; // skip columns that do not exist anymore
 							}
@@ -571,9 +514,9 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 				if (null != userListProfile) {
 					IUserListProfile userProfile = UserListUtil.toUserProfile(userListSetup, userListProfile.getDescription(), ownerId);
 
-					DAO dao = DAOSystem.getDAO(IUserListProfileDAO.class);
+					IUserListProfileDAO dao = DAOSystem.getDAO(IUserListProfileDAO.class);
 
-					userProfile.setSortField(null != userListProfile && propertyExists(userListProfile.getSortField()) ? userListProfile.getSortField() : null);
+					userProfile.setSortField(null != userListProfile  ? userListProfile.getSortField() : null);
 					userProfile.setSortDirection(null != userListProfile ? userListProfile.getSortDirection() : 0);
 					userProfile.setMaxRows(null != userListProfile ? userListProfile.getMaxRows() : 0);
 
@@ -605,10 +548,9 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 		this.tableViewer = tableViewer;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.viewer.IEnhancedTableViewer#getUserListProfile()
+	/**
+	 * @return the userLS
 	 */
-	@Override
 	public UserProfileWrapper getUserListProfile() {
 		return userListProfile;
 	}
@@ -623,8 +565,8 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 		String lsId = userProfile.getBaseProfileName();
 		
 		try {
-			ListSetup ls = ConfigurationManager.getUserProfile().getListSetup(userListProfile.getClassName(), lsId);
-			setListSetup(ls);
+			//ListSetup ls = ConfigurationManager.getUserProfile().getListSetup(userListProfile.getClassName(), lsId);
+			//setListSetup(ls);
 			
 			columnSelector.loadUserListSetup(userProfile);
 		} catch (Throwable e) {
@@ -658,10 +600,11 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 		this.toolBar = actionBar;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.viewer.IEnhancedTableViewer#handleSorting(de.jwic.controls.tableviewer.TableColumn)
+	/**
+	 * Change the sort icon.
+	 * 
+	 * @param tableColumn
 	 */
-	@Override
 	public void handleSorting(TableColumn tableColumn) {
 
 		TableViewer viewer = getTableViewer();
@@ -692,12 +635,8 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 		// do the sort
 		TableColumnInfo ci = (TableColumnInfo) tableColumn.getUserObject();
-		Property[] props = ci.getColumn().getProperty();
-		String propName = "";
-		for (int i = 0; i < props.length; i++) {
-			propName += props[i].getName() + ".";
-		}
-		propName = propName.substring(0, propName.length() - 1);
+		
+		String propName = ci.getColumn().getPropertyId();
 		sort(up, propName);
 
 		if (null != userListProfile) {
@@ -709,15 +648,12 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	}
 
 	private void sort(boolean up, String propName) {
-		EntityQuery entityQuery = contentProvider.getEntityQuery();
-		if (null == entityQuery) {
-			entityQuery = new PropertyQuery();
+		SqlStringBuilder sqlBuilder = contentProvider.getHandler().getSqlBuilder();
+		if (null == sqlBuilder) {
+			throw new IllegalArgumentException("Data SQL Builder is not set");
 		}
-		
-		entityQuery.setSortField(propName);
-		int direction = up ? EntityQuery.SORT_DIRECTION_UP : EntityQuery.SORT_DIRECTION_DOWN;
-		entityQuery.setSortDirection(direction);
-		contentProvider.setEntityQuery(entityQuery);
+		sqlBuilder.getOrderByColumns().clear();
+		sqlBuilder.addOrderBy(propName, up);
 		listSetupDirty = true; // sorting is a stored element
 	}
 	
@@ -736,7 +672,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	/**
 	 * @return the contentProvider
 	 */
-	public DAOContentProvider getContentProvider() {
+	public SqlDataContentProvider getContentProvider() {
 		return contentProvider;
 	}
 
@@ -761,7 +697,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	 * @param contentProvider
 	 *            the contentProvider to set
 	 */
-	public void setContentProvider(DAOContentProvider contentProvider) {
+	public void setContentProvider(SqlDataContentProvider contentProvider) {
 		this.contentProvider = contentProvider;
 		this.tableViewer.setContentProvider(contentProvider);
 	}
@@ -799,21 +735,6 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	}
 
 	/**
-	 * @return the lSetup
-	 */
-	public ListSetup getLSetup() {
-		return listSetup;
-	}
-
-	/**
-	 * @param newSetup
-	 *            the lSetup to set
-	 */
-	public void setListSetup(ListSetup newSetup) {
-		listSetup = newSetup;
-	}
-
-	/**
 	 * opens the column selector window
 	 */
 	public void openColumnSelector() {
@@ -844,4 +765,5 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 	void notifyColumnResized() {
 		listSetupDirty = true;
 	}
+
 }

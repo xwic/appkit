@@ -53,6 +53,16 @@ public class UserListUtil {
 	 */
 	public static ListColumn getListColumn(ListSetup setup, UserListColumn userColumn) {
 		List<ListColumn> columns = setup.getColumns();
+		return getListColumn(columns, userColumn);
+	}
+	
+	/**
+	 * @param columns
+	 * @param userColumn
+	 * @return a list column from the given list setup which has the same
+	 *         propertyId as the one of the user list column
+	 */
+	public static ListColumn getListColumn(List<ListColumn> columns, UserListColumn userColumn){
 		for (ListColumn listColumn : columns) {
 			if (listColumn.getPropertyId().equals(userColumn.getPropertyId())) {
 				return listColumn;
