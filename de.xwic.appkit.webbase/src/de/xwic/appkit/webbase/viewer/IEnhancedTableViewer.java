@@ -13,6 +13,8 @@ import de.jwic.controls.tableviewer.TableColumn;
 import de.xwic.appkit.webbase.utils.UserProfileWrapper;
 
 /**
+ * Interface for abstraction of some commmon used functions to allow 
+ * Entity Table viewer enhancements, like a SQL table viewer implementation.
  * @author dotto
  * @date May 29, 2015
  * 
