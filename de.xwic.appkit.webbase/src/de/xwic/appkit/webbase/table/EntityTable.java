@@ -395,4 +395,12 @@ public class EntityTable extends ControlContainer {
 		
 		super.destroy();
 	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public ColumnFilterControl getColumnFilterControl() {
+		return colFilter;
+	}
 }
