@@ -52,6 +52,8 @@ public abstract class EntityQuery {
 	private String languageId = null;
 
 	private List<String> columns = null;
+	
+	private boolean cacheQuery = false;
 
 	/**
 	 * Default constructor.
@@ -166,6 +168,27 @@ public abstract class EntityQuery {
 	 */
 	public void setReturnEntity(boolean returnEntity) {
 		this.returnEntity = returnEntity;
+	}
+	
+	
+	/**
+	 * set to true if the query and it's results should be cached . 
+	 * 
+	 * Default is false.
+	 * 
+	 * @param cacheQuery the cacheQuery to set
+	 */
+	public void setCacheQuery(boolean cacheQuery) {
+		this.cacheQuery = cacheQuery;
+	}
+
+	
+	/**
+	 * return true if the query and it's results should be cached
+	 * @return the cacheQuery
+	 */
+	public boolean isCacheQuery() {
+		return cacheQuery;
 	}
 	
 }

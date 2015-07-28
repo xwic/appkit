@@ -200,6 +200,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
     		} else {
     			throw new IllegalArgumentException("Resolver class " + resolver.getClass() + " not supported");
     		}
+    		q.setCacheable(query.isCacheQuery());
     	} else {
     		q = session.createQuery("from " + clazz.getName() );
     	}
@@ -234,8 +235,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
 	        
 	    	if (traceOp != null) {
 	    		traceOp.setInfo("getEntities ('" + clazz.getName() + "', " + limit + ", '" + q.getQueryString() + "')");
-	    	}
-	    	
+	    	}	    	
 	        List<Object> result = null;
 	        try {
 	            result = q.list();
