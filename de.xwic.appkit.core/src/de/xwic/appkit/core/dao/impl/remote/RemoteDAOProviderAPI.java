@@ -26,7 +26,6 @@ import java.util.List;
 
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
@@ -86,9 +85,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			entity.setLastModifiedFrom((String) eto.getPropertyValue("lastModifiedFrom").getValue());
 			entity.setCreatedAt((Date) eto.getPropertyValue("createdAt").getValue());
 			entity.setCreatedFrom((String) eto.getPropertyValue("createdFrom").getValue());
-			if (entity instanceof Entity) {
-				((Entity) entity).setVersion(eto.getEntityVersion());
-			}
+			entity.setVersion(eto.getEntityVersion());
 			
 		} catch (Exception e) {
 			throw new DataAccessException("Error updating remote entity '" + entity.type().getName() + "' #" + entity.getId(), e);

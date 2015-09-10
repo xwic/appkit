@@ -119,6 +119,11 @@ public interface IEntity {
     public long getVersion();
     
     /**
+     * @return
+     */
+    public void setVersion(long version);
+    
+    /**
      * Returns the interface that specifies the type.
      * @return
      */
