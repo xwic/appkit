@@ -22,3 +22,5 @@ logs/
 sessions/
 */_dist/*
 */bin/*
+
+.target-mvn/*
