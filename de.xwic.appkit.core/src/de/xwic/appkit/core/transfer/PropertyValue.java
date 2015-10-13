@@ -55,6 +55,7 @@ public class PropertyValue {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		int lastDot = type.getName().lastIndexOf('.');
@@ -176,6 +177,8 @@ public class PropertyValue {
 			} else {
 				if (IEntity.class.isAssignableFrom(value.getClass())) {
 					entityId = ((IEntity) value).getId();
+				} else if (value instanceof EntityTransferObject) {
+					entityId = ((EntityTransferObject) value).getEntityId();
 				} else {
 					throw new IllegalArgumentException("Not an Entity!");
 				}
@@ -200,6 +203,7 @@ public class PropertyValue {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = 1;
@@ -216,6 +220,7 @@ public class PropertyValue {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
