@@ -27,55 +27,67 @@ import de.xwic.appkit.webbase.table.Column;
 
 /**
  * Implements the standard filter for text based search.
+ * 
  * @author lippisch
  */
 public class DefaultFilter extends AbstractFilterControl {
 
+	private static final String LOGIC_EQUALS = "eq";
+	private static final String LOGIC_NOT_EQUALS = "neq";
+	private static final String LOGIC_STARTS_WITH = "sq";
+	private static final String LOGIC_ENDS_WITH = "ew";
+	private static final String LOGIC_CONTAINS = "c";
+	private static final String LOGIC_NOT_CONTAINS = "nc";
+
 	private DropDown ddLogic;
 	private InputBox inpText;
-	
-	
+
 	/**
 	 * @param container
 	 * @param name
 	 */
 	public DefaultFilter(IControlContainer container, String name) {
 		super(container, name);
-		
+
 		ddLogic = new DropDown(this, "logic");
-		ddLogic.addElement("Equals", "eq");
-		ddLogic.addElement("Does Not Equal", "neq");
-		ddLogic.addElement("Starts With", "sw");
-		ddLogic.addElement("Ends With", "ew");
-		ddLogic.addElement("Contains", "c");
-		ddLogic.addElement("Does Not Contain","nc");
+		ddLogic.addElement("Equals", LOGIC_EQUALS);
+		ddLogic.addElement("Does Not Equal", LOGIC_NOT_EQUALS);
+		ddLogic.addElement("Starts With", LOGIC_STARTS_WITH);
+		ddLogic.addElement("Ends With", LOGIC_ENDS_WITH);
+		ddLogic.addElement("Contains", LOGIC_CONTAINS);
+		ddLogic.addElement("Does Not Contain", LOGIC_NOT_CONTAINS);
 		ddLogic.setWidth(225);
-		
-		ddLogic.selectedByKey("sw");
-		
+
+		ddLogic.selectedByKey(LOGIC_STARTS_WITH);
+
 		inpText = new InputBox(this, "inpText");
 		inpText.setEmptyInfoText("Enter Search Term");
 		inpText.setWidth(225);
-		
+
 		inpText.setListenKeyCode(13);
 		inpText.addKeyListener(new KeyListener() {
+
 			@Override
 			public void keyPressed(KeyEvent event) {
 				notifyListeners();
 			}
 		});
-		
+
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredHeight()
 	 */
 	@Override
 	public int getPreferredHeight() {
 		return 70;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getQueryElement()
 	 */
 	@Override
@@ -90,81 +102,86 @@ public class DefaultFilter extends AbstractFilterControl {
 					qe = new QueryElement();
 					qe.setLinkType(QueryElement.AND);
 					qe.setPropertyName(propIds[0]);
-					
-					if(("eq".equals(logic) || "sw".equals(logic) || "c".equals(logic))){
+
+					if ((LOGIC_EQUALS.equals(logic) || LOGIC_STARTS_WITH.equals(logic) || LOGIC_CONTAINS.equals(logic))
+							|| LOGIC_ENDS_WITH.equals(logic)) {
 						qe.setOperation(QueryElement.LIKE);
-					}else if("neq".equals(logic) ||"nc".equals(logic)){
+					} else if (LOGIC_NOT_EQUALS.equals(logic) || LOGIC_NOT_CONTAINS.equals(logic)) {
 						qe.setOperation(QueryElement.NOT_LIKE);
 					}
-					if (("sw".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.endsWith("%")) {
+					if ((LOGIC_STARTS_WITH.equals(logic) || LOGIC_CONTAINS.equals(logic) || LOGIC_NOT_CONTAINS.equals(logic))
+							&& !search.endsWith("%")) {
 						search = search + "%";
-					} 
-					if (("ew".equals(logic) || "c".equals(logic) || "nc".equals(logic)) && !search.startsWith("%")) {
+					}
+					if ((LOGIC_ENDS_WITH.equals(logic) || LOGIC_CONTAINS.equals(logic) || LOGIC_NOT_CONTAINS.equals(logic))
+							&& !search.startsWith("%")) {
 						search = "%" + search;
 					}
-					
-					// in case it's equal we should not trim the seaerch string
-					if("eq".equals(logic) || "neq".equals(logic)){
+
+					// in case it's equal we should not trim the search string
+					if (LOGIC_EQUALS.equals(logic) || LOGIC_NOT_EQUALS.equals(logic)) {
 						search = inpText.getText();
 					}
-					
+
 					qe.setValue(search);
 				}
 			}
 		}
 		return qe;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#loadFilter(de.xwic.appkit.webbase.table.Column, de.xwic.appkit.core.model.queries.QueryElement)
+	 * 
+	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#loadFilter(de.xwic.appkit.webbase.table.Column,
+	 * de.xwic.appkit.core.model.queries.QueryElement)
 	 */
 	@Override
 	public void initialize(Column column, QueryElement queryElement) {
 		this.column = column;
-		
+
 		if (queryElement == null) {
-			ddLogic.selectedByKey("sw");
+			ddLogic.selectedByKey(LOGIC_STARTS_WITH);
 			inpText.setText("");
 		} else {
 			Object value = queryElement.getValue();
 			String search = "";
 			if (value instanceof String) {
-				search = (String)value;
+				search = (String) value;
 			} else if (value instanceof Number) {
-				search = ((Number)value).toString();
+				search = ((Number) value).toString();
 			}
 			if (QueryElement.EQUALS.equals(queryElement.getOperation())) {
-				ddLogic.selectedByKey("eq");
+				ddLogic.selectedByKey(LOGIC_EQUALS);
 			} else if (QueryElement.NOT_EQUALS.equals(queryElement.getOperation())) {
-				ddLogic.selectedByKey("neq");
+				ddLogic.selectedByKey(LOGIC_NOT_EQUALS);
 			} else if (QueryElement.LIKE.equals(queryElement.getOperation())) {
 				if (search.startsWith("%")) {
 					search = search.substring(1);
 					if (search.endsWith("%")) {
-						ddLogic.selectedByKey("c");
+						ddLogic.selectedByKey(LOGIC_CONTAINS);
 						search = search.substring(0, search.length() - 1);
 					} else {
-						ddLogic.selectedByKey("ew");
+						ddLogic.selectedByKey(LOGIC_ENDS_WITH);
 					}
 				} else if (search.endsWith("%")) {
-					ddLogic.selectedByKey("sw");
+					ddLogic.selectedByKey(LOGIC_STARTS_WITH);
 					search = search.substring(0, search.length() - 1);
 				} else {
-					ddLogic.selectedByKey("eq");
+					ddLogic.selectedByKey(LOGIC_EQUALS);
 				}
-			}else if(QueryElement.NOT_LIKE.equals(queryElement.getOperation())){
+			} else if (QueryElement.NOT_LIKE.equals(queryElement.getOperation())) {
 				boolean contains = false;
-				if(search.startsWith("%")){
+				if (search.startsWith("%")) {
 					search = search.substring(1);
 					contains = true;
 				}
-				if(search.endsWith("%")){
-					search = search.substring(0,search.length()-1);
+				if (search.endsWith("%")) {
+					search = search.substring(0, search.length() - 1);
 					contains = true;
 				}
-				
-				ddLogic.selectedByKey(contains ? "nc" : "neq");
+
+				ddLogic.selectedByKey(contains ? LOGIC_NOT_CONTAINS : LOGIC_NOT_EQUALS);
 			}
 			inpText.setText(search);
 		}
