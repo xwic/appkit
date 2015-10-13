@@ -92,7 +92,8 @@ public final class URemoteAccessClient {
 	 * @param config
 	 * @return
 	 */
-	public static InputStream getStream(final Map<String, String> param, final RemoteSystemConfiguration config) {
+	public static InputStream getStream(final Map<String, String> param,
+			final RemoteSystemConfiguration config) {
 		try {
 			SimpleRequestHelper requestHelper = new SimpleRequestHelper(param, config);
 			return postRequest(requestHelper);
@@ -108,7 +109,8 @@ public final class URemoteAccessClient {
 	 * @param config
 	 * @return
 	 */
-	public static int multipartRequestInt(final MultipartEntity builder, final RemoteSystemConfiguration config) {
+	public static int multipartRequestInt(final MultipartEntity builder,
+			final RemoteSystemConfiguration config) {
 		InputStream in = null;
 		try {
 			MultipartRequestHelper requestHelper = new MultipartRequestHelper(builder, config);
@@ -152,6 +154,15 @@ public final class URemoteAccessClient {
 			if (responseCode != HttpURLConnection.HTTP_OK) {
 				throw new RemoteDataAccessException(connection.getResponseMessage());
 			}
+
+			String contentEncoding = connection.getContentEncoding();
+			if (contentEncoding != null && contentEncoding.indexOf("gzip") > -1) {
+
+				final InputStream decompressStream = GZipDecompressionHelper.decompressStream(connection
+						.getInputStream());
+				return decompressStream;
+			}
+
 			return connection.getInputStream();
 		} catch (RemoteDataAccessException re) {
 			throw re;

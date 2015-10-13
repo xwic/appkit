@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -41,6 +42,7 @@ import org.dom4j.Element;
 
 import de.xwic.appkit.core.access.AccessHandler;
 import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
@@ -81,7 +83,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String ACTION_GET_COLLECTION = "gc";
 	public final static String ACTION_SOFT_DELETE = "sdel";
 	public final static String ACTION_DELETE = "del";
-	
+
 	public final static String ACTION_EXECUTE_USE_CASE = "euc";
 	public final static String ACTION_FILE_HANDLE = "fh";
 	public final static String ACTION_GET_USER_RIGHTS = "gur";
@@ -93,9 +95,11 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	public final static String RESPONSE_FAILED = "0";
 
 	public final static Log log = LogFactory.getLog(RemoteDataAccessServlet.class);
+	
+	private boolean useCompression = false;
 
 	private AccessHandler accessHandler;
-	
+
 	private Map<String, IRequestHandler> handlers;
 
 	/**
@@ -103,8 +107,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 */
 	public RemoteDataAccessServlet() {
 		accessHandler = AccessHandler.getInstance();
-		
+
 		registerHandlers();
+		useCompression = ConfigurationManager.getSetup().getProperty("useCompression", "false").equals("true");
 	}
 
 	/**
@@ -123,19 +128,25 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+	 * javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
+			throws ServletException, IOException {
 		handleRequest(req, resp);
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+	 * javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp)
+			throws ServletException, IOException {
 		handleRequest(req, resp);
 	}
 
@@ -170,7 +181,13 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				
 			} else {
 				// all responses will now basically be an XML document, so we can do some preparations
-				PrintWriter pwOut = resp.getWriter();
+				PrintWriter pwOut = null;
+				if(useCompression){		
+					pwOut = new PrintWriter(new GZIPOutputStream(resp.getOutputStream()));
+					resp.setHeader("Content-Encoding", "gzip");
+				}else {
+					pwOut = resp.getWriter();
+				}
 				
 				String entityType = req.getParameter(PARAM_ENTITY_TYPE);
 				assertValue(entityType, "Entity Type not specified");
@@ -215,8 +232,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @param equals
 	 * @throws ConfigurationException
 	 */
-	private void handleDelete(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut,
-			final boolean softDelete) throws ConfigurationException {
+	private void handleDelete(final String entityType, final HttpServletRequest req,
+			final HttpServletResponse resp, final PrintWriter pwOut, final boolean softDelete)
+			throws ConfigurationException {
 
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 		String version = req.getParameter(PARAM_VERSION);
@@ -242,7 +260,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void handleGetCollection(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException {
+	private void handleGetCollection(final String entityType, final HttpServletRequest req,
+			final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException,
+			IOException {
 
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 		String propName = req.getParameter(PARAM_ENTITY_PROPERTY);
@@ -252,32 +272,33 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		int eId = Integer.parseInt(entityId);
 
-
 		Object collection = accessHandler.getETOCollection(entityType, eId, propName);
 
 		List list = new ArrayList();
 		if (collection instanceof Collection<?>) {
-			for (Object o : (Collection<?>)collection) {
+			for (Object o : (Collection<?>) collection) {
 				list.add(o);
 			}
 		}
 
-		// we need to send the type of the entities in the collection, not the type of the parent entity
+		// we need to send the type of the entities in the collection, not the type of the parent
+		// entity
 		// if the collection is empty, it doesn't matter what type we send
 		String type = entityType;
 		if (!list.isEmpty()) {
 			// this method is used to fetch collection of entities, so this is safe
 			Object o = list.get(0);
 			if (o instanceof EntityTransferObject) {
-				DAO dao = DAOSystem.findDAOforEntity(((EntityTransferObject) o).getEntityClass().getName()); 
+				DAO dao = DAOSystem.findDAOforEntity(((EntityTransferObject) o).getEntityClass().getName());
 				type = dao.getEntityClass().getName();
-			} else if (o instanceof IEntity){
+			} else if (o instanceof IEntity) {
 				type = EntityUtil.type((IEntity) o).getName();
 			} else {
-				throw new DataAccessException("Collection is not composed of entities, but of " + o.getClass().getName()); 
+				throw new DataAccessException("Collection is not composed of entities, but of "
+						+ o.getClass().getName());
 			}
 		}
-		
+
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(type);
 		XmlEntityTransport et = new XmlEntityTransport();
 		et.write(pwOut, list, entityDescriptor);
@@ -293,7 +314,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws ConfigurationException
 	 * @throws IOException
 	 */
-	private void handleUpdateEntity(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws DocumentException, TransportException, ConfigurationException, IOException {
+	private void handleUpdateEntity(final String entityType, final HttpServletRequest req,
+			final HttpServletResponse resp, final PrintWriter pwOut) throws DocumentException,
+			TransportException, ConfigurationException, IOException {
 
 		String strEto = req.getParameter(PARAM_ETO);
 
@@ -319,7 +342,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws ConfigurationException
 	 * @throws IOException
 	 */
-	private void handleGetEntities(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException, TransportException {
+	private void handleGetEntities(final String entityType, final HttpServletRequest req,
+			final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException,
+			IOException, TransportException {
 		Limit limit = null;
 		String strLimit = req.getParameter(PARAM_LIMIT);
 		if (strLimit != null && !strLimit.isEmpty()) {
@@ -339,7 +364,6 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		et.write(pwOut, list, entityDescriptor, query.getColumns());
 	}
 
-
 	/**
 	 * @param entityType
 	 * @param req
@@ -348,7 +372,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 	 * @throws ConfigurationException
 	 * @throws IOException
 	 */
-	private void handleGetEntity(final String entityType, final HttpServletRequest req, final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException, IOException {
+	private void handleGetEntity(final String entityType, final HttpServletRequest req,
+			final HttpServletResponse resp, final PrintWriter pwOut) throws ConfigurationException,
+			IOException {
 
 		String entityId = req.getParameter(PARAM_ENTITY_ID);
 
