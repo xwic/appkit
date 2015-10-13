@@ -185,6 +185,9 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 				throw new IllegalStateException(String.format("Unknown property '%s' for '%s': ", propertyName, eto.getEntityClass()));
 			}
 			if (pv.isLoaded()) {
+				if(pv.getValue() instanceof EntityTransferObject){
+					return EntityProxyFactory.createEntityProxy((EntityTransferObject) pv.getValue());
+				}
 				return pv.getValue();
 			} else {
 				// Lazy Load

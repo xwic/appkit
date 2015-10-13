@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
@@ -108,7 +109,18 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 						if (id != null && !id.isEmpty()) {
 							int refId = Integer.parseInt(id);
 							pv.setEntityId(refId);
-							pv.setLoaded(false);
+							String etoStr = elmProp.attributeValue("eto");
+							if(etoStr != null){
+								try {
+									pv.setValue(EtoSerializer.deserialize(etoStr));
+								} catch (DocumentException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+								pv.setLoaded(true);
+							}else {
+								pv.setLoaded(false);
+							}
 						} else {
 							pv.setLoaded(true);
 							

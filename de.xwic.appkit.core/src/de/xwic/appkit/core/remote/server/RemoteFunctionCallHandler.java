@@ -69,7 +69,7 @@ public class RemoteFunctionCallHandler implements IRequestHandler {
 		} catch (Exception e1) {
 			throw new IllegalArgumentException("Error while trying to execute the function!", e1);
 		} 
-		String serialized = XmlBeanSerializer.serializeToXML("result", result);
+		String serialized = XmlBeanSerializer.serializeToXML("result", result, true);
 		PrintWriter pwOut;
 		try {
 			pwOut = resp.getWriter();

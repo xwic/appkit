@@ -178,7 +178,7 @@ public class EntityTransferObject {
 									value.setEntityId(refEntity.getId());
 									// do not store the ref entity when lazy loading is on or the ETO
 									// is constructed for an update.
-									if (property != null && property.isLazy() || loadCollections) {
+									if (property != null && (property.isLazy() || loadCollections)) {
 										value.setLoaded(false);
 									} else {
 										value.setLoaded(true);

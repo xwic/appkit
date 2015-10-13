@@ -43,6 +43,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
@@ -59,15 +60,16 @@ import de.xwic.appkit.core.export.XmlExport;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPickliste;
+import de.xwic.appkit.core.remote.client.ETOProxyHandler;
+import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
 /**
- * 
  * @author Florian Lippisch
  */
 public class XmlBeanSerializer {
-	
+
 	/**
 	 * 
 	 */
@@ -79,15 +81,15 @@ public class XmlBeanSerializer {
 	/**
 	 * 
 	 */
-	public  static final String ELM_ELEMENT = "element";
+	public static final String ELM_ELEMENT = "element";
 	/**
 	 * 
 	 */
-	public  static final String ELM_SET = "set";
+	public static final String ELM_SET = "set";
 	/**
 	 * 
 	 */
-	public  static final String ELM_LIST = "list";
+	public static final String ELM_LIST = "list";
 	/**
 	 *
 	 */
@@ -124,24 +126,27 @@ public class XmlBeanSerializer {
 
 	private List<ICustomObjectSerializer> customSerializer = new ArrayList<ICustomObjectSerializer>();
 	private Set<String> skipPropertyNames = new HashSet<String>();
-	
+
 	private boolean serializeEntity = false;
+
 	/**
 	 * Add a custom serializer
+	 * 
 	 * @param serializer
 	 */
 	public void addCustomObjectSerializer(ICustomObjectSerializer serializer) {
 		customSerializer.add(serializer);
 	}
-	
+
 	/**
 	 * Add a property name to skip.
+	 * 
 	 * @param name
 	 */
 	public void addSkipPropertyName(String name) {
 		skipPropertyNames.add(name);
 	}
-	
+
 	/**
 	 * @param rootElement
 	 * @param bean
@@ -151,76 +156,78 @@ public class XmlBeanSerializer {
 	public static String serializeToXML(String rootElement, Object bean) throws TransportException {
 		return serializeToXML(rootElement, bean, false);
 	}
-	
+
 	/**
 	 * @param rootElement
 	 * @param bean
 	 * @return
 	 * @throws TransportException
 	 */
-	public static String serializeToXML(String rootElement, Object bean, boolean serializeEntity) throws TransportException {
+	public static String serializeToXML(String rootElement, Object bean, boolean serializeEntity)
+			throws TransportException {
 		return serializeCollectionToXML(rootElement, Arrays.asList(bean), serializeEntity);
 	}
-	
+
 	/**
 	 * @param rootElement
 	 * @param beans
 	 * @return
 	 * @throws TransportException
 	 */
-	public static String serializeCollectionToXML(String rootElement, Collection<?> beans, boolean serializeEntity) throws TransportException {
+	public static String serializeCollectionToXML(String rootElement, Collection<?> beans,
+			boolean serializeEntity) throws TransportException {
 		ByteArrayOutputStream baOut = new ByteArrayOutputStream();
 		OutputStreamWriter writer = new OutputStreamWriter(baOut);
-		
+
 		try {
 			Document doc = DocumentFactory.getInstance().createDocument();
 			Element root = doc.addElement(rootElement);
-			
+
 			XmlBeanSerializer xml = new XmlBeanSerializer();
 			xml.setSerializeEntity(serializeEntity);
-			
+
 			for (Object bean : beans) {
-				xml.addValue(root, bean, true);				
+				xml.addValue(root, bean, true);
 			}
-			
-			OutputFormat prettyFormat = OutputFormat.createCompactFormat();//CompactFormat();//PrettyPrint();
-			// this "hack" is required to preserve the LBCR's in strings... 
+
+			OutputFormat prettyFormat = OutputFormat.createCompactFormat();// CompactFormat();//PrettyPrint();
+			// this "hack" is required to preserve the LBCR's in strings...
 			XMLWriter xmlWriter = new XMLWriter(writer, prettyFormat) {
 				@Override
 				public void write(Document arg0) throws IOException {
-					//this.preserve = true;
+					// this.preserve = true;
 					super.write(arg0);
 				}
 			};
 			xmlWriter.write(doc);
 			xmlWriter.flush();
-			
+
 		} catch (IOException e) {
 			throw new TransportException("Unexpected IOException while serializing query.", e);
 		}
 
 		return baOut.toString();
 	}
-	
+
 	/**
 	 * @param doc
 	 * @param string
 	 * @param query
-	 * @throws IntrospectionException 
-	 * @throws InvocationTargetException 
-	 * @throws IllegalAccessException 
-	 * @throws IllegalArgumentException 
+	 * @throws IntrospectionException
+	 * @throws InvocationTargetException
+	 * @throws IllegalAccessException
+	 * @throws IllegalArgumentException
 	 */
 	public void serializeBean(Element elm, String elementName, Object bean) throws TransportException {
-		
+
 		Element root = elm.addElement(elementName);
-		
+
 		root.addAttribute("type", bean.getClass().getName());
-		
+
 		try {
 			BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
 			for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
-				
+
 				if (!"class".equals(pd.getName())) {
 					Element pElm = root.addElement(pd.getName());
 					Method mRead = pd.getReadMethod();
@@ -229,23 +236,24 @@ public class XmlBeanSerializer {
 						continue;
 					}
 					Object value = mRead.invoke(bean, NO_ARGS);
-					
+
 					boolean addType = true;
-					addType = value != null && !value.getClass().equals(pd.getPropertyType()) && !pd.getPropertyType().isPrimitive();
+					addType = value != null && !value.getClass().equals(pd.getPropertyType())
+							&& !pd.getPropertyType().isPrimitive();
 					addValue(pElm, value, addType);
 				}
-				
+
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new TransportException("Error serializing bean: " + e, e);
 		}
-		
+
 	}
-	
+
 	/**
 	 * @param value
 	 * @param value2
-	 * @throws TransportException 
+	 * @throws TransportException
 	 */
 	public void addValue(Element elm, Object value, boolean addTypeInfo) throws TransportException {
 
@@ -256,14 +264,14 @@ public class XmlBeanSerializer {
 				return; // early exit
 			}
 		}
-		
+
 		String typeInfo = null;
-		
+
 		if (value instanceof PropertyValue) {
-			PropertyValue pv = (PropertyValue)value;
+			PropertyValue pv = (PropertyValue) value;
 			if (pv.isEntityType()) {
 				if (pv.isLoaded() && pv.getValue() == null) {
-					value = null; 
+					value = null;
 				} else {
 					elm.addAttribute("id", Integer.toString(pv.getEntityId()));
 					elm.addAttribute("entityType", ATTRVALUE_TRUE);
@@ -282,12 +290,12 @@ public class XmlBeanSerializer {
 				elm.addAttribute("lazy", ATTRVALUE_TRUE);
 				return; // BREAK
 			}
-			
+
 			if (pv.isModified()) {
 				elm.addAttribute("modified", ATTRVALUE_TRUE);
 			}
 		}
-		
+
 		if (typeInfo == null) {
 			typeInfo = value != null ? value.getClass().getName() : null;
 		}
@@ -305,18 +313,18 @@ public class XmlBeanSerializer {
 		} else if (value instanceof Integer) {
 			elm.setText(value.toString());
 		} else if (value instanceof Boolean) {
-			Boolean bo = (Boolean)value;
+			Boolean bo = (Boolean) value;
 			elm.setText(bo.booleanValue() ? "true" : "false");
 		} else if (value instanceof Long) {
 			elm.setText(value.toString());
 		} else if (value instanceof Double) {
 			elm.setText(value.toString());
 		} else if (value instanceof Date) {
-			Date date = (Date)value;
+			Date date = (Date) value;
 			elm.setText(Long.toString(date.getTime()));
-			
+
 		} else if (value instanceof IPicklistEntry) {
-			IPicklistEntry entry = (IPicklistEntry)value;
+			IPicklistEntry entry = (IPicklistEntry) value;
 			typeInfo = entry.type().getName();
 			if (entry.getKey() != null) {
 				elm.addAttribute("key", entry.getKey());
@@ -324,28 +332,36 @@ public class XmlBeanSerializer {
 			elm.addAttribute("picklistid", entry.getPickliste().getKey());
 			elm.addAttribute("entryid", Integer.toString(entry.getId()));
 			elm.addAttribute("langid", "de");
-			elm.setText(entry.getBezeichnung("de")); // use german language in export, as it is most common
+			elm.setText(entry.getBezeichnung("de")); // use german language in export, as it is most
+														// common
 
 		} else if (value instanceof IEntity) {
-			IEntity entity = (IEntity)value;
+			IEntity entity = (IEntity) value;
 			typeInfo = entity.type().getName();
 			if (entity.getId() == Entities.NEW_ENTITY_ID || serializeEntity) {
-				EntityTransferObject eto = new EntityTransferObject(entity, true);
+				EntityTransferObject eto = new EntityTransferObject(entity, false);
 				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
 			}
 			elm.addAttribute("id", Integer.toString(entity.getId()));
 			DAO<?> dao = DAOSystem.findDAOforEntity(entity.type());
 			elm.setText(dao.buildTitle(entity));
-			
+
+		} else if (value instanceof EntityTransferObject) {
+			EntityTransferObject eto = (EntityTransferObject) value;
+			DAO<?> dao = DAOSystem.findDAOforEntity(eto.getEntityClass());
+			typeInfo = dao.getEntityClass().getName();
+			elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
+			elm.addAttribute("id", Integer.toString(eto.getEntityId()));
+
 		} else if (value instanceof Set) {
-			Set<?> set = (Set<?>)value;
+			Set<?> set = (Set<?>) value;
 			Element elmSet = elm.addElement(ELM_SET);
 			for (Object o : set) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
 			}
 		} else if (value instanceof List) {
-			List<?> list = (List<?>)value;
+			List<?> list = (List<?>) value;
 			Element elmSet = elm.addElement(ELM_LIST);
 			for (Object o : list) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
@@ -357,11 +373,11 @@ public class XmlBeanSerializer {
 			serializeBean(elm, ELM_BEAN, value);
 			addTypeInfo = false;
 		}
-		
+
 		if (addTypeInfo && typeInfo != null) {
 			elm.addAttribute("type", typeInfo);
 		}
-		
+
 	}
 
 	/**
@@ -373,9 +389,10 @@ public class XmlBeanSerializer {
 		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
 		return deserializeBean(elm, context);
 	}
-	
+
 	/**
 	 * Deserializes a bean.
+	 * 
 	 * @param elm
 	 * @param context
 	 * @return
@@ -383,15 +400,16 @@ public class XmlBeanSerializer {
 	 */
 	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
 		Element firstElem = (Element) elm.elementIterator().next();
-		if (firstElem != null && (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
+		if (firstElem != null
+				&& (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
 			return readValue(context, elm, null);
 		}
-		
+
 		String strTypeClass = elm.attributeValue("type");
 		if (strTypeClass == null || strTypeClass.length() == 0) {
 			throw new TransportException("Missing type attribute in bean element (" + elm.getName() + ")");
 		}
-		
+
 		// instanciate bean
 		Class<?> beanType;
 		Object bean;
@@ -403,34 +421,40 @@ public class XmlBeanSerializer {
 		} catch (IllegalAccessException e) {
 			throw new TransportException("IllegalAccessException instantiating bean class " + strTypeClass);
 		} catch (ClassNotFoundException e) {
-			throw new TransportException("The bean '" + strTypeClass + "' can not be deserialized because the class can not be found.", e);
+			throw new TransportException("The bean '" + strTypeClass
+					+ "' can not be deserialized because the class can not be found.", e);
 		}
 
 		deserializeBean(bean, elm, context);
-		
+
 		return bean;
-	}		
-	
+	}
+
 	/**
 	 * Deserializes an element into a bean.
+	 * 
 	 * @param elm
 	 * @param context
 	 * @return
 	 * @throws TransportException
 	 */
-	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context)
+			throws TransportException {
 		// now read the properties
 		try {
 			BeanInfo bi = Introspector.getBeanInfo(bean.getClass());
 			for (PropertyDescriptor pd : bi.getPropertyDescriptors()) {
 				Method mWrite = pd.getWriteMethod();
-				if (!"class".equals(pd.getName()) && mWrite != null && !skipPropertyNames.contains(pd.getName())) {
+				if (!"class".equals(pd.getName()) && mWrite != null
+						&& !skipPropertyNames.contains(pd.getName())) {
 					Element elmProp = elm.element(pd.getName());
 					if (elmProp != null) {
 						Object value = readValue(context, elmProp, pd);
-						mWrite.invoke(bean, new Object[] {value});
+						mWrite.invoke(bean, new Object[] { value });
 					} else {
-						log.warn("The property " + pd.getName() + " is not specified in the xml document. The bean may not be restored completly");
+						log.warn("The property "
+								+ pd.getName()
+								+ " is not specified in the xml document. The bean may not be restored completly");
 					}
 				}
 			}
@@ -440,20 +464,22 @@ public class XmlBeanSerializer {
 	}
 
 	/**
-	 * @param context 
+	 * @param context
 	 * @param elmProp
-	 * @param pd 
+	 * @param pd
 	 * @return
-	 * @throws TransportException 
+	 * @throws TransportException
 	 */
 	@SuppressWarnings("unchecked")
-	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd) throws TransportException {
+	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd)
+			throws TransportException {
 
 		// check if value is null
-		if (elProp.element(XmlExport.ELM_NULL) != null || ATTRVALUE_TRUE.equals(elProp.attributeValue("null"))) {
+		if (elProp.element(XmlExport.ELM_NULL) != null
+				|| ATTRVALUE_TRUE.equals(elProp.attributeValue("null"))) {
 			return null;
 		}
-		
+
 		Class<?> type = getType(elProp.attributeValue("type"));
 
 		if (type == null) {
@@ -465,7 +491,8 @@ public class XmlBeanSerializer {
 				if (elBean != null) {
 					return deserializeBean(elBean, context);
 				}
-				throw new TransportException("Can't deserialize element '" + elProp.getName() + "' - no type informations available.");
+				throw new TransportException("Can't deserialize element '" + elProp.getName()
+						+ "' - no type informations available.");
 			}
 		}
 
@@ -473,7 +500,7 @@ public class XmlBeanSerializer {
 		for (ICustomObjectSerializer cos : customSerializer) {
 			if (cos.handlesType(type)) {
 				// found a custom serializer, directly return the value, even if null
-			    return cos.deserialize(elProp);
+				return cos.deserialize(elProp);
 			}
 		}
 
@@ -488,8 +515,8 @@ public class XmlBeanSerializer {
 			Element elSet = elProp.element(ELM_SET);
 			if (elSet != null) {
 				Set<Object> set = new HashSet<Object>();
-				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
-					Element elSetElement = (Element)itSet.next();
+				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext();) {
+					Element elSetElement = (Element) itSet.next();
 					set.add(readValue(context, elSetElement, null));
 				}
 				value = set;
@@ -498,47 +525,48 @@ public class XmlBeanSerializer {
 			Element elSet = elProp.element(ELM_LIST);
 			if (elSet != null) {
 				List<Object> list = new ArrayList<Object>();
-				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext(); ) {
-					Element elSetElement = (Element)itSet.next();
+				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext();) {
+					Element elSetElement = (Element) itSet.next();
 					list.add(readValue(context, elSetElement, null));
 				}
 				value = list;
 			}
 		} else if (Map.class.isAssignableFrom(type)) {
 			value = deserializeMap(context, elProp);
-		} else if (IPicklistEntry.class.isAssignableFrom(type)){
+		} else if (IPicklistEntry.class.isAssignableFrom(type)) {
 
 			IPicklisteDAO plDAO = DAOSystem.getDAO(IPicklisteDAO.class);
 			IPicklistEntry entry = null;
-			
+
 			String picklistId = elProp.attributeValue("picklistid");
 			String key = elProp.attributeValue("key");
 			String text = elProp.getText();
-			
+
 			if ((picklistId == null || picklistId.trim().isEmpty()) || (key == null || key.trim().isEmpty())) {
 				// maybe it was sent with the ID?
-				
+
 				String strId = elProp.attributeValue("id");
-				
+
 				if (strId != null && !strId.isEmpty()) {
-					int id = Integer.parseInt(strId);							
+					int id = Integer.parseInt(strId);
 					entry = plDAO.getPickListEntryByID(id);
 				}
-				
+
 			} else {
-			
+
 				String langid = elProp.attributeValue("langid");
 				if (langid == null || langid.length() == 0) {
 					langid = "en";
 				}
-				
+
 				// try to find by key
 				if (key != null && key.length() != 0 && picklistId != null && picklistId.length() != 0) {
 					entry = plDAO.getPickListEntryByKey(picklistId, key); // try to find by key
 				}
-			
+
 				// not found, try by title
-				if (entry == null && picklistId != null && picklistId.length() != 0 && text != null && text.length() != 0) {
+				if (entry == null && picklistId != null && picklistId.length() != 0 && text != null
+						&& text.length() != 0) {
 					List<IPicklistEntry> lst = plDAO.getAllEntriesToList(picklistId);
 					for (IPicklistEntry pe : lst) {
 						if (text.equals(pe.getBezeichnung(langid))) {
@@ -550,22 +578,22 @@ public class XmlBeanSerializer {
 			}
 
 			if (entry == null && picklistId != null && text != null) {
-				// create?? 
+				// create??
 				IPickliste plist = plDAO.getPicklisteByKey(picklistId);
 				if (plist != null) {
 					entry = plDAO.createPicklistEntry();
 					entry.setKey(key);
 					entry.setPickliste(plist);
 					plDAO.update(entry);
-					
+
 					for (Language lang : ConfigurationManager.getSetup().getLanguages()) {
 						plDAO.createBezeichnung(entry, lang.getId(), text);
 					}
 				}
 			}
 			value = entry;
-			
-		} else if (IEntity.class.isAssignableFrom(type)){
+
+		} else if (IEntity.class.isAssignableFrom(type)) {
 			// entity type
 			int refId = Integer.parseInt(elProp.attributeValue("id"));
 			if (context != null) {
@@ -576,23 +604,31 @@ public class XmlBeanSerializer {
 				}
 			}
 			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
-			final IEntity refEntity;
+			IEntity refEntity;
+			String etoStr = elProp.attributeValue("eto");
 			if (refId == Entities.NEW_ENTITY_ID) {
 				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
+			} else if (etoStr != null) {
+				try {
+					refEntity = EntityProxyFactory.createEntityProxy(EtoSerializer.deserialize(etoStr));
+				} catch (DocumentException e) {
+					refEntity = null;
+				}
 			} else {
 				refEntity = refDAO.getEntity(refId);
 			}
-			if (refEntity == null){
+
+			if (refEntity == null) {
 				throw new TransportException(String.format("No entity of type %s with id %s.", type, refId));
 			}
 			value = refEntity;
-			
+
 		} else {
-			
+
 			Element elBean = elProp.element(ELM_BEAN);
 			if (elBean != null) {
 				value = deserializeBean(elBean, context);
-			} else {				
+			} else {
 				// basic type
 				String text = elProp.getText();
 				if (String.class.equals(type)) {
@@ -607,17 +643,17 @@ public class XmlBeanSerializer {
 					value = new Boolean(text.equals("true"));
 				} else if (Date.class.equals(type) || java.sql.Timestamp.class.equals(type)) {
 					// entities coming from the DB have the Date field as java.sql.Timestamp
-					// the serialized value is the ms timestamp, so we can instantiate a Date from it
+					// the serialized value is the ms timestamp, so we can instantiate a Date from
+					// it
 					value = new Date(Long.parseLong(text));
 				} else if (double.class.equals(type) || Double.class.equals(type)) {
 					value = new Double(text);
 				}
 			}
 		}
-		
+
 		return value;
 	}
-
 
 	/**
 	 * @param elm
@@ -643,7 +679,8 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	private Map<?,?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp) throws TransportException {
+	private Map<?, ?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp)
+			throws TransportException {
 		final Element element = elProp.element(ELM_MAP);
 		if (element == null) {
 			return null;
@@ -679,6 +716,7 @@ public class XmlBeanSerializer {
 
 	/**
 	 * If true, entity object would be serialized as well
+	 * 
 	 * @return the serializeEntity
 	 */
 	public boolean isSerializeEntity() {
@@ -705,7 +743,7 @@ public class XmlBeanSerializer {
 	 * @param element
 	 * @return
 	 */
-	@SuppressWarnings ({"unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static Object deserializeEnum(final Class beanType, final Element element) {
 		return Enum.valueOf(beanType, element.elementText(ELM_ENUM));
 	}

@@ -21,6 +21,7 @@ package de.xwic.appkit.core.remote.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -182,6 +183,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			} else {
 				// all responses will now basically be an XML document, so we can do some preparations
 				PrintWriter pwOut = null;
+				
 				if(useCompression){		
 					pwOut = new PrintWriter(new GZIPOutputStream(resp.getOutputStream()));
 					resp.setHeader("Content-Encoding", "gzip");
@@ -213,7 +215,6 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				
 				pwOut.flush();
 				pwOut.close();
-				
 			}
 
 		} catch (Exception e) {
