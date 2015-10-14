@@ -24,6 +24,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.dao.UseCase;
+import de.xwic.appkit.core.remote.client.ETOSessionCache;
 import de.xwic.appkit.core.remote.client.IRemoteFunctionCallConditions;
 
 /**
@@ -52,7 +53,7 @@ public class RemoteFunctionCallSerializer {
 			SAXReader xmlReader = new SAXReader();
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
-			Object o =  new XmlBeanSerializer().deserializeBean(root.element("bean"));
+			Object o =  new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"));
 			return (IRemoteFunctionCallConditions) o;
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);

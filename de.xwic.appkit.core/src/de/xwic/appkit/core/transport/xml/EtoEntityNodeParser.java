@@ -54,7 +54,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 	 */
 	@Override
 	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass,
-			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer) throws TransportException {
+			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache) throws TransportException {
 		String sId = elmEntity.attributeValue("id");
 		String sVersion = elmEntity.attributeValue("version");
 		if (sId == null || sId.length() == 0 || sVersion == null || sVersion.length() == 0) {
@@ -78,8 +78,15 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 				throw new TransportException("Failed to read type " + sType, e);
 			}
 		}
+		
+		EntityKey key = new EntityKey(descr.getClassname(), Integer.parseInt(sId));
+		if(sessionCache.containsKey(key)){
+			log.debug("Cache hit for Entity: " + key.toString());
+			return sessionCache.get(key);
+		}
 
 		EntityTransferObject eto = new EntityTransferObject(sId, sVersion, etoClass);
+		sessionCache.put(key, eto);
 		eto.setModified(false);
 		Map<String, PropertyValue> values = eto.getPropertyValues();
 
@@ -125,21 +132,34 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 								// this is a direct entity reference, not an ETO
 								type = elmProp.attributeValue("type");
 							}
-
+							
+							String cached = elmRef.attributeValue("cached");
+							
 							EntityDescriptor descrRef;
 							Class entityClassRef;
+							DAO<?> daoRef;
 							try {
-								DAO<?> daoRef = DAOSystem.findDAOforEntity(type);
+								daoRef = DAOSystem.findDAOforEntity(type);
 								descrRef = daoRef.getEntityDescriptor();
 								entityClassRef = DAOSystem.getModelClassLoader().loadClass(descr.getClassname());
 							} catch (Exception e) {
 								throw new TransportException("Specified type not available/configured: " + type, e);
 							}
 							
+							if("true".equals(cached)){
+								EntityKey keyRef = new EntityKey(descr.getClassname(), refId);
+								EntityTransferObject etoRef = sessionCache.get(keyRef);
+								if(etoRef == null){
+									keyRef = new EntityKey(daoRef.getEntityClass().getName(), refId);
+									etoRef = sessionCache.get(keyRef );
+								}
+								pv.setValue(etoRef);
+							}else {
+							
 							pv.setValue(parseElement(elmProp.element(XmlEntityTransport.ELM_ENTITY), context,
-									entityClassRef, descrRef, xmlBeanSerializer));
+									entityClassRef, descrRef, xmlBeanSerializer, sessionCache));
 							// pv.setValue(EtoSerializer.deserialize(elmProp.elementText(XmlEntityTransport.ELM_ENTITY)));
-
+							}
 							pv.setLoaded(true);
 						} else {
 							pv.setLoaded(false);

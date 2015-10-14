@@ -43,12 +43,10 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import org.dom4j.tree.DefaultText;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
@@ -63,7 +61,6 @@ import de.xwic.appkit.core.export.XmlExport;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPickliste;
-import de.xwic.appkit.core.remote.client.ETOProxyHandler;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
@@ -131,6 +128,23 @@ public class XmlBeanSerializer {
 	private Set<String> skipPropertyNames = new HashSet<String>();
 
 	private boolean serializeEntity = false;
+	
+	private XmlEntityTransport transport;
+	
+	public XmlBeanSerializer(XmlEntityTransport transport){
+		this.transport = transport;
+	}
+	
+	/**
+	 * For no caching
+	 */
+	public XmlBeanSerializer(){
+		this(new HashMap<EntityKey, EntityTransferObject>());
+	}
+	
+	public XmlBeanSerializer(Map<EntityKey, EntityTransferObject> sessionCache){
+		this(new XmlEntityTransport(sessionCache));
+	}
 
 	/**
 	 * Add a custom serializer
@@ -186,7 +200,8 @@ public class XmlBeanSerializer {
 			Document doc = DocumentFactory.getInstance().createDocument();
 			Element root = doc.addElement(rootElement);
 
-			XmlBeanSerializer xml = new XmlBeanSerializer();
+			XmlEntityTransport transport = new XmlEntityTransport(new HashMap<EntityKey, EntityTransferObject>());
+			XmlBeanSerializer xml = new XmlBeanSerializer(transport);
 			xml.setSerializeEntity(serializeEntity);
 
 			for (Object bean : beans) {
@@ -345,11 +360,10 @@ public class XmlBeanSerializer {
 			IEntity entity = (IEntity) value;
 			typeInfo = entity.type().getName();
 			if (entity.getId() == Entities.NEW_ENTITY_ID || serializeEntity || !lazy) {
-				XmlEntityTransport trans = new XmlEntityTransport();
 				EntityDescriptor descr;
 				try {
 					descr = DAOSystem.getEntityDescriptor(typeInfo);
-					trans.addEntity(elm, descr, entity);
+					transport.addEntity(elm, descr, entity);
 				} catch (ConfigurationException e) {
 					throw new TransportException(e);
 				}
@@ -361,11 +375,10 @@ public class XmlBeanSerializer {
 			EntityTransferObject eto = (EntityTransferObject) value;
 			DAO<?> dao = DAOSystem.findDAOforEntity(eto.getEntityClass());
 			typeInfo = dao.getEntityClass().getName();
-			XmlEntityTransport trans = new XmlEntityTransport();
 			EntityDescriptor descr;
 			try {
 				descr = DAOSystem.getEntityDescriptor(typeInfo);
-				trans.addEntity(elm, descr, eto);
+				transport.addEntity(elm, descr, eto);
 			} catch (ConfigurationException e) {
 				throw new TransportException(e);
 			}
@@ -630,7 +643,7 @@ public class XmlBeanSerializer {
 
 				EtoEntityNodeParser parser = new EtoEntityNodeParser();
 				EntityTransferObject refEto= (EntityTransferObject) parser.parseElement(elProp.element(XmlEntityTransport.ELM_ENTITY),
-						context, type, refDAO.getEntityDescriptor(), this);
+						context, type, refDAO.getEntityDescriptor(), this, transport.getSessionCache());
 				refEntity = EntityProxyFactory.createEntityProxy(refEto);
 			} else {
 				refEntity = refDAO.getEntity(refId);

@@ -48,6 +48,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.remote.client.ETOSessionCache;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.util.Function;
@@ -74,7 +75,7 @@ public final class EtoSerializer {
 
 			final EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
 			final StringWriter sw = new StringWriter();
-			final XmlEntityTransport xet = new XmlEntityTransport();
+			final XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 
 			xet.write(sw, eto, descr);
 
@@ -101,7 +102,7 @@ public final class EtoSerializer {
 		SAXReader xmlReader = new SAXReader();
 		Document doc = xmlReader.read(new StringReader(serializedETO));
 
-		XmlEntityTransport xet = new XmlEntityTransport();
+		XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
 
 		int size = list.size();

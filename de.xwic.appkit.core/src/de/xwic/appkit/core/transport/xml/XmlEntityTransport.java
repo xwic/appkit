@@ -43,6 +43,7 @@ import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
+import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
@@ -93,13 +94,25 @@ public class XmlEntityTransport {
 	}
 
 	private boolean exportAll = false;
-	private XmlBeanSerializer xmlBeanSerializer = new XmlBeanSerializer();
+
+	/**
+	 * Cache used on the server, to avoid transferring an ETO twice.
+	 */
+	Map<EntityKey, Integer> serverContext = new HashMap<EntityKey, Integer>();
+	
+	/**
+	 * Used on client side. Contains all ETOs transferred during request / response cycle.
+	 * That way we can use already serialized ETOs and don't have to make another server call.
+	 */
+	Map<EntityKey, EntityTransferObject> sessionCache;
+	
+	private XmlBeanSerializer xmlBeanSerializer = new XmlBeanSerializer(this);
 
 	/**
 	 * Constructor.
 	 */
-	public XmlEntityTransport() {
-
+	public XmlEntityTransport(Map<EntityKey, EntityTransferObject> sessionCache) {
+		this.sessionCache = sessionCache;
 	}
 
 	/**
@@ -107,7 +120,8 @@ public class XmlEntityTransport {
 	 * 
 	 * @param exportAll
 	 */
-	public XmlEntityTransport(boolean exportAll) {
+	public XmlEntityTransport(boolean exportAll, Map<EntityKey, EntityTransferObject> sessionCache) {
+		this(sessionCache);
 		this.exportAll = exportAll;
 	}
 
@@ -233,6 +247,8 @@ public class XmlEntityTransport {
 	void addEntity(Element entities, EntityDescriptor descr, EntityTransferObject eto) {
 
 		try {
+			String entityClassName = DAOSystem.findDAOforEntity(descr.getClassname()).getEntityClass().getName();
+			EntityKey key = new EntityKey(entityClassName, eto.getEntityId());
 			Element elm = entities.addElement(ELM_ENTITY);
 			elm.addAttribute("id", Integer.toString(eto.getEntityId()));
 			elm.addAttribute("version", Long.toString(eto.getEntityVersion()));
@@ -244,20 +260,26 @@ public class XmlEntityTransport {
 				elm.addAttribute(ATTR_CHANGED, XmlBeanSerializer.ATTRVALUE_TRUE);
 			}
 
-			for (Iterator<?> it = eto.getPropertyValues().keySet().iterator(); it.hasNext();) {
+			if (serverContext.containsKey(key)) {
+				elm.addAttribute("cached", "true");
+			} else {
 
-				String propertyName = (String) it.next();
+				for (Iterator<?> it = eto.getPropertyValues().keySet().iterator(); it.hasNext();) {
 
-				if (exportAll || !SKIP_PROPS.contains(propertyName)) {
-					// Property property = (Property)descr.getProperty(propertyName);
-					PropertyValue val = eto.getPropertyValue(propertyName);
+					String propertyName = (String) it.next();
 
-					Element pValue = elm.addElement(propertyName);
+					if (exportAll || !SKIP_PROPS.contains(propertyName)) {
+						// Property property = (Property)descr.getProperty(propertyName);
+						PropertyValue val = eto.getPropertyValue(propertyName);
 
-					xmlBeanSerializer.addValue(pValue, val, false);
+						Element pValue = elm.addElement(propertyName);
+
+						xmlBeanSerializer.addValue(pValue, val, false);
+
+					}
 
 				}
-
+				serverContext.put(key, eto.getEntityId());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error transforming entity into XML: " + descr.getClassname() + ", #"
@@ -274,6 +296,7 @@ public class XmlEntityTransport {
 	public void addEntity(Element entities, EntityDescriptor descr, IEntity entity) {
 
 		try {
+			EntityKey key = new EntityKey(entity.type().getName(), entity.getId());
 			Element elm = entities.addElement(ELM_ENTITY);
 			elm.addAttribute("id", Integer.toString(entity.getId()));
 			elm.addAttribute("version", Long.toString(entity.getVersion()));
@@ -285,27 +308,32 @@ public class XmlEntityTransport {
 				elm.addAttribute(ATTR_CHANGED, XmlBeanSerializer.ATTRVALUE_TRUE);
 			}
 
-			for (Iterator<?> it = descr.getProperties().keySet().iterator(); it.hasNext();) {
+			if (serverContext.containsKey(key)) {
+				elm.addAttribute("cached", "true");
+			} else {
 
-				String propertyName = (String) it.next();
+				for (Iterator<?> it = descr.getProperties().keySet().iterator(); it.hasNext();) {
 
-				if (exportAll || !SKIP_PROPS.contains(propertyName)) {
-					Property property = (Property) descr.getProperty(propertyName);
+					String propertyName = (String) it.next();
 
-					Method mRead = property.getDescriptor().getReadMethod();
-					// Method mWrite = property.getDescriptor().getWriteMethod();
+					if (exportAll || !SKIP_PROPS.contains(propertyName)) {
+						Property property = (Property) descr.getProperty(propertyName);
 
-					// if (mWrite != null) { // only export properties that have a write method
-					if (mRead != null) {
+						Method mRead = property.getDescriptor().getReadMethod();
+						// Method mWrite = property.getDescriptor().getWriteMethod();
 
-						Element pValue = elm.addElement(propertyName);
-						Object value = mRead.invoke(entity, (Object[]) null);
+						// if (mWrite != null) { // only export properties that have a write method
+						if (mRead != null) {
 
-						xmlBeanSerializer.addValue(pValue, value, false, property.isLazy());
+							Element pValue = elm.addElement(propertyName);
+							Object value = mRead.invoke(entity, (Object[]) null);
+
+							xmlBeanSerializer.addValue(pValue, value, false, property.isLazy());
+						}
+						// }
 					}
-					// }
 				}
-
+				serverContext.put(key, entity.getId());
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error transforming entity into XML: " + entity.type().getName()
@@ -390,10 +418,17 @@ public class XmlEntityTransport {
 
 		for (Iterator<Element> it = elmEntities.elementIterator(ELM_ENTITY); it.hasNext();) {
 			Element elmEntity = it.next();
-			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer));
+			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer, sessionCache));
 		}
 
 		return list;
+	}
+
+	/**
+	 * @return the sessionCache
+	 */
+	public Map<EntityKey, EntityTransferObject> getSessionCache() {
+		return sessionCache;
 	}
 
 	// /**

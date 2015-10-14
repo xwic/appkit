@@ -53,6 +53,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.remote.client.ETOSessionCache;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transport.xml.EntityQuerySerializer;
 import de.xwic.appkit.core.transport.xml.EtoSerializer;
@@ -301,7 +302,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		}
 
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(type);
-		XmlEntityTransport et = new XmlEntityTransport();
+		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		et.write(pwOut, list, entityDescriptor);
 	}
 
@@ -361,7 +362,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityList list = accessHandler.getEntities(entityType, limit, query);
 
-		XmlEntityTransport et = new XmlEntityTransport();
+		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		et.write(pwOut, list, entityDescriptor, query.getColumns());
 	}
 
@@ -384,7 +385,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityTransferObject eto = accessHandler.getETO(entityType, Integer.parseInt(entityId));
 
-		XmlEntityTransport et = new XmlEntityTransport();
+		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		et.write(pwOut, eto, entityDescriptor);
 	}
 

@@ -210,6 +210,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 					}
 					try {
 						EntityDescriptor descriptor = DAOSystem.findEntityDescriptor(eto.getEntityClass().getName());
+						
 						List collection = remoteDataAccessClient.getETOCollection(descriptor.getClassname(), eto.getEntityId(), propertyName);
 
 						Collection newCol;

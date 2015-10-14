@@ -25,6 +25,7 @@ import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.EntityKey;
+import de.xwic.appkit.core.transfer.EntityTransferObject;
 
 
 /**
@@ -40,6 +41,6 @@ public interface IEntityNodeParser {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer) throws TransportException; 
+	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache) throws TransportException; 
 	
 }

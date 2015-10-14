@@ -24,6 +24,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import de.xwic.appkit.core.dao.UseCase;
+import de.xwic.appkit.core.remote.client.ETOSessionCache;
 
 /**
  * @author Adrian Ionescu
@@ -50,7 +51,7 @@ public class UseCaseSerializer {
 			SAXReader xmlReader = new SAXReader();
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
-			return (UseCase) new XmlBeanSerializer().deserializeBean(root.element("bean"));
+			return (UseCase) new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"));
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);
 		}
