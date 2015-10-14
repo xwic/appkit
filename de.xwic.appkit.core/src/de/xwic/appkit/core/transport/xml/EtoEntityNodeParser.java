@@ -30,6 +30,7 @@ import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.IEntity;
@@ -38,7 +39,6 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
-
 /**
  * @author Adrian Ionescu
  */
@@ -46,18 +46,22 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 
 	private static final Log log = LogFactory.getLog(EtoEntityNodeParser.class);
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.transport.xml.IEntityNodeParser#parseElement(org.dom4j.Element, java.util.Map, de.xwic.appkit.core.config.model.EntityDescriptor, de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.transport.xml.IEntityNodeParser#parseElement(org.dom4j.Element,
+	 * java.util.Map, de.xwic.appkit.core.config.model.EntityDescriptor,
+	 * de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
 	 */
 	@Override
-	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer) throws TransportException {
+	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass,
+			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer) throws TransportException {
 		String sId = elmEntity.attributeValue("id");
 		String sVersion = elmEntity.attributeValue("version");
 		if (sId == null || sId.length() == 0 || sVersion == null || sVersion.length() == 0) {
 			throw new TransportException("Missing id and version.");
 		}
-		
-//		etoClass can differ, this means that the descriptor can also differ, friend
+
+		// etoClass can differ, this means that the descriptor can also differ, friend
 		EntityDescriptor descriptor = descr;
 		Class etoClass = entityClass;
 
@@ -74,18 +78,18 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 				throw new TransportException("Failed to read type " + sType, e);
 			}
 		}
-		
+
 		EntityTransferObject eto = new EntityTransferObject(sId, sVersion, etoClass);
 		eto.setModified(false);
 		Map<String, PropertyValue> values = eto.getPropertyValues();
-		
+
 		// add deleted property value
 		PropertyValue pvDeleted = new PropertyValue();
 		pvDeleted.setValue(XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmEntity.attributeValue("deleted")));
 		pvDeleted.setType(boolean.class);
 		values.put("deleted", pvDeleted);
-		
-		for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext(); ) {
+
+		for (Iterator<Element> itP = elmEntity.elementIterator(); itP.hasNext();) {
 			Element elmProp = itP.next();
 			String x = elmProp.getName();
 			Property prop = descriptor.getProperty(x);
@@ -93,56 +97,76 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 				log.debug("Unrecognized property: " + x);
 				continue;
 			}
-				Class<?> propertyType = prop.getDescriptor().getPropertyType();
-				boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
-				boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
-				boolean isNull = elmProp.element(XmlExport.ELM_NULL) != null || XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("null"));
-				
-				PropertyValue pv = new PropertyValue();
-				pv.setType(propertyType);
-				if (isNull) {
-					pv.setValue(null);
-					pv.setLoaded(true);
-				} else {
-					if ((isEntityRef && !isPicklistRef)) {
-						String id = elmProp.attributeValue("id");
-						if (id != null && !id.isEmpty()) {
-							int refId = Integer.parseInt(id);
-							pv.setEntityId(refId);
-							String etoStr = elmProp.attributeValue("eto");
-							if(etoStr != null){
-								try {
-									pv.setValue(EtoSerializer.deserialize(etoStr));
-								} catch (DocumentException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-								pv.setLoaded(true);
-							}else {
-								pv.setLoaded(false);
+			Class<?> propertyType = prop.getDescriptor().getPropertyType();
+			boolean isEntityRef = IEntity.class.isAssignableFrom(propertyType);
+			boolean isPicklistRef = IPicklistEntry.class.isAssignableFrom(propertyType);
+			boolean isNull = elmProp.element(XmlExport.ELM_NULL) != null
+					|| XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("null"));
+
+			PropertyValue pv = new PropertyValue();
+			pv.setType(propertyType);
+			if (isNull) {
+				pv.setValue(null);
+				pv.setLoaded(true);
+			} else {
+				if ((isEntityRef && !isPicklistRef)) {
+					String id = elmProp.attributeValue("id");
+					if (id != null && !id.isEmpty()) {
+						int refId = Integer.parseInt(id);
+						pv.setEntityId(refId);
+
+						// String etoStr = elmProp.attributeValue("eto");
+
+						if (elmProp.element(XmlEntityTransport.ELM_ENTITY) != null) {
+
+							Element elmRef = elmProp.element(XmlEntityTransport.ELM_ENTITY);
+							String type = elmRef.attributeValue("type");
+							if (type == null || type.length() == 0) {
+								// this is a direct entity reference, not an ETO
+								type = elmProp.attributeValue("type");
 							}
-						} else {
-							pv.setLoaded(true);
+
+							EntityDescriptor descrRef;
+							Class entityClassRef;
+							try {
+								DAO<?> daoRef = DAOSystem.findDAOforEntity(type);
+								descrRef = daoRef.getEntityDescriptor();
+								entityClassRef = DAOSystem.getModelClassLoader().loadClass(descr.getClassname());
+							} catch (Exception e) {
+								throw new TransportException("Specified type not available/configured: " + type, e);
+							}
 							
+							pv.setValue(parseElement(elmProp.element(XmlEntityTransport.ELM_ENTITY), context,
+									entityClassRef, descrRef, xmlBeanSerializer));
+							// pv.setValue(EtoSerializer.deserialize(elmProp.elementText(XmlEntityTransport.ELM_ENTITY)));
+
+							pv.setLoaded(true);
+						} else {
+							pv.setLoaded(false);
 						}
-					} else if (prop.isCollection() && XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
-						pv.setLoaded(false);
 					} else {
-						pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+						pv.setLoaded(true);
+
 					}
+				} else if (prop.isCollection()
+						&& XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
+					pv.setLoaded(false);
+				} else {
+					pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
 				}
-				
-				if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
-					pv.setModified(true);
-				}
-				
-				if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
-					pv.setEntityType(true);
-				}
-				
-				values.put(elmProp.getName(), pv);
+			}
+
+			if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("modified"))) {
+				pv.setModified(true);
+			}
+
+			if (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("entityType"))) {
+				pv.setEntityType(true);
+			}
+
+			values.put(elmProp.getName(), pv);
 		}
-		
+
 		return eto;
 	}
 

@@ -48,9 +48,12 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.dom4j.tree.DefaultText;
 
+import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Language;
+import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
@@ -250,12 +253,15 @@ public class XmlBeanSerializer {
 
 	}
 
+	public void addValue(Element elm, Object value, boolean addTypeInfo) throws TransportException {
+		addValue(elm, value, addTypeInfo, true);
+	}
 	/**
 	 * @param value
 	 * @param value2
 	 * @throws TransportException
 	 */
-	public void addValue(Element elm, Object value, boolean addTypeInfo) throws TransportException {
+	public void addValue(Element elm, Object value, boolean addTypeInfo, boolean lazy) throws TransportException {
 
 		// check custom object serializers first.
 		for (ICustomObjectSerializer cos : customSerializer) {
@@ -338,19 +344,31 @@ public class XmlBeanSerializer {
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity) value;
 			typeInfo = entity.type().getName();
-			if (entity.getId() == Entities.NEW_ENTITY_ID || serializeEntity) {
-				EntityTransferObject eto = new EntityTransferObject(entity, false);
-				elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
+			if (entity.getId() == Entities.NEW_ENTITY_ID || serializeEntity || !lazy) {
+				XmlEntityTransport trans = new XmlEntityTransport();
+				EntityDescriptor descr;
+				try {
+					descr = DAOSystem.getEntityDescriptor(typeInfo);
+					trans.addEntity(elm, descr, entity);
+				} catch (ConfigurationException e) {
+					throw new TransportException(e);
+				}
+
 			}
 			elm.addAttribute("id", Integer.toString(entity.getId()));
-			DAO<?> dao = DAOSystem.findDAOforEntity(entity.type());
-			elm.setText(dao.buildTitle(entity));
-
+			
 		} else if (value instanceof EntityTransferObject) {
 			EntityTransferObject eto = (EntityTransferObject) value;
 			DAO<?> dao = DAOSystem.findDAOforEntity(eto.getEntityClass());
 			typeInfo = dao.getEntityClass().getName();
-			elm.addAttribute("eto", EtoSerializer.serialize(typeInfo, eto));
+			XmlEntityTransport trans = new XmlEntityTransport();
+			EntityDescriptor descr;
+			try {
+				descr = DAOSystem.getEntityDescriptor(typeInfo);
+				trans.addEntity(elm, descr, eto);
+			} catch (ConfigurationException e) {
+				throw new TransportException(e);
+			}
 			elm.addAttribute("id", Integer.toString(eto.getEntityId()));
 
 		} else if (value instanceof Set) {
@@ -605,15 +623,15 @@ public class XmlBeanSerializer {
 			}
 			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 			IEntity refEntity;
-			String etoStr = elProp.attributeValue("eto");
+
 			if (refId == Entities.NEW_ENTITY_ID) {
 				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
-			} else if (etoStr != null) {
-				try {
-					refEntity = EntityProxyFactory.createEntityProxy(EtoSerializer.deserialize(etoStr));
-				} catch (DocumentException e) {
-					refEntity = null;
-				}
+			} else if (elProp.element(XmlEntityTransport.ELM_ENTITY) != null) {
+
+				EtoEntityNodeParser parser = new EtoEntityNodeParser();
+				EntityTransferObject refEto= (EntityTransferObject) parser.parseElement(elProp.element(XmlEntityTransport.ELM_ENTITY),
+						context, type, refDAO.getEntityDescriptor(), this);
+				refEntity = EntityProxyFactory.createEntityProxy(refEto);
 			} else {
 				refEntity = refDAO.getEntity(refId);
 			}
