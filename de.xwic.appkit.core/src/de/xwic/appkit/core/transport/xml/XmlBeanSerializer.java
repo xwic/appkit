@@ -387,6 +387,9 @@ public class XmlBeanSerializer {
 		} else if (value instanceof Set) {
 			Set<?> set = (Set<?>) value;
 			Element elmSet = elm.addElement(ELM_SET);
+			if(lazy){
+				elm.addAttribute("lazy", ATTRVALUE_TRUE);
+			}
 			for (Object o : set) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
@@ -394,6 +397,9 @@ public class XmlBeanSerializer {
 		} else if (value instanceof List) {
 			List<?> list = (List<?>) value;
 			Element elmSet = elm.addElement(ELM_LIST);
+			if(lazy){
+				elm.addAttribute("lazy", ATTRVALUE_TRUE);
+			}
 			for (Object o : list) {
 				Element entry = elmSet.addElement(ELM_ELEMENT);
 				addValue(entry, o, true);
