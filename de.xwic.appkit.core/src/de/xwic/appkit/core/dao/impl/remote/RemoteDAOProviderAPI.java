@@ -26,11 +26,13 @@ import java.util.List;
 
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
+import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.Limit;
 import de.xwic.appkit.core.model.util.EntityUtil;
+import de.xwic.appkit.core.remote.client.ETOSessionCache;
 import de.xwic.appkit.core.remote.client.EntityProxyFactory;
 import de.xwic.appkit.core.remote.client.IRemoteDataAccessClient;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
@@ -38,7 +40,6 @@ import de.xwic.appkit.core.transport.xml.TransportException;
 
 /**
  * @author lippisch
- *
  */
 public class RemoteDAOProviderAPI implements DAOProviderAPI {
 
@@ -48,11 +49,13 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 * @param remoteServerDAOProvider
 	 * @param client
 	 */
-	public RemoteDAOProviderAPI(RemoteServerDAOProvider remoteServerDAOProvider, IRemoteDataAccessClient client) {
+	public RemoteDAOProviderAPI(RemoteServerDAOProvider remoteServerDAOProvider,
+			IRemoteDataAccessClient client) {
 		this.client = client;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getEntity(java.lang.Class, int)
 	 */
 	@SuppressWarnings("unchecked")
@@ -67,18 +70,25 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#update(de.xwic.appkit.core.dao.IEntity)
 	 */
 	@Override
 	public void update(IEntity entity) throws DataAccessException {
 		try {
-			EntityTransferObject eto = new EntityTransferObject(entity, true);
-			
+			EntityKey key = new EntityKey(entity);
+
+			EntityTransferObject eto = ETOSessionCache.getInstance().getSessionCache().get(key);
+			boolean cachedEto = eto != null;
+			if (!cachedEto) {
+				eto = new EntityTransferObject(entity, true);
+			}
+
 			EntityTransferObject response = client.updateETO(eto);
-			
+
 			eto.refresh(response);
-			
+
 			// TODO AI re-create the whole entity, maybe some other fields were updated!
 			entity.setId(eto.getEntityId());
 			entity.setLastModifiedAt((Date) eto.getPropertyValue("lastModifiedAt").getValue());
@@ -86,34 +96,43 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			entity.setCreatedAt((Date) eto.getPropertyValue("createdAt").getValue());
 			entity.setCreatedFrom((String) eto.getPropertyValue("createdFrom").getValue());
 			entity.setVersion(eto.getEntityVersion());
-			
+
+			if (cachedEto) {
+				ETOSessionCache.getInstance().refreshInCache(entity, key);
+			}
+
 		} catch (Exception e) {
-			throw new DataAccessException("Error updating remote entity '" + entity.type().getName() + "' #" + entity.getId(), e);
+			throw new DataAccessException("Error updating remote entity '" + entity.type().getName() + "' #"
+					+ entity.getId(), e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getEntities(java.lang.Class, de.xwic.appkit.core.dao.Limit)
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getEntities(java.lang.Class,
+	 * de.xwic.appkit.core.dao.Limit)
 	 */
 	@Override
 	public EntityList getEntities(Class<? extends Object> clazz, Limit limit) {
 		return getEntities(clazz, limit, null);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getEntities(java.lang.Class, de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getEntities(java.lang.Class,
+	 * de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
 	@Override
 	public EntityList getEntities(Class<? extends Object> clazz, Limit limit, EntityQuery filter) {
 		try {
 			Class<? extends Object> trueClass = EntityUtil.type(clazz);
-			
+
 			EntityList objects = client.getList(trueClass.getName(), limit, filter);
-			
+
 			List<Object> list = new ArrayList<Object>();
-			
+
 			boolean isObjectArray = filter.getColumns() != null;
-			
+
 			for (Object obj : objects) {
 				if (isObjectArray) {
 					list.add(obj);
@@ -121,15 +140,16 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 					list.add(EntityProxyFactory.createEntityProxy((EntityTransferObject) obj));
 				}
 			}
-			
-			EntityList result = new EntityList(list, limit, objects.getTotalSize());			
+
+			EntityList result = new EntityList(list, limit, objects.getTotalSize());
 			return result;
 		} catch (TransportException e) {
 			throw new DataAccessException("Error loading remote entities '" + clazz.getName() + "'", e);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#delete(de.xwic.appkit.core.dao.IEntity)
 	 */
 	@Override
@@ -137,14 +157,15 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 		performDelete(entity, false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#softDelete(de.xwic.appkit.core.dao.IEntity)
 	 */
 	@Override
 	public void softDelete(IEntity entity) throws DataAccessException {
 		performDelete(entity, true);
 	}
-	
+
 	/**
 	 * @param entity
 	 * @param softDelete
@@ -153,26 +174,31 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 		try {
 			client.delete(entity.type().getName(), entity.getId(), entity.getVersion(), softDelete);
 		} catch (Exception e) {
-			throw new DataAccessException("Error soft-deleting entity: " + entity.getClass().getName() + " -> " + entity.getId(), e);
+			throw new DataAccessException("Error soft-deleting entity: " + entity.getClass().getName()
+					+ " -> " + entity.getId(), e);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int,
+	 * java.lang.String)
 	 */
 	@Override
-	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
-        try {
-            Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);
-            List<EntityTransferObject> entityTransferObjects = (List<EntityTransferObject>) client.getETOCollection(trueClass.getName(), entityId, propertyId);
-            List<IEntity> entities = new ArrayList<IEntity>(entityTransferObjects.size());
-            for(EntityTransferObject entityTransferObject : entityTransferObjects) {
-                entities.add(EntityProxyFactory.createEntityProxy(entityTransferObject));
-            }
-            return entities;
-        } catch (Exception e) {
-        	throw new DataAccessException(String.format("Error getting collection property: %s of %s -> %s", propertyId,
-					entityImplClass.getName(), entityId), e);
-        }
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId,
+			String propertyId) {
+		try {
+			Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);
+			List<EntityTransferObject> entityTransferObjects = (List<EntityTransferObject>) client
+					.getETOCollection(trueClass.getName(), entityId, propertyId);
+			List<IEntity> entities = new ArrayList<IEntity>(entityTransferObjects.size());
+			for (EntityTransferObject entityTransferObject : entityTransferObjects) {
+				entities.add(EntityProxyFactory.createEntityProxy(entityTransferObject));
+			}
+			return entities;
+		} catch (Exception e) {
+			throw new DataAccessException(String.format("Error getting collection property: %s of %s -> %s",
+					propertyId, entityImplClass.getName(), entityId), e);
+		}
 	}
 }

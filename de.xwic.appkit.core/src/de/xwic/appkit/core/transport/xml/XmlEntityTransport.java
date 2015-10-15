@@ -305,7 +305,7 @@ public class XmlEntityTransport {
 			if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
 				clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
 			}else {
-				clasz = entity.type();
+				clasz = entity.getClass();
 			}
 			
 			elm.addAttribute("type", clasz.getName());

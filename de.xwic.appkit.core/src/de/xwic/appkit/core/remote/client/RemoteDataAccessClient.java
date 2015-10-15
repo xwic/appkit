@@ -162,7 +162,9 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Document doc = postRequest(param);
 
 		String strEto = doc.asXML();
-
+		// remove from cache to get correctly back update values
+		EntityKey key = new EntityKey(entityInterfType, eto.getEntityId());
+		ETOSessionCache.getInstance().getSessionCache().remove(key);
 		try {
 			return EtoSerializer.deserialize(strEto);
 		} catch (DocumentException e) {

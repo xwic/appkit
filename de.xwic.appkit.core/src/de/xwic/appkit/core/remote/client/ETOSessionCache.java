@@ -73,22 +73,31 @@ public class ETOSessionCache {
 		T refreshed = (T) dao.getEntity(entity.getId());
 
 		if (existInCache) {
-			Class<? extends IEntity> entityType = entity.type();
-			EntityTransferObject refreshedEto = sessionCache.get(key);
-			for (EntityTransferObject eto : getSessionCache().values()) {
-				for (PropertyValue pv : eto.getPropertyValues().values()) {
-					if (pv.isEntityType() && entityType.equals(pv.getType())
-							&& pv.getEntityId() == eto.getEntityId()) {
-						if (pv.getValue() instanceof EntityTransferObject) {
-							pv.setValue(refreshedEto);
-						} else if (pv.getValue() instanceof IEntity) {
-							pv.setValue(refreshed);
-						}
+			refreshInCache(refreshed, key);
+		}
+		return refreshed;
+	}
+	
+	/**
+	 * 
+	 * @param entity
+	 * @param key
+	 */
+	public void refreshInCache(IEntity refreshedEntity, EntityKey key){
+		Class<? extends IEntity> entityType = refreshedEntity.type();
+		EntityTransferObject refreshedEto = getSessionCache().get(key);
+		for (EntityTransferObject eto : getSessionCache().values()) {
+			for (PropertyValue pv : eto.getPropertyValues().values()) {
+				if (pv.isEntityType() && entityType.equals(pv.getType())
+						&& pv.getEntityId() == eto.getEntityId()) {
+					if (pv.getValue() instanceof EntityTransferObject) {
+						pv.setValue(refreshedEto);
+					} else if (pv.getValue() instanceof IEntity) {
+						pv.setValue(refreshedEntity);
 					}
 				}
 			}
 		}
-		return refreshed;
 	}
 
 	/**
