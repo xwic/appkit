@@ -27,6 +27,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.DataAccessException;
@@ -47,6 +50,7 @@ import de.xwic.appkit.core.util.Equals;
  */
 public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHandler {
 
+	private static Log log = LogFactory.getLog(ETOProxyHandler.class);
 	private EntityTransferObject eto;
 
 	/**
@@ -196,6 +200,7 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 				if (IEntity.class.isAssignableFrom(pv.getType())) { // Resolve entity reference
 
 					Class<? extends IEntity> clazz = (Class<? extends IEntity>) pv.getType();
+					log.debug("Loading " + clazz.getName() + " ID: " + pv.getEntityId() + " from prop: " + propertyName + " Entity: " + eto.getEntityClass().getName());
 					IEntity entity = DAOSystem.findDAOforEntity(clazz).getEntity(pv.getEntityId());
 
 					pv.setValue(entity);
