@@ -300,7 +300,15 @@ public class XmlEntityTransport {
 			Element elm = entities.addElement(ELM_ENTITY);
 			elm.addAttribute("id", Integer.toString(entity.getId()));
 			elm.addAttribute("version", Long.toString(entity.getVersion()));
-			elm.addAttribute("type", entity.type().getName());
+			
+			Class clasz = null;
+			if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
+				clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
+			}else {
+				clasz = entity.type();
+			}
+			
+			elm.addAttribute("type", clasz.getName());
 			if (entity.isDeleted()) {
 				elm.addAttribute("deleted", XmlBeanSerializer.ATTRVALUE_TRUE);
 			}

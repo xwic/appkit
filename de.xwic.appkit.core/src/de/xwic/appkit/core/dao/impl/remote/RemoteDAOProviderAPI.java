@@ -75,7 +75,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 		try {
 			EntityTransferObject eto = new EntityTransferObject(entity, true);
 			
-			EntityTransferObject response = client.updateETO(entity.type().getName(), eto);
+			EntityTransferObject response = client.updateETO(eto);
 			
 			eto.refresh(response);
 			

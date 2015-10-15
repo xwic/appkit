@@ -68,7 +68,7 @@ public interface IRemoteDataAccessClient {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public EntityTransferObject updateETO(String entityType, EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
+	public EntityTransferObject updateETO(EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
 
 	/**
 	 * Returns the collection of an entity property.

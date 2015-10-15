@@ -32,6 +32,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.EntityQuery;
@@ -143,13 +145,16 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#updateETO(java.lang.String, de.xwic.appkit.core.transfer.EntityTransferObject)
 	 */
 	@Override
-	public EntityTransferObject updateETO(final String entityType, final EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
+	public EntityTransferObject updateETO(final EntityTransferObject eto) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
 
+		DAO<?> dao = DAOSystem.findDAOforEntity(eto.getEntityClass());
+		
+		String entityInterfType = dao.getEntityClass().getName();
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
-		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityInterfType);
 
-		String serialized = EtoSerializer.serialize(entityType, eto);
+		String serialized = EtoSerializer.serialize(entityInterfType, eto);
 
 		param.put(RemoteDataAccessServlet.PARAM_ETO, serialized);
 
