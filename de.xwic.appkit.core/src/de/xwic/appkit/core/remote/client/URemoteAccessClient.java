@@ -21,16 +21,21 @@ package de.xwic.appkit.core.remote.client;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.poi.util.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -58,19 +63,13 @@ public final class URemoteAccessClient {
 	 * @return
 	 */
 	public static Document postRequest(final Map<String, String> param, final RemoteSystemConfiguration config) {
-		InputStream is = null;
 		BufferedReader rd = null;
 
 		byte[] bytes = null;
 
 		try {
-			is = getStream(param, config);
-			bytes = IoUtil.readBytes(is);
-			IoUtil.close(is);
-			is = null;
-
+			bytes = getReponseByteArray(param, config);
 			rd = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes)));
-
 			return new SAXReader().read(rd);
 		} catch (RemoteDataAccessException rdae) {
 			throw rdae;
@@ -82,7 +81,6 @@ public final class URemoteAccessClient {
 		} catch (Exception e) {
 			throw new RemoteDataAccessException("Transfer error", e);
 		} finally {
-			IoUtil.close(is);
 			IoUtil.close(rd);
 		}
 	}
@@ -92,11 +90,11 @@ public final class URemoteAccessClient {
 	 * @param config
 	 * @return
 	 */
-	public static InputStream getStream(final Map<String, String> param,
+	public static byte[] getReponseByteArray(final Map<String, String> param,
 			final RemoteSystemConfiguration config) {
 		try {
 			SimpleRequestHelper requestHelper = new SimpleRequestHelper(param, config);
-			return postRequest(requestHelper);
+			return postRequest(requestHelper, config);
 		} catch (RemoteDataAccessException rdae) {
 			throw rdae;
 		} catch (Exception e) {
@@ -111,18 +109,14 @@ public final class URemoteAccessClient {
 	 */
 	public static int multipartRequestInt(final MultipartEntity builder,
 			final RemoteSystemConfiguration config) {
-		InputStream in = null;
 		try {
 			MultipartRequestHelper requestHelper = new MultipartRequestHelper(builder, config);
-			in = postRequest(requestHelper);
-			byte[] byteArray = IOUtils.toByteArray(in);
+			byte[] byteArray = postRequest(requestHelper, config);
 			return Integer.valueOf(new String(byteArray));
 		} catch (RemoteDataAccessException rdae) {
 			throw rdae;
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);
-		} finally {
-			UStream.close(in);
 		}
 	}
 
@@ -131,43 +125,34 @@ public final class URemoteAccessClient {
 	 * @param config
 	 * @return
 	 */
-	public static InputStream postRequest(final IRequestHelper helper) {
+	public static byte[] postRequest(final IRequestHelper helper, final RemoteSystemConfiguration config) {
+		CloseableHttpResponse response = null;
 		try {
-			URL url = new URL(helper.getTargetUrl());
-			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST"); // always POST, we don't need to support GET
-			connection.setRequestProperty("Content-Type", helper.getContentType());
-			connection.setRequestProperty("Content-Length", String.valueOf(helper.getContentLen()));
-			connection.setRequestProperty("Content-Language", "en-US");
 
-			connection.setUseCaches(false);
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
+			CloseableHttpClient client = PoolingHttpConnectionManager.getInstance().getClientInstance(config);
+			HttpPost post = new HttpPost(helper.getTargetUrl());
 
-			// Send request
-			DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-			helper.writeToStream(wr);
-			wr.flush();
-			wr.close();
+			post.setEntity(helper.getHttpEntity());
 
-			int responseCode = connection.getResponseCode();
+			response = client.execute(post);
+
+			int responseCode = response.getStatusLine().getStatusCode();
 			if (responseCode != HttpURLConnection.HTTP_OK) {
-				throw new RemoteDataAccessException(connection.getResponseMessage());
+				throw new RemoteDataAccessException(response.getStatusLine().getReasonPhrase());
 			}
-
-			String contentEncoding = connection.getContentEncoding();
-			if (contentEncoding != null && contentEncoding.indexOf("gzip") > -1) {
-
-				final InputStream decompressStream = GZipDecompressionHelper.decompressStream(connection
-						.getInputStream());
-				return decompressStream;
-			}
-
-			return connection.getInputStream();
+			return EntityUtils.toByteArray(response.getEntity());
 		} catch (RemoteDataAccessException re) {
 			throw re;
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);
+		}finally {
+			if(response != null){
+				try {
+					response.close();
+				} catch (IOException e) {
+					log.error(e.getMessage(), e);
+				}
+			}
 		}
 	}
 

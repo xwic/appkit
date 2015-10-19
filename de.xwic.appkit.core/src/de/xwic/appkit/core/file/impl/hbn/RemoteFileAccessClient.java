@@ -28,6 +28,7 @@ import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_ID;
 import static de.xwic.appkit.core.remote.server.RemoteFileAccessHandler.PARAM_FH_STREAM;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +85,9 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	@Override
 	public InputStream loadFileInputStream(final int id) {
 		Map<String, String> createParams = createParams(id, PARAM_FH_ACTION_LOAD);
-		return URemoteAccessClient.getStream(createParams, config);
+		// It's somehow bad to load the attachment to memory instead of streaming it,
+		// on the other side, response has to be correctly closed.
+		return new ByteArrayInputStream(URemoteAccessClient.getReponseByteArray(createParams, config));
 	}
 
 	/**

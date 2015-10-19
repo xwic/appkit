@@ -19,10 +19,9 @@
  */
 package de.xwic.appkit.core.remote.client;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 
@@ -36,8 +35,6 @@ import de.xwic.appkit.core.security.IUser;
  */
 public class MultipartRequestHelper implements IRequestHelper {
 
-	private final String contentType;
-	private final long contentLength;
 	private final MultipartEntity entity;
 	private final String targetUrl;
 
@@ -56,32 +53,7 @@ public class MultipartRequestHelper implements IRequestHelper {
 		}
 		
 		this.entity = entity;
-		contentType = entity.getContentType().getValue();
-		contentLength = entity.getContentLength();
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.remote.client.IRequestHelper#getContentType()
-	 */
-	@Override
-	public String getContentType() {
-		return contentType;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.remote.client.IRequestHelper#getContentLen()
-	 */
-	@Override
-	public long getContentLen() {
-		return contentLength;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.remote.client.IRequestHelper#writeToStream(java.io.DataOutputStream)
-	 */
-	@Override
-	public void writeToStream(final DataOutputStream wr) throws IOException {
-		entity.writeTo(wr);
+		
 	}
 
 	/* (non-Javadoc)
@@ -90,6 +62,14 @@ public class MultipartRequestHelper implements IRequestHelper {
 	@Override
 	public String getTargetUrl() {
 		return targetUrl;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.remote.client.IRequestHelper#getHttpEntity()
+	 */
+	@Override
+	public HttpEntity getHttpEntity() {
+		return entity;
 	}
 
 }

@@ -185,7 +185,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 				// all responses will now basically be an XML document, so we can do some preparations
 				PrintWriter pwOut = null;
 				
-				if(useCompression){		
+				if(useCompression && (action.equals(ACTION_GET_ENTITIES) || action.equals(ACTION_GET_COLLECTION))){		
 					pwOut = new PrintWriter(new GZIPOutputStream(resp.getOutputStream()));
 					resp.setHeader("Content-Encoding", "gzip");
 				}else {
