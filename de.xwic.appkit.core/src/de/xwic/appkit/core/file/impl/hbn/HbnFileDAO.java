@@ -35,30 +35,47 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
  * DAO implementation for the HbnFile object.
  * 
  * This implementation is hibernate specific.
+ * 
  * @author Florian Lippisch
  */
 public class HbnFileDAO implements IFileHandler {
 
 	/**
 	 * Store a file in the database.
+	 * 
 	 * @param filename
 	 * @param dataHandler
 	 * @return
 	 */
 	public int storeFile(final String filename) throws DataAccessException {
-		final HbnFile hFile = new HbnFile();
-		
 		Session session = HibernateUtil.currentSession();
-		Transaction tx = HibernateUtil.currentSession().beginTransaction();
-		
+		Transaction tx = session.beginTransaction();
+		try {
+			int res = storeFile(filename, session);
+			tx.commit();
+			return res;
+		} catch (DataAccessException e) {
+			tx.rollback();
+			throw e;
+		}
+	}
+
+	/**
+	 * @param filename
+	 * @param session
+	 * @return
+	 * @throws DataAccessException
+	 */
+	protected int storeFile(final String filename, Session session) throws DataAccessException {
+		final HbnFile hFile = new HbnFile();
 		File file = new File(filename);
-		
+
 		hFile.setFilename(filename);
 		hFile.setFilesize(file.length());
 		FileInputStream in = null;
 		try {
 			in = new FileInputStream(file);
-			hFile.setData( Hibernate.createBlob(in ));
+			hFile.setData(Hibernate.getLobCreator(session).createBlob(in, file.length()));
 			session.save(hFile);
 		} catch (Exception e) {
 			throw new HibernateException("Could not create Blob!", e);
@@ -70,12 +87,13 @@ public class HbnFileDAO implements IFileHandler {
 					throw new DataAccessException(e);
 				}
 			}
-			tx.commit();
 		}
 		return hFile.getId();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
 	 */
 	@Override
@@ -83,14 +101,16 @@ public class HbnFileDAO implements IFileHandler {
 		Session session = HibernateUtil.currentSession();
 		Transaction tx = HibernateUtil.currentSession().beginTransaction();
 
-		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Integer(id));
+		HbnFile hFile = (HbnFile) session.load(HbnFile.class, new Integer(id));
 		if (hFile != null) {
 			session.delete(hFile);
 		}
 		tx.commit();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)
 	 */
 	@Override
@@ -98,16 +118,18 @@ public class HbnFileDAO implements IFileHandler {
 		throw new DataAccessException("This method is not supported on the server.");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.pol.crm.dao.IFileHandler#loadFileInputStream(int)
 	 */
 	public InputStream loadFileInputStream(final int id) throws DataAccessException {
 		InputStream stream = null;
-		
+
 		Session session = HibernateUtil.currentSession();
 		Transaction tx = HibernateUtil.currentSession().beginTransaction();
 
-		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Integer(id));
+		HbnFile hFile = (HbnFile) session.load(HbnFile.class, new Integer(id));
 		tx.commit();
 
 		if (hFile != null) {
@@ -116,51 +138,30 @@ public class HbnFileDAO implements IFileHandler {
 			} catch (SQLException e) {
 				throw new DataAccessException("Error while trying to get Stream from Blob!", e);
 			}
-		} 
+		}
 		return stream;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFileInUC(java.lang.String)
 	 */
 	@Override
-	public int storeFileInUC(final String fileName) throws DataAccessException {
-		final HbnFile hFile = new HbnFile();
-
+	public int storeFileInUC(final String filename) throws DataAccessException {
 		Session session = HibernateUtil.currentSession();
-
-		File file = new File(fileName);
-
-		hFile.setFilename(fileName);
-		hFile.setFilesize(file.length());
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(file);
-			hFile.setData( Hibernate.createBlob( in));
-			session.save(hFile);
-		} catch (Exception e) {
-			throw new HibernateException("Could not create Blob!", e);
-		} finally {
-			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					throw new DataAccessException(e);
-				}
-			}
-		}
-
-
-		return hFile.getId();
+		return storeFile(filename, session);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFileInUC(int)
 	 */
 	@Override
 	public void deleteFileInUC(final int id) {
 		Session session = HibernateUtil.currentSession();
-		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Integer(id));
+		HbnFile hFile = (HbnFile) session.load(HbnFile.class, new Integer(id));
 		if (hFile != null) {
 			session.delete(hFile);
 		}

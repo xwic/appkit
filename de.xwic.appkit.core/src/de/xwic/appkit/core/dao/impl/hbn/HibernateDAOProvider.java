@@ -77,29 +77,29 @@ public class HibernateDAOProvider implements DAOProvider {
         		HibernateUtil.currentSession() :
         		HibernateUtil.openSession();
         		
-        boolean startTx = session.getTransaction() == null || !session.getTransaction().isActive();
-        Transaction tx = null;
-        if (startTx) {
-        	tx = session.beginTransaction();
-        }
-        boolean rollback = true;
-        try {
-        	Object o = operation.run(new HibernateDAOProviderAPI(this, session));
-        	if (tx != null) {
-        		tx.commit();
-        	}
-        	rollback = false;
-        	return o;
-        } finally {
-        	// an exception occurred
-        	if (rollback && tx != null && tx.isActive() && !tx.wasRolledBack()) {	
-        		tx.rollback();
-        	}
-        	// If we use our own session, we must close it by ourself.
-        	if (sessionMode != USE_CURRENT_SESSION) {
-        		session.close();
-        	}
-        }
+		boolean startTx = session.getTransaction() == null || !session.getTransaction().isActive();
+		Transaction tx = null;
+		if (startTx) {
+			tx = session.beginTransaction();
+		}
+		boolean rollback = true;
+		try {
+			Object o = operation.run(new HibernateDAOProviderAPI(this, session));
+			if (tx != null) {
+				tx.commit();
+			}
+			rollback = false;
+			return o;
+		} finally {
+			// an exception occurred
+			if (rollback && tx != null && tx.isActive() && !tx.wasRolledBack()) {
+				tx.rollback();
+			}
+			// If we use our own session, we must close it by ourself.
+			if (sessionMode != USE_CURRENT_SESSION) {
+				session.close();
+			}
+		}
 	}
 
 	/**

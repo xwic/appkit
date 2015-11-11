@@ -449,7 +449,7 @@
             <dependency>
                 <groupId>dom4j</groupId>
                 <artifactId>dom4j</artifactId>
-                <version>1.6</version>
+                <version>1.6.1</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -464,7 +464,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>1.7.5</version>
+                <version>1.7.12</version>
             </dependency>
 			<dependency>
 				<groupId>net.sf.opencsv</groupId>
@@ -523,11 +523,11 @@
 				<version>${mvnDependencyVersionxWicCube}</version>
 			</dependency>
 
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate</artifactId>
-            <version>3.2.6.ga</version>
-        </dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>4.3.11.Final</version>
+			</dependency>
 
 			<dependency>
 			    <groupId>javax.transaction</groupId>
