@@ -33,6 +33,7 @@ public class Scope extends Entity implements IScope {
 
 	private String name = null;
 	private String description = null;
+	private Boolean securedScope;
 	private Set<IEntity> actions = null;
 	private Set<IEntity> actionSets = null;
 	
@@ -116,6 +117,20 @@ public class Scope extends Entity implements IScope {
 	 */
 	public boolean isActionAllowed(IAction action) {
 		return getAllActions().contains(action);
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IScope#getRestrictGrantToPeers()
+	 */
+	public Boolean getSecuredScope() {
+		return securedScope;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IScope#setRestrictGrantToPeers(java.lang.Boolean)
+	 */
+	public void setSecuredScope(Boolean securedScope) {
+		this.securedScope = securedScope;
 	}
 
 }

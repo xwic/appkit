@@ -53,13 +53,13 @@ public interface IUser extends IEntity {
 	 * Returns the set of assigned roles.
 	 * @return
 	 */
-	public Set<IEntity> getRoles();
+	public Set<IRole> getRoles();
 	
 	/**
 	 * Sets the roles assigned to the user.
 	 * @param roles
 	 */
-	public void setRoles(Set<IEntity> roles);
+	public void setRoles(Set<IRole> roles);
 
 	/**
 	 * Creates a set of all Rights.
