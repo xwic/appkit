@@ -19,6 +19,7 @@
  */
 package de.xwic.appkit.webbase.toolkit.app;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,6 +38,12 @@ import de.jwic.controls.InputBox;
 import de.jwic.util.IHTMLElement;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.typeconverters.BooleanStringConverter;
+import de.xwic.appkit.core.util.typeconverters.DoubleStringConverter;
+import de.xwic.appkit.core.util.typeconverters.FloatStringConverter;
+import de.xwic.appkit.core.util.typeconverters.IntegerStringConverter;
+import de.xwic.appkit.core.util.typeconverters.LongStringConverter;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitCheckBoxControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitDateInputControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitEmployeeControl;
@@ -53,28 +60,27 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryMultiSelectControl;
 
 /**
- * Editortoolkit to create controls for editors.
- * The controls and/or custom controls have to be registered.
+ * Editortoolkit to create controls for editors. The controls and/or custom controls have to be registered.
  * 
  * @author Ronny Pfretzschner
  */
 public class EditorToolkit {
 
 	private final Log log = LogFactory.getLog(getClass());
-	
+
 	public static Map<Class<? extends IControl>, IToolkitControlHelper> allControls = new HashMap<Class<? extends IControl>, IToolkitControlHelper>();
 	private Map<String, IControl> registeredControls = new HashMap<String, IControl>();
-	
+	private Map<String, ITypeConverter> registeredConverters = new HashMap<String, ITypeConverter>();
+
 	private Map<String, String> controlStyles = null;
-	
+
 	public final static String FIELD_NAME_PREFIX = "fld";
-	
+
 	private EditorModel model = null;
 	private String langId = null;
-	
+
 	private Object baseObj;
-	
-	
+
 	static {
 		allControls.put(DatePicker.class, new ToolkitDateInputControl());
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
@@ -85,8 +91,7 @@ public class EditorToolkit {
 		allControls.put(SingleAttachmentControl.class, new ToolkitSingleAttachmentControl());
 		allControls.put(SingleCommentEditorControl.class, new ToolkitMultiAttachmentControl());
 	}
-	
-	
+
 	/**
 	 * Create the editor toolkit
 	 * 
@@ -98,7 +103,7 @@ public class EditorToolkit {
 		this.langId = langId;
 		this.controlStyles = new HashMap<String, String>();
 	}
-	
+
 	public EditorToolkit(Object baseObj) {
 		this.baseObj = baseObj;
 	}
@@ -106,27 +111,54 @@ public class EditorToolkit {
 	/**
 	 * Create a control by given control type like InputBox.class
 	 * 
-	 * @param controlType the class type
-	 * @param container parent
-	 * @param propertyName of Entity
+	 * @param controlType
+	 *            the class type
+	 * @param container
+	 *            parent
+	 * @param propertyName
+	 *            of Entity
 	 * @return a control
 	 */
-	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, 
-			final String propertyName) {
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName) {
 		return createControl(controlType, container, propertyName, null);
 	}
 
 	/**
 	 * Create a control by given control type like InputBox.class
 	 * 
-	 * @param controlType the class type
-	 * @param container parent
-	 * @param propertyName of Entity
-	 * @param optionalParam 
+	 * @param controlType
+	 *            the class type
+	 * @param container
+	 *            parent
+	 * @param propertyName
+	 *            of Entity
 	 * @return a control
 	 */
-	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, 
-			final String propertyName, final Object optionalParam) {
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName,
+			ITypeConverter converter) {
+		return createControl(controlType, container, propertyName, null, converter);
+	}
+
+	/**
+	 * Create a control by given control type like InputBox.class
+	 * 
+	 * @param controlType
+	 *            the class type
+	 * @param container
+	 *            parent
+	 * @param propertyName
+	 *            of Entity
+	 * @param optionalParam
+	 * @return a control
+	 */
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName,
+			final Object optionalParam) {
+		return createControl(controlType, container, propertyName, optionalParam, null);
+
+	}
+
+	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName,
+			final Object optionalParam, ITypeConverter converter) {
 
 		final IToolkitControlHelper<C> implclass = allControls.get(controlType);
 		if (implclass == null) {
@@ -140,9 +172,10 @@ public class EditorToolkit {
 		}
 
 		registeredControls.put(propertyName, con);
+		registeredConverters.put(propertyName, converter);
+
 		return con;
 	}
-	
 
 	/**
 	 * @param control
@@ -173,7 +206,8 @@ public class EditorToolkit {
 	 * @param elements
 	 * @return
 	 */
-	public <C extends IControl> Collection<C> massCreateControls(Class<C> controlClass, IControlContainer container, boolean hasOptional, Object... elements) {
+	public <C extends IControl> Collection<C> massCreateControls(Class<C> controlClass, IControlContainer container, boolean hasOptional,
+			Object... elements) {
 		Collection<C> controls = new ArrayList<C>();
 		for (int i = 0; i < elements.length; i++) {
 			String name = (String) elements[i];
@@ -195,31 +229,29 @@ public class EditorToolkit {
 	public void markInvalidFields(ValidationResult result) {
 
 		for (Iterator<IControl> iterator = registeredControls.values().iterator(); iterator.hasNext();) {
-			IControl con = (IControl)iterator.next();
+			IControl con = (IControl) iterator.next();
 			//String propName = getPropertyName(control);
 
 			IToolkitControlHelper helper = allControls.get(con.getClass());
-			
+
 			if (helper == null) {
-				throw new RuntimeException("Could not find control helper: "
-						+ con.getClass());
+				throw new RuntimeException("Could not find control helper: " + con.getClass());
 			}
 
 			if (helper != null && con.getName().startsWith(FIELD_NAME_PREFIX)) {
 				String fieldName = con.getName().substring(FIELD_NAME_PREFIX.length());
-				
+
 				if (result.getErrorMap().get(fieldName) != null) {
 					//save old css class, to get it back after removing the error style!
 					if (!controlStyles.containsKey(con.getName())) {
 						controlStyles.put(con.getName(), helper.getFieldMarkedCssClass(con));
 					}
 					helper.markField(con, "error");
-				} else if (helper.getFieldMarkedCssClass(con) != null
-						&& ("error".equals(helper.getFieldMarkedCssClass(con)) || "valueError".equals(helper.getFieldMarkedCssClass(con)))) {
+				} else if (helper.getFieldMarkedCssClass(con) != null && ("error".equals(helper.getFieldMarkedCssClass(con))
+						|| "valueError".equals(helper.getFieldMarkedCssClass(con)))) {
 
 					if (controlStyles.containsKey(con.getName())) {
-						helper.markField(con, controlStyles.get(con
-								.getName()));
+						helper.markField(con, controlStyles.get(con.getName()));
 					} else {
 						helper.markField(con, null);
 					}
@@ -227,10 +259,9 @@ public class EditorToolkit {
 			}
 		}
 	}
-	
+
 	/**
-	 * Loads the field values into the controls. Entity is coming
-	 * by internal editor model.
+	 * Loads the field values into the controls. Entity is coming by internal editor model.
 	 */
 	public void loadFieldValues() {
 		Object obj = null;
@@ -242,87 +273,43 @@ public class EditorToolkit {
 			obj = model.getEntity();
 			clazz = ((IEntity) obj).type();
 		}
-		
-		for (Iterator<String> iterator = registeredControls.keySet().iterator(); iterator
-				.hasNext();) {
+
+		for (Iterator<String> iterator = registeredControls.keySet().iterator(); iterator.hasNext();) {
 			String controlId = iterator.next();
 			IControl control = registeredControls.get(controlId);
 
 			String propName = getPropertyName(control);
-			
+
 			Object value = null;
 
 			try {
-				PropertyDescriptor propInfo = new PropertyDescriptor(propName,
-						clazz);
-				value = propInfo.getReadMethod().invoke(obj, (Object []) null);
+				PropertyDescriptor propInfo = new PropertyDescriptor(propName, clazz);
+				value = propInfo.getReadMethod().invoke(obj, (Object[]) null);
 			} catch (Exception ex) {
-				throw new RuntimeException("Property not found: " + propName,
-						ex);
+				throw new RuntimeException("Property not found: " + propName, ex);
 			}
 
-			
 			IToolkitControlHelper helper = allControls.get(control.getClass());
-			
+
 			if (helper == null) {
-				throw new RuntimeException("Could not find control helper: "
-						+ control.getClass());
+				throw new RuntimeException("Could not find control helper: " + control.getClass());
 			}
-			
-			helper.loadContent(control, value);
-			
-//			if (control instanceof DateInputBox) {
-//				if (null != value) {
-//					((DateInputBox) control).setDate((Date) value);
-//				}
-////			} else if (control instanceof PicklistEntryControl) {
-////				PicklistEntryControl plcombo = (PicklistEntryControl) control;
-////				if (null == value || value instanceof IPicklistEntry) {
-////					plcombo.selectEntry((IPicklistEntry) value);
-////				}
-////			} else if (control instanceof PicklistEntryCheckControl) {
-////				PicklistEntryCheckControl check = (PicklistEntryCheckControl) control;
-////				check.selectEntry((Set) value);
-//			} 
-//			if (control instanceof DateTimeSelectionControl) {
-//				if (null != value) {
-//					((DateTimeSelectionControl) control).setDateTime((Date) value, null);
-//				}
-//			}
-//			else if (control instanceof IEntityListBoxControl) {
-//				IEntityListBoxControl ent = (IEntityListBoxControl) control;
-//				ent.selectEntry(((IEntity) value));
-//			} else if (control instanceof LabelControl) {
-//				LabelControl lblControl = (LabelControl) control;
-//
-//				if (value instanceof IPicklistEntry) {
-//					lblControl.setText(((IPicklistEntry) value).getBezeichnung(
-//							plDao, langId));
-//				} else {
-//					lblControl.setText(value != null ? value.toString() : "");
-//				}
-//			} else if (control instanceof SingleAttachmentControl) {
-//				SingleAttachmentControl sac = (SingleAttachmentControl) control;
-//				sac.loadAttachment((IAttachment) value);
-//			} else if (control instanceof InputBox) {
-//				InputBox inp = (InputBox) control;
-//				inp.setText(value != null ? value.toString() : "");
-//			} else if (control instanceof CheckBox) {
-//				CheckBox inp = (CheckBox) control;
-//				boolean boolVal = ((Boolean) value).booleanValue();
-//				if (boolVal) {
-//					inp.setSelectedKey(propName);
-//				}
-//			} 
+
+			Object controlValue;
+			ITypeConverter converter = registeredConverters.get(propName);
+			if (converter != null) {
+				//if we have a type converter registered for the property, convert the entity type to the control value type first
+				controlValue = converter.convertLeft(value);
+			} else {
+				controlValue = value;
+			}
+
+			helper.loadContent(control, controlValue);
 		}
 	}
 
-	
-	
-	
 	/**
-	 * Saves the values from GUI controls into the entity of the editormodel.
-	 * No update on DB is triggered.
+	 * Saves the values from GUI controls into the entity of the editormodel. No update on DB is triggered.
 	 */
 	public void saveFieldValues() {
 
@@ -335,160 +322,105 @@ public class EditorToolkit {
 			obj = model.getEntity();
 			clazz = ((IEntity) obj).type();
 		}
-		
 
 		for (Iterator<IControl> iterator = registeredControls.values().iterator(); iterator.hasNext();) {
-			
+
 			IControl control = iterator.next();
 			String propName = getPropertyName(control);
 
-			Object value = null;
 			PropertyDescriptor propInfo = null;
 
 			try {
 				propInfo = new PropertyDescriptor(propName, clazz);
-				value = propInfo.getReadMethod().invoke(obj, (Object[]) null);
-			} catch (Exception ex) {
-				throw new RuntimeException("Could not write property: "
-						+ propName
-						+ " of entityclass: "
-						+ (obj == null ? "No entity!" : obj.getClass()
-								.getName()), ex);
+			} catch (IntrospectionException ex) {
+				throw new RuntimeException(
+						"Could find property: " + propName + " of entityclass: " + (obj == null ? "No entity!" : obj.getClass().getName()),
+						ex);
 			}
 
 			if (!control.isVisible()) {
 				continue;
 			}
-			
+
 			if (control instanceof IHTMLElement) {
-				IHTMLElement htmlElement = (IHTMLElement)control;
+				IHTMLElement htmlElement = (IHTMLElement) control;
 				if (!htmlElement.isEnabled()) {
 					continue;
 				}
 			}
-			
-			IToolkitControlHelper helper = allControls.get(control.getClass());
-			
-			if (helper == null) {
-				throw new RuntimeException("Could not find control helper: "
-						+ control.getClass());
-			}
-			
-			value = helper.getContent(control);
-			
-			//yet, no extra "converter" classes
-//			if (control instanceof DateInputBox) {
-//				value = ((DateInputBox) control).getDate();
-//			} else if (control instanceof PicklistEntryControl) {
-//				PicklistEntryControl plcombo = (PicklistEntryControl) control;
-//				value = plcombo.getSelectionEntry();
-//			}else if (control instanceof ExpertiseControl) {
-//				ExpertiseControl plcombo = (ExpertiseControl) control;
-//				value = plcombo.getSelectedEntries();
-//			} else if (control instanceof InputBox) {
-//				InputBox inp = (InputBox) control;
-//				value = inp.getText();
-//			} else if (control instanceof PicklistEntryCheckControl) {
-//				PicklistEntryCheckControl checkCon = (PicklistEntryCheckControl) control;
-//				value = checkCon.getSelectionEntrySet();
-//			} else if (control instanceof CheckBox) {
-//				CheckBox inp = (CheckBox) control;
-//				value = Boolean.valueOf(propName.equals(inp.getSelectedKey()));
-//			} else if (control instanceof IEntityListBoxControl) {
-//				IEntityListBoxControl entityCon = (IEntityListBoxControl) control;
-//				value = entityCon.getSelectedEntry();
-//			} else if (control instanceof SingleAttachmentControl) {
-//				SingleAttachmentControl sac = (SingleAttachmentControl) control;
-//				IAttachmentWrapper wrapper = sac.saveAttachment(entity);
-//				if (wrapper == null)
-//					value = null;
-//				else if (wrapper.isDeleted()) {
-//					value = null;
-//				} else {
-//					value = wrapper.getAnhang();
-//				}
-//			} 
-//			else if (control instanceof GeoListBoxControl) {
-//				GeoListBoxControl geo = (GeoListBoxControl)control;
-//				value = geo.getGeo();
-//			} 
-//			
-//			else {
-//				continue; // skip unknown types...
-//			}
 
-			if (value != null) {
-				if (propInfo.getPropertyType().equals(Integer.class)
-						|| propInfo.getPropertyType().equals(int.class)) {
-					if (value.getClass().equals(String.class)) {
-						// convert int to String
-						String s = (String) value;
-						if(s == null || s.length() == 0){
-							Class<?> propertyType = propInfo.getPropertyType();
-							if(propertyType.equals(Integer.class)){
-								value = null;
-							}else {
-								value = 0;
-							}
-						}else {
-							value = Integer.valueOf(s);
-						}
-					} else if (value.getClass().equals(Integer.class)) {
-						value = ((Integer) value);
-					}
-				}
-				if (propInfo.getPropertyType().equals(Double.class)
-						|| propInfo.getPropertyType().equals(double.class)) {
-					if (value.getClass().equals(String.class)) {
-						// convert String to decimal
-						String s = ((String) value).trim();
-						if(s == null || s.length() == 0){
-							Class<?> propertyType = propInfo.getPropertyType();
-							if(propertyType.equals(Double.class)){
-								value = null;
-							}else {
-								value = new Double(0);
-							}
-						} else {
-							value = Double.valueOf(s);
-						}
-					}
-				}
+			IToolkitControlHelper helper = allControls.get(control.getClass());
+
+			if (helper == null) {
+				throw new RuntimeException("Could not find control helper: " + control.getClass());
 			}
-			
+
+			Object value;
+			Object controlValue = helper.getContent(control);
+
+			ITypeConverter converter = registeredConverters.get(propName);
+			if (converter != null) {
+				//if we have a type converter registered for the property, convert the control value type to the entity value type first
+				value = converter.convertRight(controlValue);
+			} else {
+				value = autoConvertToEntityType(propInfo, controlValue);
+			}
+
 			try {
-//				//generic part
-//				if (isPicklist && !propertyFound) {
-//					String picklistKey = ((IPicklistEntryControl)control).getPicklistKey();
-//					if (value instanceof Set) {
-//						Set set = (Set)value;
-//						saveFieldPicklistEntries((IPdbPicklistEntryRelationsEntity)entity, set, picklistKey);
-//					} else {
-//						IPicklistEntry entry = (IPicklistEntry)value;
-//						saveFieldPicklistEntries((IPdbPicklistEntryRelationsEntity)entity, entry, picklistKey);
-//					}
-//					
-//				} else if (isPicklist && propertyFound) {
-//					
-//				} else {
-//					if (propertyFound) {
-//						propInfo.getWriteMethod().invoke(entity, new Object[] { value });
-//					} else {
-//						// save or delete property as PropertyValue
-//						opDao.update(propertyValues, entity, propName, value);
-//					}
-//				}
 				propInfo.getWriteMethod().invoke(obj, new Object[] { value });
 			} catch (Exception ex) {
-				throw new RuntimeException("Could not write property: "
-						+ propName
-						+ " of entityclass: "
-						+ (obj == null ? "No entity!" : obj.getClass()
-								.getName()), ex);
+				throw new RuntimeException("Could not write property: " + propName + " of entityclass: "
+						+ (obj == null ? "No entity!" : obj.getClass().getName()), ex);
 			}
 		}
 	}
 
+	/**
+	 * Try some common type mappings
+	 * 
+	 * @param propInfo
+	 * @param controlValue
+	 * @return
+	 */
+	private Object autoConvertToEntityType(PropertyDescriptor propInfo, Object controlValue) {
+
+		Class propertyType = propInfo.getPropertyType();
+		Class controlType = null;
+		if (controlValue == null) {
+			//for primitives, null gets mapped to the default value 
+			if (int.class.equals(propertyType) || long.class.equals(propertyType) || double.class.equals(propertyType)
+					|| float.class.equals(propertyType) || byte.class.equals(propertyType) || short.class.equals(propertyType)) {
+				return 0;
+			}
+			if (boolean.class.equals(propertyType)) {
+				return false;
+			}
+			if (char.class.equals(propertyType)) {
+				return '\u0000';
+			}
+		} else {
+			controlType = controlValue.getClass();
+		}
+
+		ITypeConverter converter = null;
+		if (String.class.equals(controlType)) {
+			if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
+				converter = IntegerStringConverter.INSTANCE;
+			} else if (Long.class.equals(propertyType) || long.class.equals(propertyType)) {
+				converter = LongStringConverter.INSTANCE;
+			} else if (Float.class.equals(propertyType) || float.class.equals(propertyType)) {
+				converter = FloatStringConverter.INSTANCE;
+			} else if (Double.class.equals(propertyType) || double.class.equals(propertyType)) {
+				converter = DoubleStringConverter.INSTANCE;
+			} else if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
+				converter = BooleanStringConverter.INSTANCE;
+			}
+			if (converter != null) {
+				return converter.convertRight(controlValue);
+			}
+		}
+		return controlValue;
+	}
 
 	/**
 	 * @return the editor model holding the entity
