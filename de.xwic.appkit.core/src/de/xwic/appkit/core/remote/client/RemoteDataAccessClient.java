@@ -154,7 +154,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_UPDATE_ENTITY);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityInterfType);
 
-		String serialized = EtoSerializer.serialize(entityInterfType, eto, false);
+		String serialized = EtoSerializer.serialize(entityInterfType, eto, true);
 
 		param.put(RemoteDataAccessServlet.PARAM_ETO, serialized);
 

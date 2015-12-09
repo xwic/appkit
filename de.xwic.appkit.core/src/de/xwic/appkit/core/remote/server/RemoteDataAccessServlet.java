@@ -322,7 +322,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		String strEto = req.getParameter(PARAM_ETO);
 
-		EntityTransferObject eto = EtoSerializer.deserialize(strEto, false);
+		EntityTransferObject eto = EtoSerializer.deserialize(strEto, true);
 
 		EntityTransferObject result = accessHandler.updateETO(eto);
 
