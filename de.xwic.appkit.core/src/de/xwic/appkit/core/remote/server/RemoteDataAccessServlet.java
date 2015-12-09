@@ -322,7 +322,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		String strEto = req.getParameter(PARAM_ETO);
 
-		EntityTransferObject eto = EtoSerializer.deserialize(strEto);
+		EntityTransferObject eto = EtoSerializer.deserialize(strEto, true);
 
 		EntityTransferObject result = accessHandler.updateETO(eto);
 
@@ -356,7 +356,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityQuery query = null;
 		String strQuery = req.getParameter(PARAM_QUERY);
 		if (strQuery != null && !strQuery.isEmpty()) {
-			query = EntityQuerySerializer.stringToQuery(strQuery);
+			query = EntityQuerySerializer.stringToQuery(strQuery, false);
 		}
 
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);

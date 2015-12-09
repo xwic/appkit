@@ -51,7 +51,7 @@ public class UseCaseSerializer {
 			SAXReader xmlReader = new SAXReader();
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
-			return (UseCase) new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"));
+			return (UseCase) new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"), false);
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);
 		}

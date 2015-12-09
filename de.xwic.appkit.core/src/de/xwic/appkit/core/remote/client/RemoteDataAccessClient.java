@@ -89,7 +89,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 
 		XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 
-		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser(), false);
 
 		if (!list.isEmpty()) {
 			return (EntityTransferObject) list.get(0);
@@ -114,9 +114,9 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		EntityList list = null;
 		XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		if (query.getColumns() == null) {
-			list = xet.createList(doc, limit, new EtoEntityNodeParser());
+			list = xet.createList(doc, limit, new EtoEntityNodeParser(), false);
 		} else {
-			list = xet.createList(doc, limit, new ObjectArrayEntityNodeParser());
+			list = xet.createList(doc, limit, new ObjectArrayEntityNodeParser(), false);
 		}
 
 		return list;
@@ -136,7 +136,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Document doc = postRequest(param);
 
 		XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
-		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser());
+		EntityList list = xet.createList(doc, new Limit(), new EtoEntityNodeParser(), false);
 
 		return list;
 	}
@@ -166,7 +166,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		EntityKey key = new EntityKey(entityInterfType, eto.getEntityId());
 		ETOSessionCache.getInstance().getSessionCache().remove(key);
 		try {
-			return EtoSerializer.deserialize(strEto);
+			return EtoSerializer.deserialize(strEto, false);
 		} catch (DocumentException e) {
 			throw new RemoteDataAccessException(e);
 		}
@@ -204,7 +204,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		XmlBeanSerializer xml = new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache());
 		
-		Object x = xml.readValue(null, root, null);
+		Object x = xml.readValue(null, root, null, false);
 		
 		return x;
 	}
@@ -223,7 +223,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		Element root = doc.getRootElement();
 		
 		XmlBeanSerializer xml = new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache());
-		Set<ScopeActionKey> result = (Set<ScopeActionKey>) xml.deserializeBean(root);
+		Set<ScopeActionKey> result = (Set<ScopeActionKey>) xml.deserializeBean(root, false);
 		
 		return result;
 	}
@@ -244,7 +244,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 		
 		XmlBeanSerializer xml = new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache());
 		
-		Object x = xml.readValue(null, root, null);
+		Object x = xml.readValue(null, root, null, false);
 		
 		return x;
 	}

@@ -385,7 +385,7 @@ public class XmlEntityTransport {
 	 * @return
 	 * @throws TransportException
 	 */
-	public EntityList createList(Document doc, Limit limit, IEntityNodeParser parser)
+	public EntityList createList(Document doc, Limit limit, IEntityNodeParser parser, boolean forceLoadCollection)
 			throws TransportException {
 		Element elmExport = doc.getRootElement();
 		if (!ELM_EXPORT.equals(elmExport.getName())) {
@@ -426,7 +426,7 @@ public class XmlEntityTransport {
 
 		for (Iterator<Element> it = elmEntities.elementIterator(ELM_ENTITY); it.hasNext();) {
 			Element elmEntity = it.next();
-			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer, sessionCache));
+			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer, sessionCache, forceLoadCollection));
 		}
 
 		return list;

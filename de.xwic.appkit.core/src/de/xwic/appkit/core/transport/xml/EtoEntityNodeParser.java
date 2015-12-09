@@ -54,7 +54,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 	 */
 	@Override
 	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass,
-			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache) throws TransportException {
+			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache, boolean forceLoadCollection) throws TransportException {
 		String sId = elmEntity.attributeValue("id");
 		String sVersion = elmEntity.attributeValue("version");
 		if (sId == null || sId.length() == 0 || sVersion == null || sVersion.length() == 0) {
@@ -157,7 +157,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 							}else {
 							
 							pv.setValue(parseElement(elmProp.element(XmlEntityTransport.ELM_ENTITY), context,
-									entityClassRef, descrRef, xmlBeanSerializer, sessionCache));
+									entityClassRef, descrRef, xmlBeanSerializer, sessionCache, forceLoadCollection));
 							// pv.setValue(EtoSerializer.deserialize(elmProp.elementText(XmlEntityTransport.ELM_ENTITY)));
 							}
 							pv.setLoaded(true);
@@ -169,10 +169,10 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 
 					}
 				} else if (prop.isCollection()
-						&& XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy"))) {
+						&& (XmlBeanSerializer.ATTRVALUE_TRUE.equals(elmProp.attributeValue("lazy")) && !forceLoadCollection)) {
 					pv.setLoaded(false);
 				} else {
-					pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor()));
+					pv.setValue(xmlBeanSerializer.readValue(context, elmProp, prop.getDescriptor(), forceLoadCollection));
 				}
 			}
 
