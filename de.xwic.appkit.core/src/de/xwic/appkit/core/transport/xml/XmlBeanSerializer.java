@@ -378,7 +378,7 @@ public class XmlBeanSerializer {
 			EntityDescriptor descr;
 			try {
 				descr = DAOSystem.getEntityDescriptor(typeInfo);
-				transport.addEntity(elm, descr, eto);
+				transport.addEntity(elm, descr, eto, lazy);
 			} catch (ConfigurationException e) {
 				throw new TransportException(e);
 			}
@@ -425,6 +425,26 @@ public class XmlBeanSerializer {
 	public Object deserializeBean(Element elm, boolean forceLoadCollection) throws TransportException {
 		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
 		return deserializeBean(elm, context, forceLoadCollection);
+	}
+	
+	/**
+	 * 
+	 * @param elm
+	 * @return
+	 * @throws TransportException
+	 */
+	public Object deserializeBean(Element elm) throws TransportException {
+		return deserializeBean(elm, false);
+	}
+	
+	/**
+	 * @param elm
+	 * @param context
+	 * @return
+	 * @throws TransportException
+	 */
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
+		deserializeBean(bean, elm, context, false);
 	}
 
 	/**

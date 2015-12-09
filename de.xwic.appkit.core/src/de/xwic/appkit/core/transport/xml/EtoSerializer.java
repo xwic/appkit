@@ -70,14 +70,14 @@ public final class EtoSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public static String serialize(final String entityType, final EntityTransferObject eto) throws TransportException {
+	public static String serialize(final String entityType, final EntityTransferObject eto, boolean lazy) throws TransportException {
 		try {
 
 			final EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
 			final StringWriter sw = new StringWriter();
 			final XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 
-			xet.write(sw, eto, descr);
+			xet.write(sw, eto, descr, lazy);
 
 			return sw.toString();
 
