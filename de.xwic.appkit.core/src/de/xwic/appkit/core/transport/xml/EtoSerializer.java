@@ -70,14 +70,14 @@ public final class EtoSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public static String serialize(final String entityType, final EntityTransferObject eto) throws TransportException {
+	public static String serialize(final String entityType, final EntityTransferObject eto, boolean lazy) throws TransportException {
 		try {
 
 			final EntityDescriptor descr = DAOSystem.getEntityDescriptor(entityType);
 			final StringWriter sw = new StringWriter();
 			final XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 
-			xet.write(sw, eto, descr);
+			xet.write(sw, eto, descr, lazy);
 
 			return sw.toString();
 
@@ -94,7 +94,7 @@ public final class EtoSerializer {
 	 * @throws DocumentException
 	 * @throws TransportException
 	 */
-	public static EntityTransferObject deserialize(final String serializedETO) throws DocumentException, TransportException {
+	public static EntityTransferObject deserialize(final String serializedETO, boolean forceLoadCollection) throws DocumentException, TransportException {
 		if (serializedETO == null || serializedETO.isEmpty()) {
 			throw new IllegalArgumentException("ETO details not specified");
 		}
@@ -103,7 +103,7 @@ public final class EtoSerializer {
 		Document doc = xmlReader.read(new StringReader(serializedETO));
 
 		XmlEntityTransport xet = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
-		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser());
+		EntityList list = xet.createList(doc, null, new EtoEntityNodeParser(), forceLoadCollection);
 
 		int size = list.size();
 		if (size > 0) {
@@ -122,9 +122,9 @@ public final class EtoSerializer {
 	 * @throws DocumentException
 	 * @throws TransportException
 	 */
-	public static IEntity newEntity(final String serializedETO) {
+	public static IEntity newEntity(final String serializedETO, boolean forceLoadCollection) {
 		try {
-			EntityTransferObject deserialize = deserialize(serializedETO);
+			EntityTransferObject deserialize = deserialize(serializedETO, forceLoadCollection);
 			IEntity createEntityProxy = EntityProxyFactory.createEntityProxy(deserialize);
 			Class<? extends IEntity> type = EntityUtil.type(deserialize.getEntityClass());
 			return transferData(createEntityProxy, type);

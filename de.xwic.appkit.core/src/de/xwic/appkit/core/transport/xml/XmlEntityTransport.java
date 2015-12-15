@@ -133,11 +133,11 @@ public class XmlEntityTransport {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void write(Writer writer, IEntity entity, EntityDescriptor descr) throws IOException,
+	public void write(Writer writer, IEntity entity, EntityDescriptor descr, boolean lazy) throws IOException,
 			ConfigurationException {
 		List<IEntity> l = new ArrayList<IEntity>();
 		l.add(entity);
-		write(writer, l, descr);
+		write(writer, l, descr, lazy);
 	}
 
 	/**
@@ -148,13 +148,13 @@ public class XmlEntityTransport {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void write(Writer writer, EntityTransferObject eto, EntityDescriptor descr) throws IOException,
+	public void write(Writer writer, EntityTransferObject eto, EntityDescriptor descr, boolean lazy) throws IOException,
 			ConfigurationException {
 		List<EntityTransferObject> l = new ArrayList<EntityTransferObject>();
 		if (eto != null) {
 			l.add(eto);
 		}
-		write(writer, l, descr);
+		write(writer, l, descr, lazy);
 	}
 
 	/**
@@ -164,9 +164,9 @@ public class XmlEntityTransport {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void write(Writer writer, List<?> entities, EntityDescriptor descr) throws IOException,
+	public void write(Writer writer, List<?> entities, EntityDescriptor descr, boolean lazy) throws IOException,
 			ConfigurationException {
-		write(writer, entities, descr, null);
+		write(writer, entities, descr, null, lazy);
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class XmlEntityTransport {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public void write(Writer writer, List<?> entities, EntityDescriptor descr, List<String> columnNames)
+	public void write(Writer writer, List<?> entities, EntityDescriptor descr, List<String> columnNames, boolean lazy)
 			throws IOException, ConfigurationException {
 
 		boolean isETO = false;
@@ -210,7 +210,7 @@ public class XmlEntityTransport {
 			Object o = it.next();
 			if (isETO) {
 				EntityTransferObject eto = (EntityTransferObject) o;
-				addEntity(elmEntities, descr, eto);
+				addEntity(elmEntities, descr, eto, lazy);
 			} else if (isEntity) {
 				IEntity entity = (IEntity) o;
 				addEntity(elmEntities, descr, entity);
@@ -222,7 +222,7 @@ public class XmlEntityTransport {
 							"Error attempting to serialize Object array with no column information");
 				}
 				Object[] arr = (Object[]) o;
-				addObjectArray(elmEntities, descr, arr, columnNames);
+				addObjectArray(elmEntities, descr, arr, columnNames, lazy);
 			}
 		}
 
@@ -244,7 +244,7 @@ public class XmlEntityTransport {
 	 * @param descr
 	 * @param eto
 	 */
-	void addEntity(Element entities, EntityDescriptor descr, EntityTransferObject eto) {
+	void addEntity(Element entities, EntityDescriptor descr, EntityTransferObject eto, boolean lazy) {
 
 		try {
 			String entityClassName = DAOSystem.findDAOforEntity(descr.getClassname()).getEntityClass().getName();
@@ -274,7 +274,7 @@ public class XmlEntityTransport {
 
 						Element pValue = elm.addElement(propertyName);
 
-						xmlBeanSerializer.addValue(pValue, val, false);
+						xmlBeanSerializer.addValue(pValue, val, true, lazy);
 
 					}
 
@@ -357,21 +357,21 @@ public class XmlEntityTransport {
 	 * @param columnNames
 	 */
 	public void addObjectArray(Element entities, EntityDescriptor descr, Object[] arr,
-			List<String> columnNames) {
+			List<String> columnNames, boolean lazy) {
 
 		try {
 			Element elm = entities.addElement(ELM_ENTITY);
 
 			// first one is always the ID
 			Element idValue = elm.addElement("id");
-			xmlBeanSerializer.addValue(idValue, arr[0], true);
+			xmlBeanSerializer.addValue(idValue, arr[0], lazy);
 
 			for (int i = 1; i < arr.length; i++) {
 				// use the column name as the tag
 				Element pValue = elm.addElement(columnNames.get(i - 1));
 				Object value = arr[i];
 
-				xmlBeanSerializer.addValue(pValue, value, true);
+				xmlBeanSerializer.addValue(pValue, value, lazy);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error transforming object array into XML: " + arr, e);
@@ -385,7 +385,7 @@ public class XmlEntityTransport {
 	 * @return
 	 * @throws TransportException
 	 */
-	public EntityList createList(Document doc, Limit limit, IEntityNodeParser parser)
+	public EntityList createList(Document doc, Limit limit, IEntityNodeParser parser, boolean forceLoadCollection)
 			throws TransportException {
 		Element elmExport = doc.getRootElement();
 		if (!ELM_EXPORT.equals(elmExport.getName())) {
@@ -426,7 +426,7 @@ public class XmlEntityTransport {
 
 		for (Iterator<Element> it = elmEntities.elementIterator(ELM_ENTITY); it.hasNext();) {
 			Element elmEntity = it.next();
-			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer, sessionCache));
+			data.add(parser.parseElement(elmEntity, context, entityClass, descr, xmlBeanSerializer, sessionCache, forceLoadCollection));
 		}
 
 		return list;

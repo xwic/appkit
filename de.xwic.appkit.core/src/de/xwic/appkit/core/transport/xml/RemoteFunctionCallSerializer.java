@@ -47,13 +47,13 @@ public class RemoteFunctionCallSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public static IRemoteFunctionCallConditions deseralize(String conditions) throws TransportException {
+	public static IRemoteFunctionCallConditions deseralize(String conditions, boolean forceLoadCollection) throws TransportException {
 		try {
 			ByteArrayInputStream in = new ByteArrayInputStream(conditions.getBytes());
 			SAXReader xmlReader = new SAXReader();
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
-			Object o =  new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"));
+			Object o =  new XmlBeanSerializer(ETOSessionCache.getInstance().getSessionCache()).deserializeBean(root.element("bean"), forceLoadCollection);
 			return (IRemoteFunctionCallConditions) o;
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);

@@ -41,6 +41,6 @@ public interface IEntityNodeParser {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache) throws TransportException; 
+	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache, boolean forceLoadCollection) throws TransportException; 
 	
 }
