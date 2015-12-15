@@ -364,14 +364,14 @@ public class XmlEntityTransport {
 
 			// first one is always the ID
 			Element idValue = elm.addElement("id");
-			xmlBeanSerializer.addValue(idValue, arr[0], lazy);
+			xmlBeanSerializer.addValue(idValue, arr[0], true, lazy);
 
 			for (int i = 1; i < arr.length; i++) {
 				// use the column name as the tag
 				Element pValue = elm.addElement(columnNames.get(i - 1));
 				Object value = arr[i];
 
-				xmlBeanSerializer.addValue(pValue, value, lazy);
+				xmlBeanSerializer.addValue(pValue, value, true, lazy);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error transforming object array into XML: " + arr, e);
