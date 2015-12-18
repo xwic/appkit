@@ -34,12 +34,14 @@ public class Scope extends Entity implements IScope {
 	private String name = null;
 	private String description = null;
 	private Boolean securedScope;
+	private Boolean hidden;
 	private Set<IEntity> actions = null;
 	private Set<IEntity> actionSets = null;
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -47,6 +49,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -54,6 +57,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getDescription()
 	 */
+	@Override
 	public String getDescription() {
 		return description;
 	}
@@ -61,6 +65,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#setDescription(java.lang.String)
 	 */
+	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -68,6 +73,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getActions()
 	 */
+	@Override
 	public Set<IEntity> getActions() {
 		if (actions == null) {
 			actions = new HashSet<IEntity>();
@@ -78,6 +84,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#setActions(java.util.Set)
 	 */
+	@Override
 	public void setActions(Set<IEntity> actions) {
 		this.actions = actions;
 	}
@@ -85,6 +92,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getActionSets()
 	 */
+	@Override
 	public Set<IEntity> getActionSets() {
 		if (actionSets == null) {
 			actionSets = new HashSet<IEntity>();
@@ -95,6 +103,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#setActionSets(java.util.Set)
 	 */
+	@Override
 	public void setActionSets(Set<IEntity> actionSets) {
 		this.actionSets = actionSets;
 	}
@@ -102,6 +111,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getAllActions()
 	 */
+	@Override
 	public Set<IEntity> getAllActions() {
 		HashSet<IEntity> allActions = new HashSet<IEntity>();
 		allActions.addAll(getActions());
@@ -115,6 +125,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#isActionAllowed(de.xwic.appkit.core.security.IAction)
 	 */
+	@Override
 	public boolean isActionAllowed(IAction action) {
 		return getAllActions().contains(action);
 	}
@@ -122,6 +133,7 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#getRestrictGrantToPeers()
 	 */
+	@Override
 	public Boolean getSecuredScope() {
 		return securedScope;
 	}
@@ -129,8 +141,25 @@ public class Scope extends Entity implements IScope {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IScope#setRestrictGrantToPeers(java.lang.Boolean)
 	 */
+	@Override
 	public void setSecuredScope(Boolean securedScope) {
 		this.securedScope = securedScope;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IScope#setHidden(boolean)
+	 */
+	@Override
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IScope#isHidden()
+	 */
+	@Override
+	public Boolean isHidden() {
+		return hidden;
 	}
 
 }

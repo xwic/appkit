@@ -28,11 +28,13 @@ public class Role extends Entity implements IRole {
 
 	private String name = null;
 	private Boolean restrictGrantToPeers;
+	private Boolean hidden;
 	private Set<IRole> assignableRoles;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -40,6 +42,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -48,6 +51,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#getRestrictGrantToPeers()
 	 */
+	@Override
 	public Boolean getRestrictGrantToPeers() {
 		return restrictGrantToPeers;
 	}
@@ -55,6 +59,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#setRestrictGrantToPeers(java.lang.Boolean)
 	 */
+	@Override
 	public void setRestrictGrantToPeers(Boolean restrictGrantToPeers) {
 		this.restrictGrantToPeers = restrictGrantToPeers;
 	}
@@ -62,6 +67,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return "role: " + name;
 	}
@@ -81,6 +87,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#getAssignableRoles()
 	 */
+	@Override
 	public Set<IRole> getAssignableRoles() {
 		return assignableRoles;
 	}
@@ -88,6 +95,7 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#setAssignableRoles(java.util.Set)
 	 */
+	@Override
 	public void setAssignableRoles(Set<IRole> assignableRoles) {
 		this.assignableRoles = assignableRoles;
 	}
@@ -97,23 +105,46 @@ public class Role extends Entity implements IRole {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Role other = (Role) obj;
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (restrictGrantToPeers == null) {
-			if (other.restrictGrantToPeers != null)
+			if (other.restrictGrantToPeers != null) {
 				return false;
-		} else if (!restrictGrantToPeers.equals(other.restrictGrantToPeers))
+			}
+		} else if (!restrictGrantToPeers.equals(other.restrictGrantToPeers)) {
 			return false;
+		}
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IRole#setHidden(boolean)
+	 */
+	@Override
+	public void setHidden(Boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IRole#isHidden()
+	 */
+	@Override
+	public Boolean isHidden() {
+		return hidden;
 	}
 }
