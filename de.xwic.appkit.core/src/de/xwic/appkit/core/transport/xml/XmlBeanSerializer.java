@@ -378,7 +378,7 @@ public class XmlBeanSerializer {
 			EntityDescriptor descr;
 			try {
 				descr = DAOSystem.getEntityDescriptor(typeInfo);
-				transport.addEntity(elm, descr, eto);
+				transport.addEntity(elm, descr, eto, lazy);
 			} catch (ConfigurationException e) {
 				throw new TransportException(e);
 			}
@@ -422,9 +422,29 @@ public class XmlBeanSerializer {
 	 * @param string
 	 * @return
 	 */
-	public Object deserializeBean(Element elm) throws TransportException {
+	public Object deserializeBean(Element elm, boolean forceLoadCollection) throws TransportException {
 		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
-		return deserializeBean(elm, context);
+		return deserializeBean(elm, context, forceLoadCollection);
+	}
+	
+	/**
+	 * 
+	 * @param elm
+	 * @return
+	 * @throws TransportException
+	 */
+	public Object deserializeBean(Element elm) throws TransportException {
+		return deserializeBean(elm, false);
+	}
+	
+	/**
+	 * @param elm
+	 * @param context
+	 * @return
+	 * @throws TransportException
+	 */
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
+		deserializeBean(bean, elm, context, false);
 	}
 
 	/**
@@ -435,11 +455,11 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context) throws TransportException {
+	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context, boolean forceLoadCollection) throws TransportException {
 		Element firstElem = (Element) elm.elementIterator().next();
 		if (firstElem != null
 				&& (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
-			return readValue(context, elm, null);
+			return readValue(context, elm, null, forceLoadCollection);
 		}
 
 		String strTypeClass = elm.attributeValue("type");
@@ -462,7 +482,7 @@ public class XmlBeanSerializer {
 					+ "' can not be deserialized because the class can not be found.", e);
 		}
 
-		deserializeBean(bean, elm, context);
+		deserializeBean(bean, elm, context, forceLoadCollection);
 
 		return bean;
 	}
@@ -475,7 +495,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context)
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context, boolean forceLoadCollection)
 			throws TransportException {
 		// now read the properties
 		try {
@@ -486,7 +506,7 @@ public class XmlBeanSerializer {
 						&& !skipPropertyNames.contains(pd.getName())) {
 					Element elmProp = elm.element(pd.getName());
 					if (elmProp != null) {
-						Object value = readValue(context, elmProp, pd);
+						Object value = readValue(context, elmProp, pd, forceLoadCollection);
 						mWrite.invoke(bean, new Object[] { value });
 					} else {
 						log.warn("The property "
@@ -508,7 +528,7 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	@SuppressWarnings("unchecked")
-	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd)
+	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd, boolean forceLoadCollection)
 			throws TransportException {
 
 		// check if value is null
@@ -526,7 +546,7 @@ public class XmlBeanSerializer {
 				// is it a bean?
 				Element elBean = elProp.element(ELM_BEAN);
 				if (elBean != null) {
-					return deserializeBean(elBean, context);
+					return deserializeBean(elBean, context, forceLoadCollection);
 				}
 				throw new TransportException("Can't deserialize element '" + elProp.getName()
 						+ "' - no type informations available.");
@@ -554,7 +574,7 @@ public class XmlBeanSerializer {
 				Set<Object> set = new HashSet<Object>();
 				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext();) {
 					Element elSetElement = (Element) itSet.next();
-					set.add(readValue(context, elSetElement, null));
+					set.add(readValue(context, elSetElement, null, forceLoadCollection));
 				}
 				value = set;
 			}
@@ -564,12 +584,12 @@ public class XmlBeanSerializer {
 				List<Object> list = new ArrayList<Object>();
 				for (Iterator<?> itSet = elSet.elementIterator(ELM_ELEMENT); itSet.hasNext();) {
 					Element elSetElement = (Element) itSet.next();
-					list.add(readValue(context, elSetElement, null));
+					list.add(readValue(context, elSetElement, null, forceLoadCollection));
 				}
 				value = list;
 			}
 		} else if (Map.class.isAssignableFrom(type)) {
-			value = deserializeMap(context, elProp);
+			value = deserializeMap(context, elProp, forceLoadCollection);
 		} else if (IPicklistEntry.class.isAssignableFrom(type)) {
 
 			IPicklisteDAO plDAO = DAOSystem.getDAO(IPicklisteDAO.class);
@@ -644,12 +664,12 @@ public class XmlBeanSerializer {
 			IEntity refEntity;
 
 			if (refId == Entities.NEW_ENTITY_ID) {
-				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY));
+				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY), forceLoadCollection);
 			} else if (elProp.element(XmlEntityTransport.ELM_ENTITY) != null) {
 
 				EtoEntityNodeParser parser = new EtoEntityNodeParser();
 				EntityTransferObject refEto= (EntityTransferObject) parser.parseElement(elProp.element(XmlEntityTransport.ELM_ENTITY),
-						context, type, refDAO.getEntityDescriptor(), this, transport.getSessionCache());
+						context, type, refDAO.getEntityDescriptor(), this, transport.getSessionCache(), forceLoadCollection);
 				refEntity = EntityProxyFactory.createEntityProxy(refEto);
 			} else {
 				refEntity = refDAO.getEntity(refId);
@@ -664,7 +684,7 @@ public class XmlBeanSerializer {
 
 			Element elBean = elProp.element(ELM_BEAN);
 			if (elBean != null) {
-				value = deserializeBean(elBean, context);
+				value = deserializeBean(elBean, context, forceLoadCollection);
 			} else {
 				// basic type
 				String text = elProp.getText();
@@ -716,7 +736,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	private Map<?, ?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp)
+	private Map<?, ?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp, boolean forceLoadCollection)
 			throws TransportException {
 		final Element element = elProp.element(ELM_MAP);
 		if (element == null) {
@@ -727,8 +747,8 @@ public class XmlBeanSerializer {
 		while (it.hasNext()) {
 			final Element entry = it.next();
 
-			final Object key = readValue(context, entry.element(ELM_MAP_KEY), null);
-			final Object value = readValue(context, entry.element(ELM_MAP_VALUE), null);
+			final Object key = readValue(context, entry.element(ELM_MAP_KEY), null, forceLoadCollection);
+			final Object value = readValue(context, entry.element(ELM_MAP_VALUE), null, forceLoadCollection);
 
 			map.put(key, value);
 		}

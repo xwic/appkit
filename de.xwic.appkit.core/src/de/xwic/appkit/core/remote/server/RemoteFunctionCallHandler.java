@@ -57,7 +57,7 @@ public class RemoteFunctionCallHandler implements IRequestHandler {
 			throw new IllegalArgumentException("The string is empty!");
 		}
 		
-		IRemoteFunctionCallConditions conditions = RemoteFunctionCallSerializer.deseralize(strFunctionCall);
+		IRemoteFunctionCallConditions conditions = RemoteFunctionCallSerializer.deseralize(strFunctionCall, true);
 		
 		Class<?> c;
 		Object result = null;

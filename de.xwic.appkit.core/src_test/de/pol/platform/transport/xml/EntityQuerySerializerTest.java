@@ -44,7 +44,7 @@ public class EntityQuerySerializerTest extends TestCase {
 		System.out.println(data);
 		System.out.println("size: " + data.length());
 		
-		EntityQuery q2 = EntityQuerySerializer.stringToQuery(data);
+		EntityQuery q2 = EntityQuerySerializer.stringToQuery(data, false);
 		System.out.println(query);
 		System.out.println(q2);
 		

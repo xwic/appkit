@@ -47,13 +47,13 @@ public class EntityQuerySerializer {
 	 * @param queryString
 	 * @return
 	 */
-	public static EntityQuery stringToQuery(String queryString) throws TransportException {
+	public static EntityQuery stringToQuery(String queryString, boolean forceLoadCollection) throws TransportException {
 		try {
 			ByteArrayInputStream in = new ByteArrayInputStream(queryString.getBytes());
 			SAXReader xmlReader = new SAXReader();
 			Document doc = xmlReader.read(in);
 			Element root = doc.getRootElement();
-			return (EntityQuery)new XmlBeanSerializer().deserializeBean(root.element("bean"));
+			return (EntityQuery)new XmlBeanSerializer().deserializeBean(root.element("bean"), forceLoadCollection);
 		} catch (DocumentException e) {
 			throw new TransportException("Unexpected DocumentException while deseiralizing query.", e);
 		}
