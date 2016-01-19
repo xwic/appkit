@@ -303,7 +303,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(type);
 		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
-		et.write(pwOut, list, entityDescriptor);
+		et.write(pwOut, list, entityDescriptor, false);
 	}
 
 	/**
@@ -322,7 +322,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 
 		String strEto = req.getParameter(PARAM_ETO);
 
-		EntityTransferObject eto = EtoSerializer.deserialize(strEto);
+		EntityTransferObject eto = EtoSerializer.deserialize(strEto, true);
 
 		EntityTransferObject result = accessHandler.updateETO(eto);
 
@@ -330,7 +330,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 			throw new IllegalStateException("Result ETO is null");
 		}
 
-		String strResult = EtoSerializer.serialize(entityType, result);
+		String strResult = EtoSerializer.serialize(entityType, result, true);
 
 		pwOut.write(strResult);
 		pwOut.flush();
@@ -356,14 +356,14 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityQuery query = null;
 		String strQuery = req.getParameter(PARAM_QUERY);
 		if (strQuery != null && !strQuery.isEmpty()) {
-			query = EntityQuerySerializer.stringToQuery(strQuery);
+			query = EntityQuerySerializer.stringToQuery(strQuery, false);
 		}
 
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
 		EntityList list = accessHandler.getEntities(entityType, limit, query);
 
 		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
-		et.write(pwOut, list, entityDescriptor, query.getColumns());
+		et.write(pwOut, list, entityDescriptor, query.getColumns(), false);
 	}
 
 	/**
@@ -386,7 +386,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		EntityTransferObject eto = accessHandler.getETO(entityType, Integer.parseInt(entityId));
 
 		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
-		et.write(pwOut, eto, entityDescriptor);
+		et.write(pwOut, eto, entityDescriptor, false);
 	}
 
 	/**

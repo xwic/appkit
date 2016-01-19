@@ -69,7 +69,7 @@ public final class TestXmlBeanSerializer {
 		final Document doc = new SAXReader().read(new StringReader(serialized));
 		final Element root = doc.getRootElement().element("bean");
 
-		final Object deserialized = new XmlBeanSerializer().deserializeBean(root);
+		final Object deserialized = new XmlBeanSerializer().deserializeBean(root, false);
 		assertEquals(what, deserialized);
 	}
 
