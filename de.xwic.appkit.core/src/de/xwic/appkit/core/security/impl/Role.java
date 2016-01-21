@@ -28,7 +28,6 @@ public class Role extends Entity implements IRole {
 
 	private String name = null;
 	private Boolean restrictGrantToPeers;
-	private Boolean hidden;
 	private Set<IRole> assignableRoles;
 
 	/* (non-Javadoc)
@@ -130,21 +129,5 @@ public class Role extends Entity implements IRole {
 			return false;
 		}
 		return true;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.security.IRole#setHidden(boolean)
-	 */
-	@Override
-	public void setHidden(Boolean hidden) {
-		this.hidden = hidden;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.security.IRole#isHidden()
-	 */
-	@Override
-	public Boolean isHidden() {
-		return hidden;
 	}
 }

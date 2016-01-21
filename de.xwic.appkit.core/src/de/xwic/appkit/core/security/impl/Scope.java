@@ -34,7 +34,6 @@ public class Scope extends Entity implements IScope {
 	private String name = null;
 	private String description = null;
 	private Boolean securedScope;
-	private Boolean hidden;
 	private Set<IEntity> actions = null;
 	private Set<IEntity> actionSets = null;
 	
@@ -145,21 +144,4 @@ public class Scope extends Entity implements IScope {
 	public void setSecuredScope(Boolean securedScope) {
 		this.securedScope = securedScope;
 	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.security.IScope#setHidden(boolean)
-	 */
-	@Override
-	public void setHidden(Boolean hidden) {
-		this.hidden = hidden;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.security.IScope#isHidden()
-	 */
-	@Override
-	public Boolean isHidden() {
-		return hidden;
-	}
-
 }

@@ -57,16 +57,4 @@ public interface IRole extends IEntity {
 	 * @param assignableRoles the assignableRoles to set
 	 */
 	public void setAssignableRoles(Set<IRole> assignableRoles);
-	
-	/**
-	 * 
-	 * @param hidden
-	 */
-	public void setHidden(Boolean hidden);
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Boolean isHidden();
 }

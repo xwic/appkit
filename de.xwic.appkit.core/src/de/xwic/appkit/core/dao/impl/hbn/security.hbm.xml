@@ -109,10 +109,6 @@
             <column name="SECURED_SCOPE"/>
         </property>
         
-         <property name="hidden" type="java.lang.Boolean">
-            <column name="HIDDEN"/>
-        </property>
-        
         <property name="description">
             <column name="DESCRIPTION" length="100"/>
         </property>
@@ -226,10 +222,6 @@
         
         <property name="restrictGrantToPeers" type="java.lang.Boolean">
             <column name="RESTRICT_GRANT_TO_PEERS"/>
-        </property>
-        
-        <property name="hidden" type="java.lang.Boolean">
-            <column name="HIDDEN"/>
         </property>
 
 		<!-- additional object properties -->

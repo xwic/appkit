@@ -103,16 +103,4 @@ public interface IScope extends IEntity {
 	 * @return
 	 */
 	public Set<IEntity> getAllActions();
-	
-	/**
-	 * 
-	 * @param hidden
-	 */
-	public void setHidden(Boolean hidden);
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public Boolean isHidden();
 }
