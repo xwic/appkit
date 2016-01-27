@@ -302,7 +302,8 @@ public class XmlEntityTransport {
 			elm.addAttribute("version", Long.toString(entity.getVersion()));
 			
 			Class clasz = null;
-			if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
+			// hibernate has proxy classes and depending on version it contains a different text
+			if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1 || entity.getClass().getName().indexOf("_$$_jvs") != -1) {
 				clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
 			}else {
 				clasz = entity.getClass();

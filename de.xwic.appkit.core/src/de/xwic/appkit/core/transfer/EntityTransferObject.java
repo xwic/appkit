@@ -95,7 +95,8 @@ public class EntityTransferObject {
 			throw new NullPointerException("Entity must not be null");
 		}
 		final Class<? extends IEntity> clasz;
-		if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1) {
+		// hibernate has proxy classes and depending on version it contains a different text
+		if (entity.getClass().getName().indexOf("EnhancerByCGLIB") != -1 || entity.getClass().getName().indexOf("_$$_jvs") != -1) {
 			clasz = (Class<? extends IEntity>) entity.getClass().getSuperclass();
 		} else if (Proxy.isProxyClass(entity.getClass())) {
 			InvocationHandler ih = Proxy.getInvocationHandler(entity);
@@ -249,6 +250,7 @@ public class EntityTransferObject {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("ETO [" + entityClass.getName() + "]: \n");
@@ -294,6 +296,7 @@ public class EntityTransferObject {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = 1;
@@ -307,30 +310,41 @@ public class EntityTransferObject {
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		final EntityTransferObject other = (EntityTransferObject) obj;
 		if (entityClass == null) {
-			if (other.entityClass != null)
+			if (other.entityClass != null) {
 				return false;
-		} else if (!entityClass.equals(other.entityClass))
+			}
+		} else if (!entityClass.equals(other.entityClass)) {
 			return false;
-		if (entityId != other.entityId)
+		}
+		if (entityId != other.entityId) {
 			return false;
-		if (modified != other.modified)
+		}
+		if (modified != other.modified) {
 			return false;
-		if (entityVersion != other.entityVersion)
+		}
+		if (entityVersion != other.entityVersion) {
 			return false;
+		}
 		if (propertyValues == null) {
-			if (other.propertyValues != null)
+			if (other.propertyValues != null) {
 				return false;
-		} else if (!propertyValues.equals(other.propertyValues))
+			}
+		} else if (!propertyValues.equals(other.propertyValues)) {
 			return false;
+		}
 		return true;
 	}
 
