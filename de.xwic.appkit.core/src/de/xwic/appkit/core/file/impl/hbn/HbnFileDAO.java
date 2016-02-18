@@ -27,8 +27,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IFileHandler;
+import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 
 /**
@@ -48,15 +50,19 @@ public class HbnFileDAO implements IFileHandler {
 	 * @return
 	 */
 	public int storeFile(final String filename) throws DataAccessException {
-		Session session = HibernateUtil.currentSession();
-		Transaction tx = session.beginTransaction();
-		try {
-			int res = storeFile(filename, session);
-			tx.commit();
+		Integer res = (Integer) new UseCase() {
+
+			@Override
+			protected Object execute(DAOProviderAPI api) {
+				Session session = HibernateUtil.currentSession();
+				int res = storeFile(filename, session);
+				return res;
+			}
+		}.execute();
+		if (res != null) {
 			return res;
-		} catch (DataAccessException e) {
-			tx.rollback();
-			throw e;
+		} else {
+			throw new DataAccessException("Could not store file: " + filename);
 		}
 	}
 
@@ -98,14 +104,18 @@ public class HbnFileDAO implements IFileHandler {
 	 */
 	@Override
 	public void deleteFile(final int id) {
-		Session session = HibernateUtil.currentSession();
-		Transaction tx = HibernateUtil.currentSession().beginTransaction();
+		new UseCase() {
 
-		HbnFile hFile = (HbnFile) session.load(HbnFile.class, new Integer(id));
-		if (hFile != null) {
-			session.delete(hFile);
-		}
-		tx.commit();
+			@Override
+			protected Object execute(DAOProviderAPI api) {
+				Session session = HibernateUtil.currentSession();
+				HbnFile hFile = (HbnFile) session.load(HbnFile.class, new Integer(id));
+				if (hFile != null) {
+					session.delete(hFile);
+				}
+				return true;
+			}
+		}.execute();
 	}
 
 	/*
