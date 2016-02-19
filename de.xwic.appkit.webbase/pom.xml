@@ -10,7 +10,7 @@
 
     <artifactId>appkit-webbase</artifactId>
     <packaging>jar</packaging>
-
+    
     <dependencies>
         <dependency>
             <groupId>de.xwic.appkit</groupId>
@@ -22,10 +22,17 @@
 		<dependency>
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-core</artifactId>
+			<version>${mvnDependencyVersionxWicjWic}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.xwic.jwic</groupId>
 			<artifactId>jwic-controls</artifactId>
+			<version>${mvnDependencyVersionxWicjWic}</version>
+		</dependency>
+		<dependency>
+			<groupId>de.xwic.jwic</groupId>
+			<artifactId>jwic-web</artifactId>
+			<version>${mvnDependencyVersionxWicjWic}</version>
 		</dependency>
 		<dependency>
 			<groupId>de.xwic.cube</groupId>

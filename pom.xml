@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.1</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
@@ -516,6 +516,11 @@
 				<artifactId>jwic-controls</artifactId>
 				<version>${mvnDependencyVersionxWicjWic}</version>
 			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-web</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
 	
 			<dependency>
 				<groupId>de.xwic.cube</groupId>
@@ -526,6 +531,12 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
+				<version>4.3.11.Final</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-ehcache</artifactId>
 				<version>4.3.11.Final</version>
 			</dependency>
 
