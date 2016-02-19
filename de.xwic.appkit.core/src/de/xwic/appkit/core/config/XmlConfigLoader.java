@@ -162,6 +162,8 @@ public class XmlConfigLoader {
 							loadLanguages(element);
 						} else if (name.equals("properties")) {
 							loadProperties(element);
+						} else if (name.equals("apps")) {
+							loadApps(element);
 						}
 						
 					} 
@@ -194,6 +196,30 @@ public class XmlConfigLoader {
 		return setup;
 	}
 	
+	/**
+	 * @param element
+	 * @throws ParseException 
+	 */
+	private void loadApps(Element elApps) throws ParseException {
+
+		NodeList nl = elApps.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node node = nl.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element)node;
+				if (element.getNodeName().equals("app")) {
+					if (!element.hasAttribute("id")) {
+						throw new ParseException("id must be specified for an App node");
+					}
+					String id = element.getAttribute("id");
+					String title = getFirstChildValue(element, "title");
+					setup.addApp(new App(id, title));
+				}
+			}
+		}
+		
+	}
+
 	/**
 	 * @param element
 	 * @throws ConfigurationException 
@@ -544,6 +570,30 @@ public class XmlConfigLoader {
 		}
 
 		return sb.toString();
+	}
+	
+	/**
+	 * Returns the text of the first childNode with the given nodeName. Returns
+	 * <code>null</code> if no childNode with the specified nodeName was found.
+	 * 
+	 * @param node
+	 * @param nodeName
+	 * @return
+	 */
+	private String getFirstChildValue(Element node, String nodeName) {
+
+		NodeList nl = node.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node child = nl.item(i);
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element)child;
+				if (element.getNodeName().equals(nodeName)) {
+					return getNodeText(element);
+				}
+			}
+		}
+
+		return null;
 	}
 	
 }
