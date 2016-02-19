@@ -48,6 +48,7 @@ public class Setup {
 	private String appTitle = null;
 	private String version = null;
 	private String defaultLangId = null;
+	private List<App> apps = new ArrayList<App>();
 	private List<Language> languages = new ArrayList<Language>();
 	private List<Model> models = new ArrayList<Model>();
 	private Map<String, Model> entityModelMap = new HashMap<String, Model>();
@@ -74,6 +75,22 @@ public class Setup {
 	 */
 	public void addLanguage(Language lang) {
 		languages.add(lang);
+	}
+	
+	/**
+	 * Add an app to the configuration.
+	 * @param app
+	 */
+	public void addApp(App app) {
+		apps.add(app);
+	}
+	
+	/**
+	 * Returns the list of Apps registered.
+	 * @return
+	 */
+	public List<App> getApps() {
+		return Collections.unmodifiableList(apps);
 	}
 	
 	/**
