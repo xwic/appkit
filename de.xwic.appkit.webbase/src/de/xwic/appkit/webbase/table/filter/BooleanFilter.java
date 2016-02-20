@@ -49,7 +49,7 @@ public class BooleanFilter extends AbstractFilterControl {
 	 */
 	@Override
 	public int getPreferredHeight() {
-		return 40;
+		return 30;
 	}
 	
 	/* (non-Javadoc)
@@ -57,8 +57,8 @@ public class BooleanFilter extends AbstractFilterControl {
 	 */
 	@Override
 	public int getPreferredWidth() {
-		
-		return 220;
+
+		return 260;
 	}
 	
 	/* (non-Javadoc)
