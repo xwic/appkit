@@ -88,6 +88,10 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        	<groupId>de.xwic.jwic</groupId>
+        	<artifactId>jwic-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
