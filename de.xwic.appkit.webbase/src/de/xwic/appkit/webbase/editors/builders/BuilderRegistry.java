@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.xwic.appkit.core.config.editor.EComposite;
+import de.xwic.appkit.core.config.editor.EGroup;
 import de.xwic.appkit.core.config.editor.ELabel;
 import de.xwic.appkit.core.config.editor.EText;
 import de.xwic.appkit.core.config.editor.UIElement;
@@ -47,6 +48,8 @@ public class BuilderRegistry {
 		registerBuilder(EComposite.class, new EContainerBuilder());
 		registerBuilder(EText.class, new EInputboxBuilder());
 		registerBuilder(ELabel.class, new ELabelBuilder());
+		registerBuilder(EGroup.class, new EGroupBuilder());
+		
 	}
 
 	/**

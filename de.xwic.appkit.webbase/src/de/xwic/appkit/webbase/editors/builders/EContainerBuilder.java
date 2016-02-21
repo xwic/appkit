@@ -65,6 +65,8 @@ public class EContainerBuilder extends Builder {
 			Builder builder = BuilderRegistry.getBuilder(element);
 			if (null != builder) {
 				builder.buildComponents(element, parent, context);
+			} else {
+				log.warn("No Builder registered for element " + composite.getClass().getName());
 			}
 		}
 	}

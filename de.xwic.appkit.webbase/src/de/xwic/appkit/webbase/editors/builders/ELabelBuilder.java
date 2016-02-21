@@ -21,6 +21,7 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.ELabel;
 import de.xwic.appkit.core.config.editor.UIElement;
+import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
 /**
@@ -43,7 +44,8 @@ public class ELabelBuilder extends Builder {
 		if (eLabel.getTitle() != null) {
 			text = context.getResString(eLabel.getTitle());
 		} else if (eLabel.getProperty() != null) {
-			text = context.getResString(eLabel.getFinalProperty().getName());
+			Property finalProperty = eLabel.getFinalProperty();
+			text = context.getResString(finalProperty);
 		}
 
 		Label label = null;

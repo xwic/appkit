@@ -27,6 +27,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -169,6 +170,16 @@ public class EntityDescriptor {
     		reportTemplates = new ArrayList<ReportTemplate>();
     	}
     	reportTemplates.add(reportTemplate);
+    }
+    
+    /**
+     * @return
+     */
+    public Collection<String> getListSetupIds() {
+    	if (lists != null) {
+    		return lists.keySet();
+    	}
+    	return null;
     }
     
     /**

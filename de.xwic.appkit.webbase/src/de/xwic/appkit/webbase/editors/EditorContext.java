@@ -60,7 +60,6 @@ public class EditorContext implements IBuilderContext {
 	static final int EVENT_BEFORESAVE = 2;
 	static final int EVENT_PAGES_CREATED = 3;
 	
-	private GenericEntityEditor editor = null;
 	private GenericEditorInput input = null;
 	private EditorConfiguration config = null;
 	private IEntityModel model = null;
@@ -104,14 +103,11 @@ public class EditorContext implements IBuilderContext {
 	 * @throws ConfigurationException
 	 * @throws EntityModelException
 	 */
-	public EditorContext(GenericEntityEditor editor) throws ConfigurationException,
+	public EditorContext(GenericEditorInput input, String langId) throws ConfigurationException,
 			EntityModelException {
-//		this.input = (GenericEditorInput) editor.getEditorInput();
-		this.editor = editor;
-		//TODO: just to escape warning, remove this in future
-//		this.editor.getTitle();
+		this.input = input;
 		this.config = input.getConfig();
-		this.bundle = config.getEntityType().getDomain().getBundle(Locale.getDefault().getLanguage());
+		this.bundle = config.getEntityType().getDomain().getBundle(langId);
 		this.model = EntityModelFactory.createModel(input.getEntity());
 		this.dirty = input.getEntity().getId() == 0; // is a new entity.
 		

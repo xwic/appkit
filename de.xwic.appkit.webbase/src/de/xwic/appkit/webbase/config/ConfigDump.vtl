@@ -101,6 +101,8 @@
 		<h3>Domains</h3>
 		#foreach($domainId in $util.sorted($setup.domains))
 			#set($domain = $setup.getDomain($domainId))
+			#set($bundle = $domain.getBundle("en"))
+			
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">$domainId</h3>
@@ -109,12 +111,70 @@
 					<h4>Model</h4>
 					#set($model = $domain.model)
 					
+					<table class="table table-striped">
+						<tr>
+							<th>Entity</th>
+							<th>Entity Title</th>
+							<th>Title Pattern</th>
+						</tr>
 					#foreach($entityId in $util.sorted($model.managedEntities))
-						<h5>$entityId</h5>
+						#set($ed = $model.getEntityDescriptor($entityId))
+						#set($title = $bundle.getString($entityId))
+						#if($title.charAt(0) == "!") #set($title = "<i>Unnamed</i>") #end
+						<tr>
+							<td>$entityId</td>
+							<td>$title</td>
+							<td>
+								$!ed.titlePattern
+							</td>
 					#end
+					</table>
 					
 				</div>
 			</div>
+		#end
+
+		<h3>Profiles</h3>
+		#foreach($profileId in $util.sorted($setup.profiles.keySet()))
+			#set($profile = $setup.getProfile($profileId))
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">$profileId</h3>
+				</div>
+				<div class="panel-body">
+					<h4>Features</h4>
+					<table class="table table-striped">
+						<tr>
+							<th>Feature</th>
+							<th>Enabled</th>
+						</tr>
+					#foreach($feature in $util.sorted($profile.features.keySet()))
+						<tr>
+							<td>$feature</td>
+							<td>#if($profile.isFeatureEnabled($feature)) Yes #else No #end</td>
+						</tr>
+					#end
+					</table>
+					
+					<h4>Editors</h4>
+					<table class="table table-striped">
+						<tr>
+							<th>EntityClass</th>
+							<th>Editor Id</th>
+						</tr>
+					#foreach($edEntity in $util.sorted($profile.supportedEditors))
+						<tr>
+							<td>$edEntity</td>
+							<td>
+								#foreach($editorId in $profile.getEditorConfigsForEntity($edEntity))
+									$editorId<br>
+								#end
+							</td>
+						</tr>
+					#end
+					</table>
+				</div>
+			</div>		
 		#end
 
 

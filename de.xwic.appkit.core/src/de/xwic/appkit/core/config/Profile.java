@@ -16,9 +16,11 @@
  *******************************************************************************/
 package de.xwic.appkit.core.config;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.list.ListColumn;
@@ -263,6 +265,26 @@ public class Profile {
 		}
 		
 		
+	}
+
+	/**
+	 * Returns the list of entities that have an editor configured.
+	 * @return
+	 */
+	public Collection<String> getSupportedEditors() {
+		return editorMap.keySet();
+	}
+
+	/**
+	 * Returns the list of entities that have an editor configured.
+	 * @return
+	 */
+	public Collection<String> getEditorConfigsForEntity(String entityClass) {
+		Map<String, EditorConfiguration> configs = editorMap.get(entityClass);
+		if (configs != null) {
+			return configs.keySet();
+		}
+		return null;
 	}
 
 }
