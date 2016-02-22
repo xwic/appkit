@@ -220,7 +220,7 @@ public class EditorContext implements IBuilderContext {
 //			} else if (widget instanceof CheckboxControl) {
 //				mapper = checkMapper;
 			} else {
-				//throw new IllegalArgumentException("No default mapper for such a widget (" + widget.getClass().getName() + ")");
+				throw new IllegalArgumentException("No default mapper for such a widget (" + widget.getClass().getName() + ")");
 			}
 			if (null != mapper) {
 				mapper.registerProperty(widget, property, infoMode);

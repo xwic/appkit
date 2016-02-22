@@ -23,6 +23,7 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.layout.TableLayoutContainer;
 import de.xwic.appkit.core.config.editor.EComposite;
+import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
@@ -45,8 +46,16 @@ public class EContainerBuilder extends Builder {
 		ControlContainer control = null;
 
 		if (composite.getCols() > 1) {
-			control = new TableLayoutContainer(parent);
-			((TableLayoutContainer) control).setColumnCount(composite.getCols());
+			TableLayoutContainer table = new TableLayoutContainer(parent); 
+			control = table;
+			
+			Style style = element.getStyle();
+			
+			table.setColumnCount(composite.getCols());
+			table.setCellPadding(style.getStyleInt("padding"));
+			table.setCellSpacing(0);
+			table.setWidth("100%");
+			
 		} else {
 			control = new ControlContainer(parent);
 		}

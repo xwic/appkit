@@ -30,6 +30,7 @@ import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.webbase.editors.builders.Builder;
 import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;
 import de.xwic.appkit.webbase.editors.builders.EContainerBuilder;
+import de.xwic.appkit.webbase.editors.mappers.MappingException;
 
 /**
  * This class defines the generic entity editor.
@@ -54,6 +55,12 @@ public class GenericEntityEditor extends ControlContainer {
 		this.context = new EditorContext(input, getSessionContext().getLocale().getLanguage());
 		
 		createControls();
+		try {
+			context.loadFromEntity();
+		} catch (MappingException e) {
+			getSessionContext().notifyMessage("Error loading data from entity: " + e);
+			log.error(e);
+		}
 	}
 
 	
@@ -75,6 +82,7 @@ public class GenericEntityEditor extends ControlContainer {
 				ETab eTab = (ETab) it.next();
 				Tab tab = mainTabs.addTab(eTab.getTitle());
 				
+				context.setCurrPage(tab);
 				createPage(tab, eTab);
 			}
 		} catch (Exception e) {

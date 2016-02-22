@@ -49,6 +49,8 @@ public class EInputboxBuilder extends Builder {
 			inputBox.setMaxLength(prop.getMaxLength());
 		}
 
+		context.registerField(text.getProperty(), inputBox, text.getId());
+		
 		return inputBox;
 	}
 }

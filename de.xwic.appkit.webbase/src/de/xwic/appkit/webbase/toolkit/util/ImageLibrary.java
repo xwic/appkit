@@ -40,11 +40,11 @@ public class ImageLibrary {
 
     public static final ImageRef ICON_APPLICATION_CASCADE = new ImageRef("icons/application_cascade.png");
     
-    public static final ImageRef ICON_SAVE_ACTIVE = new ImageRef("icons/save_a.gif");
-    public static final ImageRef ICON_SAVE_INACTIVE = new ImageRef("icons/save_i.gif");
+    public static final ImageRef ICON_SAVE_ACTIVE = new ImageRef("icons/save_a_small.gif");
+    public static final ImageRef ICON_SAVE_INACTIVE = new ImageRef("icons/save_i_small.gif");
 
-    public static final ImageRef ICON_SAVECLOSE_ACTIVE = new ImageRef("icons/saveclose_a.gif");
-    public static final ImageRef ICON_SAVECLOSE_INACTIVE = new ImageRef("icons/saveclose_i.gif");
+    public static final ImageRef ICON_SAVECLOSE_ACTIVE = new ImageRef("icons/saveclose_a_small.gif");
+    public static final ImageRef ICON_SAVECLOSE_INACTIVE = new ImageRef("icons/saveclose_i_small.gif");
 
     public static final ImageRef ICON_ABORT_ACTIVE = new ImageRef("icons/abort_a.gif");
     public static final ImageRef ICON_ABORT_INACTIVE = new ImageRef("icons/abort_i.gif");
