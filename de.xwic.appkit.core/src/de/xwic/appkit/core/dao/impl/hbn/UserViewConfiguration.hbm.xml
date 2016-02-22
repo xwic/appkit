@@ -24,13 +24,13 @@
 		<property name="name" column="CONFIG_NAME" />
 		<property name="description" column="CONFIG_DESCRIPTION" length="300"/>
 		<property name="public" column="IS_PUBLIC" type="boolean" />
-		<property name="columnsConfiguration" column="COLUMNS_CONFIG" type="org.hibernate.type.TextType" />
+		<property name="columnsConfiguration" column="COLUMNS_CONFIG" type="materialized_clob" />
  		<property name="sortField" column="SORT_FIELD" />
  		<property name="sortDirection" column="SORT_DIRECTION" />
  		<property name="maxRows" column="MAX_ROWS" type="int" />
  		<property name="mainConfiguration" column="IS_MAIN_CONFIG" type="boolean" />
  		<many-to-one name="relatedConfiguration" class="de.xwic.appkit.core.model.entities.impl.UserViewConfiguration" column="RELATED_CONFIG"/>
- 		<property name="filtersConfiguration" column="FILTERS_CONFIG" type="org.hibernate.type.TextType" />
+ 		<property name="filtersConfiguration" column="FILTERS_CONFIG" type="materialized_clob" />
 
 		<!-- additional object properties -->
 
