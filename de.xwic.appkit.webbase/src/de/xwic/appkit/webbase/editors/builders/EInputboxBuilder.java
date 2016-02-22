@@ -44,6 +44,9 @@ public class EInputboxBuilder extends Builder {
 
 		inputBox.setReadonly(text.isReadonly());
 		inputBox.setMultiLine(text.isMultiline());
+		if (text.isMultiline()) {
+			inputBox.setHeight(100);
+		}
 		Property prop = text.getFinalProperty();
 		if (prop.getMaxLength() > 0) {
 			inputBox.setMaxLength(prop.getMaxLength());
