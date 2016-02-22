@@ -46,6 +46,9 @@ public class ELabelBuilder extends Builder {
 		} else if (eLabel.getProperty() != null) {
 			Property finalProperty = eLabel.getFinalProperty();
 			text = context.getResString(finalProperty);
+			if (finalProperty.getRequired()) {
+				text += "&nbsp;<span class=\"xwic-ed-lbl-required\">*</span>";
+			}
 		}
 
 		Label label = null;

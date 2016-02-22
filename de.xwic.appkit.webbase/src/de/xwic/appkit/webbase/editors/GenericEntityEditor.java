@@ -81,9 +81,10 @@ public class GenericEntityEditor extends ControlContainer {
 			for (Iterator<?> it = tabs.iterator(); it.hasNext();) {
 				ETab eTab = (ETab) it.next();
 				Tab tab = mainTabs.addTab(eTab.getTitle());
+				EditorPage page = new EditorPage(tab, null);
 				
-				context.setCurrPage(tab);
-				createPage(tab, eTab);
+				context.setCurrPage(page);
+				createPage(page, eTab);
 			}
 		} catch (Exception e) {
 			log.error("Error opening editor", e);
@@ -94,12 +95,12 @@ public class GenericEntityEditor extends ControlContainer {
 	/**
 	 * creates a page.
 	 * 
-	 * @param tab
+	 * @param page
 	 * @param eTab
 	 */
-	private void createPage(Tab tab, ETab eTab) {
+	private void createPage(EditorPage page, ETab eTab) {
 		Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
-		builder.buildComponents(eTab, tab, context);
+		builder.buildComponents(eTab, page, context);
 	}
 
 	/**

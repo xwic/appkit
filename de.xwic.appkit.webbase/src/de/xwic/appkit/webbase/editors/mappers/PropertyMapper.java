@@ -27,6 +27,7 @@ import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
 
@@ -307,6 +308,51 @@ public abstract class PropertyMapper {
 	 */
 	protected void addPropertyToQuery(IControl widget, Property[] property, IPropertyQuery query) {
 		throw new RuntimeException("This mapper does not support queries");
+		
+	}
+
+
+	/**
+	 * @param result
+	 */
+	public void highlightValidationResults(ValidationResult result) {
+		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty wp = (ControlProperty)it.next();
+			
+			StringBuilder sbPropId = new StringBuilder();
+			sbPropId.append(baseEntity.getClassname());
+			for (Property p : wp.getProperty()) {
+				sbPropId.append(".");
+				sbPropId.append(p.getName());
+			}
+			String fullPropertyId = sbPropId.toString();
+			
+			if (result.getErrorMap().containsKey(fullPropertyId)) {
+				highlightWidget(wp.getWidget(), ValidationResult.Severity.ERROR);
+			} else if (result.getWarningMap().containsKey(fullPropertyId)) {
+				highlightWidget(wp.getWidget(), ValidationResult.Severity.WARN);
+			} else {
+				clearHighlightWidget(wp.getWidget());
+			}
+		}		
+	}
+
+
+	/**
+	 * Remove any highlight indicator from the widget.
+	 * @param widget
+	 */
+	protected void clearHighlightWidget(IControl widget) {
+		
+	}
+
+
+	/**
+	 * Add a highlight indicator to the widget.
+	 * @param widget
+	 * @param error
+	 */
+	protected void highlightWidget(IControl widget, Severity error) {
 		
 	}
 }

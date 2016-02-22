@@ -69,7 +69,7 @@ public class EditorContext implements IBuilderContext {
 
 	/** indicates if the fields are modified during save/load operation */
 	private boolean inTransaction = false;
-	private List mappers = new ArrayList();
+	private List<PropertyMapper> mappers = new ArrayList<PropertyMapper>();
 
 	// default mappers
 	private InputboxMapper textMapper;
@@ -79,10 +79,10 @@ public class EditorContext implements IBuilderContext {
 //	private CheckboxPropertyMapper checkMapper;
 
 	// properties - page assignment
-	private Tab currPage = null;
-	private Map propertyPageMap = new HashMap();
+	private EditorPage currPage = null;
+	private Map<String, EditorPage> propertyPageMap = new HashMap<String, EditorPage>();
 	private Map widgetMap = new HashMap();
-	private List pages = new ArrayList();
+	private List<EditorPage> pages = new ArrayList<EditorPage>();
 	private List listeners = new ArrayList();
 
 	// default listeners
@@ -257,8 +257,7 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setAllEditable(boolean editable) {
 		if (!editable || this.editable) {
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper mapper : mappers) {
 				mapper.setEditable(editable);
 			}
 		}
@@ -271,8 +270,7 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setFieldEditable(boolean editable, String propertyKey) {
 		if (!editable || this.editable) { // prevent listeners to enable editable when the entity is not editable.
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper mapper : mappers) {
 				mapper.setFieldEditable(editable, propertyKey);
 			}
 		}
@@ -287,8 +285,7 @@ public class EditorContext implements IBuilderContext {
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity)model;
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper mapper : mappers) {
 				mapper.loadContent(entity);
 			}
 			fireEvent(EVENT_LOADED, entity.getId() == 0);
@@ -319,19 +316,27 @@ public class EditorContext implements IBuilderContext {
 		inTransaction = true;
 		ValidationResult result = new ValidationResult();
 		try {
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			// perform UI side validation first...
+			for (PropertyMapper mapper : mappers) {
 				ValidationResult tempResult = mapper.validateWidgets();
 				result.addErrors(tempResult.getErrorMap());
 				result.addWarnings(tempResult.getWarningMap());
 			}
-			DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+			
+			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
 				throw new DataAccessException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
+			// then perform DAO (backend) side validation
 			ValidationResult daoResult = dao.validateEntity((IEntity) model);
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
+			
+			// now that all validations are done, highlight fields with errors
+			for (PropertyMapper mapper : mappers) {
+				mapper.highlightValidationResults(result);
+			}			
+			
 			return result;
 		} finally {
 			inTransaction = false;
@@ -355,7 +360,7 @@ public class EditorContext implements IBuilderContext {
 			if (dao == null) {
 				throw new MappingException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
-			ValidationResult result = dao.validateEntity(entity);
+			ValidationResult result = validateFields();
 			if (!result.hasErrors()) {
 				model.commit();
 				boolean isNew = model.getOriginalEntity().getId() == 0;
@@ -401,73 +406,64 @@ public class EditorContext implements IBuilderContext {
 	 */
 	void displayValidationResults(ValidationResult result) {
 
-		// clear all warnings
-		//TODO
-//		for (Iterator it = pages.iterator(); it.hasNext();) {
-//			Tab page = (Tab) it.next();
-//			page.resetMessages();
-//		}
-//		Tab mainPage = (Tab) pages.get(0);
+		for (EditorPage page : pages) {
+			page.resetMessages();
+		}
+		EditorPage mainPage = pages.get(0);
 
 		// assign warnings
-//		Map warnings = result.getWarningMap();
-//		String prefix = config.getEntityType().getClassname();
-//		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
-//			String prop = (String) it.next();
-//			String msg = (String) warnings.get(prop);
-//			Tab page = (Tab) propertyPageMap.get(prop);
-//			String title;
-//			if (prop.startsWith("#")) {
-//				title = bundle.getString(prop.substring(1));
-//			} else {
-//				title = bundle.getString(prefix + "." + prop);
-//			}
-//			String message = title + ": " + bundle.getString(msg);
-//			if (page != null) {
-//				page.addWarningMessage(message);
-//			} else {
-//				mainPage.addWarningMessage(message);
-//			}
-//		}
-//
-//		// assign warnings
-//		Map errors = result.getErrorMap();
-//		for (Iterator it = errors.keySet().iterator(); it.hasNext();) {
-//			String prop = (String) it.next();
-//			String msg = (String) errors.get(prop);
-//			GenericPage page = (GenericPage) propertyPageMap.get(prop);
-//			String title;
-//			if (prop.startsWith("#")) {
-//				title = bundle.getString(prop.substring(1));
-//			} else {
-//				title = bundle.getString(prefix + "." + prop);
-//			}
-//			String message = title + ": " + bundle.getString(msg);
-//			if (page != null) {
-//				page.addErrorMessage(message);
-//			} else {
-//				mainPage.addErrorMessage(message);
-//			}
-//		}
-//
-//		int idx = 0;
-//		for (Iterator it = pages.iterator(); it.hasNext(); idx++) {
-//			GenericPage page = (GenericPage) it.next();
-//			int lvl = page.writeMessages();
-//			Image img;
-//			switch (lvl) {
-//				case 1:
-//					img = UIToolsPlugin.getDefault().getImage(UIToolsPlugin.IMG_WARNING);
-//					break;
-//				case 2:
-//					img = UIToolsPlugin.getDefault().getImage(UIToolsPlugin.IMG_ERROR);
-//					break;
-//				default:
-//					img = null;
-//					break;
-//			}
-//			editor.setPageImage(idx, img);
-//		}
+		Map warnings = result.getWarningMap();
+		String prefix = config.getEntityType().getClassname();
+		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
+			String prop = (String) it.next();
+			String msg = (String) warnings.get(prop);
+			EditorPage page = propertyPageMap.get(prop);
+			String title;
+			if (prop.startsWith("#")) {
+				title = bundle.getString(prop.substring(1));
+			} else {
+				title = bundle.getString(prop);
+			}
+			String message = title + ": " + bundle.getString(msg);
+			if (page != null) {
+				page.addWarn(message);
+			} else {
+				mainPage.addWarn(message);
+			}
+		}
+
+		// assign errors
+		Map errors = result.getErrorMap();
+		for (Iterator it = errors.keySet().iterator(); it.hasNext();) {
+			String prop = (String) it.next();
+			String msg = (String) errors.get(prop);
+			EditorPage page = propertyPageMap.get(prop);
+			String title;
+			if (prop.startsWith("#")) {
+				title = bundle.getString(prop.substring(1));
+			} else {
+				title = bundle.getString(prop);
+			}
+			String message = title + ": " + bundle.getString(msg);
+			if (page != null) {
+				page.addError(message);
+			} else {
+				mainPage.addError(message);
+			}
+		}
+
+		String tag = "";
+		for (EditorPage page : pages) {
+			if (page.hasErrors()) {
+				tag = "[E]";
+			} else if (page.hasWarnings()) {
+				tag = "[W]";
+			} else if (page.hasInfos()) {
+				tag = "[I]";
+			} 
+			// TODO Assign the state to the page/tab
+			
+		}
 
 	}
 
@@ -519,7 +515,7 @@ public class EditorContext implements IBuilderContext {
 	 * @param currPage
 	 *            the currPage to set
 	 */
-	public void setCurrPage(Tab currPage) {
+	public void setCurrPage(EditorPage currPage) {
 		if (this.currPage != null && currPage != null) {
 			throw new IllegalStateException("Another process is still creating properties on a page.");
 		}
