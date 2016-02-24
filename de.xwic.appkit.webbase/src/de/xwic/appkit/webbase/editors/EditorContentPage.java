@@ -21,7 +21,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * 
  * @author lippisch
  */
-public class EditorPage extends ControlContainer {
+public class EditorContentPage extends ControlContainer {
 	
 	private EditorMessagesControl msgError;
 	private EditorMessagesControl msgWarn;
@@ -36,7 +36,7 @@ public class EditorPage extends ControlContainer {
 	 * @param container
 	 * @param name
 	 */
-	public EditorPage(IControlContainer container, String name) {
+	public EditorContentPage(IControlContainer container, String name) {
 		super(container, name);
 		
 		msgError = new EditorMessagesControl(this, "msgError");
@@ -167,7 +167,7 @@ public class EditorPage extends ControlContainer {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		EditorPage other = (EditorPage) obj;
+		EditorContentPage other = (EditorContentPage) obj;
 		if (contentControlIds == null) {
 			if (other.contentControlIds != null)
 				return false;
@@ -239,12 +239,16 @@ public class EditorPage extends ControlContainer {
 					break;
 				}
 			}
+			String newTitle;
 			if (imgIndicator != null) {
-				myTab.setTitle(title + " " + imgIndicator.toImgTag());
+				newTitle = title + " " + imgIndicator.toImgTag();
 			} else {
-				myTab.setTitle(title);
+				newTitle = title;
 			}
-			((ControlContainer)myTab.getContainer()).requireRedraw();
+			if (!newTitle.equals(myTab.getTitle())) {
+				myTab.setTitle(newTitle);
+				((ControlContainer)myTab.getContainer()).requireRedraw();
+			}
 			
 		}
 		

@@ -33,11 +33,11 @@ import de.xwic.appkit.webbase.editors.builders.EContainerBuilder;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
 
 /**
- * This class defines the generic entity editor.
+ * Generates a form to edit an entity based upon a user configuration.
+ * 
+ * @author lippisch
  */
-public class GenericEntityEditor extends ControlContainer {
-
-	public static final String ID_EDITOR = GenericEntityEditor.class.getName();
+public class EntityEditor extends ControlContainer {
 
 	private GenericEditorInput input = null;
 	private EditorContext context = null;
@@ -49,7 +49,7 @@ public class GenericEntityEditor extends ControlContainer {
 	 * @throws EntityModelException 
 	 * @throws ConfigurationException 
 	 */
-	public GenericEntityEditor(IControlContainer container, String name, GenericEditorInput input) throws ConfigurationException, EntityModelException {
+	public EntityEditor(IControlContainer container, String name, GenericEditorInput input) throws ConfigurationException, EntityModelException {
 		super(container, name);
 		this.input = input;
 		this.context = new EditorContext(input, getSessionContext().getLocale().getLanguage());
@@ -81,7 +81,7 @@ public class GenericEntityEditor extends ControlContainer {
 			for (Iterator<?> it = tabs.iterator(); it.hasNext();) {
 				ETab eTab = (ETab) it.next();
 				Tab tab = mainTabs.addTab(eTab.getTitle());
-				EditorPage page = new EditorPage(tab, null);
+				EditorContentPage page = new EditorContentPage(tab, null);
 				page.setTitle(eTab.getTitle());
 				
 				context.setCurrPage(page);
@@ -100,7 +100,7 @@ public class GenericEntityEditor extends ControlContainer {
 	 * @param page
 	 * @param eTab
 	 */
-	private void createPage(EditorPage page, ETab eTab) {
+	private void createPage(EditorContentPage page, ETab eTab) {
 		Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
 		builder.buildComponents(eTab, page, context);
 	}

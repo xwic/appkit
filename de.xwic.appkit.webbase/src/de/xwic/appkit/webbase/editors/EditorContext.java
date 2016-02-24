@@ -81,10 +81,10 @@ public class EditorContext implements IBuilderContext {
 //	private CheckboxPropertyMapper checkMapper;
 
 	// properties - page assignment
-	private EditorPage currPage = null;
-	private Map<String, EditorPage> propertyPageMap = new HashMap<String, EditorPage>();
+	private EditorContentPage currPage = null;
+	private Map<String, EditorContentPage> propertyPageMap = new HashMap<String, EditorContentPage>();
 	private Map widgetMap = new HashMap();
-	private List<EditorPage> pages = new ArrayList<EditorPage>();
+	private List<EditorContentPage> pages = new ArrayList<EditorContentPage>();
 	private List listeners = new ArrayList();
 
 	// default listeners
@@ -409,10 +409,10 @@ public class EditorContext implements IBuilderContext {
 	 */
 	void displayValidationResults(ValidationResult result) {
 
-		for (EditorPage page : pages) {
+		for (EditorContentPage page : pages) {
 			page.resetMessages();
 		}
-		EditorPage mainPage = pages.get(0);
+		EditorContentPage mainPage = pages.get(0);
 
 		// assign warnings
 		Map warnings = result.getWarningMap();
@@ -420,7 +420,7 @@ public class EditorContext implements IBuilderContext {
 		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
 			String prop = (String) it.next();
 			String msg = (String) warnings.get(prop);
-			EditorPage page = propertyPageMap.get(prop);
+			EditorContentPage page = propertyPageMap.get(prop);
 			String title;
 			if (prop.startsWith("#")) {
 				title = bundle.getString(prop.substring(1));
@@ -440,7 +440,7 @@ public class EditorContext implements IBuilderContext {
 		for (Iterator it = errors.keySet().iterator(); it.hasNext();) {
 			String prop = (String) it.next();
 			String msg = (String) errors.get(prop);
-			EditorPage page = propertyPageMap.get(prop);
+			EditorContentPage page = propertyPageMap.get(prop);
 			String title;
 			if (prop.startsWith("#")) {
 				title = bundle.getString(prop.substring(1));
@@ -455,7 +455,7 @@ public class EditorContext implements IBuilderContext {
 			}
 		}
 
-		for (EditorPage page : pages) {
+		for (EditorContentPage page : pages) {
 			if (page.hasErrors()) {
 				page.setStateIndicator(Severity.ERROR);
 			} else if (page.hasWarnings()) {
@@ -517,7 +517,7 @@ public class EditorContext implements IBuilderContext {
 	 * @param currPage
 	 *            the currPage to set
 	 */
-	public void setCurrPage(EditorPage currPage) {
+	public void setCurrPage(EditorContentPage currPage) {
 		if (this.currPage != null && currPage != null) {
 			throw new IllegalStateException("Another process is still creating properties on a page.");
 		}
