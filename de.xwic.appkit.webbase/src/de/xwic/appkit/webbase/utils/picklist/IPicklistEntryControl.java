@@ -17,10 +17,12 @@
 package de.xwic.appkit.webbase.utils.picklist;
 
 import de.jwic.base.IControl;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
  * Created on Mar 9, 2008
  * @author Ronny Pfretzschner
+ * @author lippisch
  */
 public interface IPicklistEntryControl extends IControl {
 
@@ -33,5 +35,31 @@ public interface IPicklistEntryControl extends IControl {
 	 * @param picklistKey The picklistKey to set.
 	 */
 	public void setPicklistKey(String picklistKey);
+
+	
+	/**
+	 * Returns the selected IPicklistEntry.
+	 * @return
+	 */
+	public IPicklistEntry getSelectedEntry();
+	
+	/**
+	 * Select the picklistEntry.
+	 * @param entry
+	 */
+	public void selectEntry(IPicklistEntry pEntry);
+	
+	/**
+	 * Change enabled state.
+	 * @param enabled
+	 */
+	public void setEnabled(boolean enabled);
+
+	
+	/**
+	 * Returns true if the field is enabled (Editable).
+	 * @param enabled
+	 */
+	public boolean isEnabled();
 
 }

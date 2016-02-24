@@ -38,7 +38,9 @@ public class EGroupBuilder extends EContainerBuilder {
 		GroupControl gc = new GroupControl(parent);
 		gc.setTitle(group.getTitle());
 		
-		return super.buildComponents(element, gc, context);
+		super.buildComponents(element, gc, context);
+		
+		return gc;
 	}
 	
 }

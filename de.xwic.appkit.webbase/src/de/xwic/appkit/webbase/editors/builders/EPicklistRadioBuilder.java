@@ -18,19 +18,22 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBox;
-import de.xwic.appkit.core.config.editor.EText;
-import de.xwic.appkit.core.config.editor.Style;
+import de.jwic.controls.Label;
+import de.xwic.appkit.core.config.editor.EPicklistCombo;
+import de.xwic.appkit.core.config.editor.EPicklistRadio;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
+import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
+import de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl;
 
 /**
- * Defines the InputBox builder class.
+ * The Builder for the Label.
  * 
- * @author Aron Cotrau
+ * @author lippisch
+ * @editortag plRadio
  */
-public class EInputboxBuilder extends Builder {
+public class EPicklistRadioBuilder extends Builder {
 
 	/*
 	 * (non-Javadoc)
@@ -40,33 +43,25 @@ public class EInputboxBuilder extends Builder {
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
 	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		EText text = (EText) element;
-		InputBox inputBox = new InputBox(parent);
 
-		inputBox.setReadonly(text.isReadonly());
-		inputBox.setMultiLine(text.isMultiline());
-		if (text.isMultiline()) {
-			inputBox.setHeight(100);
-		}
-		Property prop = text.getFinalProperty();
-		if (prop.getMaxLength() > 0) {
-			inputBox.setMaxLength(prop.getMaxLength());
-		}
-		if (prop.getRequired()) {
-			inputBox.setEmptyInfoText("Required Field");
-		}
-		
-		Style style = text.getStyle();
-		if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
-			inputBox.setWidth(style.getStyleInt(Style.WIDTH_HINT) );
-		}
+		EPicklistRadio ePl = (EPicklistRadio) element;
+		if (ePl.getProperty() != null) {
+			Property finalProperty = ePl.getFinalProperty();
+			PicklistEntryRadioGroupControl pe = new PicklistEntryRadioGroupControl(parent, null, finalProperty.getPicklistId());
 
-		if (style.getStyleInt(Style.HEIGHT_HINT) != 0) {
-			inputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT) );
+			pe.setColumns(ePl.getCols());
+			context.registerField(ePl.getProperty(), pe, ePl.getId());
+
+			return pe;
+			
+		} else {
+
+			Label label = null;
+			label = new Label(parent);
+			label.setText("No Property Specified");
+			return label;
+			
 		}
 
-		context.registerField(text.getProperty(), inputBox, text.getId());
-		
-		return inputBox;
 	}
 }

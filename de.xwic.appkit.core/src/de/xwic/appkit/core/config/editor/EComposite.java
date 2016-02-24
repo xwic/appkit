@@ -33,6 +33,8 @@ public class EComposite extends UIElement {
 	private String layout = null;
 	private int cols = 0;
 	
+	private String colWidth = null;
+	
 	/**
 	 * Add a child element.
 	 * @param element
@@ -75,7 +77,22 @@ public class EComposite extends UIElement {
 	public void setCols(int cols) {
 		this.cols = cols;
 	}
-	
+
+	/**
+	 * @return the colWidth
+	 */
+	public String getColWidth() {
+		return colWidth;
+	}
+
+	/**
+	 * Semicolon separated list of width hints.
+	 * @param colWidth the colWidth to set
+	 */
+	public void setColWidth(String colWidth) {
+		this.colWidth = colWidth;
+	}
+		
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.config.editor.UIElement#toString()
 	 */
@@ -112,5 +129,5 @@ public class EComposite extends UIElement {
 		  
 		return sb.toString();
 	}
-	
+
 }

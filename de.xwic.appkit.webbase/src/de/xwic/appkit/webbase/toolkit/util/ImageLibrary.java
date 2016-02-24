@@ -67,14 +67,14 @@ public class ImageLibrary {
 
     public static final ImageRef ICON_REFRESH = new ImageRef("icons/arrow_refresh.png");
     
-    public static final ImageRef ICON_ERROR = new ImageRef("icons/error.png");
+    public static final ImageRef ICON_ERROR = new ImageRef("icons/error_red.png");
+    public static final ImageRef ICON_WARNING = new ImageRef("icons/error.png");
     public static final ImageRef ICON_OK = new ImageRef("icons/ok.png");
     public static final ImageRef ICON_OK_INACTIVE = new ImageRef("icons/ok_i.png");
 
     public static final ImageRef ICON_CLOSED = new ImageRef("icons/closed.png");
     public static final ImageRef ICON_CLOSED_INACTIVE = new ImageRef("icons/closed_i.png");
 
-    public static final ImageRef ICON_WARNING = new ImageRef("icons/warning.gif");
 
     public static final ImageRef ICON_LENS_ACTIVE = new ImageRef("icons/lupe2_a.gif");
     public static final ImageRef ICON_LENS_INACTIVE = new ImageRef("icons/lupe2_i.gif");

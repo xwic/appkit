@@ -9,7 +9,11 @@ import java.util.List;
 import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlContainer;
+import de.jwic.base.ImageRef;
 import de.jwic.base.JWicException;
+import de.jwic.controls.Tab;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
+import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 
 /**
  * A page on a a GenericEditor that contains editor content and a message area for warnings and hints. An EditorPage is typically
@@ -22,6 +26,9 @@ public class EditorPage extends ControlContainer {
 	private EditorMessagesControl msgError;
 	private EditorMessagesControl msgWarn;
 	private EditorMessagesControl msgInfo;
+	
+	private String title = null;
+	private Severity stateIndicator = null;
 
 	private List<String> contentControlIds = new ArrayList<String>();
 	
@@ -182,6 +189,65 @@ public class EditorPage extends ControlContainer {
 		} else if (!msgWarn.equals(other.msgWarn))
 			return false;
 		return true;
+	}
+
+
+	/**
+	 * @return the title
+	 */
+	public String getTitle() {
+		return title;
+	}
+
+
+	/**
+	 * @param title the title to set
+	 */
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+
+	/**
+	 * @return the stateIndicator
+	 */
+	public Severity getStateIndicator() {
+		return stateIndicator;
+	}
+
+
+	/**
+	 * @param stateIndicator the stateIndicator to set
+	 */
+	public void setStateIndicator(Severity stateIndicator) {
+		this.stateIndicator = stateIndicator;
+		
+		// the hack.... - this should go into an event based model where the EditorPage throws a propertyChanged event and the editor updates the
+		// respective tab... but for now.. for the demo... 
+		
+		if (getContainer() instanceof Tab) {
+			
+			Tab myTab = (Tab)getContainer();
+			ImageRef imgIndicator = null;
+			if (stateIndicator != null) {
+				switch (stateIndicator) {
+				case ERROR:
+					imgIndicator = ImageLibrary.ICON_ERROR;
+					break;
+				case WARN:
+					imgIndicator = ImageLibrary.ICON_WARNING;
+					break;
+				}
+			}
+			if (imgIndicator != null) {
+				myTab.setTitle(title + " " + imgIndicator.toImgTag());
+			} else {
+				myTab.setTitle(title);
+			}
+			((ControlContainer)myTab.getContainer()).requireRedraw();
+			
+		}
+		
 	}
 	
 }

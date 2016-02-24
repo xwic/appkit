@@ -82,9 +82,11 @@ public class GenericEntityEditor extends ControlContainer {
 				ETab eTab = (ETab) it.next();
 				Tab tab = mainTabs.addTab(eTab.getTitle());
 				EditorPage page = new EditorPage(tab, null);
+				page.setTitle(eTab.getTitle());
 				
 				context.setCurrPage(page);
 				createPage(page, eTab);
+				context.setCurrPage(null);
 			}
 		} catch (Exception e) {
 			log.error("Error opening editor", e);

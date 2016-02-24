@@ -39,6 +39,7 @@ import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
 import de.xwic.appkit.core.model.IEntityModel;
@@ -46,7 +47,9 @@ import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
 import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
+import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
 import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
+import de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
@@ -73,8 +76,7 @@ public class EditorContext implements IBuilderContext {
 
 	// default mappers
 	private InputboxMapper textMapper;
-	//TODO
-//	private PicklistComboPropertyMapper plComboMapper;
+	private PicklistEntryMapper plEntryMapper;
 //	private DateMapper dateMapper;
 //	private CheckboxPropertyMapper checkMapper;
 
@@ -126,8 +128,8 @@ public class EditorContext implements IBuilderContext {
 		textMapper = new InputboxMapper(config.getEntityType());
 		mappers.add(textMapper);
 
-//		plComboMapper = new PicklistComboPropertyMapper(config.getEntityType());
-//		mappers.add(plComboMapper);
+		plEntryMapper = new PicklistEntryMapper(config.getEntityType());
+		mappers.add(plEntryMapper);
 //
 //		dateMapper = new DateMapper(config.getEntityType());
 //		mappers.add(dateMapper);
@@ -213,8 +215,8 @@ public class EditorContext implements IBuilderContext {
 		} else {
 			if (widget instanceof InputBox) {
 				mapper = textMapper;
-//			} else if (widget instanceof PicklistEntryCombo) {
-//				mapper = plComboMapper;
+			} else if (widget instanceof IPicklistEntryControl) {
+				mapper = plEntryMapper;
 //			} else if (widget instanceof DateInputControl) {
 //				mapper = dateMapper;
 //			} else if (widget instanceof CheckboxControl) {
@@ -241,7 +243,8 @@ public class EditorContext implements IBuilderContext {
 				sb.append(property[i].getName());
 			}
 		}
-		propertyPageMap.put(sb.toString(), currPage);
+		//propertyPageMap.put(sb.toString(), currPage);
+		propertyPageMap.put(finalprop.getEntityDescriptor().getClassname() + "." + finalprop.getName(), currPage);
 
 		if (id != null) {
 			widgetMap.put(id, widget);
@@ -452,17 +455,16 @@ public class EditorContext implements IBuilderContext {
 			}
 		}
 
-		String tag = "";
 		for (EditorPage page : pages) {
 			if (page.hasErrors()) {
-				tag = "[E]";
+				page.setStateIndicator(Severity.ERROR);
 			} else if (page.hasWarnings()) {
-				tag = "[W]";
+				page.setStateIndicator(Severity.WARN);
 			} else if (page.hasInfos()) {
-				tag = "[I]";
-			} 
-			// TODO Assign the state to the page/tab
-			
+				page.setStateIndicator(null);
+			} else {
+				page.setStateIndicator(null);
+			}
 		}
 
 	}
