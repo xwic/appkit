@@ -38,12 +38,12 @@ import de.xwic.appkit.webbase.editors.ValidationException;
  * 
  * @author Florian Lippisch
  */
-public abstract class PropertyMapper {
+public abstract class PropertyMapper<T extends IControl> {
 
 	/** base entity */
 	protected EntityDescriptor baseEntity;
 	/** list of widgetProperties */
-	protected List widgets = new ArrayList();
+	protected List<ControlProperty<T>> widgets = new ArrayList<ControlProperty<T>>();
 	
 	/**
 	 * Constructor.
@@ -77,8 +77,8 @@ public abstract class PropertyMapper {
 	 * @param widget
 	 * @param property
 	 */
-	public void registerProperty(IControl widget, Property[] property) {
-		widgets.add(new ControlProperty(widget, property));
+	public void registerProperty(T widget, Property[] property) {
+		widgets.add(new ControlProperty<T>(widget, property));
 	}
 	
 	/**
@@ -86,8 +86,8 @@ public abstract class PropertyMapper {
 	 * @param property
 	 * @param infoMode
 	 */
-	public void registerProperty(IControl widget, Property[] property, boolean infoMode) {
-		widgets.add(new ControlProperty(widget, property, infoMode));
+	public void registerProperty(T widget, Property[] property, boolean infoMode) {
+		widgets.add(new ControlProperty<T>(widget, property, infoMode));
 	}
 	
 	/**
@@ -96,8 +96,8 @@ public abstract class PropertyMapper {
 	 */
 	public void loadContent(IEntity entity) throws MappingException {
 		
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			Property[] prop = wp.getProperty();
 			if (prop == null || prop[prop.length - 1].hasReadAccess()) {
 				loadContent(entity, wp.getWidget(), wp.getProperty());
@@ -112,8 +112,8 @@ public abstract class PropertyMapper {
 	 */
 	public ValidationResult validateWidgets() {
 		ValidationResult result = new ValidationResult();
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			String msg = validateWidget(wp.getWidget(), wp.getProperty());
 			if (msg != null) {
 				result.addError(getPropertyKey(wp.getProperty()), msg);
@@ -124,11 +124,11 @@ public abstract class PropertyMapper {
 	
 	/**
 	 * Changes the readonly flag for all controlled widgets.
-	 * @param readonly
+	 * @param editable
 	 */
 	public void setEditable(boolean editable) {
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			setEditable(wp.getWidget(), wp.getProperty(), editable);
 		}
 	}
@@ -137,9 +137,9 @@ public abstract class PropertyMapper {
 	 * Change the readonly flag for the specified widget/property.
 	 * @param widget
 	 * @param property
-	 * @param readonly
+	 * @param editable
 	 */
-	public abstract void setEditable(IControl widget, Property[] property, boolean editable);
+	public abstract void setEditable(T widget, Property[] property, boolean editable);
 	
 	/**
 	 * Load the content from the entity into the widgets.
@@ -147,8 +147,8 @@ public abstract class PropertyMapper {
 	 */
 	public void storeContent(IEntity entity) throws MappingException, ValidationException {
 		
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			if (! wp.isInfoMode()) {
 				Property[] prop = wp.getProperty();
 				if (prop == null || prop[prop.length - 1].hasReadAccess()) {
@@ -166,7 +166,7 @@ public abstract class PropertyMapper {
 	 * @param property
 	 * @return
 	 */
-	public String validateWidget(IControl widget, Property[] property) {
+	public String validateWidget(T widget, Property[] property) {
 		return null;
 	}
 
@@ -176,14 +176,14 @@ public abstract class PropertyMapper {
 	 * @param property
 	 * @throws MappingException 
 	 */
-	public abstract void loadContent(IEntity entity, IControl widget, Property[] property) throws MappingException;
+	public abstract void loadContent(IEntity entity, T widget, Property[] property) throws MappingException;
 
 	/**
 	 * @param entity
 	 * @param widget
 	 * @param property
 	 */
-	public abstract void storeContent(IEntity entity, IControl widget, Property[] property) throws MappingException, ValidationException;
+	public abstract void storeContent(IEntity entity, T widget, Property[] property) throws MappingException, ValidationException;
 	
 	/**
 	 * @param entity
@@ -273,8 +273,8 @@ public abstract class PropertyMapper {
 	 */
 	public void setFieldEditable(boolean editable, String propertyKey) {
 		String pkStartsWith = propertyKey + ".";
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			String propKey = getPropertyKey(wp.getProperty()); 
 			if (propKey.equals(propertyKey) || propKey.startsWith(pkStartsWith)) {
 				setEditable(wp.getWidget(), wp.getProperty(), editable);
@@ -289,8 +289,8 @@ public abstract class PropertyMapper {
 	 */
 	public void addToQuery(IPropertyQuery query) {
 
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = it.next();
 			Property[] prop = wp.getProperty();
 			if (prop == null || prop[prop.length - 1].hasReadAccess()) {
 				addPropertyToQuery(wp.getWidget(), wp.getProperty(), query);
@@ -306,7 +306,7 @@ public abstract class PropertyMapper {
 	 * @param property
 	 * @param query
 	 */
-	protected void addPropertyToQuery(IControl widget, Property[] property, IPropertyQuery query) {
+	protected void addPropertyToQuery(T widget, Property[] property, IPropertyQuery query) {
 		throw new RuntimeException("This mapper does not support queries");
 		
 	}
@@ -316,8 +316,8 @@ public abstract class PropertyMapper {
 	 * @param result
 	 */
 	public void highlightValidationResults(ValidationResult result) {
-		for (Iterator it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty wp = (ControlProperty)it.next();
+		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
+			ControlProperty<T> wp = (ControlProperty)it.next();
 			
 			StringBuilder sbPropId = new StringBuilder();
 			sbPropId.append(baseEntity.getClassname());
@@ -342,7 +342,7 @@ public abstract class PropertyMapper {
 	 * Remove any highlight indicator from the widget.
 	 * @param widget
 	 */
-	protected void clearHighlightWidget(IControl widget) {
+	protected void clearHighlightWidget(T widget) {
 		
 	}
 
@@ -352,7 +352,7 @@ public abstract class PropertyMapper {
 	 * @param widget
 	 * @param error
 	 */
-	protected void highlightWidget(IControl widget, Severity error) {
+	protected void highlightWidget(T widget, Severity error) {
 		
 	}
 }
