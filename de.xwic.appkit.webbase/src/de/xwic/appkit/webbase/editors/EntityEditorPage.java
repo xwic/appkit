@@ -20,7 +20,13 @@ import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.actions.Action;
 import de.jwic.controls.actions.IAction;
+import de.xwic.appkit.core.config.Bundle;
+import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
+import de.xwic.appkit.core.config.model.EntityDescriptor;
+import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
@@ -50,7 +56,24 @@ public class EntityEditorPage extends InnerPage {
 	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) {
 		super(container, name);
 		
-		setTitle("Experimental Editor");
+		
+		String title;
+		if (entity.getId() == 0) { // new entity
+			String entityType = entity.type().getName();
+			try {
+				EntityDescriptor descriptor = ConfigurationManager.getSetup().getEntityDescriptor(entityType);
+				Bundle bundle = descriptor.getDomain().getBundle(getSessionContext().getLocale().getLanguage());
+				title = "New " + bundle.getString(entityType) + "*";
+			} catch (ConfigurationException ce) {
+				log.warn("Error retrieving bundle string for entity", ce);
+				title = "Editor";
+			}
+		} else {
+			DAO<? extends IEntity> dao = DAOSystem.findDAOforEntity(entity.type());
+			title = dao.buildTitle(entity);
+		}
+			
+		setTitle(title);
 		
 		createActions();
 		createToolbar();
