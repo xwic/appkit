@@ -73,7 +73,7 @@ public class EditorContext implements IBuilderContext {
 	// default mappers
 	private InputboxMapper textMapper;
 	private PicklistEntryMapper plEntryMapper;
-	private RadioGroupMapper1 radioGroupMapper1;
+	private YesNoRadioGroupMapper yesNoRadioGroupMapper;
 //	private DateMapper dateMapper;
 //	private CheckboxPropertyMapper checkMapper;
 
@@ -128,8 +128,8 @@ public class EditorContext implements IBuilderContext {
 		plEntryMapper = new PicklistEntryMapper(config.getEntityType());
 		mappers.add(plEntryMapper);
 
-		radioGroupMapper1 = new RadioGroupMapper1(config.getEntityType());
-		mappers.add(radioGroupMapper1);
+		yesNoRadioGroupMapper = new YesNoRadioGroupMapper(config.getEntityType());
+		mappers.add(yesNoRadioGroupMapper);
 //
 //		dateMapper = new DateMapper(config.getEntityType());
 //		mappers.add(dateMapper);
@@ -218,7 +218,7 @@ public class EditorContext implements IBuilderContext {
 			} else if (widget instanceof IPicklistEntryControl) {
 				mapper = plEntryMapper;
 			} else if (widget instanceof RadioGroup) {
-				mapper = radioGroupMapper1;
+				mapper = yesNoRadioGroupMapper;
 //			} else if (widget instanceof DateInputControl) {
 //				mapper = dateMapper;
 //			} else if (widget instanceof CheckboxControl) {
