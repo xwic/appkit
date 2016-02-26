@@ -38,8 +38,8 @@ import org.apache.poi.util.StringUtil;
  */
 public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
 
-	private static final String KEY_YES = "1";
-	private static final String KEY_NO = "0";
+	public static final String KEY_YES = "1";
+    public static final String KEY_NO = "0";
 
 
 	/*

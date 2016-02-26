@@ -20,12 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import de.jwic.base.IControl;
 import de.jwic.controls.InputBox;
-import de.jwic.controls.Tab;
+import de.jwic.controls.RadioGroup;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
@@ -45,10 +44,7 @@ import de.xwic.appkit.core.model.EntityModelFactory;
 import de.xwic.appkit.core.model.IEntityModel;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
-import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
-import de.xwic.appkit.webbase.editors.mappers.MappingException;
-import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
-import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
+import de.xwic.appkit.webbase.editors.mappers.*;
 import de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl;
 
 /**
@@ -77,6 +73,7 @@ public class EditorContext implements IBuilderContext {
 	// default mappers
 	private InputboxMapper textMapper;
 	private PicklistEntryMapper plEntryMapper;
+	private RadioGroupMapper radioGroupMapper;
 //	private DateMapper dateMapper;
 //	private CheckboxPropertyMapper checkMapper;
 
@@ -130,6 +127,9 @@ public class EditorContext implements IBuilderContext {
 
 		plEntryMapper = new PicklistEntryMapper(config.getEntityType());
 		mappers.add(plEntryMapper);
+
+		radioGroupMapper = new RadioGroupMapper(config.getEntityType());
+		mappers.add(radioGroupMapper);
 //
 //		dateMapper = new DateMapper(config.getEntityType());
 //		mappers.add(dateMapper);
@@ -217,6 +217,8 @@ public class EditorContext implements IBuilderContext {
 				mapper = textMapper;
 			} else if (widget instanceof IPicklistEntryControl) {
 				mapper = plEntryMapper;
+			} else if (widget instanceof RadioGroup) {
+				mapper = radioGroupMapper;
 //			} else if (widget instanceof DateInputControl) {
 //				mapper = dateMapper;
 //			} else if (widget instanceof CheckboxControl) {

@@ -192,7 +192,7 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (int i = 0; i < property.length && root != null; i++) {
 			Method mRead = property[i].getDescriptor().getReadMethod();
 			try {
-				root = mRead.invoke(root, null);
+				root = mRead.invoke(root);
 			} catch (Exception e) {
 				throw new MappingException("Error reading property '" + property[i].getName() + "': " + e, e);
 			}
@@ -216,7 +216,7 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (int i = 0; i < max && root != null; i++) {
 			Method mRead = property[i].getDescriptor().getReadMethod();
 			try {
-				root = mRead.invoke(root, null);
+				root = mRead.invoke(root);
 			} catch (IllegalArgumentException e) {
 				throw new MappingException("Error reading property", e);
 			} catch (IllegalAccessException e) {
@@ -249,13 +249,13 @@ public abstract class PropertyMapper<T extends IControl> {
 				if (targetType.equals(String.class)) {
 					value = iValue.toString();
 				} else if (targetType.equals(Double.class)) {
-					value = new Double(iValue.doubleValue());
+					value = iValue.doubleValue();
 				}
 			}
 		}
 		
 		try {
-			mWrite.invoke(root, new Object[] { value });
+			mWrite.invoke(root, value);
 		} catch (Exception e) {
 			throw new MappingException("Error writing property '" + property[max].getName() + "':" + e, e);
 		}
