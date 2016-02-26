@@ -34,7 +34,7 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * 
  * @author Aron Cotrau
  */
-public class EContainerBuilder extends Builder {
+public class EContainerBuilder<T extends EComposite> extends Builder<T> {
 
 	/*
 	 * (non-Javadoc)
@@ -43,8 +43,8 @@ public class EContainerBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		EComposite composite = (EComposite) element;
+	@Override
+	public IControl buildComponents(T composite, IControlContainer parent, IBuilderContext context) {
 		ControlContainer control = null;
 		
 		TableLayoutContainer table = null;
@@ -52,7 +52,7 @@ public class EContainerBuilder extends Builder {
 			table = new TableLayoutContainer(parent); 
 			control = table;
 			
-			Style style = element.getStyle();
+			Style style = composite.getStyle();
 			
 			table.setColumnCount(composite.getCols());
 			table.setCellPadding(style.getStyleInt("padding"));

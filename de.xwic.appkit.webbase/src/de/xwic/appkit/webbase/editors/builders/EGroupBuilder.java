@@ -26,19 +26,17 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * Generates a group as per the EGroup settings.
  * @author Lippisch
  */
-public class EGroupBuilder extends EContainerBuilder {
+public class EGroupBuilder extends EContainerBuilder<EGroup> {
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.builders.EContainerBuilder#buildComponents(de.xwic.appkit.core.config.editor.UIElement, de.jwic.base.IControlContainer, de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
 	@Override
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		
-		EGroup group = (EGroup)element;
+	public IControl buildComponents(EGroup group, IControlContainer parent, IBuilderContext context) {
 		GroupControl gc = new GroupControl(parent);
 		gc.setTitle(group.getTitle());
 		
-		super.buildComponents(element, gc, context);
+		super.buildComponents(group, gc, context);
 		
 		return gc;
 	}

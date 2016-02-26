@@ -26,6 +26,7 @@ import de.jwic.controls.TabStrip;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
+import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.webbase.editors.builders.Builder;
 import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;

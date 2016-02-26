@@ -29,7 +29,7 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * 
  * @author Florian Lippisch
  */
-public abstract class Builder {
+public abstract class Builder<T extends UIElement> {
 
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -40,5 +40,5 @@ public abstract class Builder {
 	 * @param parent
  	 * @param context
 	 */
-	public abstract IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context);
+	public abstract IControl buildComponents(T element, IControlContainer parent, IBuilderContext context);
 }

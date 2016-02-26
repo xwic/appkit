@@ -19,13 +19,7 @@ package de.xwic.appkit.webbase.editors.builders;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xwic.appkit.core.config.editor.EComposite;
-import de.xwic.appkit.core.config.editor.EGroup;
-import de.xwic.appkit.core.config.editor.ELabel;
-import de.xwic.appkit.core.config.editor.EPicklistCombo;
-import de.xwic.appkit.core.config.editor.EPicklistRadio;
-import de.xwic.appkit.core.config.editor.EText;
-import de.xwic.appkit.core.config.editor.UIElement;
+import de.xwic.appkit.core.config.editor.*;
 
 /**
  * Contains a map of builders.
@@ -53,7 +47,8 @@ public class BuilderRegistry {
 		registerBuilder(EGroup.class, new EGroupBuilder());
 		registerBuilder(EPicklistCombo.class, new EPicklistComboBuilder());
 		registerBuilder(EPicklistRadio.class, new EPicklistRadioBuilder());
-		
+		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
+
 	}
 
 	/**
@@ -62,7 +57,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Class<?> elementClass, Builder builder) {
+	public static void registerBuilder(Class<? extends UIElement> elementClass, Builder<? extends UIElement> builder) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -76,7 +71,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Builder builder) {
+	public static void registerBuilder(Builder<? extends UIElement> builder) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -89,7 +84,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Builder builder, String extensionId) {
+	public static void registerBuilder(Builder<? extends UIElement> builder, String extensionId) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -120,7 +115,7 @@ public class BuilderRegistry {
 	 * @param element
 	 * @return
 	 */
-	public static Builder getBuilderByClass(Class<?> builderClass) {
+	public static Builder getBuilderByClass(Class<? extends Builder> builderClass) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
