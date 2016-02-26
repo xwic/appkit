@@ -47,6 +47,7 @@ public class BuilderRegistry {
 		registerBuilder(EGroup.class, new EGroupBuilder());
 		registerBuilder(EPicklistCombo.class, new EPicklistComboBuilder());
 		registerBuilder(EPicklistRadio.class, new EPicklistRadioBuilder());
+		registerBuilder(EPicklistCheckbox.class, new EPicklistCheckboxBuilder());
 		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
 
 	}
