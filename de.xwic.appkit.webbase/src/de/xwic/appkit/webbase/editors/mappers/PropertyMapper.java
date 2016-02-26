@@ -95,9 +95,8 @@ public abstract class PropertyMapper<T extends IControl> {
 	 * @param entity
 	 */
 	public void loadContent(IEntity entity) throws MappingException {
-		
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
+
+		for (ControlProperty<T> wp : widgets) {
 			Property[] prop = wp.getProperty();
 			if (prop == null || prop[prop.length - 1].hasReadAccess()) {
 				loadContent(entity, wp.getWidget(), wp.getProperty());
@@ -112,8 +111,7 @@ public abstract class PropertyMapper<T extends IControl> {
 	 */
 	public ValidationResult validateWidgets() {
 		ValidationResult result = new ValidationResult();
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
+		for (ControlProperty<T> wp : widgets) {
 			String msg = validateWidget(wp.getWidget(), wp.getProperty());
 			if (msg != null) {
 				result.addError(getPropertyKey(wp.getProperty()), msg);
@@ -127,8 +125,7 @@ public abstract class PropertyMapper<T extends IControl> {
 	 * @param editable
 	 */
 	public void setEditable(boolean editable) {
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
+		for (ControlProperty<T> wp : widgets) {
 			setEditable(wp.getWidget(), wp.getProperty(), editable);
 		}
 	}
@@ -146,10 +143,9 @@ public abstract class PropertyMapper<T extends IControl> {
 	 * @param entity
 	 */
 	public void storeContent(IEntity entity) throws MappingException, ValidationException {
-		
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
-			if (! wp.isInfoMode()) {
+
+		for (ControlProperty<T> wp : widgets) {
+			if (!wp.isInfoMode()) {
 				Property[] prop = wp.getProperty();
 				if (prop == null || prop[prop.length - 1].hasReadAccess()) {
 					storeContent(entity, wp.getWidget(), wp.getProperty());
@@ -273,9 +269,8 @@ public abstract class PropertyMapper<T extends IControl> {
 	 */
 	public void setFieldEditable(boolean editable, String propertyKey) {
 		String pkStartsWith = propertyKey + ".";
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
-			String propKey = getPropertyKey(wp.getProperty()); 
+		for (ControlProperty<T> wp : widgets) {
+			String propKey = getPropertyKey(wp.getProperty());
 			if (propKey.equals(propertyKey) || propKey.startsWith(pkStartsWith)) {
 				setEditable(wp.getWidget(), wp.getProperty(), editable);
 			}
@@ -289,8 +284,7 @@ public abstract class PropertyMapper<T extends IControl> {
 	 */
 	public void addToQuery(IPropertyQuery query) {
 
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = it.next();
+		for (ControlProperty<T> wp : widgets) {
 			Property[] prop = wp.getProperty();
 			if (prop == null || prop[prop.length - 1].hasReadAccess()) {
 				addPropertyToQuery(wp.getWidget(), wp.getProperty(), query);
@@ -316,9 +310,7 @@ public abstract class PropertyMapper<T extends IControl> {
 	 * @param result
 	 */
 	public void highlightValidationResults(ValidationResult result) {
-		for (Iterator<ControlProperty<T>> it = widgets.iterator(); it.hasNext(); ) {
-			ControlProperty<T> wp = (ControlProperty)it.next();
-			
+		for (ControlProperty<T> wp : widgets) {
 			StringBuilder sbPropId = new StringBuilder();
 			sbPropId.append(baseEntity.getClassname());
 			for (Property p : wp.getProperty()) {
@@ -326,11 +318,11 @@ public abstract class PropertyMapper<T extends IControl> {
 				sbPropId.append(p.getName());
 			}
 			String fullPropertyId = sbPropId.toString();
-			
+
 			if (result.getErrorMap().containsKey(fullPropertyId)) {
-				highlightWidget(wp.getWidget(), ValidationResult.Severity.ERROR);
+				highlightWidget(wp.getWidget(), Severity.ERROR);
 			} else if (result.getWarningMap().containsKey(fullPropertyId)) {
-				highlightWidget(wp.getWidget(), ValidationResult.Severity.WARN);
+				highlightWidget(wp.getWidget(), Severity.WARN);
 			} else {
 				clearHighlightWidget(wp.getWidget());
 			}
