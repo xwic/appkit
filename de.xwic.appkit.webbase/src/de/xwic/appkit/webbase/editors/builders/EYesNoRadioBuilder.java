@@ -28,6 +28,7 @@ import de.xwic.appkit.core.config.editor.EYesNoRadio;
 import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.YesNoRadioGroupMapper;
 
@@ -56,6 +57,8 @@ public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
 			final RadioGroup rg = new RadioGroup(parent, null);
 			rg.addElement("Yes", KEY_YES);
 			rg.addElement("No", KEY_NO);
+			
+			rg.addElementSelectedListener(new FieldChangeListener(context, radio.getProperty()));
 			context.registerField(radio.getProperty(), rg, radio, YesNoRadioGroupMapper.MAPPER_ID);
 			return rg;
 		} else {

@@ -113,6 +113,7 @@ public class EditorContext implements IBuilderContext {
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
 		bindings.put("bundle", bundle);
+		bindings.put("context", this);
 
 		try {
 			if (config.getGlobalScript() != null && !config.getGlobalScript().trim().isEmpty()) {
@@ -414,6 +415,42 @@ public class EditorContext implements IBuilderContext {
 		} finally {
 			inTransaction = false;
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.IBuilderContext#fieldChanged(de.xwic.appkit.core.config.model.Property[])
+	 */
+	@Override
+	public void fieldChanged(Property[] property) {
+		
+		long t = System.currentTimeMillis();
+
+		if (inTransaction) {
+			// ignore the events when the editor is in a transaction, i.e. loading or saving.
+			return;
+		}
+
+		// something changed? set dirty.
+		setDirty(true); 
+		
+		// update the property on the entity (model), to perform the hideWhen evaluation
+		IEntity entity = (IEntity) model;
+		try {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
+				mapper.storeContent(entity, property);
+			}
+		} catch (Exception me) {
+			// Just log an error, do not notify users
+			log.warn("Error handling field change", me);
+		}
+		
+		evaluateHideWhens();
+		
+		long dur = System.currentTimeMillis() - t;
+		if (dur > 100) {
+			log.info("fieldChange handling took more than 100ms in Editor for " + this.config.getEntityType().getClassname());
+		}
+		
 	}
 	
 	/**

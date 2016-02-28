@@ -19,6 +19,7 @@ package de.xwic.appkit.webbase.editors.mappers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -147,8 +148,31 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (ControlProperty<T> wp : widgets) {
 			if (!wp.isInfoMode()) {
 				Property[] prop = wp.getProperty();
-				if (prop == null || prop[prop.length - 1].hasReadAccess()) {
+				if (prop == null || prop[prop.length - 1].hasReadWriteAccess()) {
 					storeContent(entity, wp.getWidget(), wp.getProperty());
+				}
+			}
+		}
+		
+	}
+	
+	/**
+	 * Write only the specified property to the entity. If this mapper does
+	 * not handle the specified property, do nothing.
+	 * @param entity
+	 * @param property
+	 * @throws ValidationException 
+	 * @throws MappingException 
+	 */
+	public void storeContent(IEntity entity, Property[] property) throws MappingException, ValidationException {
+
+		for (ControlProperty<T> wp : widgets) {
+			if (!wp.isInfoMode()) {
+				Property[] prop = wp.getProperty();
+				if (prop != null && prop[prop.length - 1].hasReadWriteAccess()) {
+					if (Arrays.equals(property, prop)) {
+						storeContent(entity, wp.getWidget(), wp.getProperty());
+					}
 				}
 			}
 		}
@@ -339,4 +363,6 @@ public abstract class PropertyMapper<T extends IControl> {
 	protected void highlightWidget(T widget, Severity error) {
 		
 	}
+
+
 }

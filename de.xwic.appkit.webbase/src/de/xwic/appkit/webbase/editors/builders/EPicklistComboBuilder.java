@@ -20,8 +20,8 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.EPicklistCombo;
-import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
@@ -31,7 +31,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
  * 
  * @author lippisch
  */
-public class EPicklistComboBuilder extends Builder {
+public class EPicklistComboBuilder extends Builder<EPicklistCombo> {
 
 	/*
 	 * (non-Javadoc)
@@ -40,13 +40,12 @@ public class EPicklistComboBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
+	public IControl buildComponents(EPicklistCombo ePl, IControlContainer parent, IBuilderContext context) {
 
-		EPicklistCombo ePl = (EPicklistCombo) element;
 		if (ePl.getProperty() != null) {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryControl pe = new PicklistEntryControl(parent, null, finalProperty.getPicklistId());
-
+			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
 			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID);
 
 			return pe;

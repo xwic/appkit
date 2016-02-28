@@ -21,8 +21,8 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.editor.EText;
 import de.xwic.appkit.core.config.editor.Style;
-import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 
@@ -31,7 +31,7 @@ import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
  * 
  * @author Aron Cotrau
  */
-public class EInputboxBuilder extends Builder {
+public class EInputboxBuilder extends Builder<EText> {
 
 	/*
 	 * (non-Javadoc)
@@ -40,10 +40,11 @@ public class EInputboxBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		EText text = (EText) element;
+	public IControl buildComponents(EText text, IControlContainer parent, IBuilderContext context) {
+
 		InputBox inputBox = new InputBox(parent);
 
+		inputBox.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
 		inputBox.setReadonly(text.isReadonly());
 		inputBox.setMultiLine(text.isMultiline());
 		if (text.isMultiline()) {

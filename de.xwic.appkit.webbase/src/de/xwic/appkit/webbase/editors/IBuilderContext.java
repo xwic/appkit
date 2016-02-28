@@ -101,4 +101,9 @@ public interface IBuilderContext {
 	 * @return the resource string by given property
 	 */
 	public String getResString(Property property);
+
+	/**
+	 * @param property
+	 */
+	public abstract void fieldChanged(Property[] property);
 }

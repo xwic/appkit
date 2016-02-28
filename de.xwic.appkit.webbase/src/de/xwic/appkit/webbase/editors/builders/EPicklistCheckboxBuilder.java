@@ -20,20 +20,18 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.EPicklistCheckbox;
-import de.xwic.appkit.core.config.editor.EPicklistCombo;
-import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntrySetMapper;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckboxControl;
-import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 
 /**
- * The Builder for the Label.
+ * The Builder for a multi-value PicklistCheckboxControl.
  * 
  * @author lippisch
  */
-public class EPicklistCheckboxBuilder extends Builder {
+public class EPicklistCheckboxBuilder extends Builder<EPicklistCheckbox> {
 
 	/*
 	 * (non-Javadoc)
@@ -42,13 +40,13 @@ public class EPicklistCheckboxBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
+	public IControl buildComponents(EPicklistCheckbox ePl, IControlContainer parent, IBuilderContext context) {
 
-		EPicklistCheckbox ePl = (EPicklistCheckbox) element;
 		if (ePl.getProperty() != null) {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryCheckboxControl pe = new PicklistEntryCheckboxControl(parent, null, finalProperty.getPicklistId());
 			pe.setColumns(ePl.getCols());
+			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
 			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntrySetMapper.MAPPER_ID);
 
 			return pe;

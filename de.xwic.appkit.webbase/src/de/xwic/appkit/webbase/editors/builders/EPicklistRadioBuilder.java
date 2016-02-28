@@ -19,13 +19,11 @@ package de.xwic.appkit.webbase.editors.builders;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
-import de.xwic.appkit.core.config.editor.EPicklistCombo;
 import de.xwic.appkit.core.config.editor.EPicklistRadio;
-import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
-import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl;
 
 /**
@@ -34,7 +32,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl;
  * @author lippisch
  * @editortag plRadio
  */
-public class EPicklistRadioBuilder extends Builder {
+public class EPicklistRadioBuilder extends Builder<EPicklistRadio> {
 
 	/*
 	 * (non-Javadoc)
@@ -43,13 +41,12 @@ public class EPicklistRadioBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
+	public IControl buildComponents(EPicklistRadio ePl, IControlContainer parent, IBuilderContext context) {
 
-		EPicklistRadio ePl = (EPicklistRadio) element;
 		if (ePl.getProperty() != null) {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryRadioGroupControl pe = new PicklistEntryRadioGroupControl(parent, null, finalProperty.getPicklistId());
-
+			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
 			pe.setColumns(ePl.getCols());
 			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID);
 
