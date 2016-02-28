@@ -89,14 +89,6 @@ public class PicklistEntrySetMapper extends PropertyMapper<PicklistEntryCheckbox
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#clearHighlightWidget(de.jwic.base.IControl)
-	 */
-	@Override
-	protected void clearHighlightWidget(PicklistEntryCheckboxControl widget) {
-		// NOT SUPPORTED AT THIS TIME.
-	}
-	
-	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
 	 */
 	@Override

@@ -16,7 +16,6 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.base.IControl;
 import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
@@ -24,7 +23,6 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import org.apache.poi.ss.formula.functions.T;
 
 /**
  * Mapper for the InputBox control.
@@ -78,21 +76,15 @@ public class InputboxMapper extends PropertyMapper<InputBox> {
 			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getText());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#clearHighlightWidget(de.jwic.base.IControl)
-	 */
-	@Override
-	protected void clearHighlightWidget(InputBox text) {
-		text.setFlagAsError(false);
-	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
 	 */
 	@Override
 	protected void highlightWidget(InputBox text, Severity error) {
-		if (error == Severity.ERROR) {
+		if (error == null) {
+			text.setFlagAsError(false);
+		} else if (error == Severity.ERROR) {
 			text.setFlagAsError(true);
 		} else {
 			text.setFlagAsError(false); // do not flag warnings at this time..

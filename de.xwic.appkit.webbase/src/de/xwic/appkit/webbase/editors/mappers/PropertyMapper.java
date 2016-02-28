@@ -324,23 +324,15 @@ public abstract class PropertyMapper<T extends IControl> {
 			} else if (result.getWarningMap().containsKey(fullPropertyId)) {
 				highlightWidget(wp.getWidget(), Severity.WARN);
 			} else {
-				clearHighlightWidget(wp.getWidget());
+				highlightWidget(wp.getWidget(), null);
 			}
 		}		
 	}
 
-
 	/**
-	 * Remove any highlight indicator from the widget.
-	 * @param widget
-	 */
-	protected void clearHighlightWidget(T widget) {
-		
-	}
-
-
-	/**
-	 * Add a highlight indicator to the widget.
+	 * Add a highlight indicator to the widget. If error is <code>null</code>,
+	 * no error exists and the highlight flag can be removed.
+	 * 
 	 * @param widget
 	 * @param error
 	 */
