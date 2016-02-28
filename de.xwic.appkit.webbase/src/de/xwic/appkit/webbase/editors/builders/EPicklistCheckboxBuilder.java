@@ -49,7 +49,7 @@ public class EPicklistCheckboxBuilder extends Builder {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryCheckboxControl pe = new PicklistEntryCheckboxControl(parent, null, finalProperty.getPicklistId());
 			pe.setColumns(ePl.getCols());
-			context.registerField(ePl.getProperty(), pe, ePl.getId(), PicklistEntrySetMapper.MAPPER_ID);
+			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntrySetMapper.MAPPER_ID);
 
 			return pe;
 			

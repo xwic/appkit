@@ -47,7 +47,7 @@ public class EPicklistComboBuilder extends Builder {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryControl pe = new PicklistEntryControl(parent, null, finalProperty.getPicklistId());
 
-			context.registerField(ePl.getProperty(), pe, ePl.getId(), PicklistEntryMapper.MAPPER_ID);
+			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID);
 
 			return pe;
 			

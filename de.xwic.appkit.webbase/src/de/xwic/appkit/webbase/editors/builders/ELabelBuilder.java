@@ -56,6 +56,8 @@ public class ELabelBuilder extends Builder {
 		Label label = null;
 		label = new Label(parent);
 		label.setText(text);
+		
+		context.registerWidget(label, element);
 
 		return label;
 	}

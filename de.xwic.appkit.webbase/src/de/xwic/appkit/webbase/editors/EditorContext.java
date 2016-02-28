@@ -18,21 +18,22 @@ package de.xwic.appkit.webbase.editors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.jwic.base.IControl;
-import de.jwic.controls.InputBox;
-import de.jwic.controls.RadioGroup;
-import de.jwic.events.SelectionEvent;
-import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
+import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.DAO;
@@ -45,10 +46,12 @@ import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
 import de.xwic.appkit.core.model.IEntityModel;
+import de.xwic.appkit.core.script.ScriptEngineProvider;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
-import de.xwic.appkit.webbase.editors.mappers.*;
-import de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl;
+import de.xwic.appkit.webbase.editors.mappers.MappingException;
+import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
+import de.xwic.appkit.webbase.editors.mappers.StandardMapperFactory;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
@@ -75,30 +78,18 @@ public class EditorContext implements IBuilderContext {
 	private boolean inTransaction = false;
 	private Map<String, PropertyMapper<IControl>> mappers = new HashMap<String, PropertyMapper<IControl>>();
 
-	// default mappers
-
 	// properties - page assignment
 	private EditorContentPage currPage = null;
 	private Map<String, EditorContentPage> propertyPageMap = new HashMap<String, EditorContentPage>();
 	private Map<String, IControl> widgetMap = new HashMap<String, IControl>();
 	private List<EditorContentPage> pages = new ArrayList<EditorContentPage>();
-	private List listeners = new ArrayList();
+	private List<EditorListener> listeners = new ArrayList<EditorListener>();
+	private List<HideWhenWidgetWrapper> hideWhenWidgets = new ArrayList<HideWhenWidgetWrapper>();
 	
 	/** This list contains errors that happened during the start. They are displayed to the user. */
 	private List<String> initErrors = new ArrayList<String>();
 
-	// default listeners
-//	private ModifyListener defaultModifyListener = new ModifyListener() {
-//		public void modifyText(ModifyEvent e) {
-//			setDirty(true);
-//		}
-//	};
-
-	private SelectionListener defaultSelectionListener = new SelectionListener() {
-		public void objectSelected(SelectionEvent event) {
-			setDirty(true);
-		}
-	};
+	private ScriptEngine scriptEngine;
 
 	/**
 	 * @param input
@@ -113,11 +104,25 @@ public class EditorContext implements IBuilderContext {
 		this.model = EntityModelFactory.createModel(input.getEntity());
 		this.dirty = input.getEntity().getId() == 0; // is a new entity.
 		
-		DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+		DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 		this.editable = dao.hasRight(input.getEntity(), "UPDATE") 
 							&& !input.getEntity().isDeleted()
 							&& !(input.getEntity() instanceof IHistory);
+		
+		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType() + ":" + config.getId() + ")");
+		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+		bindings.put("entity", model);
+		bindings.put("bundle", bundle);
 
+		try {
+			if (config.getGlobalScript() != null && !config.getGlobalScript().trim().isEmpty()) {
+				scriptEngine.eval(config.getGlobalScript());
+			}
+		} catch (ScriptException se) {
+			initErrors.add("ScriptException in GlobalScript for editor configuration (" + se + ")");
+			log.error("Error evaluating global script in Editor(" + config.getEntityType() + ":" + config.getId() + ")", se);
+		}
+		
 	}
 
 	/**
@@ -173,14 +178,14 @@ public class EditorContext implements IBuilderContext {
 	 * @param id
 	 * @param customMapper
 	 */
-	public void registerField(Property[] property, IControl widget, String id, String mapperId) {
-		registerField(property, widget, id, mapperId, false);
+	public void registerField(Property[] property, IControl widget, UIElement uiDef, String mapperId) {
+		registerField(property, widget, uiDef, mapperId, false);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, java.lang.String, boolean)
 	 */
-	public void registerField(Property[] property, IControl widget, String id, String mapperId, boolean infoMode) {
+	public void registerField(Property[] property, IControl widget, UIElement uiDef, String mapperId, boolean infoMode) {
 
 		PropertyMapper<IControl> mapper = mappers.get(mapperId);
 		if (mapper == null) {
@@ -217,12 +222,39 @@ public class EditorContext implements IBuilderContext {
 		//propertyPageMap.put(sb.toString(), currPage);
 		propertyPageMap.put(finalprop.getEntityDescriptor().getClassname() + "." + finalprop.getName(), currPage);
 
-		if (id != null) {
-			widgetMap.put(id, widget);
-		}
+		registerWidget(widget, uiDef);
 
 		// set initial editable flag.
 		mapper.setEditable(widget, property, editable && (finalprop == null || finalprop.hasReadWriteAccess()));
+	}
+	
+	/**
+	 * Register a widget with the given id. If the id is <code>null</code>, the widget
+	 * will not be registered but no exception is thrown.
+	 * <p>This is useful for widgets that should be accessible from script but are not a field by
+	 * itself, like a container.
+	 * 
+	 * @param id
+	 * @param widget
+	 */
+	public void registerWidget(IControl widget, UIElement uiDef) {
+		// register widget
+		String id = uiDef.getId();
+		if (id != null && !id.isEmpty()) {
+			if (widgetMap.containsKey(id)) {
+				// print a warning, in case this already exists. Either an id was used twice (where it
+				// should be unique), or a builder has called registerWidget for a widget where
+				// registerField(..) was already invoked.
+				log.warn("A widget with the id '" + id + "' is already registered!");
+			}
+			widgetMap.put(id, widget);
+		}
+		
+		if (uiDef.getHideWhen() != null && !uiDef.getHideWhen().trim().isEmpty()) {
+			// the widget has some logic that is to be evaluated after refreshes. Add the
+			// control to the hideWhenField list
+			hideWhenWidgets.add(new HideWhenWidgetWrapper(widget, uiDef.getHideWhen()));
+		}
 	}
 
 	/**
@@ -275,9 +307,27 @@ public class EditorContext implements IBuilderContext {
 				displayValidationResults(new ValidationResult());
 			}
 			
+			evaluateHideWhens();
+			
 		} finally {
 			inTransaction = false;
 		}
+	}
+
+	/**
+	 * Run through all widgets with a hideWhen formula and execute it to
+	 * hide/show those widgets.
+	 */
+	private void evaluateHideWhens() {
+		
+		for (HideWhenWidgetWrapper hwWidget : hideWhenWidgets) {
+			try {
+				hwWidget.evaluate(scriptEngine);
+			} catch (ScriptException e) {
+				log.error("Error evaluating 'hideWhen'", e);
+			}
+		}
+		
 	}
 
 	/**
@@ -335,7 +385,7 @@ public class EditorContext implements IBuilderContext {
 			fireEvent(EVENT_BEFORESAVE, entity.getId() == 0);
 			updateModel();
 
-			DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
 				throw new MappingException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
@@ -395,10 +445,8 @@ public class EditorContext implements IBuilderContext {
 		}
 
 		// assign warnings
-		Map warnings = result.getWarningMap();
-		String prefix = config.getEntityType().getClassname();
-		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
-			String prop = (String) it.next();
+		Map<String, String> warnings = result.getWarningMap();
+		for (String prop : warnings.keySet()) {
 			String msg = (String) warnings.get(prop);
 			EditorContentPage page = propertyPageMap.get(prop);
 			String title;
@@ -416,9 +464,8 @@ public class EditorContext implements IBuilderContext {
 		}
 
 		// assign errors
-		Map errors = result.getErrorMap();
-		for (Iterator it = errors.keySet().iterator(); it.hasNext();) {
-			String prop = (String) it.next();
+		Map<String, String> errors = result.getErrorMap();
+		for (String prop : errors.keySet()) {
 			String msg = (String) errors.get(prop);
 			EditorContentPage page = propertyPageMap.get(prop);
 			String title;
@@ -480,13 +527,6 @@ public class EditorContext implements IBuilderContext {
 		if (dirty != this.dirty && !inTransaction) {
 			this.dirty = dirty;
 		}
-	}
-
-	/**
-	 * @return the defaultSelectionListener
-	 */
-	public SelectionListener getDefaultSelectionListener() {
-		return defaultSelectionListener;
 	}
 
 	/**

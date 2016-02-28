@@ -69,7 +69,8 @@ public class EContainerBuilder<T extends EComposite> extends Builder<T> {
 		} else {
 			control = new ControlContainer(parent);
 		}
-		
+
+		context.registerWidget(control, composite);
 		buildChilds(composite, control, context, table);
 
 		return control;

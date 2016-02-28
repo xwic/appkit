@@ -51,7 +51,7 @@ public class EPicklistRadioBuilder extends Builder {
 			PicklistEntryRadioGroupControl pe = new PicklistEntryRadioGroupControl(parent, null, finalProperty.getPicklistId());
 
 			pe.setColumns(ePl.getCols());
-			context.registerField(ePl.getProperty(), pe, ePl.getId(), PicklistEntryMapper.MAPPER_ID);
+			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID);
 
 			return pe;
 			
