@@ -22,6 +22,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.jwic.base.IControl;
 import de.jwic.controls.InputBox;
 import de.jwic.controls.RadioGroup;
@@ -59,6 +62,8 @@ public class EditorContext implements IBuilderContext {
 	static final int EVENT_BEFORESAVE = 2;
 	static final int EVENT_PAGES_CREATED = 3;
 	
+	private final static Log log = LogFactory.getLog(EditorContext.class);
+	
 	private GenericEditorInput input = null;
 	private EditorConfiguration config = null;
 	private IEntityModel model = null;
@@ -75,9 +80,12 @@ public class EditorContext implements IBuilderContext {
 	// properties - page assignment
 	private EditorContentPage currPage = null;
 	private Map<String, EditorContentPage> propertyPageMap = new HashMap<String, EditorContentPage>();
-	private Map widgetMap = new HashMap();
+	private Map<String, IControl> widgetMap = new HashMap<String, IControl>();
 	private List<EditorContentPage> pages = new ArrayList<EditorContentPage>();
 	private List listeners = new ArrayList();
+	
+	/** This list contains errors that happened during the start. They are displayed to the user. */
+	private List<String> initErrors = new ArrayList<String>();
 
 	// default listeners
 //	private ModifyListener defaultModifyListener = new ModifyListener() {
@@ -178,9 +186,10 @@ public class EditorContext implements IBuilderContext {
 		if (mapper == null) {
 			try {
 				mapper = StandardMapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
-			} catch (EditorConfigurationException e) {
-				//TODO HANDLE PROPERLY
-				e.printStackTrace();
+			} catch (Exception e) {
+				String msg = "Error creating mapper " + mapperId; 
+				log.error(msg, e);
+				initErrors.add(msg + " (" + e.toString() + ")");
 				return;
 			}
 			mappers.put(mapperId, mapper);
@@ -188,6 +197,9 @@ public class EditorContext implements IBuilderContext {
 		mapper.registerProperty(widget, property, infoMode);
 
 		if (currPage == null) {
+			// This is a problem when the editor container is not creating the tabs properly.
+			// before creating a tab, the current page should be set and after creating the 
+			// currPage should be set to null again.
 			throw new IllegalStateException("No current page assigned!");
 		}
 		// build property name
@@ -312,6 +324,11 @@ public class EditorContext implements IBuilderContext {
 	 * @throws EntityModelException
 	 */
 	public ValidationResult saveToEntity() throws ValidationException, MappingException, EntityModelException {
+		
+		if (!initErrors.isEmpty()) {
+			throw new IllegalStateException("Save is disabled as there have been exceptions during initialization of the editor.");
+		}
+		
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity) model;
@@ -371,6 +388,11 @@ public class EditorContext implements IBuilderContext {
 			page.resetMessages();
 		}
 		EditorContentPage mainPage = pages.get(0);
+		
+		// add any initialization error
+		for (String msg : initErrors) {
+			mainPage.addError(msg);
+		}
 
 		// assign warnings
 		Map warnings = result.getWarningMap();

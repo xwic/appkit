@@ -164,6 +164,7 @@ public class EntityEditorPage extends InnerPage {
 				return true;
 			}
 		} catch (Exception e) {
+			getSessionContext().notifyMessage("A Problem occured while saving your changes. (" + e + ")", "error");
 			log.error("An error occured when saving an entity (" + context.getEntityDescriptor().getClassname() + ":#" + context.getInput().getEntity().getId() + ")", e);
 		}
 		return false;
