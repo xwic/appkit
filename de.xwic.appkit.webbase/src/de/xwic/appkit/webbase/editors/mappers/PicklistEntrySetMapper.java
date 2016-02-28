@@ -19,8 +19,6 @@ package de.xwic.appkit.webbase.editors.mappers;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.jwic.base.IControl;
-import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
@@ -28,17 +26,16 @@ import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckboxControl;
-import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
-import de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl;
 
 /**
  * Maps a Set of IPicklistEntry values to multi-selection IPicklistEntryCheckboxControl field.
  * 
  * @author lippisch
  */
-public class PicklistEntrySetMapper extends PropertyMapper {
+public class PicklistEntrySetMapper extends PropertyMapper<PicklistEntryCheckboxControl> {
+
+	public final static String MAPPER_ID = "PicklistEntrySet"; 
 
 	/**
 	 * @param baseEntity
@@ -50,7 +47,8 @@ public class PicklistEntrySetMapper extends PropertyMapper {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void loadContent(IEntity entity, IControl widget, Property[] property) throws MappingException {
+	@SuppressWarnings("unchecked")
+	public void loadContent(IEntity entity, PicklistEntryCheckboxControl widget, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
 		
 		Set<IPicklistEntry> entries = null;
@@ -58,29 +56,27 @@ public class PicklistEntrySetMapper extends PropertyMapper {
 			entries = (Set<IPicklistEntry>)value;
 		}
 		
-		PicklistEntryCheckboxControl pe = (PicklistEntryCheckboxControl)widget;
-		pe.selectEntries(entries);
+		widget.selectEntries(entries);
 		
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
-	public void setEditable(IControl widget, Property[] property, boolean editable) {
+	public void setEditable(PicklistEntryCheckboxControl widget, Property[] property, boolean editable) {
 		
-		PicklistEntryCheckboxControl pe = (PicklistEntryCheckboxControl)widget;
-		pe.setEnabled(editable);
+		widget.setEnabled(editable);
+		
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void storeContent(IEntity entity, IControl widget, Property[] property) throws MappingException,
+	public void storeContent(IEntity entity, PicklistEntryCheckboxControl widget, Property[] property) throws MappingException,
 			ValidationException {
 		
-		PicklistEntryCheckboxControl pe = (PicklistEntryCheckboxControl)widget;
 		Set<IPicklistEntry> entries = new HashSet<IPicklistEntry>();
-		entries.addAll(pe.getSelectedEntries());
+		entries.addAll(widget.getSelectedEntries());
 		writeValue(entity, property, entries);
 	}
 	
@@ -88,7 +84,7 @@ public class PicklistEntrySetMapper extends PropertyMapper {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
-	protected void addPropertyToQuery(IControl widget, Property[] property, IPropertyQuery query) {
+	protected void addPropertyToQuery(PicklistEntryCheckboxControl widget, Property[] property, IPropertyQuery query) {
 		throw new UnsupportedOperationException();
 	}
 	
@@ -96,7 +92,7 @@ public class PicklistEntrySetMapper extends PropertyMapper {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#clearHighlightWidget(de.jwic.base.IControl)
 	 */
 	@Override
-	protected void clearHighlightWidget(IControl widget) {
+	protected void clearHighlightWidget(PicklistEntryCheckboxControl widget) {
 		// NOT SUPPORTED AT THIS TIME.
 	}
 	
@@ -104,7 +100,7 @@ public class PicklistEntrySetMapper extends PropertyMapper {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
 	 */
 	@Override
-	protected void highlightWidget(IControl widget, Severity error) {
+	protected void highlightWidget(PicklistEntryCheckboxControl widget, Severity error) {
 		// NOT SUPPORTED AT THIS TIME.
 	}
 	

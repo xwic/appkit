@@ -68,14 +68,9 @@ public class EditorContext implements IBuilderContext {
 
 	/** indicates if the fields are modified during save/load operation */
 	private boolean inTransaction = false;
-	private List<PropertyMapper> mappers = new ArrayList<PropertyMapper>();
+	private Map<String, PropertyMapper<IControl>> mappers = new HashMap<String, PropertyMapper<IControl>>();
 
 	// default mappers
-	private InputboxMapper textMapper;
-	private PicklistEntryMapper plEntryMapper;
-	private YesNoRadioGroupMapper yesNoRadioGroupMapper;
-//	private DateMapper dateMapper;
-//	private CheckboxPropertyMapper checkMapper;
 
 	// properties - page assignment
 	private EditorContentPage currPage = null;
@@ -114,28 +109,6 @@ public class EditorContext implements IBuilderContext {
 		this.editable = dao.hasRight(input.getEntity(), "UPDATE") 
 							&& !input.getEntity().isDeleted()
 							&& !(input.getEntity() instanceof IHistory);
-		createStandardMappers();
-	}
-
-	/**
-	 * 
-	 */
-	private void createStandardMappers() {
-
-		textMapper = new InputboxMapper(config.getEntityType());
-		mappers.add(textMapper);
-
-		plEntryMapper = new PicklistEntryMapper(config.getEntityType());
-		mappers.add(plEntryMapper);
-
-		yesNoRadioGroupMapper = new YesNoRadioGroupMapper(config.getEntityType());
-		mappers.add(yesNoRadioGroupMapper);
-//
-//		dateMapper = new DateMapper(config.getEntityType());
-//		mappers.add(dateMapper);
-//
-//		checkMapper = new CheckboxPropertyMapper(config.getEntityType());
-//		mappers.add(checkMapper);
 
 	}
 
@@ -184,13 +157,6 @@ public class EditorContext implements IBuilderContext {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String)
-	 */
-	public void registerField(Property[] property, IControl widget, String id) {
-		registerField(property, widget, id, null);
-	}
-
 	/**
 	 * Register a field that uses a custom mapper.
 	 * 
@@ -199,37 +165,28 @@ public class EditorContext implements IBuilderContext {
 	 * @param id
 	 * @param customMapper
 	 */
-	public void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper) {
-		registerField(property, widget, id, customMapper, false);
+	public void registerField(Property[] property, IControl widget, String id, String mapperId) {
+		registerField(property, widget, id, mapperId, false);
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper)
+	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, java.lang.String, boolean)
 	 */
-	public void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper, boolean infoMode) {
+	public void registerField(Property[] property, IControl widget, String id, String mapperId, boolean infoMode) {
 
-		PropertyMapper mapper = null;
-		if (customMapper != null) {
-			mappers.add(customMapper);
-			mapper = customMapper;
-		} else {
-			if (widget instanceof InputBox) {
-				mapper = textMapper;
-			} else if (widget instanceof IPicklistEntryControl) {
-				mapper = plEntryMapper;
-			} else if (widget instanceof RadioGroup) {
-				mapper = yesNoRadioGroupMapper;
-//			} else if (widget instanceof DateInputControl) {
-//				mapper = dateMapper;
-//			} else if (widget instanceof CheckboxControl) {
-//				mapper = checkMapper;
-			} else {
-				throw new IllegalArgumentException("No default mapper for such a widget (" + widget.getClass().getName() + ")");
+		PropertyMapper<IControl> mapper = mappers.get(mapperId);
+		if (mapper == null) {
+			try {
+				mapper = StandardMapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
+			} catch (EditorConfigurationException e) {
+				//TODO HANDLE PROPERLY
+				e.printStackTrace();
+				return;
 			}
-			if (null != mapper) {
-				mapper.registerProperty(widget, property, infoMode);
-			}
+			mappers.put(mapperId, mapper);
 		}
+		mapper.registerProperty(widget, property, infoMode);
+
 		if (currPage == null) {
 			throw new IllegalStateException("No current page assigned!");
 		}
@@ -262,7 +219,7 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setAllEditable(boolean editable) {
 		if (!editable || this.editable) {
-			for (PropertyMapper mapper : mappers) {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.setEditable(editable);
 			}
 		}
@@ -275,7 +232,7 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setFieldEditable(boolean editable, String propertyKey) {
 		if (!editable || this.editable) { // prevent listeners to enable editable when the entity is not editable.
-			for (PropertyMapper mapper : mappers) {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.setFieldEditable(editable, propertyKey);
 			}
 		}
@@ -290,7 +247,7 @@ public class EditorContext implements IBuilderContext {
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity)model;
-			for (PropertyMapper mapper : mappers) {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.loadContent(entity);
 			}
 			fireEvent(EVENT_LOADED, entity.getId() == 0);
@@ -322,7 +279,7 @@ public class EditorContext implements IBuilderContext {
 		ValidationResult result = new ValidationResult();
 		try {
 			// perform UI side validation first...
-			for (PropertyMapper mapper : mappers) {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				ValidationResult tempResult = mapper.validateWidgets();
 				result.addErrors(tempResult.getErrorMap());
 				result.addWarnings(tempResult.getWarningMap());
@@ -338,7 +295,7 @@ public class EditorContext implements IBuilderContext {
 			result.addWarnings(daoResult.getWarningMap());
 			
 			// now that all validations are done, highlight fields with errors
-			for (PropertyMapper mapper : mappers) {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.highlightValidationResults(result);
 			}			
 			
@@ -400,8 +357,7 @@ public class EditorContext implements IBuilderContext {
 	public void updateModel() throws MappingException, ValidationException {
 		
 		IEntity entity = (IEntity) model;
-		for (Iterator it = mappers.iterator(); it.hasNext();) {
-			PropertyMapper mapper = (PropertyMapper) it.next();
+		for (PropertyMapper<IControl> mapper : mappers.values()) {
 			mapper.storeContent(entity);
 		}
 	}

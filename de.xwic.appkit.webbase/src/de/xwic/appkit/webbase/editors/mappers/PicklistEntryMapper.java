@@ -35,7 +35,9 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryRadioGroupControl;
  * 
  * @author lippisch
  */
-public class PicklistEntryMapper extends PropertyMapper {
+public class PicklistEntryMapper extends PropertyMapper<IPicklistEntryControl> {
+
+	public final static String MAPPER_ID = "PicklistEntry"; 
 
 	/**
 	 * @param baseEntity
@@ -47,7 +49,7 @@ public class PicklistEntryMapper extends PropertyMapper {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void loadContent(IEntity entity, IControl widget, Property[] property) throws MappingException {
+	public void loadContent(IEntity entity, IPicklistEntryControl widget, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
 		
 		IPicklistEntry entry = null;
@@ -63,20 +65,18 @@ public class PicklistEntryMapper extends PropertyMapper {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
-	public void setEditable(IControl widget, Property[] property, boolean editable) {
+	public void setEditable(IPicklistEntryControl widget, Property[] property, boolean editable) {
 		
-		IPicklistEntryControl pe = (IPicklistEntryControl)widget;
-		pe.setEnabled(editable);
+		widget.setEnabled(editable);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void storeContent(IEntity entity, IControl widget, Property[] property) throws MappingException,
+	public void storeContent(IEntity entity, IPicklistEntryControl widget, Property[] property) throws MappingException,
 			ValidationException {
 		
-		IPicklistEntryControl pe = (IPicklistEntryControl)widget;
-		IPicklistEntry value = pe.getSelectedEntry();
+		IPicklistEntry value = widget.getSelectedEntry();
 		writeValue(entity, property, value);
 	}
 	
@@ -84,9 +84,8 @@ public class PicklistEntryMapper extends PropertyMapper {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
-	protected void addPropertyToQuery(IControl widget, Property[] property, IPropertyQuery query) {
-		IPicklistEntryControl pe = (IPicklistEntryControl)widget;
-		IPicklistEntry value = pe.getSelectedEntry();
+	protected void addPropertyToQuery(IPicklistEntryControl widget, Property[] property, IPropertyQuery query) {
+		IPicklistEntry value = widget.getSelectedEntry();
 		
 		if (value != null) {
 			query.addEquals(getPropertyKey(property), value);
@@ -97,7 +96,7 @@ public class PicklistEntryMapper extends PropertyMapper {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#clearHighlightWidget(de.jwic.base.IControl)
 	 */
 	@Override
-	protected void clearHighlightWidget(IControl widget) {
+	protected void clearHighlightWidget(IPicklistEntryControl widget) {
 		// NOT SUPPORTED AT THIS TIME.
 	}
 	
@@ -105,7 +104,7 @@ public class PicklistEntryMapper extends PropertyMapper {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
 	 */
 	@Override
-	protected void highlightWidget(IControl widget, Severity error) {
+	protected void highlightWidget(IPicklistEntryControl widget, Severity error) {
 		// NOT SUPPORTED AT THIS TIME.
 	}
 	

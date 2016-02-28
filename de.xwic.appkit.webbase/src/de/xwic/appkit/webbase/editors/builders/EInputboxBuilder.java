@@ -24,6 +24,7 @@ import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
+import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 
 /**
  * Defines the InputBox builder class.
@@ -65,7 +66,7 @@ public class EInputboxBuilder extends Builder {
 			inputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT) );
 		}
 
-		context.registerField(text.getProperty(), inputBox, text.getId());
+		context.registerField(text.getProperty(), inputBox, text.getId(), InputboxMapper.MAPPER_ID);
 		
 		return inputBox;
 	}

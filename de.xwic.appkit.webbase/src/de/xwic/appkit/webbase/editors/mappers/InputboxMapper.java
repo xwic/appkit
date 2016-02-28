@@ -33,6 +33,8 @@ import org.apache.poi.ss.formula.functions.T;
  */
 public class InputboxMapper extends PropertyMapper<InputBox> {
 
+	public final static String MAPPER_ID = "InputBox"; 
+	
 	/**
 	 * @param baseEntity
 	 */

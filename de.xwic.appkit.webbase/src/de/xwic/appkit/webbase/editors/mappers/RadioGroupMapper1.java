@@ -31,6 +31,8 @@ import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
  */
 public class RadioGroupMapper1 extends PropertyMapper<RadioGroup> {
 
+	public final static String MAPPER_ID = "BooleanRadioGroup"; 
+
 	/**
 	 * @param baseEntity
 	 */

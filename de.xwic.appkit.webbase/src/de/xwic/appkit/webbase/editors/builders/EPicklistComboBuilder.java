@@ -23,6 +23,7 @@ import de.xwic.appkit.core.config.editor.EPicklistCombo;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
+import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 
 /**
@@ -46,7 +47,7 @@ public class EPicklistComboBuilder extends Builder {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryControl pe = new PicklistEntryControl(parent, null, finalProperty.getPicklistId());
 
-			context.registerField(ePl.getProperty(), pe, ePl.getId());
+			context.registerField(ePl.getProperty(), pe, ePl.getId(), PicklistEntryMapper.MAPPER_ID);
 
 			return pe;
 			

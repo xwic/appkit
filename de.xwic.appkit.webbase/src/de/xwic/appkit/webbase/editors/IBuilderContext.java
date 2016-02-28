@@ -33,23 +33,14 @@ import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
 public interface IBuilderContext {
 
 	/**
-	 * Register a created field.
-	 * 
-	 * @param property
-	 * @param widget
-	 * @param id
-	 */
-	public abstract void registerField(Property[] property, IControl widget, String id);
-
-	/**
-	 * Register a field that uses a custom mapper.
+	 * Register a field to the specified mapper.
 	 * 
 	 * @param property
 	 * @param widget
 	 * @param id
 	 * @param customMapper
 	 */
-	public abstract void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper);
+	public abstract void registerField(Property[] property, IControl widget, String id, String mapperId);
 
 	/**
 	 * Register a field that uses a custom mapper.
@@ -60,8 +51,7 @@ public interface IBuilderContext {
 	 * @param customMapper
 	 * @param infoMode
 	 */
-	public abstract void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper,
-			boolean infoMode);
+	public abstract void registerField(Property[] property, IControl widget, String id, String mapperId, boolean infoMode);
 
 	/**
 	 * Returns the widget with the specified id or null if no such widget

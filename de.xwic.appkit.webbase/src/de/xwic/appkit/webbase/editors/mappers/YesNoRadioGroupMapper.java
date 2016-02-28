@@ -31,6 +31,8 @@ import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
  */
 public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 
+	public final static String MAPPER_ID = "YesNoRadio"; 
+
 	/**
 	 * @param baseEntity
 	 */
