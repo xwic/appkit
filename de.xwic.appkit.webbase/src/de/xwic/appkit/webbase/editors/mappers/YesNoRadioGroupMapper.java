@@ -53,6 +53,9 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
         if(value instanceof Boolean) {
             final Boolean booleanValue = (Boolean) value;
             text.setSelectedKey(booleanValue ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
+        } else if(value instanceof String) {
+            final String strValue = (String) value;
+            text.setSelectedKey(strValue);
         } else {
             throw new IllegalArgumentException("Unable to map value. Target type is not Boolean.");
         }
