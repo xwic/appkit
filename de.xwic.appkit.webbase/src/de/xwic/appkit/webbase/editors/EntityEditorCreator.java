@@ -16,6 +16,9 @@
 package de.xwic.appkit.webbase.editors;
 
 import de.jwic.base.IControl;
+import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.ConfigurationManager;
+import de.xwic.appkit.core.config.Profile;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.actions.editors.AbstractEntityEditorCreator;
@@ -28,13 +31,11 @@ import de.xwic.appkit.webbase.toolkit.editor.EditorModel;
  */
 public class EntityEditorCreator extends AbstractEntityEditorCreator {
 
-	private EditorConfiguration editorConfig;
 
 	/**
 	 * @param editorConfig
 	 */
-	public EntityEditorCreator(EditorConfiguration editorConfig) {
-		this.editorConfig = editorConfig;
+	public EntityEditorCreator() {
 	}
 
 	/*
@@ -45,7 +46,14 @@ public class EntityEditorCreator extends AbstractEntityEditorCreator {
 	 */
 	@Override
 	protected IControl getEditorPage(Site site, EditorModel editorModel) {
-		return new EntityEditorPage(site.getContentContainer(), null, editorModel.getEntity(), editorConfig);
+		Profile profile = ConfigurationManager.getUserProfile();
+		EditorConfiguration editorConfig;
+		try {
+			editorConfig = profile.getEditorConfiguration(editorModel.getEntity().type().getName());
+			return new EntityEditorPage(site.getContentContainer(), null, editorModel.getEntity(), editorConfig);
+		} catch (ConfigurationException e) {
+			throw new IllegalStateException("The editor configuration somehow disappeared??", e);
+		}
 	}
 
 	/*

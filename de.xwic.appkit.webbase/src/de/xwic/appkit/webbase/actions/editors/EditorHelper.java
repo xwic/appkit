@@ -148,8 +148,11 @@ public class EditorHelper {
 			if (creator == null) {
 				Profile profile = ConfigurationManager.getUserProfile();
 				try {
-					EditorConfiguration editorConfig = profile.getEditorConfiguration(entityName);
-					creator = new EntityEditorCreator(editorConfig);
+					// just read the configuration. If it does not exist, a ConfigurationException 
+					// is thrown. We do not "remember" the configuration, as that way we do not
+					// get the "latest" config in case the config was reloaded..
+					profile.getEditorConfiguration(entityName);
+					creator = new EntityEditorCreator();
 				} catch (ConfigurationException  ce) {
 					// no configuration available either.
 					log.debug("There is no editor configuration for entity " + entityName);
