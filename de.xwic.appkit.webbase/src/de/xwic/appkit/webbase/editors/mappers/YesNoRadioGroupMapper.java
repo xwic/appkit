@@ -25,7 +25,7 @@ import de.xwic.appkit.webbase.editors.ValidationException;
 import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 
 /**
- * Mapper for the InputBox control.
+ * Mapper for the RadioGroup control.
  *
  * @author Aron Cotrau
  */
