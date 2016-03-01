@@ -18,15 +18,14 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBox;
 import de.jwic.controls.NumericInputBox;
 import de.xwic.appkit.core.config.editor.ENumberInputField;
-import de.xwic.appkit.core.config.editor.EText;
 import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
-import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
+import de.xwic.appkit.webbase.editors.mappers.NumericInputboxMapper;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Defines the NumericInputBox builder class.
@@ -45,32 +44,43 @@ public class ENumberInputBuilder extends Builder<ENumberInputField> {
 	@Override
 	public IControl buildComponents(ENumberInputField text, IControlContainer parent, IBuilderContext context) {
 
-		NumericInputBox inputBox = new NumericInputBox(parent);
+		NumericInputBox numericInputBox = new NumericInputBox(parent);
 
-		inputBox.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
-		inputBox.setReadonly(text.isReadonly());
+		numericInputBox.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
+		numericInputBox.setReadonly(text.isReadonly());
 		Property prop = text.getFinalProperty();
 		if (prop.getMaxLength() > 0) {
-			inputBox.setMaxLength(prop.getMaxLength());
+			numericInputBox.setMaxLength(prop.getMaxLength());
 		}
 		if (prop.getRequired()) {
-			inputBox.setEmptyInfoText("Required Field");
+			numericInputBox.setEmptyInfoText("Required Field");
 		}
 
 		if ("double".equals(text.getFormat())) {
-			inputBox.setDecimalPlaces(0);
+			numericInputBox.setDecimalPlaces(2);
+		} else if("long".equals(text.getFormat())) {
+			numericInputBox.setDecimalPlaces(0);
+		}
+		if(text.getDecimalPoints() != null) {
+			numericInputBox.setDecimalPlaces(text.getDecimalPoints());
+		}
+		if(StringUtils.isNotEmpty(text.getCurrencySymbol())) {
+			numericInputBox.setSymbol(text.getCurrencySymbol());
+			if(StringUtils.isNotEmpty(text.getCurrencySymbolPlacement())) {
+				numericInputBox.setSymbolPlacement(NumericInputBox.SymbolPlacement.valueOf(text.getCurrencySymbolPlacement()));
+			}
 		}
 		Style style = text.getStyle();
 		if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
-			inputBox.setWidth(style.getStyleInt(Style.WIDTH_HINT) );
+			numericInputBox.setWidth(style.getStyleInt(Style.WIDTH_HINT));
 		}
 
 		if (style.getStyleInt(Style.HEIGHT_HINT) != 0) {
-			inputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT) );
+			numericInputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT));
 		}
 
-		context.registerField(text.getProperty(), inputBox, text, InputboxMapper.MAPPER_ID);
+		context.registerField(text.getProperty(), numericInputBox, text, NumericInputboxMapper.MAPPER_ID);
 		
-		return inputBox;
+		return numericInputBox;
 	}
 }

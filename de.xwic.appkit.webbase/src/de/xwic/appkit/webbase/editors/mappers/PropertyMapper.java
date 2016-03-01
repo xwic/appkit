@@ -18,6 +18,7 @@ package de.xwic.appkit.webbase.editors.mappers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -274,6 +275,15 @@ public abstract class PropertyMapper<T extends IControl> {
 					value = iValue.toString();
 				} else if (targetType.equals(Double.class)) {
 					value = iValue.doubleValue();
+				}
+			} else if (value instanceof Double) { // Integer to..
+				Double iValue = (Double)value;
+				if (targetType.equals(String.class)) {
+					value = iValue.toString();
+				} else if (targetType.equals(Integer.class)) {
+					value = iValue.intValue();
+				} else if (targetType.equals(BigDecimal.class)) {
+					value = new BigDecimal(iValue);
 				}
 			}
 		}

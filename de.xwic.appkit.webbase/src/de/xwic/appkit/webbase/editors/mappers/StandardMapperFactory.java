@@ -16,7 +16,6 @@
 package de.xwic.appkit.webbase.editors.mappers;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +41,7 @@ public class StandardMapperFactory {
 	private StandardMapperFactory() {
 		
 		knownMappers.put(InputboxMapper.MAPPER_ID, InputboxMapper.class);
+		knownMappers.put(NumericInputboxMapper.MAPPER_ID, NumericInputboxMapper.class);
 		knownMappers.put(PicklistEntryMapper.MAPPER_ID, PicklistEntryMapper.class);
 		knownMappers.put(PicklistEntrySetMapper.MAPPER_ID, PicklistEntrySetMapper.class);
 		knownMappers.put(YesNoRadioGroupMapper.MAPPER_ID, YesNoRadioGroupMapper.class);

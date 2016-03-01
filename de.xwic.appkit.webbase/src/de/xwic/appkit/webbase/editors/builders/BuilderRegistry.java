@@ -49,6 +49,7 @@ public class BuilderRegistry {
 		registerBuilder(EPicklistRadio.class, new EPicklistRadioBuilder());
 		registerBuilder(EPicklistCheckbox.class, new EPicklistCheckboxBuilder());
 		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
+		registerBuilder(ENumberInputField.class, new ENumberInputBuilder());
 
 	}
 
