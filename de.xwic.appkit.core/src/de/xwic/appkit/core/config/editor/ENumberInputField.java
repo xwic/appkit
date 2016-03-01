@@ -38,7 +38,7 @@ public class ENumberInputField extends EField {
      * Currency placement symbol relative to amount.
      * Values supported: left side to "p", right side to "s".
      */
-	private String currencySymbolPlacement = "s";
+	private String currencySymbolPlacement = "RIGHT";
     /**
      * Decimal points, will override values defined by format.
      */
