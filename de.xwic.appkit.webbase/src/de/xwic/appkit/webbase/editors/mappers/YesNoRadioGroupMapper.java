@@ -25,9 +25,9 @@ import de.xwic.appkit.webbase.editors.ValidationException;
 import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 
 /**
- * Mapper for the InputBox control.
+ * Mapper for the RadioGroup control.
  *
- * @author Aron Cotrau
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 
@@ -53,6 +53,11 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
         if(value instanceof Boolean) {
             final Boolean booleanValue = (Boolean) value;
             text.setSelectedKey(booleanValue ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
+        } else if(value instanceof String) {
+            final String strValue = (String) value;
+            text.setSelectedKey(EYesNoRadioBuilder.KEY_YES.equals(strValue)
+                    || "true".equals(strValue)
+                    ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
         } else {
             throw new IllegalArgumentException("Unable to map value. Target type is not Boolean.");
         }

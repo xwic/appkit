@@ -35,9 +35,9 @@ import de.xwic.appkit.webbase.editors.mappers.YesNoRadioGroupMapper;
 import org.apache.poi.util.StringUtil;
 
 /**
- * Defines the InputBox builder class.
+ * Defines the YesNoRadioGroup builder class.
  * 
- * @author Aron Cotrau
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
 
