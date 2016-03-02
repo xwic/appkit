@@ -45,6 +45,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/**
 	 * @return the key
 	 */
+	@Override
 	public String getKey() {
 		return key;
 	}
@@ -52,6 +53,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/**
 	 * @param key the key to set
 	 */
+	@Override
 	public void setKey(String key) {
 		this.key = key;
 	}
@@ -59,6 +61,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/**
 	 * @return the sortIndex
 	 */
+	@Override
 	public int getSortIndex() {
 		return sortIndex;
 	}
@@ -66,6 +69,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/**
 	 * @param sortIndex the sortIndex to set
 	 */
+	@Override
 	public void setSortIndex(int sortIndex) {
 		this.sortIndex = sortIndex;
 	}
@@ -100,6 +104,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#getPickliste()
 	 */
+	@Override
 	public IPickliste getPickliste() {
 		return pickliste;
 	}
@@ -107,6 +112,7 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#setPickliste(de.xwic.appkit.core.model.entities.IPickliste)
 	 */
+	@Override
 	public void setPickliste(IPickliste pickliste) {
 		this.pickliste = pickliste;
 	}
@@ -115,9 +121,10 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#getBezeichnung(java.lang.String)
 	 */
+	@Override
 	public String getBezeichnung(String languageID) {
-	    IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
-	    IPicklistText text = (IPicklistText)dao.getPicklistText(this, languageID);
+	    IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
+	    IPicklistText text = dao.getPicklistText(this, languageID);
 	    return text != null ? text.getBezeichnung() : "";
 	}
 	
@@ -125,26 +132,37 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	 *  (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#setBezeichnung(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void setBezeichnung(String languageID, String bezeichnung) {
-	    IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+	    IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 	    
 	    IPicklistText text = dao.getPicklistText(this, languageID);
-	    text.setBezeichnung(bezeichnung);
-	    dao.update(text);
+	    
+	    if (text == null) {
+	    	// this will also call update on the new entity
+	    	text = dao.createBezeichnung(this, languageID, bezeichnung);	    	
+	    } else {
+	    	text.setBezeichnung(bezeichnung);	    	
+	    	dao.update(text);
+	    }
 	}
 
+	@Override
 	public Set<IPicklistText> getPickTextValues() {
 	  return pickTextValues;
 	}
 	
+	@Override
 	public void setPickTextValues(Set<IPicklistText> pickTextValues) {
 	  this.pickTextValues= pickTextValues;
 	}
 
+	@Override
 	public boolean isVeraltet() {
 		return veraltet;
 	}
 	
+	@Override
 	public void setVeraltet(boolean veraltet) {
 		this.veraltet = veraltet;
 	}
@@ -153,9 +171,10 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#getKommentar(java.lang.String)
 	 */
+	@Override
 	public String getKommentar(String langID) {
-	    IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
-	    IPicklistText text = (IPicklistText)dao.getPicklistText(this, langID);
+	    IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
+	    IPicklistText text = dao.getPicklistText(this, langID);
 	    return text != null ? text.getBeschreibung() : "";
 	}
 
@@ -163,12 +182,14 @@ public class PicklistEntry extends Entity implements IPicklistEntry {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IPicklistEntry#setKommentar(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public void setKommentar(String langID, String comment) {
-	    IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+	    IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 	    
 	    IPicklistText text = dao.getPicklistText(this, langID);
-	    text.setBeschreibung(comment);
-	    dao.update(text);
-		
+	    if (text != null) {
+	    	text.setBeschreibung(comment);
+	    	dao.update(text);
+	    }
 	}
 }

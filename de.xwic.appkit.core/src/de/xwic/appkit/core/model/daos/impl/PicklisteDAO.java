@@ -218,14 +218,14 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 			@Override
 			public Object run(DAOProviderAPI api) {
 		    	EntityList list = api.getEntities(PicklistText.class, null, new PicklistTextQuery(entry, langID));
-		    	if (list.size() == 0) {
-		    	    //TODO IF you had added a new language ID then you have to
-		    	    //create here a new IPicklistText with the new id coming and return it!!
-		    	    //THIS would then fix the Project on its own!!!
-		    	    IPicklistText newTextWithNewID = createBezeichnung(entry, langID, "<nicht gepflegt>");
-		    	    cache.putPicklistText(newTextWithNewID);
-		    	    return newTextWithNewID;
-		    	    //return null;
+		    	if (list.size() == 0) {		    		
+		    		// AI 02-Mar-2016: do not automatically create an empty PicklistText. This will cause wrong entries to be created in the DB.
+		    		// Make sure the getPicklistText method is always null checked
+		    		
+//		    	    IPicklistText newTextWithNewID = createBezeichnung(entry, langID, "<nicht gepflegt>");
+//		    	    cache.putPicklistText(newTextWithNewID);
+//		    	    return newTextWithNewID;
+		    	    return null;
 		    	} else {
 		    		IPicklistText t = (IPicklistText)list.get(0);
 		    		cache.putPicklistText(t);
@@ -233,9 +233,6 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		    	}
 			}
 		});
-
-        //System.out.println(o);
-
 
         return (IPicklistText)o;
 	}
