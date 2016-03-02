@@ -25,24 +25,38 @@ import java.util.Date;
 
 import de.xwic.appkit.core.model.util.EntityUtil;
 
+import javax.persistence.*;
+
 
 /**
  * An entity is stored in a database and managed by a corrosponding DAO
  * implementation.
  * @author Florian Lippisch
  */
+@MappedSuperclass
 public class Entity implements IEntity {
-    
-    private int id;
+	@Id
+	@GeneratedValue
+	@Column(name = "ID")
+	private int id;
+	@Column(name = "SRVENTITY_ID")
     private int serverEntityId;
+	@Column(name = "CREATED_AT")
     private Date createdAt = new Date();
+	@Column(name = "LASTMODIFIED_AT")
     private Date lastModifiedAt = null;
+	@Column(name = "CREATED_FROM", length = 50)
     private String createdFrom = "";
+	@Column(name = "LASTMODIFIED_FROM", length = 50)
     private String lastModifiedFrom = "";
+	@Version
+	@Column(name = "VERSION")
     private long version = 0;
+	@Column(name = "CHANGED")
     private boolean changed = false;
+	@Column(name = "DELETED", nullable = false)
     private boolean deleted = false;
-   
+	@Column(name = "DOWNLOAD_VERSION")
 	private long downloadVersion = -1;
 	
     /**
