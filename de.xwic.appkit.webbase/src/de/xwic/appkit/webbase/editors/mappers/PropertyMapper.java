@@ -276,7 +276,7 @@ public abstract class PropertyMapper<T extends IControl> {
 				} else if (targetType.equals(Double.class)) {
 					value = iValue.doubleValue();
 				}
-			} else if (value instanceof Double) { // Integer to..
+			} else if (value instanceof Double) { // Double to..
 				Double iValue = (Double)value;
 				if (targetType.equals(String.class)) {
 					value = iValue.toString();

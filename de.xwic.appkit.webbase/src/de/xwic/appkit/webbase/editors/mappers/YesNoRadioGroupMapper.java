@@ -27,7 +27,7 @@ import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 /**
  * Mapper for the RadioGroup control.
  *
- * @author Aron Cotrau
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 

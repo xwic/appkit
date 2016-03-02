@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Defines the NumericInputBox builder class.
  * 
- * @author Aron Cotrau
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public class ENumberInputBuilder extends Builder<ENumberInputField> {
 

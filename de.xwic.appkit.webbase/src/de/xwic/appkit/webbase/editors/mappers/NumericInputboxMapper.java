@@ -28,7 +28,7 @@ import de.xwic.appkit.webbase.editors.ValidationException;
 /**
  * Mapper for the NumericInputBox control.
  *
- * @author Aron Cotrau
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public class NumericInputboxMapper extends PropertyMapper<NumericInputBox> {
 
