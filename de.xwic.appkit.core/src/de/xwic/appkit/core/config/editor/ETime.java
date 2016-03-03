@@ -24,20 +24,5 @@ package de.xwic.appkit.core.config.editor;
  * @editortag time
  */
 public class ETime extends EField {
-	
-    boolean seconds = false;
-    
-    /**
-	 * @return Returns the seconds.
-	 */
-	public boolean getSeconds() {
-		return seconds;
-	}
-	/**
-	 * @param seconds The seconds to set.
-	 * @default false
-	 */
-	public void setSeconds(boolean seconds) {
-		this.seconds = seconds;
-	}
+
 }
