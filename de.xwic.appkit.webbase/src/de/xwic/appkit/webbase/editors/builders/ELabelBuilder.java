@@ -31,7 +31,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
  * 
  * @author Aron Cotrau
  */
-public class ELabelBuilder extends Builder {
+public class ELabelBuilder extends Builder<ELabel> {
 
 	/*
 	 * (non-Javadoc)
@@ -40,8 +40,7 @@ public class ELabelBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		ELabel eLabel = (ELabel) element;
+	public IControl buildComponents(ELabel eLabel, IControlContainer parent, IBuilderContext context) {
 		String text = "unnamed";
 		if (eLabel.getTitle() != null) {
 			text = context.getResString(eLabel.getTitle());
@@ -57,7 +56,7 @@ public class ELabelBuilder extends Builder {
 		label = new Label(parent);
 		label.setText(text);
 		
-		context.registerWidget(label, element);
+		context.registerWidget(label, eLabel);
 
 		return label;
 	}
