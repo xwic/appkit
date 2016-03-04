@@ -17,17 +17,15 @@
 package de.xwic.appkit.webbase.editors.mappers;
 
 import de.jwic.controls.DatePicker;
-import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -52,6 +50,9 @@ public class DatePickerMapper extends PropertyMapper<DatePicker> {
 	@Override
 	public void loadContent(IEntity entity, DatePicker text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
+		if(value == null) {
+			value = Calendar.getInstance().getTime();
+		}
 		if(value instanceof Date) {
 			final Date dateValue = (Date) value;
 			text.setDate(dateValue);

@@ -45,7 +45,8 @@ public class StandardMapperFactory {
 		knownMappers.put(PicklistEntryMapper.MAPPER_ID, PicklistEntryMapper.class);
 		knownMappers.put(PicklistEntrySetMapper.MAPPER_ID, PicklistEntrySetMapper.class);
 		knownMappers.put(YesNoRadioGroupMapper.MAPPER_ID, YesNoRadioGroupMapper.class);
-		
+		knownMappers.put(DatePickerMapper.MAPPER_ID, DatePickerMapper.class);
+
 	}
 
 	/**
