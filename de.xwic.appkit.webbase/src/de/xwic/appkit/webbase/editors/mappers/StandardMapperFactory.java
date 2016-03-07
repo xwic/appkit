@@ -23,6 +23,8 @@ import de.jwic.base.IControl;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.webbase.editors.EditorConfigurationException;
 
+import javax.swing.text.html.HTML;
+
 /**
  * Creates a mapper instance of the specified type. This factory knows only the
  * standard mappers. Custom mappers need to be created during the build phase.
@@ -41,6 +43,7 @@ public class StandardMapperFactory {
 	private StandardMapperFactory() {
 		
 		knownMappers.put(InputboxMapper.MAPPER_ID, InputboxMapper.class);
+		knownMappers.put(HtmlEditorMapper.MAPPER_ID, HtmlEditorMapper.class);
 		knownMappers.put(NumericInputboxMapper.MAPPER_ID, NumericInputboxMapper.class);
 		knownMappers.put(PicklistEntryMapper.MAPPER_ID, PicklistEntryMapper.class);
 		knownMappers.put(PicklistEntrySetMapper.MAPPER_ID, PicklistEntrySetMapper.class);
