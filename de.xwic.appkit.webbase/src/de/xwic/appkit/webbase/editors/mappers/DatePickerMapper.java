@@ -51,7 +51,7 @@ public class DatePickerMapper extends PropertyMapper<DatePicker> {
 	public void loadContent(IEntity entity, DatePicker text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
 		if(value == null) {
-			value = Calendar.getInstance().getTime();
+            return;
 		}
 		if(value instanceof Date) {
 			final Date dateValue = (Date) value;
