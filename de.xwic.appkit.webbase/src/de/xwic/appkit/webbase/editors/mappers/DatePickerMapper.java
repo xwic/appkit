@@ -51,6 +51,7 @@ public class DatePickerMapper extends PropertyMapper<DatePicker> {
 	public void loadContent(IEntity entity, DatePicker text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
 		if(value == null) {
+            text.setText("");
             return;
 		}
 		if(value instanceof Date) {
