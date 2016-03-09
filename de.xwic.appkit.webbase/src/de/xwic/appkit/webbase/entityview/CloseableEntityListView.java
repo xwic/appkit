@@ -6,6 +6,8 @@ import java.util.Collection;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.ToolBarGroup;
+import de.jwic.events.ElementSelectedEvent;
+import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.ConfigurationException;
@@ -73,6 +75,14 @@ public class CloseableEntityListView<I extends IEntity> extends EntityListView<I
 		});
 		btAbort.setIconEnabled(ImageLibrary.ICON_CLOSED);
 		btAbort.setIconDisabled(ImageLibrary.ICON_CLOSED_INACTIVE);
+		addElementSelectedListener(new ElementSelectedListener() {
+			@Override
+			public void elementSelected(ElementSelectedEvent event) {
+				if (event.isDblClick()) {
+					performSelect();
+				}
+			}
+		});
 	}
 
 	/**
