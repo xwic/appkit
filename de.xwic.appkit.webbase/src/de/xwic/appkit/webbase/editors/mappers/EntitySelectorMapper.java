@@ -16,18 +16,12 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.controls.InputBox;
-import de.jwic.controls.RadioGroup;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 import de.xwic.appkit.webbase.entityselection.EntityComboSelector;
-import de.xwic.appkit.webbase.entityselection.EntitySelectionControl;
 
 /**
  * Mapper for the RadioGroup control.
@@ -51,9 +45,12 @@ public class EntitySelectorMapper extends PropertyMapper<EntityComboSelector> {
 	@Override
 	public void loadContent(IEntity entity, EntityComboSelector text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
+		if(value == null) {
+			text.setText("");
+			return;
+		}
         if(value instanceof IEntity) {
-            final Entity entityRef = (Entity) value;
-            text.setEntity(entityRef);
+            text.setEntity((IEntity) value);
         } else {
             throw new IllegalArgumentException("Unable to map value. Target type is not IEntity.");
         }

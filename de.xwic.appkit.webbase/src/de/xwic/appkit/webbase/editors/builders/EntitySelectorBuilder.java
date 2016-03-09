@@ -27,6 +27,7 @@ import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
+import de.xwic.appkit.webbase.editors.mappers.EntitySelectorMapper;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntryMapper;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntrySetMapper;
 import de.xwic.appkit.webbase.entityselection.EntityComboSelector;
@@ -37,6 +38,8 @@ import de.xwic.appkit.webbase.entityview.EntityDisplayListModel;
 import de.xwic.appkit.webbase.entityviewer.quickfilter.AbstractQuickFilterPanel;
 import de.xwic.appkit.webbase.table.EntityTableModel;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
+
+import java.beans.PropertyDescriptor;
 
 /**
  * The Builder for the Label.
@@ -53,17 +56,16 @@ public class EntitySelectorBuilder extends Builder<EEntityField> {
      *      de.xwic.appkit.webbase.editors.IBuilderContext)
      */
     public IControl buildComponents(EEntityField entityField, IControlContainer parent, IBuilderContext context) {
-        final EntityDescriptor entityDescriptor = entityField.getFinalProperty().getEntityDescriptor();
-        Class<? extends IEntity> entityType = null;
-        try {
-            entityType = (Class<? extends IEntity>) Class.forName(entityDescriptor.getClassname());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Class<? extends IEntity> entityType = getPropertyClass(entityField);
         GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType, entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName());
         final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
-        context.registerField(entityField.getProperty(), comboSelector, entityField, PicklistEntrySetMapper.MAPPER_ID);
+        context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);
         return comboSelector;
+    }
+
+    private Class<? extends IEntity> getPropertyClass(EEntityField entityField) {
+        final PropertyDescriptor entityDescriptor = entityField.getFinalProperty().getDescriptor();
+        return (Class<? extends IEntity>) entityDescriptor.getPropertyType();
     }
 }
