@@ -24,7 +24,7 @@ import de.xwic.appkit.webbase.editors.ValidationException;
 import de.xwic.appkit.webbase.entityselection.EntityComboSelector;
 
 /**
- * Mapper for the RadioGroup control.
+ * Mapper for the EntitySelector control.
  *
  * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */

@@ -42,11 +42,11 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 import java.beans.PropertyDescriptor;
 
 /**
- * The Builder for the Label.
+ * The Builder for the EEntityField.
  *
- * @author lippisch
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
-public class EntitySelectorBuilder extends Builder<EEntityField> {
+public class EEntitySelectorBuilder extends Builder<EEntityField> {
 
     /*
      * (non-Javadoc)
@@ -57,7 +57,8 @@ public class EntitySelectorBuilder extends Builder<EEntityField> {
      */
     public IControl buildComponents(EEntityField entityField, IControlContainer parent, IBuilderContext context) {
         Class<? extends IEntity> entityType = getPropertyClass(entityField);
-        GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType, entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName());
+        GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType,
+                entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName());
         final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
         context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);

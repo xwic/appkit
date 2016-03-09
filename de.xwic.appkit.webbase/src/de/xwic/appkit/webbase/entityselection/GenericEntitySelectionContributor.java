@@ -13,8 +13,7 @@ import de.xwic.appkit.webbase.table.EntityTableModel;
 import java.util.Arrays;
 
 /**
- * @author boogie
- * @since Aug 26, 2014
+ * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
 public final class GenericEntitySelectionContributor extends EntitySelectionAdapter {
     private final EntitySelectionModel selectionModel;
@@ -28,7 +27,6 @@ public final class GenericEntitySelectionContributor extends EntitySelectionAdap
      */
     public GenericEntitySelectionContributor(Class<? extends IEntity> entityType, String pageTitle, String pageSubTitle, String... queryProps) {
         this(entityType, new PropertyQuery(), pageTitle, pageSubTitle, queryProps);
-
     }
 
     /**
