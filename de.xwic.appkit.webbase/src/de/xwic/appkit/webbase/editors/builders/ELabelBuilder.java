@@ -20,11 +20,9 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.ELabel;
-import de.xwic.appkit.core.config.editor.EPicklistCombo;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
-import de.xwic.appkit.webbase.utils.picklist.PicklistEntryControl;
 
 /**
  * The Builder for the Label.
