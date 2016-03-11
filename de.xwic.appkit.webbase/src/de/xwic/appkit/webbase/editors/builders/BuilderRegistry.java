@@ -43,6 +43,7 @@ public class BuilderRegistry {
 
 		registerBuilder(EComposite.class, new EContainerBuilder());
 		registerBuilder(EText.class, new EInputboxBuilder());
+		registerBuilder(EEntityField.class, new EEntitySelectorBuilder());
 		registerBuilder(EHtmlEditor.class, new EHtmlEditorBuilder());
 		registerBuilder(ELabel.class, new ELabelBuilder());
 		registerBuilder(EGroup.class, new EGroupBuilder());
