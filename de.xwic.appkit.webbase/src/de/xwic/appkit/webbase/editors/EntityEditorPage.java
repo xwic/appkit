@@ -137,7 +137,10 @@ public class EntityEditorPage extends InnerPage {
 		context.setAllEditable(true);
 		actionSave.setEnabled(true);
 		actionSaveClose.setEnabled(true);
-		actionEdit.setEnabled(false);
+
+		// for now consider that if we have edit rights, we open the entity always in edit mode (and never return from it)
+		//actionEdit.setEnabled(false);
+		actionEdit.setVisible(false);
 
 	}
 
@@ -198,13 +201,12 @@ public class EntityEditorPage extends InnerPage {
 			editor = new EntityEditor(this, "editor", input);
 			context = editor.getContext();
 		
-			// start with all fields non-editable
-			if (entity.getId() != 0) { // is not new
+			if (context.isEditable()) {
+				editEntity();
+			} else {
 				context.setAllEditable(false);
 				actionSave.setEnabled(false);
 				actionSaveClose.setEnabled(false);
-			} else {
-				actionEdit.setEnabled(false);
 			}
 			
 		} catch (Exception e) {

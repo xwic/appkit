@@ -50,7 +50,11 @@ public class EntityEditorCreator extends AbstractEntityEditorCreator {
 		EditorConfiguration editorConfig;
 		try {
 			editorConfig = profile.getEditorConfiguration(editorModel.getEntity().type().getName());
-			return new EntityEditorPage(site.getContentContainer(), null, editorModel.getEntity(), editorConfig);
+			EntityEditorPage editorPage = new EntityEditorPage(site.getContentContainer(), null, editorModel.getEntity(), editorConfig);
+			
+			
+			
+			return editorPage;
 		} catch (ConfigurationException e) {
 			throw new IllegalStateException("The editor configuration somehow disappeared??", e);
 		}

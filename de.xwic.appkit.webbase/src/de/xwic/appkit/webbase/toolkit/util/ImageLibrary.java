@@ -129,5 +129,8 @@ public class ImageLibrary {
     public static final ImageRef ICON_TABLE = new ImageRef("icons/table.png");
     
     public static final ImageRef ICON_CONFIG = new ImageRef("icons/config.png");
+    
+    public static final ImageRef ICON_PAGE_OPEN = new ImageRef("icons/page_white_magnify.png");
+    public static final ImageRef ICON_PAGE_OPEN_INACTIVE = new ImageRef("icons/page_white_magnify_i.png");
 	
 }

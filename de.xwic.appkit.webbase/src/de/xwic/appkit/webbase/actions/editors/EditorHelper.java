@@ -105,9 +105,20 @@ public class EditorHelper {
 	 * @throws Exception
 	 */
 	public static EditorModel openEditor(Site site, IEntity entity, IEntity baseEntity) throws Exception {
-		return getInstance()._openEditor(site, entity, baseEntity);		
+		return getInstance()._openEditor(site, entity, baseEntity, false);		
 	}
 	
+	/**
+	 * @param site
+	 * @param entity
+	 * @param baseEntity
+	 * @return
+	 * @throws Exception
+	 */
+	public static EditorModel openEditor(Site site, IEntity entity, IEntity baseEntity, boolean readOnly) throws Exception {
+		return getInstance()._openEditor(site, entity, baseEntity, readOnly);		
+	}
+
 	/**
 	 * INTERNAL method to handle opening the editor.
 	 * @param site
@@ -116,7 +127,7 @@ public class EditorHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	private EditorModel _openEditor(Site site, IEntity entity, IEntity baseEntity) throws Exception {
+	private EditorModel _openEditor(Site site, IEntity entity, IEntity baseEntity, boolean readOnly) throws Exception {
 		
 		String entityName = entity.type().getName();
 
@@ -170,6 +181,9 @@ public class EditorHelper {
 		}
 
 		EditorModel editModel = creator.createAndOpenEditor(site, entity, baseEntity);
+		if (readOnly) {
+			editModel.setEditMode(false);
+		}
 		return editModel;
 	}
 }
