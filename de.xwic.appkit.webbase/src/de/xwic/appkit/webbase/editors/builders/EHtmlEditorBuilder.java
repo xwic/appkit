@@ -19,31 +19,22 @@ package de.xwic.appkit.webbase.editors.builders;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.InputBox;
-import de.jwic.controls.Label;
-import de.jwic.controls.RadioGroup;
-import de.jwic.events.ElementSelectedEvent;
-import de.jwic.events.ElementSelectedListener;
+import de.jwic.controls.ckeditor.CKEditor;
+import de.xwic.appkit.core.config.editor.EHtmlEditor;
 import de.xwic.appkit.core.config.editor.EText;
-import de.xwic.appkit.core.config.editor.EYesNoRadio;
 import de.xwic.appkit.core.config.editor.Style;
-import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
-import de.xwic.appkit.webbase.editors.mappers.YesNoRadioGroupMapper;
-
-import org.apache.poi.util.StringUtil;
+import de.xwic.appkit.webbase.editors.mappers.HtmlEditorMapper;
+import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 
 /**
- * Defines the YesNoRadioGroup builder class.
+ * Defines the CKEditor builder class.
  * 
- * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
+ * @author Aron Cotrau
  */
-public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
-
-	public static final String KEY_YES = "1";
-    public static final String KEY_NO = "0";
-
+public class EHtmlEditorBuilder extends Builder<EHtmlEditor> {
 
 	/*
 	 * (non-Javadoc)
@@ -52,20 +43,21 @@ public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(EYesNoRadio radio, IControlContainer parent, IBuilderContext context) {
-		if(radio.getProperty() != null) {
-			final RadioGroup rg = new RadioGroup(parent, null);
-			rg.addElement("Yes", KEY_YES);
-			rg.addElement("No", KEY_NO);
-			
-			rg.addElementSelectedListener(new FieldChangeListener(context, radio.getProperty()));
-			context.registerField(radio.getProperty(), rg, radio, YesNoRadioGroupMapper.MAPPER_ID);
-			return rg;
-		} else {
-			Label label = new Label(parent);
-			label.setText("No Property Specified");
-			return label;
+	public IControl buildComponents(EHtmlEditor text, IControlContainer parent, IBuilderContext context) {
+
+		CKEditor ckEditor = new CKEditor(parent, null);
+		ckEditor.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
+		Style style = text.getStyle();
+		if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
+			ckEditor.setWidth(style.getStyleInt(Style.WIDTH_HINT));
 		}
 
+		if (style.getStyleInt(Style.HEIGHT_HINT) != 0) {
+			ckEditor.setHeight(style.getStyleInt(Style.HEIGHT_HINT));
+		}
+
+		context.registerField(text.getProperty(), ckEditor, text, HtmlEditorMapper.MAPPER_ID);
+		
+		return ckEditor;
 	}
 }

@@ -16,27 +16,28 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.controls.RadioGroup;
+import de.jwic.controls.InputBox;
+import de.jwic.controls.NumericInputBox;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 
 /**
- * Mapper for the RadioGroup control.
+ * Mapper for the NumericInputBox control.
  *
  * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
-public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
+public class NumericInputboxMapper extends PropertyMapper<NumericInputBox> {
 
-	public final static String MAPPER_ID = "YesNoRadio"; 
+	public final static String MAPPER_ID = "NumericInputBox";
 
 	/**
 	 * @param baseEntity
 	 */
-	public YesNoRadioGroupMapper(EntityDescriptor baseEntity) {
+	public NumericInputboxMapper(EntityDescriptor baseEntity) {
 		super(baseEntity);
 	}
 
@@ -44,41 +45,28 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
 	@Override
-	public void loadContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException {
+	public void loadContent(IEntity entity, NumericInputBox text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
-        if(value == null) {
-            text.setSelectedKey(EYesNoRadioBuilder.KEY_NO);
-            return;
-        }
-        if(value instanceof Boolean) {
-            final Boolean booleanValue = (Boolean) value;
-            text.setSelectedKey(booleanValue ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
-        } else if(value instanceof String) {
-            final String strValue = (String) value;
-            text.setSelectedKey(EYesNoRadioBuilder.KEY_YES.equals(strValue)
-                    || "true".equals(strValue)
-                    ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
-        } else {
-            throw new IllegalArgumentException("Unable to map value. Target type is not Boolean.");
-        }
+		if(value != null) {
+			text.setNumber(Double.valueOf(value.toString()));
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
     @Override
-	public void setEditable(RadioGroup text, Property[] property, boolean editable) {
-        text.setEnabled(editable);
+	public void setEditable(NumericInputBox text, Property[] property, boolean editable) {
+		text.setReadonly(!editable);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
     @Override
-	public void storeContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException,
+	public void storeContent(IEntity entity, NumericInputBox text, Property[] property) throws MappingException,
 			ValidationException {
-        final Boolean value = EYesNoRadioBuilder.KEY_YES.equals(text.getSelectedKey());
-		writeValue(entity, property, value);
+		writeValue(entity, property, text.getNumber());
 	}
 	
 	/*
@@ -86,9 +74,25 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
     @Override
-	protected void addPropertyToQuery(RadioGroup text, Property[] property, IPropertyQuery query) {
-		if (text.getSelectedKey().length() > 0) {
-			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getSelectedKey());
+	protected void addPropertyToQuery(NumericInputBox text, Property[] property, IPropertyQuery query) {
+		if (text.getText().length() > 0) {
+			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getText());
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
+	 */
+	@Override
+	protected void highlightWidget(NumericInputBox text, Severity error) {
+		if (error == null) {
+			text.setFlagAsError(false);
+		} else if (error == Severity.ERROR) {
+			text.setFlagAsError(true);
+		} else {
+			text.setFlagAsError(false); // do not flag warnings at this time..
+			
+		}
+	}
+	
 }

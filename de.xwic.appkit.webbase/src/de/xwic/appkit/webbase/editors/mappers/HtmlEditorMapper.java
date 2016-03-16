@@ -16,27 +16,26 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.controls.RadioGroup;
+import de.jwic.controls.ckeditor.CKEditor;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
 
 /**
- * Mapper for the InputBox control.
+ * Mapper for the CKEditor control.
  *
  * @author Aron Cotrau
  */
-public class RadioGroupMapper1 extends PropertyMapper<RadioGroup> {
+public class HtmlEditorMapper extends PropertyMapper<CKEditor> {
 
-	public final static String MAPPER_ID = "BooleanRadioGroup"; 
+	public final static String MAPPER_ID = "HTMLEditor";
 
 	/**
 	 * @param baseEntity
 	 */
-	public RadioGroupMapper1(EntityDescriptor baseEntity) {
+	public HtmlEditorMapper(EntityDescriptor baseEntity) {
 		super(baseEntity);
 	}
 
@@ -44,36 +43,26 @@ public class RadioGroupMapper1 extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
 	@Override
-	public void loadContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException {
+	public void loadContent(IEntity entity, CKEditor text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
-        if(value == null) {
-            text.setSelectedKey(EYesNoRadioBuilder.KEY_NO);
-            return;
-        }
-        if(value instanceof Boolean) {
-            final Boolean booleanValue = (Boolean) value;
-            text.setSelectedKey(booleanValue ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
-        } else {
-            throw new IllegalArgumentException("Unable to map value. Target type is not Boolean.");
-        }
+		text.setText(value != null ? value.toString() : "");
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
     @Override
-	public void setEditable(RadioGroup text, Property[] property, boolean editable) {
-        text.setEnabled(editable);
+	public void setEditable(CKEditor text, Property[] property, boolean editable) {
+		text.setEnabled(editable);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
     @Override
-	public void storeContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException,
+	public void storeContent(IEntity entity, CKEditor text, Property[] property) throws MappingException,
 			ValidationException {
-        final Boolean value = EYesNoRadioBuilder.KEY_YES.equals(text.getSelectedKey());
-		writeValue(entity, property, value);
+		writeValue(entity, property, text.getText());
 	}
 	
 	/*
@@ -81,9 +70,10 @@ public class RadioGroupMapper1 extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
     @Override
-	protected void addPropertyToQuery(RadioGroup text, Property[] property, IPropertyQuery query) {
-		if (text.getSelectedKey().length() > 0) {
-			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getSelectedKey());
+	protected void addPropertyToQuery(CKEditor text, Property[] property, IPropertyQuery query) {
+		if (text.getText().length() > 0) {
+			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getText());
 		}
 	}
+	
 }

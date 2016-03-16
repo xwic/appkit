@@ -16,27 +16,26 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.controls.RadioGroup;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
-import de.xwic.appkit.webbase.editors.builders.EYesNoRadioBuilder;
+import de.xwic.appkit.webbase.entityselection.EntityComboSelector;
 
 /**
- * Mapper for the RadioGroup control.
+ * Mapper for the EntitySelector control.
  *
  * @author <a href="mailto:vzhovtiuk@gmail.com">Vitaliy Zhovtyuk</a>
  */
-public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
+public class EntitySelectorMapper extends PropertyMapper<EntityComboSelector> {
 
-	public final static String MAPPER_ID = "YesNoRadio"; 
+	public final static String MAPPER_ID = "EntitySelector";
 
 	/**
 	 * @param baseEntity
 	 */
-	public YesNoRadioGroupMapper(EntityDescriptor baseEntity) {
+	public EntitySelectorMapper(EntityDescriptor baseEntity) {
 		super(baseEntity);
 	}
 
@@ -44,22 +43,16 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
 	@Override
-	public void loadContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException {
+	public void loadContent(IEntity entity, EntityComboSelector text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
-        if(value == null) {
-            text.setSelectedKey(EYesNoRadioBuilder.KEY_NO);
-            return;
-        }
-        if(value instanceof Boolean) {
-            final Boolean booleanValue = (Boolean) value;
-            text.setSelectedKey(booleanValue ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
-        } else if(value instanceof String) {
-            final String strValue = (String) value;
-            text.setSelectedKey(EYesNoRadioBuilder.KEY_YES.equals(strValue)
-                    || "true".equals(strValue)
-                    ? EYesNoRadioBuilder.KEY_YES : EYesNoRadioBuilder.KEY_NO);
+		if(value == null) {
+			text.setText("");
+			return;
+		}
+        if(value instanceof IEntity) {
+            text.setEntity((IEntity) value);
         } else {
-            throw new IllegalArgumentException("Unable to map value. Target type is not Boolean.");
+            throw new IllegalArgumentException("Unable to map value. Target type is not IEntity.");
         }
 	}
 
@@ -67,7 +60,7 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
     @Override
-	public void setEditable(RadioGroup text, Property[] property, boolean editable) {
+	public void setEditable(EntityComboSelector text, Property[] property, boolean editable) {
         text.setEnabled(editable);
 	}
 
@@ -75,20 +68,20 @@ public class YesNoRadioGroupMapper extends PropertyMapper<RadioGroup> {
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
     @Override
-	public void storeContent(IEntity entity, RadioGroup text, Property[] property) throws MappingException,
+	public void storeContent(IEntity entity, EntityComboSelector text, Property[] property) throws MappingException,
 			ValidationException {
-        final Boolean value = EYesNoRadioBuilder.KEY_YES.equals(text.getSelectedKey());
+        final IEntity value = text.getSelectedEntity();
 		writeValue(entity, property, value);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
-    @Override
-	protected void addPropertyToQuery(RadioGroup text, Property[] property, IPropertyQuery query) {
-		if (text.getSelectedKey().length() > 0) {
-			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getSelectedKey());
+	@Override
+	protected void addPropertyToQuery(EntityComboSelector text, Property[] property, IPropertyQuery query) {
+		if (text.getText().length() > 0) {
+			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getText());
 		}
 	}
 }
