@@ -21,12 +21,13 @@ public interface IEntityEditorExtension {
 	/**
 	 * Initialize the extension and provide the EditorContext for this session.
 	 * @param context
+	 * @param editor 
 	 */
-	public void initialize(EditorContext context);
+	public void initialize(EditorContext context, EntityEditor editor);
 	
 	/**
 	 * Add actions to the toolbar in the editor. This method will be invoked after the
-	 * standard actions have been added, but before the actual editor content is created.
+	 * standard actions have been added and the editor was already created.
 	 * 
 	 * @param toolbar
 	 */

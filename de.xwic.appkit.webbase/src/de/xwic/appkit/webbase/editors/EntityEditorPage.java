@@ -15,6 +15,9 @@
 **/
 package de.xwic.appkit.webbase.editors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
@@ -29,6 +32,8 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.registry.ExtensionRegistry;
+import de.xwic.appkit.core.registry.IExtension;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 import de.xwic.appkit.webbase.toolkit.app.Site;
@@ -40,6 +45,9 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class EntityEditorPage extends InnerPage {
 
+	public final static String EXTENSION_POINT_EDITOR_EXT = "enityEditorExtension";
+	public final static String EXT_ATTR_FOR_ENTITY = "forEntity";
+	
 	private EntityEditor editor;
 	private EditorContext context;
 
@@ -48,6 +56,9 @@ public class EntityEditorPage extends InnerPage {
 	private IAction actionClose;
 	
 	private IAction actionEdit;
+	
+	private List<IEntityEditorExtension> extensions = new ArrayList<IEntityEditorExtension>();
+	private ToolBar toolbar;
 
 	/**
 	 * @param container
@@ -79,8 +90,51 @@ public class EntityEditorPage extends InnerPage {
 		createToolbar();
 		createContent(entity, editorConfig);
 		
+		createExtensions();
 	}
 	
+	/**
+	 * Search for editor extensions and initialize them. 
+	 */
+	private void createExtensions() {
+
+		// Step 1 - find and instantiate extensions...
+		String entityType = context.getEntityDescriptor().getId();
+		
+		List<IExtension> rawExtList = ExtensionRegistry.getInstance().getExtensions(EXTENSION_POINT_EDITOR_EXT);
+		for (IExtension ext : rawExtList) {
+			
+			String applyToEntity = ext.getAttribute(EXT_ATTR_FOR_ENTITY);
+			if (applyToEntity != null && entityType.equals(applyToEntity)) {
+				
+				Object extObj = null;
+				try {
+					extObj = ext.createExtensionObject();
+				} catch (Exception e) {
+					log.error("Error creating EntityEditorExtension for " + entityType + " (id:" + ext.getId() + ")", e);
+					// extObj will be null, so we can continue
+				}
+				if (extObj != null && extObj instanceof IEntityEditorExtension) {
+					IEntityEditorExtension extension = (IEntityEditorExtension)extObj;
+					extensions.add(extension);
+				} else {
+					log.error("EntityEditorExtension for entity " + entityType + " does not implement IEntityEditorExtension interface.");
+				}
+				
+			}
+			
+		}
+		
+		// Step 2 - initialize extensions
+		
+		for (IEntityEditorExtension extension : extensions) {
+			extension.initialize(context, editor);
+			extension.addActions(toolbar);
+		}
+		
+		
+	}
+
 	/**
 	 * 
 	 */
@@ -178,7 +232,7 @@ public class EntityEditorPage extends InnerPage {
 	 */
 	private void createToolbar() {
 		
-		ToolBar toolbar = new ToolBar(this, "toolbar");
+		toolbar = new ToolBar(this, "toolbar");
 		ToolBarGroup grpDefault = toolbar.addGroup();
 
 		grpDefault.addAction(actionClose);
