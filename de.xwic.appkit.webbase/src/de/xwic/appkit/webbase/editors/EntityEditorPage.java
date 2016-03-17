@@ -106,13 +106,39 @@ public class EntityEditorPage extends InnerPage {
 
 		// Step 1 - find and instantiate extensions...
 		String entityType = context.getEntityDescriptor().getId();
-		
-		List<IExtension> rawExtList = ExtensionRegistry.getInstance().getExtensions(EXTENSION_POINT_EDITOR_EXT);
+		List<Object> extensionObjs = getExtentions(EXTENSION_POINT_EDITOR_EXT, entityType);
+		for (Object extObj : extensionObjs) {
+			if (extObj instanceof IEntityEditorExtension) {
+				IEntityEditorExtension extension = (IEntityEditorExtension) extObj;
+				extensions.add(extension);
+			} else {
+				log.error("EntityEditorExtension for entity " + entityType + " does not implement IEntityEditorExtension interface.");
+			}
+		}
+
+		// Step 2 - initialize extensions
+		for (IEntityEditorExtension extension : extensions) {
+			extension.initialize(context, editor);
+			extension.addActions(toolbar);
+		}
+
+		List<Object> tabExtensions = getExtentions("entityEditorActions", entityType);
+		for (Object ext : tabExtensions) {
+			if(ext instanceof ICustomEntityActionCreator) {
+				ICustomEntityActionCreator entityActionCreator = (ICustomEntityActionCreator) ext;
+				toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite()));
+			}
+		}
+	}
+
+	private List<Object> getExtentions(String extPoint, String entityType) {
+		List<Object> extension = new ArrayList<Object>();
+		List<IExtension> rawExtList = ExtensionRegistry.getInstance().getExtensions(extPoint);
 		for (IExtension ext : rawExtList) {
-			
+
 			String applyToEntity = ext.getAttribute(EXT_ATTR_FOR_ENTITY);
 			if (applyToEntity != null && entityType.equals(applyToEntity)) {
-				
+
 				Object extObj = null;
 				try {
 					extObj = ext.createExtensionObject();
@@ -120,25 +146,14 @@ public class EntityEditorPage extends InnerPage {
 					log.error("Error creating EntityEditorExtension for " + entityType + " (id:" + ext.getId() + ")", e);
 					// extObj will be null, so we can continue
 				}
-				if (extObj != null && extObj instanceof IEntityEditorExtension) {
-					IEntityEditorExtension extension = (IEntityEditorExtension)extObj;
-					extensions.add(extension);
-				} else {
-					log.error("EntityEditorExtension for entity " + entityType + " does not implement IEntityEditorExtension interface.");
+
+				if (extObj != null) {
+					extension.add(extObj);
 				}
-				
 			}
-			
+
 		}
-		
-		// Step 2 - initialize extensions
-		
-		for (IEntityEditorExtension extension : extensions) {
-			extension.initialize(context, editor);
-			extension.addActions(toolbar);
-		}
-		
-		
+        return extension;
 	}
 
 	/**
@@ -187,21 +202,6 @@ public class EntityEditorPage extends InnerPage {
 		actionEdit.setTitle("Edit");
 		actionEdit.setIconEnabled(ImageLibrary.ICON_EDIT_ACTIVE);
 		actionEdit.setIconDisabled(ImageLibrary.ICON_EDIT_INACTIVE);
-
-        // load tabs from extension point
-		List<IExtension> tabExtensions = ExtensionRegistry.getInstance().getExtensions("entityEditorActions");
-		for (IExtension ext : tabExtensions) {
-			try {
-				ICustomEntityActionCreator entityActionCreator = (ICustomEntityActionCreator) Class.forName(ext.getClassName()).newInstance();
-				IEntityAction entityAction = entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite());
-			} catch (InstantiationException e) {
-				log.error("Error creating editor action " + e.getMessage(), e);
-			} catch (IllegalAccessException e) {
-				log.error("Error creating editor action " + e.getMessage(), e);
-			} catch (ClassNotFoundException e) {
-				log.error("Error creating editor action " + e.getMessage(), e);
-			}
-		}
 	}
 
 	/**
@@ -287,8 +287,5 @@ public class EntityEditorPage extends InnerPage {
 			log.error("Error creating editor", e);
 			getSessionContext().notifyMessage("Error: " + e.toString());
 		}
-		
 	}
-
-	
 }
