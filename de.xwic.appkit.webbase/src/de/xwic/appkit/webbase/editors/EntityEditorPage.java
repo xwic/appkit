@@ -29,10 +29,16 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.registry.ExtensionRegistry;
+import de.xwic.appkit.core.registry.IExtension;
+import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
+import de.xwic.appkit.webbase.actions.IEntityAction;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
+
+import java.util.List;
 
 /**
  * Provides a standard Page 'frame' for the EntityEditor.
@@ -127,7 +133,21 @@ public class EntityEditorPage extends InnerPage {
 		actionEdit.setTitle("Edit");
 		actionEdit.setIconEnabled(ImageLibrary.ICON_EDIT_ACTIVE);
 		actionEdit.setIconDisabled(ImageLibrary.ICON_EDIT_INACTIVE);
-		
+
+        // load tabs from extension point
+		List<IExtension> tabExtensions = ExtensionRegistry.getInstance().getExtensions("entityEditorActions");
+		for (IExtension ext : tabExtensions) {
+			try {
+				ICustomEntityActionCreator entityActionCreator = (ICustomEntityActionCreator) Class.forName(ext.getClassName()).newInstance();
+				IEntityAction entityAction = entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite());
+			} catch (InstantiationException e) {
+				log.error("Error creating editor action " + e.getMessage(), e);
+			} catch (IllegalAccessException e) {
+				log.error("Error creating editor action " + e.getMessage(), e);
+			} catch (ClassNotFoundException e) {
+				log.error("Error creating editor action " + e.getMessage(), e);
+			}
+		}
 	}
 
 	/**
@@ -145,7 +165,7 @@ public class EntityEditorPage extends InnerPage {
 	 * 
 	 */
 	protected void closeEditor() {
-		
+
 		Site site = ExtendedApplication.getInstance(this).getSite();
 		site.popPage(this);
 		
