@@ -109,7 +109,7 @@ public class EditorContext implements IBuilderContext {
 							&& !input.getEntity().isDeleted()
 							&& !(input.getEntity() instanceof IHistory);
 		
-		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType() + ":" + config.getId() + ")");
+		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType().getId() + ":" + config.getId() + ")");
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
 		bindings.put("bundle", bundle);
