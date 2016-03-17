@@ -643,5 +643,13 @@ public class EditorContext implements IBuilderContext {
 		return (IControl) widgetMap.get(id);
 	}
 
+	/**
+	 * Returns true if the entity being edited is new and unsaved.
+	 * @return
+	 */
+	public boolean isNew() {
+		return ((IEntity)model).getId() == 0;
+	}
+
 }
 

@@ -56,6 +56,7 @@ import de.xwic.appkit.core.dao.ISecurityManager;
 import de.xwic.appkit.webbase.actions.EntityActionDelete;
 import de.xwic.appkit.webbase.actions.EntityActionEdit;
 import de.xwic.appkit.webbase.actions.EntityActionNew;
+import de.xwic.appkit.webbase.actions.EntityActionOpen;
 import de.xwic.appkit.webbase.actions.EntityActionsHelper;
 import de.xwic.appkit.webbase.actions.IEntityAction;
 import de.xwic.appkit.webbase.actions.IEntityProvider;
@@ -277,20 +278,41 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 			tg.addAction(actionNew);
 		}
 		
+		boolean showOpen = actions.contains(ListSetup.ACTION_OPEN) && secMan.hasRight(className, ApplicationData.SECURITY_ACTION_READ);
+		if (showOpen) {
+			final EntityActionOpen actionOpen = new EntityActionOpen(site, dao, this);
+			standardActions.add(actionOpen);
+			tg.addAction(actionOpen);
+			
+			entityTable.addElementSelectedListener(new ElementSelectedListener() {
+				@Override
+				public void elementSelected(ElementSelectedEvent event) {
+					if(event.isDblClick()){
+						actionOpen.run();
+					}
+				}
+			});
+		}
+
 		showAction = actions.contains(ListSetup.ACTION_EDIT) && secMan.hasRight(className, ApplicationData.SECURITY_ACTION_UPDATE);
 		if (showAction) {
 			final EntityActionEdit actionEdit = new EntityActionEdit(site, dao, this);
 			standardActions.add(actionEdit);
 			tg.addAction(actionEdit);
 			
-			entityTable.addElementSelectedListener(new ElementSelectedListener() {
-				@Override
-				public void elementSelected(ElementSelectedEvent event) {
-					if(event.isDblClick()){
-						actionEdit.run();
+			if (!showOpen) {
+				// only add a listener to open an entity in edit mode if there is not already
+				// an OPEN action. This way, the default action on a double click is to open
+				// an entity in read mode (if OPEN is present)
+				entityTable.addElementSelectedListener(new ElementSelectedListener() {
+					@Override
+					public void elementSelected(ElementSelectedEvent event) {
+						if(event.isDblClick()){
+							actionEdit.run();
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 
 		showAction = actions.contains(ListSetup.ACTION_DELETE) && secMan.hasRight(className, ApplicationData.SECURITY_ACTION_DELETE);

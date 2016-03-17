@@ -25,19 +25,19 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 
 /**
- * @author Adrian Ionescu
+ * @author lippisch
  */
-public class EntityActionEdit extends AbstractEntityAction {
+public class EntityActionOpen extends AbstractEntityAction {
 
 	/**
 	 * @param site
 	 * @param entityDao
 	 * @param entityProvider
 	 */
-	public EntityActionEdit(Site site, DAO entityDao, IEntityProvider entityProvider) {
-		setTitle("Edit");
-		setIconEnabled(ImageLibrary.ICON_EDIT_ACTIVE);
-		setIconDisabled(ImageLibrary.ICON_EDIT_INACTIVE);
+	public EntityActionOpen(Site site, DAO entityDao, IEntityProvider entityProvider) {
+		setTitle("Open");
+		setIconEnabled(ImageLibrary.ICON_PAGE_OPEN);
+		setIconDisabled(ImageLibrary.ICON_PAGE_OPEN_INACTIVE);
 		setVisible(true);
 		setEnabled(false);
 		
@@ -53,11 +53,10 @@ public class EntityActionEdit extends AbstractEntityAction {
 	@Override
 	public void run() {
 		try {
-			EditorHelper.getInstance().openEditor(site, entityProvider.getEntity(), entityProvider.getBaseEntity(), false);
+			EditorHelper.getInstance().openEditor(site, entityProvider.getEntity(), entityProvider.getBaseEntity(), true);
 		} catch (Exception e) {
 			log.error("Error while executing EntityActionEdit", e);
 			throw new RuntimeException(e);
 		}
 	}
-
 }
