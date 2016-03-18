@@ -96,13 +96,14 @@ public class EntityEditorPage extends InnerPage {
 		createToolbar();
 		createContent(entity, editorConfig);
 		
-		createExtensions();
+		createExtensions(entity.getId());
 	}
 	
 	/**
-	 * Search for editor extensions and initialize them. 
-	 */
-	private void createExtensions() {
+	 * Search for editor extensions and initialize them.
+     * @param id editor entity id
+     */
+	private void createExtensions(Integer id) {
 
 		// Step 1 - find and instantiate extensions...
 		String entityType = context.getEntityDescriptor().getId();
@@ -126,7 +127,7 @@ public class EntityEditorPage extends InnerPage {
 		for (Object ext : tabExtensions) {
 			if(ext instanceof ICustomEntityActionCreator) {
 				ICustomEntityActionCreator entityActionCreator = (ICustomEntityActionCreator) ext;
-				toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite()));
+				toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite(), entityType, String.valueOf(id)));
 			}
 		}
 	}

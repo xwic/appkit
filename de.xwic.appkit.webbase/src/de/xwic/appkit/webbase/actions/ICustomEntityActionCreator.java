@@ -7,5 +7,5 @@ import de.xwic.appkit.webbase.toolkit.app.Site;
  */
 public interface ICustomEntityActionCreator {
 
-   IEntityAction createAction(final Site site);
+   IEntityAction createAction(final Site site, String entityType, String id);
 }
