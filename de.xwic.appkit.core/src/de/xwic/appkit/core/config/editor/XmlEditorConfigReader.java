@@ -71,14 +71,12 @@ public class XmlEditorConfigReader {
 	private final static String NODE_NUMBER = "number";
 	private final static String NODE_HTMLEDITOR = "htmleditor";
 	private final static String NODE_DATE = "date";
-	private final static String NODE_DATETIME = "dateTime";
 	private final static String NODE_CHECKBOX = "checkbox";
 	private final static String NODE_YESNORADIO = "yesNoRadio";
 	private final static String NODE_CUSTOM = "custom";
 	private final static String NODE_INFO = "info";
 	private final static String NODE_IF = "if";
 	private final static String NODE_DATE_RANGE = "dateRange";
-	private final static String NODE_TIME = "time";
 	private final static String NODE_DATETIMERANGE = "dateTimeRange";
 	
 	private final static String NODE_SINGLE_ATTACHMENT = "singleAttachment";
@@ -115,13 +113,11 @@ public class XmlEditorConfigReader {
 		TYPE_MAP.put(NODE_NUMBER, ENumberInputField.class);
 		TYPE_MAP.put(NODE_HTMLEDITOR, EHtmlEditor.class);
 		TYPE_MAP.put(NODE_DATE, EDate.class);
-		TYPE_MAP.put(NODE_DATETIME, EDateTime.class);
 		TYPE_MAP.put(NODE_CHECKBOX, ECheckbox.class);
 		TYPE_MAP.put(NODE_CUSTOM, ECustom.class);
 		TYPE_MAP.put(NODE_INFO, EInfoField.class);
 		TYPE_MAP.put(NODE_IF, EIf.class);
 		TYPE_MAP.put(NODE_DATE_RANGE, EDateRange.class);
-		TYPE_MAP.put(NODE_TIME, ETime.class);
 		TYPE_MAP.put(NODE_DATETIMERANGE, EDateTimeRange.class);
 		TYPE_MAP.put(NODE_SINGLE_ATTACHMENT, ESingleAttachmentField.class);
 	}

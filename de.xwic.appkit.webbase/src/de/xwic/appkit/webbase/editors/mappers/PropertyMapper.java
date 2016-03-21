@@ -19,10 +19,7 @@ package de.xwic.appkit.webbase.editors.mappers;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import de.jwic.base.IControl;
 import de.xwic.appkit.core.config.model.EntityDescriptor;

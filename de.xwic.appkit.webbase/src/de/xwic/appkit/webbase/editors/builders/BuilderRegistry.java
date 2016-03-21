@@ -41,10 +41,11 @@ public class BuilderRegistry {
 		// register standard builder
 		instance = this;
 
-		registerBuilder(EComposite.class, new EContainerBuilder());
+		registerBuilder(EComposite.class, new EContainerBuilder<EComposite>());
 		registerBuilder(EText.class, new EInputboxBuilder());
 		registerBuilder(EEntityField.class, new EEntitySelectorBuilder());
 		registerBuilder(EHtmlEditor.class, new EHtmlEditorBuilder());
+		registerBuilder(EDate.class, new EDateBuilder());
 		registerBuilder(ELabel.class, new ELabelBuilder());
 		registerBuilder(EGroup.class, new EGroupBuilder());
 		registerBuilder(EPicklistCombo.class, new EPicklistComboBuilder());
