@@ -23,9 +23,9 @@ import de.xwic.appkit.core.config.model.Property;
  * @author Florian Lippisch
  *
  */
-public class ControlProperty {
+public class ControlProperty<T extends IControl> {
 
-	private IControl control = null;
+	private T control = null;
 	private Property[] property = null;
 	private boolean infoMode = false; 
 	
@@ -33,7 +33,7 @@ public class ControlProperty {
 	 * @param widget2
 	 * @param property2
 	 */
-	public ControlProperty(IControl control, Property[] property) {
+	public ControlProperty(T control, Property[] property) {
 		this(control, property, false);
 	}
 	
@@ -42,7 +42,7 @@ public class ControlProperty {
 	 * @param property
 	 * @param infoMode
 	 */
-	public ControlProperty(IControl control, Property[] property, boolean infoMode) {
+	public ControlProperty(T control, Property[] property, boolean infoMode) {
 		this.control = control;
 		this.property = property;		
 	}
@@ -50,13 +50,13 @@ public class ControlProperty {
 	/**
 	 * @return the control
 	 */
-	public IControl getWidget() {
+	public T getWidget() {
 		return control;
 	}
 	/**
 	 * @param control the control to set
 	 */
-	public void setWidget(IControl control) {
+	public void setWidget(T control) {
 		this.control = control;
 	}
 	/**

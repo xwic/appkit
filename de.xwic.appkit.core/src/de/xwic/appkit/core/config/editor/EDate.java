@@ -23,5 +23,32 @@ package de.xwic.appkit.core.config.editor;
  * @editortag date
  */
 public class EDate extends EField {
+    public static final String TIME_ONLY = "TIME";
+    public static final String DATETIME = "DATETIME";
 
+    private String mode;
+
+    private boolean seconds = false;
+
+    /**
+     * @return Returns the seconds.
+     */
+    public boolean getSeconds() {
+        return seconds;
+    }
+    /**
+     * @param seconds The seconds to set.
+     * @default false
+     */
+    public void setSeconds(boolean seconds) {
+        this.seconds = seconds;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
 }

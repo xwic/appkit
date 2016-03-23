@@ -40,11 +40,11 @@ public class ImageLibrary {
 
     public static final ImageRef ICON_APPLICATION_CASCADE = new ImageRef("icons/application_cascade.png");
     
-    public static final ImageRef ICON_SAVE_ACTIVE = new ImageRef("icons/save_a.gif");
-    public static final ImageRef ICON_SAVE_INACTIVE = new ImageRef("icons/save_i.gif");
+    public static final ImageRef ICON_SAVE_ACTIVE = new ImageRef("icons/save_a_small.gif");
+    public static final ImageRef ICON_SAVE_INACTIVE = new ImageRef("icons/save_i_small.gif");
 
-    public static final ImageRef ICON_SAVECLOSE_ACTIVE = new ImageRef("icons/saveclose_a.gif");
-    public static final ImageRef ICON_SAVECLOSE_INACTIVE = new ImageRef("icons/saveclose_i.gif");
+    public static final ImageRef ICON_SAVECLOSE_ACTIVE = new ImageRef("icons/saveclose_a_small.gif");
+    public static final ImageRef ICON_SAVECLOSE_INACTIVE = new ImageRef("icons/saveclose_i_small.gif");
 
     public static final ImageRef ICON_ABORT_ACTIVE = new ImageRef("icons/abort_a.gif");
     public static final ImageRef ICON_ABORT_INACTIVE = new ImageRef("icons/abort_i.gif");
@@ -67,14 +67,14 @@ public class ImageLibrary {
 
     public static final ImageRef ICON_REFRESH = new ImageRef("icons/arrow_refresh.png");
     
-    public static final ImageRef ICON_ERROR = new ImageRef("icons/error.png");
+    public static final ImageRef ICON_ERROR = new ImageRef("icons/error_red.png");
+    public static final ImageRef ICON_WARNING = new ImageRef("icons/error.png");
     public static final ImageRef ICON_OK = new ImageRef("icons/ok.png");
     public static final ImageRef ICON_OK_INACTIVE = new ImageRef("icons/ok_i.png");
 
     public static final ImageRef ICON_CLOSED = new ImageRef("icons/closed.png");
     public static final ImageRef ICON_CLOSED_INACTIVE = new ImageRef("icons/closed_i.png");
 
-    public static final ImageRef ICON_WARNING = new ImageRef("icons/warning.gif");
 
     public static final ImageRef ICON_LENS_ACTIVE = new ImageRef("icons/lupe2_a.gif");
     public static final ImageRef ICON_LENS_INACTIVE = new ImageRef("icons/lupe2_i.gif");
@@ -129,5 +129,8 @@ public class ImageLibrary {
     public static final ImageRef ICON_TABLE = new ImageRef("icons/table.png");
     
     public static final ImageRef ICON_CONFIG = new ImageRef("icons/config.png");
+    
+    public static final ImageRef ICON_PAGE_OPEN = new ImageRef("icons/page_white_magnify.png");
+    public static final ImageRef ICON_PAGE_OPEN_INACTIVE = new ImageRef("icons/page_white_magnify_i.png");
 	
 }

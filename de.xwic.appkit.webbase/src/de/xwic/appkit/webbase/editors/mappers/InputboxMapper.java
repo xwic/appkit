@@ -16,11 +16,11 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.mappers;
 
-import de.jwic.base.IControl;
 import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.queries.IPropertyQuery;
 import de.xwic.appkit.webbase.editors.ValidationException;
 
@@ -29,8 +29,10 @@ import de.xwic.appkit.webbase.editors.ValidationException;
  *
  * @author Aron Cotrau
  */
-public class InputboxMapper extends PropertyMapper {
+public class InputboxMapper extends PropertyMapper<InputBox> {
 
+	public final static String MAPPER_ID = "InputBox"; 
+	
 	/**
 	 * @param baseEntity
 	 */
@@ -41,26 +43,26 @@ public class InputboxMapper extends PropertyMapper {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#loadContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void loadContent(IEntity entity, IControl widget, Property[] property) throws MappingException {
+	@Override
+	public void loadContent(IEntity entity, InputBox text, Property[] property) throws MappingException {
 		Object value = readValue(entity, property);
-		InputBox text = (InputBox) widget;
 		text.setText(value != null ? value.toString() : "");
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#setEditable(de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[], boolean)
 	 */
-	public void setEditable(IControl widget, Property[] property, boolean editable) {
-		InputBox text = (InputBox) widget;
+    @Override
+	public void setEditable(InputBox text, Property[] property, boolean editable) {
 		text.setReadonly(!editable);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#storeContent(de.xwic.appkit.core.dao.IEntity, de.jwic.base.IControl, de.xwic.appkit.core.config.model.Property[])
 	 */
-	public void storeContent(IEntity entity, IControl widget, Property[] property) throws MappingException,
+    @Override
+	public void storeContent(IEntity entity, InputBox text, Property[] property) throws MappingException,
 			ValidationException {
-		InputBox text = (InputBox) widget;
 		writeValue(entity, property, text.getText());
 	}
 	
@@ -68,10 +70,26 @@ public class InputboxMapper extends PropertyMapper {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper#addPropertyToQuery(org.eclipse.swt.widgets.Widget, de.xwic.appkit.core.config.model.Property[], de.xwic.appkit.core.model.queries.PropertyQuery)
 	 */
-	protected void addPropertyToQuery(IControl widget, Property[] property, IPropertyQuery query) {
-		InputBox text = (InputBox) widget;
+    @Override
+	protected void addPropertyToQuery(InputBox text, Property[] property, IPropertyQuery query) {
 		if (text.getText().length() > 0) {
 			query.addLikeWithWildcardSetting(getPropertyKey(property), text.getText());
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.mappers.PropertyMapper#highlightWidget(de.jwic.base.IControl, de.xwic.appkit.core.dao.ValidationResult.Severity)
+	 */
+	@Override
+	protected void highlightWidget(InputBox text, Severity error) {
+		if (error == null) {
+			text.setFlagAsError(false);
+		} else if (error == Severity.ERROR) {
+			text.setFlagAsError(true);
+		} else {
+			text.setFlagAsError(false); // do not flag warnings at this time..
+			
+		}
+	}
+	
 }

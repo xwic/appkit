@@ -18,11 +18,14 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import java.util.Iterator;
 
+import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
+import de.jwic.controls.layout.TableData;
 import de.jwic.controls.layout.TableLayoutContainer;
 import de.xwic.appkit.core.config.editor.EComposite;
+import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
@@ -31,7 +34,7 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * 
  * @author Aron Cotrau
  */
-public class EContainerBuilder extends Builder {
+public class EContainerBuilder<T extends EComposite> extends Builder<T> {
 
 	/*
 	 * (non-Javadoc)
@@ -40,17 +43,35 @@ public class EContainerBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		EComposite composite = (EComposite) element;
+	@Override
+	public IControl buildComponents(T composite, IControlContainer parent, IBuilderContext context) {
 		ControlContainer control = null;
-
+		
+		TableLayoutContainer table = null;
 		if (composite.getCols() > 1) {
-			control = new TableLayoutContainer(parent);
-			((TableLayoutContainer) control).setColumnCount(composite.getCols());
+			table = new TableLayoutContainer(parent); 
+			control = table;
+			
+			Style style = composite.getStyle();
+			
+			table.setColumnCount(composite.getCols());
+			table.setCellPadding(style.getStyleInt("padding"));
+			table.setCellSpacing(0);
+			table.setWidth("100%");
+			
+			if (composite.getColWidth() != null && !composite.getColWidth().isEmpty()) {
+				String[] widthHint = composite.getColWidth().split(";");
+				for (int idx = 0; idx < widthHint.length && idx < table.getColumnCount(); idx++) {
+					table.setColWidth(idx, Integer.parseInt(widthHint[idx]));
+				}
+			}
+			
 		} else {
 			control = new ControlContainer(parent);
 		}
-		buildChilds(composite, control, context);
+
+		context.registerWidget(control, composite);
+		buildChilds(composite, control, context, table);
 
 		return control;
 	}
@@ -58,13 +79,25 @@ public class EContainerBuilder extends Builder {
 	/**
 	 * @param composite
 	 * @param parent
+	 * @param table 
+	 * @param widthHint 
+	 * @param table 
 	 */
-	private void buildChilds(EComposite composite, ControlContainer parent, IBuilderContext context) {
-		for (Iterator it = composite.getChilds().iterator(); it.hasNext();) {
-			UIElement element = (UIElement) it.next();
+	private void buildChilds(EComposite composite, ControlContainer parent, IBuilderContext context, TableLayoutContainer table) {
+		for (UIElement element : composite.getChilds()) {
 			Builder builder = BuilderRegistry.getBuilder(element);
 			if (null != builder) {
-				builder.buildComponents(element, parent, context);
+				IControl widget = builder.buildComponents(element, parent, context);
+				if (table != null) {
+					
+					if (widget.getContainer() == table) {
+						TableData layoutData = new TableData();
+						layoutData.setVAlign(TableData.ALIGN_TOP);
+						table.setLayoutData((Control)widget, layoutData);
+					}
+				}
+			} else {
+				log.warn("No Builder registered for element " + composite.getClass().getName());
 			}
 		}
 	}

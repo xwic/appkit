@@ -34,7 +34,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * 
  * @author Aron Cotrau
  */
-public class PicklistEntryRadioGroupControl extends RadioGroup {
+public class PicklistEntryRadioGroupControl extends RadioGroup implements IPicklistEntryControl {
 
 	private String lang = "DE";
 
@@ -76,7 +76,6 @@ public class PicklistEntryRadioGroupControl extends RadioGroup {
 	 * 
 	 * @param picklistKey
 	 */
-	@SuppressWarnings("unchecked")
 	private void setupEntries(String picklistKey) {
 
 		List<IPicklistEntry> entryList = plDao.getAllEntriesToList(picklistKey);
@@ -138,8 +137,17 @@ public class PicklistEntryRadioGroupControl extends RadioGroup {
 
 	/**
 	 * @return the id of the selected entry
+	 * @deprecated Use getSelectedEntry() instead.
 	 */
 	public IPicklistEntry getSelectionEntry() {
+		return getSelectedEntry();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.utils.picklist.IPicklistEntryControl#getSelectedEntry()
+	 */
+	@Override
+	public IPicklistEntry getSelectedEntry() {
 		if (getSelectedKey() == null || getSelectedKey().length() < 1) {
 			return null;
 		}
@@ -155,7 +163,7 @@ public class PicklistEntryRadioGroupControl extends RadioGroup {
 		
 		return null;
 	}
-
+	
 	/**
 	 * @return Returns the picklistKey.
 	 */

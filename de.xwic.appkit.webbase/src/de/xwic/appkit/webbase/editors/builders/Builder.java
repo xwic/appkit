@@ -16,6 +16,9 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.builders;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.xwic.appkit.core.config.editor.UIElement;
@@ -26,8 +29,10 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * 
  * @author Florian Lippisch
  */
-public abstract class Builder {
+public abstract class Builder<T extends UIElement> {
 
+	protected final Log log = LogFactory.getLog(getClass());
+	
 	/**
 	 * Create the components.
 	 * 
@@ -35,5 +40,5 @@ public abstract class Builder {
 	 * @param parent
  	 * @param context
 	 */
-	public abstract IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context);
+	public abstract IControl buildComponents(T element, IControlContainer parent, IBuilderContext context);
 }

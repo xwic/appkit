@@ -388,4 +388,65 @@ public class Property implements Comparable<Property> {
 		this.isPicklistEntry = isPicklistEntry;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((entityDescriptor == null) ? 0 : entityDescriptor.getClassname().hashCode());
+		result = prime * result
+				+ ((entityType == null) ? 0 : entityType.hashCode());
+		result = prime * result + maxLength;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((picklistId == null) ? 0 : picklistId.hashCode());
+		result = prime * result + (required ? 1231 : 1237);
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Property other = (Property) obj;
+		if (entityDescriptor == null) {
+			if (other.entityDescriptor != null)
+				return false;
+		} else if (!entityDescriptor.getClassname().equals(other.entityDescriptor.getClassname()))
+			return false;
+		if (entityType == null) {
+			if (other.entityType != null)
+				return false;
+		} else if (!entityType.equals(other.entityType))
+			return false;
+		if (maxLength != other.maxLength)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (picklistId == null) {
+			if (other.picklistId != null)
+				return false;
+		} else if (!picklistId.equals(other.picklistId))
+			return false;
+		if (required != other.required)
+			return false;
+		return true;
+	}
+
+	
+	
 }

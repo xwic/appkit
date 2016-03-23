@@ -21,6 +21,7 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.ELabel;
 import de.xwic.appkit.core.config.editor.UIElement;
+import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 
 /**
@@ -28,7 +29,7 @@ import de.xwic.appkit.webbase.editors.IBuilderContext;
  * 
  * @author Aron Cotrau
  */
-public class ELabelBuilder extends Builder {
+public class ELabelBuilder extends Builder<ELabel> {
 
 	/*
 	 * (non-Javadoc)
@@ -37,18 +38,23 @@ public class ELabelBuilder extends Builder {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(UIElement element, IControlContainer parent, IBuilderContext context) {
-		ELabel eLabel = (ELabel) element;
+	public IControl buildComponents(ELabel eLabel, IControlContainer parent, IBuilderContext context) {
 		String text = "unnamed";
 		if (eLabel.getTitle() != null) {
 			text = context.getResString(eLabel.getTitle());
 		} else if (eLabel.getProperty() != null) {
-			text = context.getResString(eLabel.getFinalProperty().getName());
+			Property finalProperty = eLabel.getFinalProperty();
+			text = context.getResString(finalProperty);
+			if (finalProperty.getRequired()) {
+				text += "&nbsp;<span class=\"xwic-ed-lbl-required\">*</span>";
+			}
 		}
 
 		Label label = null;
 		label = new Label(parent);
 		label.setText(text);
+		
+		context.registerWidget(label, eLabel);
 
 		return label;
 	}

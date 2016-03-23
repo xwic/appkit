@@ -19,10 +19,7 @@ package de.xwic.appkit.webbase.editors.builders;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.xwic.appkit.core.config.editor.EComposite;
-import de.xwic.appkit.core.config.editor.ELabel;
-import de.xwic.appkit.core.config.editor.EText;
-import de.xwic.appkit.core.config.editor.UIElement;
+import de.xwic.appkit.core.config.editor.*;
 
 /**
  * Contains a map of builders.
@@ -31,9 +28,9 @@ import de.xwic.appkit.core.config.editor.UIElement;
  */
 public class BuilderRegistry {
 
-	private Map byElementMap = new HashMap();
-	private Map byClassMap = new HashMap();
-	private Map byExtension = new HashMap();
+	private Map<Class<?>, Builder> byElementMap = new HashMap<Class<?>, Builder>();
+	private Map<Class<?>, Builder> byClassMap = new HashMap<Class<?>, Builder>();
+	private Map<String, Builder> byExtension = new HashMap<String, Builder>();
 
 	private static BuilderRegistry instance = null;
 
@@ -44,9 +41,19 @@ public class BuilderRegistry {
 		// register standard builder
 		instance = this;
 
-		registerBuilder(EComposite.class, new EContainerBuilder());
+		registerBuilder(EComposite.class, new EContainerBuilder<EComposite>());
 		registerBuilder(EText.class, new EInputboxBuilder());
+		registerBuilder(EEntityField.class, new EEntitySelectorBuilder());
+		registerBuilder(EHtmlEditor.class, new EHtmlEditorBuilder());
+		registerBuilder(EDate.class, new EDateBuilder());
 		registerBuilder(ELabel.class, new ELabelBuilder());
+		registerBuilder(EGroup.class, new EGroupBuilder());
+		registerBuilder(EPicklistCombo.class, new EPicklistComboBuilder());
+		registerBuilder(EPicklistRadio.class, new EPicklistRadioBuilder());
+		registerBuilder(EPicklistCheckbox.class, new EPicklistCheckboxBuilder());
+		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
+		registerBuilder(ENumberInputField.class, new ENumberInputBuilder());
+
 	}
 
 	/**
@@ -55,7 +62,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Class elementClass, Builder builder) {
+	public static void registerBuilder(Class<? extends UIElement> elementClass, Builder<? extends UIElement> builder) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -69,7 +76,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Builder builder) {
+	public static void registerBuilder(Builder<? extends UIElement> builder) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -82,7 +89,7 @@ public class BuilderRegistry {
 	 * @param elementClass
 	 * @param builder
 	 */
-	public static void registerBuilder(Builder builder, String extensionId) {
+	public static void registerBuilder(Builder<? extends UIElement> builder, String extensionId) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
@@ -102,8 +109,7 @@ public class BuilderRegistry {
 		}
 		Builder builder = (Builder) instance.byElementMap.get(element.getClass());
 		if (builder == null) {
-			//TODO: uncomment this when all builders are added
-			//throw new IllegalArgumentException("No builder registered for this element type.");
+			throw new IllegalArgumentException("No builder registered for this element type.");
 		}
 		return builder;
 	}
@@ -114,14 +120,13 @@ public class BuilderRegistry {
 	 * @param element
 	 * @return
 	 */
-	public static Builder getBuilderByClass(Class builderClass) {
+	public static Builder getBuilderByClass(Class<? extends Builder> builderClass) {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
-		Builder builder = (Builder) instance.byClassMap.get(builderClass);
+		Builder builder = instance.byClassMap.get(builderClass);
 		if (builder == null) {
-			//TODO: uncomment this when all builders are added
-			//throw new IllegalArgumentException("No such builder registered type.");
+			throw new IllegalArgumentException("No such builder registered type.");
 		}
 		return builder;
 	}
@@ -136,10 +141,9 @@ public class BuilderRegistry {
 		if (instance == null) {
 			instance = new BuilderRegistry();
 		}
-		Builder builder = (Builder) instance.byExtension.get(extensionId);
+		Builder builder = instance.byExtension.get(extensionId);
 		if (builder == null) {
-			//TODO: uncomment this when all builders are added
-			//throw new IllegalArgumentException("No such builder registered.");
+			throw new IllegalArgumentException("No such builder registered.");
 		}
 		return builder;
 	}

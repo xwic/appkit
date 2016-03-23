@@ -1,0 +1,6 @@
+$insert.control("msgError")
+$insert.control("msgWarn")
+$insert.control("msgInfo")
+#foreach($ctrlId in $control.contentControlIds)
+	$insert.control($ctrlId)
+#end

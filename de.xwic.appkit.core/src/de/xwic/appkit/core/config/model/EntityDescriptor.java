@@ -27,6 +27,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -169,6 +170,16 @@ public class EntityDescriptor {
     		reportTemplates = new ArrayList<ReportTemplate>();
     	}
     	reportTemplates.add(reportTemplate);
+    }
+    
+    /**
+     * @return
+     */
+    public Collection<String> getListSetupIds() {
+    	if (lists != null) {
+    		return lists.keySet();
+    	}
+    	return null;
     }
     
     /**
@@ -359,4 +370,99 @@ public class EntityDescriptor {
 	public void setDefaultDisplayProperty(String defaultDisplayProperty) {
 		this.defaultDisplayProperty = defaultDisplayProperty;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((classname == null) ? 0 : classname.hashCode());
+		result = prime * result + ((domain == null) ? 0 : domain.hashCode());
+		result = prime * result + (hidden ? 1231 : 1237);
+		result = prime * result + (history ? 1231 : 1237);
+		result = prime * result + ((iconKey == null) ? 0 : iconKey.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((lists == null) ? 0 : lists.hashCode());
+		result = prime * result + (monitorable ? 1231 : 1237);
+		result = prime * result
+				+ ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + replicationOrder;
+		result = prime * result
+				+ ((reportTemplates == null) ? 0 : reportTemplates.hashCode());
+		result = prime * result
+				+ ((titlePattern == null) ? 0 : titlePattern.hashCode());
+		result = prime * result + (transform ? 1231 : 1237);
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EntityDescriptor other = (EntityDescriptor) obj;
+		if (classname == null) {
+			if (other.classname != null)
+				return false;
+		} else if (!classname.equals(other.classname))
+			return false;
+		if (domain == null) {
+			if (other.domain != null)
+				return false;
+		} else if (!domain.equals(other.domain))
+			return false;
+		if (hidden != other.hidden)
+			return false;
+		if (history != other.history)
+			return false;
+		if (iconKey == null) {
+			if (other.iconKey != null)
+				return false;
+		} else if (!iconKey.equals(other.iconKey))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (lists == null) {
+			if (other.lists != null)
+				return false;
+		} else if (!lists.equals(other.lists))
+			return false;
+		if (monitorable != other.monitorable)
+			return false;
+		if (properties == null) {
+			if (other.properties != null)
+				return false;
+		} else if (!properties.equals(other.properties))
+			return false;
+		if (replicationOrder != other.replicationOrder)
+			return false;
+		if (reportTemplates == null) {
+			if (other.reportTemplates != null)
+				return false;
+		} else if (!reportTemplates.equals(other.reportTemplates))
+			return false;
+		if (titlePattern == null) {
+			if (other.titlePattern != null)
+				return false;
+		} else if (!titlePattern.equals(other.titlePattern))
+			return false;
+		if (transform != other.transform)
+			return false;
+		return true;
+	}
+	
+	
+	
 }
