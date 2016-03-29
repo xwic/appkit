@@ -15,8 +15,7 @@ public class CompanyUrlActionCreator implements ICustomEntityActionCreator {
         IEntityAction entityAction = new AbstractEntityAction() {
             @Override
             public void run() {
-                CenteredWindow centeredWindow = new CenteredWindow(site);
-                centeredWindow.show();
+                site.getSessionContext().queueScriptCall("location.href='google.com'");
             }
         };
         entityAction.setTitle("Show company URL");
