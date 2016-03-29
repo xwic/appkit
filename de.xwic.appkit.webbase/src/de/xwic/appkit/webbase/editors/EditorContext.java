@@ -51,7 +51,7 @@ import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
 import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
-import de.xwic.appkit.webbase.editors.mappers.StandardMapperFactory;
+import de.xwic.appkit.webbase.editors.mappers.MapperFactory;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
@@ -191,7 +191,7 @@ public class EditorContext implements IBuilderContext {
 		PropertyMapper<IControl> mapper = mappers.get(mapperId);
 		if (mapper == null) {
 			try {
-				mapper = StandardMapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
+				mapper = MapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
 			} catch (Exception e) {
 				String msg = "Error creating mapper " + mapperId; 
 				log.error(msg, e);

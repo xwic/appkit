@@ -113,7 +113,9 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (ControlProperty<T> wp : widgets) {
 			String msg = validateWidget(wp.getWidget(), wp.getProperty());
 			if (msg != null) {
-				result.addError(getPropertyKey(wp.getProperty()), msg);
+				Property[] path = wp.getProperty();
+				String key = path[path.length - 1].getEntityDescriptor().getClassname() + "." + path[path.length - 1].getName();
+				result.addError(key, msg);
 			}
 		}
 		return result;

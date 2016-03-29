@@ -17,13 +17,22 @@ package de.xwic.appkit.webbase.editors.mappers;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.jwic.base.IControl;
+import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
+import de.xwic.appkit.core.registry.ExtensionRegistry;
+import de.xwic.appkit.core.registry.IExtension;
 import de.xwic.appkit.webbase.editors.EditorConfigurationException;
+import de.xwic.appkit.webbase.editors.builders.Builder;
+import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;
 
 import javax.swing.text.html.HTML;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Creates a mapper instance of the specified type. This factory knows only the
@@ -31,16 +40,21 @@ import javax.swing.text.html.HTML;
  * 
  * @author Lippisch
  */
-public class StandardMapperFactory {
+public class MapperFactory {
 
-	private static StandardMapperFactory instance = null;
+	public final static String EXP_ENTITY_EDITOR_MAPPER = "entityEditorMapper";
+
+	private final static Log log = LogFactory.getLog(MapperFactory.class);
+
+	private static MapperFactory instance = null;
 	
 	private Map<String, Class<? extends PropertyMapper<?>>> knownMappers = new HashMap<String, Class<? extends PropertyMapper<?>>>();
 	
 	/**
 	 * Private constructor, turning this class into a singleton.
 	 */
-	private StandardMapperFactory() {
+	@SuppressWarnings("unchecked")
+	private MapperFactory() {
 		
 		knownMappers.put(InputboxMapper.MAPPER_ID, InputboxMapper.class);
 		knownMappers.put(HtmlEditorMapper.MAPPER_ID, HtmlEditorMapper.class);
@@ -50,17 +64,35 @@ public class StandardMapperFactory {
 		knownMappers.put(YesNoRadioGroupMapper.MAPPER_ID, YesNoRadioGroupMapper.class);
 		knownMappers.put(EntitySelectorMapper.MAPPER_ID, EntitySelectorMapper.class);
 		knownMappers.put(DatePickerMapper.MAPPER_ID, DatePickerMapper.class);
+		
+		
+		// register 'extensions'
+		List<IExtension> extensions = ExtensionRegistry.getInstance().getExtensions(EXP_ENTITY_EDITOR_MAPPER);
+		for (IExtension ex : extensions) {
+			try {
+				String mapperClazz = ex.getClassName();
+				Class<PropertyMapper<?>> clazz = (Class<PropertyMapper<?>>) Class.forName(mapperClazz);
+				if (knownMappers.containsKey(ex.getId())) {
+					log.info("Mapper with ID '" + ex.getId() + "' is already registered. Mapper will be overriden.");
+				}
+				knownMappers.put(ex.getId(), clazz);
+				log.info("Registered mapper with id " + ex.getId());
+			} catch (Exception e) {
+				log.error("Error registering custom builder id '" + ex.getId() + "'", e);
+			}
+		}
+
 	}
 
 	/**
 	 * Returns the single instance of the StandardMapperFactory.
 	 * @return
 	 */
-	public static StandardMapperFactory instance() {
+	public static MapperFactory instance() {
 		if (instance == null) {
-			synchronized(StandardMapperFactory.class) {
+			synchronized(MapperFactory.class) {
 				if (instance == null) {
-					instance = new StandardMapperFactory();
+					instance = new MapperFactory();
 				}
 			}
 		}

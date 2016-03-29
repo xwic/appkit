@@ -17,9 +17,15 @@
 package de.xwic.appkit.webbase.editors.builders;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.xwic.appkit.core.config.editor.*;
+import de.xwic.appkit.core.registry.ExtensionRegistry;
+import de.xwic.appkit.core.registry.IExtension;
 
 /**
  * Contains a map of builders.
@@ -28,11 +34,15 @@ import de.xwic.appkit.core.config.editor.*;
  */
 public class BuilderRegistry {
 
+	public final static String EXP_ENTITY_EDITOR_BUILDER = "entityEditorBuilder";
+	
 	private Map<Class<?>, Builder> byElementMap = new HashMap<Class<?>, Builder>();
 	private Map<Class<?>, Builder> byClassMap = new HashMap<Class<?>, Builder>();
 	private Map<String, Builder> byExtension = new HashMap<String, Builder>();
 
 	private static BuilderRegistry instance = null;
+	
+	private final static Log log = LogFactory.getLog(BuilderRegistry.class);
 
 	/**
 	 * Constructor.
@@ -53,7 +63,20 @@ public class BuilderRegistry {
 		registerBuilder(EPicklistCheckbox.class, new EPicklistCheckboxBuilder());
 		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
 		registerBuilder(ENumberInputField.class, new ENumberInputBuilder());
+		registerBuilder(ECustom.class, new ECustomBuilder());
 
+		
+		// register 'extensions'
+		List<IExtension> extensions = ExtensionRegistry.getInstance().getExtensions(EXP_ENTITY_EDITOR_BUILDER);
+		for (IExtension ex : extensions) {
+			try {
+				Builder<UIElement> customBuilder = (Builder<UIElement>)ex.createExtensionObject();
+				registerBuilder(customBuilder, ex.getId());
+			} catch (Exception e) {
+				log.error("Error registering custom builder id '" + ex.getId() + "'", e);
+			}
+		}
+		
 	}
 
 	/**
@@ -95,6 +118,7 @@ public class BuilderRegistry {
 		}
 		instance.byClassMap.put(builder.getClass(), builder);
 		instance.byExtension.put(extensionId, builder);
+		log.info("Registered custom builder with id " + extensionId);
 	}
 
 	/**
@@ -143,7 +167,7 @@ public class BuilderRegistry {
 		}
 		Builder builder = instance.byExtension.get(extensionId);
 		if (builder == null) {
-			throw new IllegalArgumentException("No such builder registered.");
+			throw new IllegalArgumentException("No builder with extension id + '" + extensionId + "' registered.");
 		}
 		return builder;
 	}
