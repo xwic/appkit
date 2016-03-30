@@ -16,6 +16,8 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.events;
 
+import de.xwic.appkit.webbase.editors.EditorContext;
+
 /**
  * Factory interface for extending editor listener.
  *

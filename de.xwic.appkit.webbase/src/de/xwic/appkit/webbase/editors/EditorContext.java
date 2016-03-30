@@ -476,7 +476,7 @@ public class EditorContext implements IBuilderContext {
 	/**
 	 * @param result
 	 */
-	void displayValidationResults(ValidationResult result) {
+	public void displayValidationResults(ValidationResult result) {
 
 		for (EditorContentPage page : pages) {
 			page.resetMessages();
