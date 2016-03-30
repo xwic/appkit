@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors;
 
@@ -26,6 +26,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -55,7 +56,7 @@ import de.xwic.appkit.webbase.editors.mappers.StandardMapperFactory;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
- * 
+ *
  * @author Florian Lippisch
  */
 public class EditorContext implements IBuilderContext {
@@ -64,9 +65,10 @@ public class EditorContext implements IBuilderContext {
 	static final int EVENT_LOADED = 1;
 	static final int EVENT_BEFORESAVE = 2;
 	static final int EVENT_PAGES_CREATED = 3;
-	
+
 	private final static Log log = LogFactory.getLog(EditorContext.class);
-	
+	private static final String EP_EDITOR_LISTENER = "editorListener";
+
 	private GenericEditorInput input = null;
 	private EditorConfiguration config = null;
 	private IEntityModel model = null;
@@ -85,7 +87,7 @@ public class EditorContext implements IBuilderContext {
 	private List<EditorContentPage> pages = new ArrayList<EditorContentPage>();
 	private List<EditorListener> listeners = new ArrayList<EditorListener>();
 	private List<HideWhenWidgetWrapper> hideWhenWidgets = new ArrayList<HideWhenWidgetWrapper>();
-	
+
 	/** This list contains errors that happened during the start. They are displayed to the user. */
 	private List<String> initErrors = new ArrayList<String>();
 
@@ -103,12 +105,12 @@ public class EditorContext implements IBuilderContext {
 		this.bundle = config.getEntityType().getDomain().getBundle(langId);
 		this.model = EntityModelFactory.createModel(input.getEntity());
 		this.dirty = input.getEntity().getId() == 0; // is a new entity.
-		
+
 		DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
-		this.editable = dao.hasRight(input.getEntity(), "UPDATE") 
+		this.editable = dao.hasRight(input.getEntity(), "UPDATE")
 							&& !input.getEntity().isDeleted()
 							&& !(input.getEntity() instanceof IHistory);
-		
+
 		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType() + ":" + config.getId() + ")");
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
@@ -123,12 +125,17 @@ public class EditorContext implements IBuilderContext {
 			initErrors.add("ScriptException in GlobalScript for editor configuration (" + se + ")");
 			log.error("Error evaluating global script in Editor(" + config.getEntityType() + ":" + config.getId() + ")", se);
 		}
-		
-	}
+        final String entityType = getEntityDescriptor().getClassname();
+        final List<IEditorListenerFactory> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_LISTENER, entityType);
+        for (IEditorListenerFactory listenerExtension : listenerExtensions) {
+            EditorListener editorListener = listenerExtension.createListener();
+            addEditorListener(editorListener);
+        }
+    }
 
 	/**
 	 * Add an EditorListener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public synchronized void addEditorListener(EditorListener listener) {
@@ -137,7 +144,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Remove an EditorListener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public synchronized void removeEditorListener(EditorListener listener) {
@@ -146,7 +153,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Fire an event.
-	 * 
+	 *
 	 * @param event
 	 */
 	void fireEvent(int eventId, boolean isNewEntity) {
@@ -164,16 +171,16 @@ public class EditorContext implements IBuilderContext {
 				case EVENT_BEFORESAVE:
 					listener.beforeSave(event);
 					break;
-				case EVENT_PAGES_CREATED: 
+				case EVENT_PAGES_CREATED:
 					listener.pagesCreated(event);
 					break;
-			} 
+			}
 		}
 	}
 
 	/**
 	 * Register a field that uses a custom mapper.
-	 * 
+	 *
 	 * @param property
 	 * @param widget
 	 * @param id
@@ -193,7 +200,7 @@ public class EditorContext implements IBuilderContext {
 			try {
 				mapper = StandardMapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
 			} catch (Exception e) {
-				String msg = "Error creating mapper " + mapperId; 
+				String msg = "Error creating mapper " + mapperId;
 				log.error(msg, e);
 				initErrors.add(msg + " (" + e.toString() + ")");
 				return;
@@ -204,7 +211,7 @@ public class EditorContext implements IBuilderContext {
 
 		if (currPage == null) {
 			// This is a problem when the editor container is not creating the tabs properly.
-			// before creating a tab, the current page should be set and after creating the 
+			// before creating a tab, the current page should be set and after creating the
 			// currPage should be set to null again.
 			throw new IllegalStateException("No current page assigned!");
 		}
@@ -228,13 +235,13 @@ public class EditorContext implements IBuilderContext {
 		// set initial editable flag.
 		mapper.setEditable(widget, property, editable && (finalprop == null || finalprop.hasReadWriteAccess()));
 	}
-	
+
 	/**
 	 * Register a widget with the given id. If the id is <code>null</code>, the widget
 	 * will not be registered but no exception is thrown.
 	 * <p>This is useful for widgets that should be accessible from script but are not a field by
 	 * itself, like a container.
-	 * 
+	 *
 	 * @param id
 	 * @param widget
 	 */
@@ -250,7 +257,7 @@ public class EditorContext implements IBuilderContext {
 			}
 			widgetMap.put(id, widget);
 		}
-		
+
 		if (uiDef.getHideWhen() != null && !uiDef.getHideWhen().trim().isEmpty()) {
 			// the widget has some logic that is to be evaluated after refreshes. Add the
 			// control to the hideWhenField list
@@ -282,10 +289,10 @@ public class EditorContext implements IBuilderContext {
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the values from the entity model into the fields.
-	 * 
+	 *
 	 * @throws MappingException
 	 */
 	public void loadFromEntity() throws MappingException {
@@ -296,7 +303,7 @@ public class EditorContext implements IBuilderContext {
 				mapper.loadContent(entity);
 			}
 			fireEvent(EVENT_LOADED, entity.getId() == 0);
-			
+
 			// if not new, validate
 			if (entity.getId() != 0) {
 				displayValidationResults(validateFields());
@@ -307,9 +314,9 @@ public class EditorContext implements IBuilderContext {
 				// on new entities.
 				displayValidationResults(new ValidationResult());
 			}
-			
+
 			evaluateHideWhens();
-			
+
 		} finally {
 			inTransaction = false;
 		}
@@ -320,7 +327,7 @@ public class EditorContext implements IBuilderContext {
 	 * hide/show those widgets.
 	 */
 	private void evaluateHideWhens() {
-		
+
 		for (HideWhenWidgetWrapper hwWidget : hideWhenWidgets) {
 			try {
 				hwWidget.evaluate(scriptEngine);
@@ -328,12 +335,12 @@ public class EditorContext implements IBuilderContext {
 				log.error("Error evaluating 'hideWhen'", e);
 			}
 		}
-		
+
 	}
 
 	/**
 	 * Validates the fields on the form.
-	 * 
+	 *
 	 * @return A ValidationResult containing all errors
 	 * @throws MappingException
 	 */
@@ -347,7 +354,7 @@ public class EditorContext implements IBuilderContext {
 				result.addErrors(tempResult.getErrorMap());
 				result.addWarnings(tempResult.getWarningMap());
 			}
-			
+
 			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
 				throw new DataAccessException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
@@ -356,12 +363,12 @@ public class EditorContext implements IBuilderContext {
 			ValidationResult daoResult = dao.validateEntity((IEntity) model);
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
-			
+
 			// now that all validations are done, highlight fields with errors
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.highlightValidationResults(result);
-			}			
-			
+			}
+
 			return result;
 		} finally {
 			inTransaction = false;
@@ -375,11 +382,11 @@ public class EditorContext implements IBuilderContext {
 	 * @throws EntityModelException
 	 */
 	public ValidationResult saveToEntity() throws ValidationException, MappingException, EntityModelException {
-		
+
 		if (!initErrors.isEmpty()) {
 			throw new IllegalStateException("Save is disabled as there have been exceptions during initialization of the editor.");
 		}
-		
+
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity) model;
@@ -416,13 +423,13 @@ public class EditorContext implements IBuilderContext {
 			inTransaction = false;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.editors.IBuilderContext#fieldChanged(de.xwic.appkit.core.config.model.Property[])
 	 */
 	@Override
 	public void fieldChanged(Property[] property) {
-		
+
 		long t = System.currentTimeMillis();
 
 		if (inTransaction) {
@@ -431,8 +438,8 @@ public class EditorContext implements IBuilderContext {
 		}
 
 		// something changed? set dirty.
-		setDirty(true); 
-		
+		setDirty(true);
+
 		// update the property on the entity (model), to perform the hideWhen evaluation
 		IEntity entity = (IEntity) model;
 		try {
@@ -443,23 +450,23 @@ public class EditorContext implements IBuilderContext {
 			// Just log an error, do not notify users
 			log.warn("Error handling field change", me);
 		}
-		
+
 		evaluateHideWhens();
-		
+
 		long dur = System.currentTimeMillis() - t;
 		if (dur > 100) {
 			log.info("fieldChange handling took more than 100ms in Editor for " + this.config.getEntityType().getClassname());
 		}
-		
+
 	}
-	
+
 	/**
 	 * Write the property values to the model without saving (commiting) the model.
 	 * @throws MappingException
 	 * @throws ValidationException
 	 */
 	public void updateModel() throws MappingException, ValidationException {
-		
+
 		IEntity entity = (IEntity) model;
 		for (PropertyMapper<IControl> mapper : mappers.values()) {
 			mapper.storeContent(entity);
@@ -475,7 +482,7 @@ public class EditorContext implements IBuilderContext {
 			page.resetMessages();
 		}
 		EditorContentPage mainPage = pages.get(0);
-		
+
 		// add any initialization error
 		for (String msg : initErrors) {
 			mainPage.addError(msg);
@@ -535,7 +542,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Returns the EditorConfiguration.
-	 * 
+	 *
 	 * @return
 	 */
 	public EditorConfiguration getEditorConfiguration() {
@@ -570,7 +577,7 @@ public class EditorContext implements IBuilderContext {
 	 * When a page is rendered, it must set itself as current page so that the
 	 * context can assign created properties to the page. Warnings and Error
 	 * messages for properties can then be assigned to the right page.
-	 * 
+	 *
 	 * @param currPage
 	 *            the currPage to set
 	 */
