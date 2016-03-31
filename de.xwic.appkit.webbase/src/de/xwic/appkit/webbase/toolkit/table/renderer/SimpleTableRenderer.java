@@ -397,13 +397,5 @@ public class SimpleTableRenderer implements ITableRenderer, Serializable{
 		}
 		log = LogFactory.getLog(getClass());
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.jwic.controls.tableviewer.ITableRenderer#renderMTable(de.jwic.base.RenderContext, de.jwic.controls.tableviewer.TableViewer, de.jwic.controls.tableviewer.TableModel, de.jwic.controls.tableviewer.ITableLabelProvider)
-	 */
-	@Override
-	public void renderMTable(RenderContext arg0, TableViewer arg1, TableModel arg2, ITableLabelProvider arg3) {
-		// not implemented. But should also get removed in future.
-	}
 
 }
