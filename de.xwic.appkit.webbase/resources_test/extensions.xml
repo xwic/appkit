@@ -1,0 +1,11 @@
+<config>
+    <extensions>
+        <!--
+            ENTITY EDITOR ACTIONS
+         -->
+        <extension extensionPointId="entityEditorActions" id="companyUrlOpenAction"
+                   className="CompanyUrlActionCreator"
+                   priority="0">
+        </extension>
+    </extensions>
+</config>
