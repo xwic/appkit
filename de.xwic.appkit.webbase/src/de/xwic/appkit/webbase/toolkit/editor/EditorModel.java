@@ -20,13 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DAO;
-import de.xwic.appkit.core.dao.DAOProvider;
-import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.dao.*;
 import de.xwic.appkit.core.file.uc.AttachmentUseCase;
 import de.xwic.appkit.core.file.uc.AttachmentWrapper;
 import de.xwic.appkit.core.file.uc.CommentUseCase;
@@ -114,6 +108,7 @@ public class EditorModel extends EditorEventSupport {
 
         DAO dao = DAOSystem.findDAOforEntity(entity.type());
         lastValidationResult = dao.validateEntity(entity);
+		ValidationCallContext.popuplateValidtionFromContext(lastValidationResult);
 
         onAfterValidationRefreshRequest(this);
         // Disatvantage, if Editortoolkit markInvalid Field-Property is set to true: You could get some Exceptions twice! 

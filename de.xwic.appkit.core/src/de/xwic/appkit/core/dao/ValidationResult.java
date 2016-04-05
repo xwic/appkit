@@ -33,7 +33,7 @@ import de.xwic.appkit.core.cluster.INode;
  * @author Ronny Pfretzschner
  *
  */
-public class ValidationResult {
+public class ValidationResult implements IValidationResult {
 
 	public enum Severity {
 		ERROR,
@@ -77,6 +77,7 @@ public class ValidationResult {
 	 * 
 	 * @return true, if errors were added
 	 */
+	@Override
 	public boolean hasErrors() {
 		return !valErrorMap.isEmpty();
 	}
@@ -86,6 +87,7 @@ public class ValidationResult {
 	 * 
 	 * @return true, if warnings were added
 	 */
+	@Override
 	public boolean hasWarnings() {
 		return !valWarningMap.isEmpty();
 	}
@@ -102,6 +104,7 @@ public class ValidationResult {
 	 * @param property the attribute, which has warnings 
 	 * @param warningKey the resource string key
 	 */
+	@Override
 	public void addWarning(String property, String warningKey) {
 		valWarningMap.put(property, warningKey);
 	}
@@ -119,6 +122,7 @@ public class ValidationResult {
 	 * @param errorKey the resource string key
 	 * @param infoProps the additional properties info to be added to the error message.
 	 */
+	@Override
 	public void addError(String property, String errorKey, Object... infoProps) {
 		valErrorMap.put(property, errorKey);
 		if(!valErrorInfoMap.containsKey(property)){
@@ -138,6 +142,7 @@ public class ValidationResult {
 	 * 
 	 * @return a new instance of the Map with all errors registered 
 	 */
+	@Override
 	public Map<String, String> getErrorMap() {
 		return new HashMap<String, String>(valErrorMap);
 	}
@@ -146,6 +151,7 @@ public class ValidationResult {
 	 * Returns the Map with additional error informations for error properties
 	 * @return
 	 */
+	@Override
 	public Map<String, List<Object>> getValErrorInfoMap() {
 		return valErrorInfoMap;
 	}
@@ -156,6 +162,7 @@ public class ValidationResult {
 	 * 
 	 * @return a new instance of the Map with all warnings registered 
 	 */
+	@Override
 	public Map<String, String> getWarningMap() {
 		return new HashMap<String, String>(valWarningMap);
 	}
@@ -167,6 +174,7 @@ public class ValidationResult {
 	 * 
 	 * @param allErrors
 	 */
+	@Override
 	public void addErrors(Map<String, String> allErrors) {
 		valErrorMap.putAll(allErrors);
 	}
@@ -179,6 +187,7 @@ public class ValidationResult {
 	 * 
 	 * @param allWarnings
 	 */
+	@Override
 	public void addWarnings(Map<String, String> allWarnings) {
 		valWarningMap.putAll(allWarnings);
 	}

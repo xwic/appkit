@@ -26,6 +26,7 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
+import de.xwic.appkit.core.dao.*;
 import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,12 +38,6 @@ import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.DAO;
-import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.IHistory;
-import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
@@ -364,6 +359,7 @@ public class EditorContext implements IBuilderContext {
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
 
+			ValidationCallContext.popuplateValidtionFromContext(result);
 			// now that all validations are done, highlight fields with errors
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.highlightValidationResults(result);
@@ -413,6 +409,7 @@ public class EditorContext implements IBuilderContext {
 				loadFromEntity(); // load probably modified data.
 				result = dao.validateEntity(entity); // revalidate after
 														// save.
+				ValidationCallContext.popuplateValidtionFromContext(result);
 			}else{
 				// RCPErrorDialog.openError(UIToolsPlugin.getResourceString("error.dialog.EditorContext.validationfail"));
 			}
