@@ -28,10 +28,12 @@ import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.model.EntityModelException;
+import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
 import de.xwic.appkit.webbase.editors.builders.Builder;
 import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;
 import de.xwic.appkit.webbase.editors.builders.EContainerBuilder;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
+import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 
 /**
  * Generates a form to edit an entity based upon a user configuration.
@@ -40,6 +42,7 @@ import de.xwic.appkit.webbase.editors.mappers.MappingException;
  */
 public class EntityEditor extends ControlContainer {
 
+	private static final String EP_EDITOR_PANELS = "";
 	private GenericEditorInput input = null;
 	private EditorContext context = null;
 

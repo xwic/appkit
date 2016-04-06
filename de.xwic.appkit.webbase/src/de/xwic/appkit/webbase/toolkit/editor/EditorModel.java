@@ -108,7 +108,6 @@ public class EditorModel extends EditorEventSupport {
 
         DAO dao = DAOSystem.findDAOforEntity(entity.type());
         lastValidationResult = dao.validateEntity(entity);
-		ValidationCallContext.popuplateValidtionFromContext(lastValidationResult);
 
         onAfterValidationRefreshRequest(this);
         // Disatvantage, if Editortoolkit markInvalid Field-Property is set to true: You could get some Exceptions twice! 

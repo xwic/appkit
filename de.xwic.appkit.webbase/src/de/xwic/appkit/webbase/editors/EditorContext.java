@@ -62,7 +62,14 @@ public class EditorContext implements IBuilderContext {
 	static final int EVENT_PAGES_CREATED = 3;
 
 	private final static Log log = LogFactory.getLog(EditorContext.class);
+	/**
+	 * Editor entity listener custom extension point name.
+	 */
 	private static final String EP_EDITOR_LISTENER = "editorListener";
+	/**
+	 * Editor entity validator custom extension point name.
+	 */
+	private static final String EP_EDITOR_VALIDATOR = "editorValidator";
 
 	private GenericEditorInput input = null;
 	private EditorConfiguration config = null;
@@ -359,15 +366,21 @@ public class EditorContext implements IBuilderContext {
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
 
-			ValidationCallContext.popuplateValidtionFromContext(result);
+			validateEntity(result, getEntityDescriptor().getClassname());
 			// now that all validations are done, highlight fields with errors
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.highlightValidationResults(result);
 			}
-
 			return result;
 		} finally {
 			inTransaction = false;
+		}
+	}
+
+	private void validateEntity(ValidationResult result, String entityType) {
+		final List<IEditorValidator> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
+		for (IEditorValidator editorValidator : listenerExtensions) {
+			editorValidator.validate(model, result);
 		}
 	}
 
@@ -409,7 +422,7 @@ public class EditorContext implements IBuilderContext {
 				loadFromEntity(); // load probably modified data.
 				result = dao.validateEntity(entity); // revalidate after
 														// save.
-				ValidationCallContext.popuplateValidtionFromContext(result);
+				validateEntity(result, getEntityDescriptor().getClassname());
 			}else{
 				// RCPErrorDialog.openError(UIToolsPlugin.getResourceString("error.dialog.EditorContext.validationfail"));
 			}
