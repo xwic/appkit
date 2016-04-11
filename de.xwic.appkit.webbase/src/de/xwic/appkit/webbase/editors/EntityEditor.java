@@ -41,8 +41,6 @@ import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
  * @author lippisch
  */
 public class EntityEditor extends ControlContainer {
-
-	private static final String EP_EDITOR_PANELS = "";
 	private GenericEditorInput input = null;
 	private EditorContext context = null;
 

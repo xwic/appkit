@@ -377,6 +377,13 @@ public class EditorContext implements IBuilderContext {
 		}
 	}
 
+	/**
+	 * Validate entity model using extension validator.
+	 * Iterate all possible validation extensions and perform validation.
+	 *
+	 * @param result validation result
+	 * @param entityType type of entity to validate
+	 */
 	private void validateEntity(ValidationResult result, String entityType) {
 		final List<IEditorValidator> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
 		for (IEditorValidator editorValidator : listenerExtensions) {
