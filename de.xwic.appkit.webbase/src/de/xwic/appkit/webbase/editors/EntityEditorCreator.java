@@ -22,8 +22,11 @@ import de.xwic.appkit.core.config.Profile;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.webbase.actions.editors.AbstractEntityEditorCreator;
+import de.xwic.appkit.webbase.editors.events.EditorAdapter;
+import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.editor.EditorModel;
+import de.xwic.appkit.webbase.toolkit.editor.EditorModelEvent;
 
 /**
  * Adapter to the old way of opening an editor via an EditorCreator.
@@ -45,13 +48,22 @@ public class EntityEditorCreator extends AbstractEntityEditorCreator {
 	 * de.xwic.appkit.webbase.toolkit.editor.EditorModel)
 	 */
 	@Override
-	protected IControl getEditorPage(Site site, EditorModel editorModel) {
+	protected IControl getEditorPage(Site site, final EditorModel editorModel) {
 		Profile profile = ConfigurationManager.getUserProfile();
 		EditorConfiguration editorConfig;
 		try {
 			editorConfig = profile.getEditorConfiguration(editorModel.getEntity().type().getName());
 			EntityEditorPage editorPage = new EntityEditorPage(site.getContentContainer(), null, editorModel.getEntity(), editorConfig);
 			
+			// for compatibility reasons, delegate the afterSave event to the EditorModel,
+			// so that the controls who opened the entity can refresh after save.
+			editorPage.getContext().addEditorListener(new EditorAdapter() {
+				@Override
+				public void afterSave(EditorEvent event) {
+					EditorModelEvent emEvent = new EditorModelEvent(EditorModelEvent.AFTER_SAVE, editorModel);
+					editorModel.fireModelChangedEvent(emEvent);
+				}
+			});
 			
 			
 			return editorPage;

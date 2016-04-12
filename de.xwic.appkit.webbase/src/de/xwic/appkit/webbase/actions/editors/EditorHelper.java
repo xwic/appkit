@@ -29,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Profile;
-import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.registry.ExtensionRegistry;
 import de.xwic.appkit.core.registry.IExtension;

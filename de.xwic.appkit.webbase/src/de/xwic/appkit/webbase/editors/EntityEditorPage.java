@@ -35,15 +35,10 @@ import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.registry.ExtensionRegistry;
 import de.xwic.appkit.core.registry.IExtension;
 import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
-import de.xwic.appkit.webbase.actions.IEntityAction;
-import de.xwic.appkit.core.registry.ExtensionRegistry;
-import de.xwic.appkit.core.registry.IExtension;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
-
-import java.util.List;
 
 /**
  * Provides a standard Page 'frame' for the EntityEditor.
@@ -236,7 +231,7 @@ public class EntityEditorPage extends InnerPage {
 		try {
 			ValidationResult validationResult = context.saveToEntity();
 			if (validationResult.hasErrors()) {
-				getSessionContext().notifyMessage("There have been issues... *eek*", "error");
+				getSessionContext().notifyMessage("The changes could not be saved due to validation errors. Please review the issues below and try again.", "error");
 			} else {
 				getSessionContext().notifyMessage("Your changes have been saved...");
 				return true;
@@ -288,5 +283,12 @@ public class EntityEditorPage extends InnerPage {
 			log.error("Error creating editor", e);
 			getSessionContext().notifyMessage("Error: " + e.toString());
 		}
+	}
+
+	/**
+	 * Returns the underlying EditorContext.
+	 */
+	public EditorContext getContext() {
+		return context;
 	}
 }
