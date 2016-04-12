@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.3.9</version>
+    <version>5.3.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - AppKit</name>
@@ -30,7 +30,7 @@
         <connection>scm:git:https://github.com/xwic/appkit.git</connection>
         <developerConnection>scm:git:https://github.com/xwic/appkit.git</developerConnection>
         <url>https://github.com/xwic/appkit</url>
-        <tag>appkit-5.3.9</tag>
+        <tag>master</tag>
     </scm>
     <developers>
         <developer>
