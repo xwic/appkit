@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.resource.transaction.spi.TransactionStatus;
 
 import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProvider;
@@ -77,7 +78,7 @@ public class HibernateDAOProvider implements DAOProvider {
         		HibernateUtil.currentSession() :
         		HibernateUtil.openSession();
         		
-		boolean startTx = session.getTransaction() == null || !session.getTransaction().isActive();
+		boolean startTx = session.getTransaction() == null || session.getTransaction().getStatus() != TransactionStatus.ACTIVE;
 		Transaction tx = null;
 		if (startTx) {
 			tx = session.beginTransaction();
@@ -92,7 +93,7 @@ public class HibernateDAOProvider implements DAOProvider {
 			return o;
 		} finally {
 			// an exception occurred
-			if (rollback && tx != null && tx.isActive() && !tx.wasRolledBack()) {
+			if (rollback && tx != null && tx.getStatus().canRollback()) {
 				tx.rollback();
 			}
 			// If we use our own session, we must close it by ourself.
