@@ -28,6 +28,7 @@ import javax.script.ScriptException;
 
 import de.xwic.appkit.core.dao.*;
 import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
+import de.xwic.appkit.webbase.editors.events.ValidationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -366,7 +367,7 @@ public class EditorContext implements IBuilderContext {
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
 
-			validateEntity(result, getEntityDescriptor().getClassname());
+			fireValidated(result, getEntityDescriptor().getClassname(), false);
 			// now that all validations are done, highlight fields with errors
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.highlightValidationResults(result);
@@ -384,10 +385,10 @@ public class EditorContext implements IBuilderContext {
 	 * @param result validation result
 	 * @param entityType type of entity to validate
 	 */
-	private void validateEntity(ValidationResult result, String entityType) {
-		final List<IEditorValidator> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
-		for (IEditorValidator editorValidator : listenerExtensions) {
-			editorValidator.validate(model, result);
+	private void fireValidated(ValidationResult result, String entityType, boolean onSave) {
+		final List<IEditorValidatorListener> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
+		for (IEditorValidatorListener editorValidator : listenerExtensions) {
+			editorValidator.modelValidated(new ValidationEvent(model, result, onSave));
 		}
 	}
 
@@ -429,7 +430,7 @@ public class EditorContext implements IBuilderContext {
 				loadFromEntity(); // load probably modified data.
 				result = dao.validateEntity(entity); // revalidate after
 														// save.
-				validateEntity(result, getEntityDescriptor().getClassname());
+				fireValidated(result, getEntityDescriptor().getClassname(), true);
 			}else{
 				// RCPErrorDialog.openError(UIToolsPlugin.getResourceString("error.dialog.EditorContext.validationfail"));
 			}
