@@ -148,7 +148,7 @@ public class XmlEditorConfigReader {
 		try {
 			InputStream in = file.openStream();
 			DocumentBuilder dom = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document doc = (Document) dom.parse(in);
+			Document doc = dom.parse(in);
 			in.close();
 			return instance.buildConfig(doc);
 		} catch (Exception e) {
@@ -168,7 +168,7 @@ public class XmlEditorConfigReader {
 
 		try {
 			DocumentBuilder dom = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document doc = (Document) dom.parse(in);
+			Document doc = dom.parse(in);
 			in.close();
 			return instance.buildConfig(doc);
 		} catch (Exception e) {
@@ -421,8 +421,7 @@ public class XmlEditorConfigReader {
 		if (enRoot == null && type.indexOf('.') == -1) {
 			// find matching type
 			String search = "." + type;
-			for (Iterator<String> it = model.getManagedEntities().iterator(); it.hasNext();) {
-				String enType = it.next();
+			for (String enType : model.getManagedEntities()) {
 				if (enType.endsWith(search)) {
 					enRoot = model.getEntityDescriptor(enType);
 					break;
