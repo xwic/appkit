@@ -105,10 +105,10 @@
         </tab>
         <subTabs>
             <subTab title="Contacts">
-                <listView type="IContact" filterOn="customer" listProfile="blabla"/>
+                <listView type="de.xwic.sandbox.demoapp.model.entities.IContact" filterOn="customer" listProfile="default"/>
             </subTab>
             <subTab title="Calculator">
-                <custom class="de.bla.bla.CustomContentCreator"/>
+                <custom extension="CustomContentCreator"/>
             </subTab>
         </subTabs>
     </layout>

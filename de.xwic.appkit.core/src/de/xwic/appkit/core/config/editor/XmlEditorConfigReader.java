@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 package de.xwic.appkit.core.config.editor;
 
@@ -47,15 +47,18 @@ import de.xwic.appkit.core.config.model.Property;
 /**
  * Reads the editor configuration from an xml document. The data is automaticaly
  * mapped to bean properties via reflection.
- * 
+ *
  * @author Florian Lippisch
  */
 public class XmlEditorConfigReader {
 
 	private final static String NODE_TAB = "tab";
+	private final static String NODE_SUBTAB = "subTab";
+	private final static String NODE_LISTVIEW = "listView";
 	private final static String NODE_AUTOFIELD = "autofield";
 	private final static String NODE_COMBOBOX = "combobox";
 	private final static String NODE_COMPOSITE = "composite";
+	private final static String NODE_SUBTABS = "subTabs";
 	private final static String NODE_FIELD = "field";
 	private final static String NODE_MAIL = "mail";
 	private final static String NODE_WEBADDR = "webaddr";
@@ -80,9 +83,9 @@ public class XmlEditorConfigReader {
 	private final static String NODE_DATE_RANGE = "dateRange";
 	private final static String NODE_TIME = "time";
 	private final static String NODE_DATETIMERANGE = "dateTimeRange";
-	
+
 	private final static String NODE_SINGLE_ATTACHMENT = "singleAttachment";
-	
+
 	private EditorConfiguration config = null;
 
 	private Model model = null;
@@ -90,13 +93,16 @@ public class XmlEditorConfigReader {
 	private EntityDescriptor enRoot = null;
 
 	private static Map<String, Class<? extends UIElement>> TYPE_MAP = new HashMap<String, Class<? extends UIElement>>();
+
 	/*
-	 * Map a node to a field implementation. The nodename is used within the xml
-	 * files to specify such a field.
-	 */
+         * Map a node to a field implementation. The nodename is used within the xml
+         * files to specify such a field.
+         */
 	static {
 		TYPE_MAP.put(NODE_YESNORADIO, EYesNoRadio.class);
 		TYPE_MAP.put(NODE_TAB, ETab.class);
+		TYPE_MAP.put(NODE_SUBTAB, ESubTab.class);
+		TYPE_MAP.put(NODE_LISTVIEW, EListView.class);
 		TYPE_MAP.put(NODE_AUTOFIELD, EAutofield.class);
 		TYPE_MAP.put(NODE_COMBOBOX, ECombobox.class);
 		TYPE_MAP.put(NODE_COMPOSITE, EComposite.class);
@@ -128,7 +134,7 @@ public class XmlEditorConfigReader {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param descriptor
 	 */
 	private XmlEditorConfigReader(Model model) {
@@ -137,7 +143,7 @@ public class XmlEditorConfigReader {
 
 	/**
 	 * Create/Read an editor configuration.
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 * @throws Exception
@@ -158,7 +164,7 @@ public class XmlEditorConfigReader {
 
 	/**
 	 * Create/Read an editor configuration.
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 * @throws Exception
@@ -175,32 +181,32 @@ public class XmlEditorConfigReader {
 			throw new ParseException("Error parsing editor configuration. " + e, e);
 		}
 	}
-	
+
 	/**
 	 * Reads the configuration for the quicksearch panel in a list setup.
 	 * @param model2
 	 * @param listSetup
 	 * @param node
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	public static EComposite readSimpleConfig(Model model, EntityDescriptor descriptor, Node node) throws ParseException {
-		
+
 		XmlEditorConfigReader instance = new XmlEditorConfigReader(model);
 		return instance.buildSimpleConfig(descriptor, node);
-		
+
 	}
 
 	/**
 	 * @param node
 	 * @return
-	 * @throws ParseException 
+	 * @throws ParseException
 	 */
 	private EComposite buildSimpleConfig(EntityDescriptor descriptor, Node root) throws ParseException {
-		
+
 		config = new EditorConfiguration();
 		enRoot = descriptor;
 		EComposite result = null;
-		
+
 		NodeList nl = root.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
@@ -226,7 +232,7 @@ public class XmlEditorConfigReader {
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -262,6 +268,10 @@ public class XmlEditorConfigReader {
 		}
 
 		return config;
+	}
+
+	private void buildSubTabs(Element subTabs) throws ParseException {
+
 	}
 
 	/**
@@ -304,7 +314,21 @@ public class XmlEditorConfigReader {
 					ETab tab = (ETab) createUINode(element);
 					config.addTab(tab);
 				}
-			}
+                if (element.getNodeName().equals(NODE_SUBTABS)) {
+                    Element subTabs = (Element) node;
+                    NodeList subTabElement = subTabs.getChildNodes();
+                    for (int subTabIndex = 0; subTabIndex < subTabElement.getLength(); subTabIndex++) {
+                        Node subTabItem = subTabElement.item(subTabIndex);
+                        if (subTabItem.getNodeType() == Node.ELEMENT_NODE) {
+                            Element subTabItem1 = (Element) subTabItem;
+                            if (subTabItem1.getNodeName().equals(NODE_SUBTAB)) {
+                                ESubTab tab = (ESubTab) createUINode(subTabItem1);
+                                config.addSubTab(tab);
+                            }
+                        }
+                    }
+                }
+            }
 		}
 	}
 
@@ -378,9 +402,9 @@ public class XmlEditorConfigReader {
 						value = editor.getValue();
 					}
 				}
-				
-				mWrite.invoke(uiEl, new Object[] { value });
-				
+
+				mWrite.invoke(uiEl, value);
+
 			} catch (ParseException pe) {
 				throw pe;
 			} catch (ConfigurationException ce) {
@@ -437,7 +461,7 @@ public class XmlEditorConfigReader {
 
 	/**
 	 * Returns the text value of an XML node element
-	 * 
+	 *
 	 * @return java.lang.String
 	 * @param node
 	 *            org.w3c.dom.Node
