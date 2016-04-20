@@ -24,6 +24,7 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.Tab;
 import de.jwic.controls.TabStrip;
 import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.editor.ESubTab;
 import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
@@ -75,19 +76,30 @@ public class EntityEditor extends ControlContainer {
 	public void createControls() {
 		try {
 			EditorConfiguration config = input.getConfig();
-			List<?> tabs = config.getTabs();
+			List<ETab> tabs = config.getTabs();
 			//setTitle(input.getName());
 
 			TabStrip mainTabs = new TabStrip(this);
-			
-			for (Iterator<?> it = tabs.iterator(); it.hasNext();) {
-				ETab eTab = (ETab) it.next();
+
+			for (ETab eTab : tabs) {
 				Tab tab = mainTabs.addTab(eTab.getTitle());
 				EditorContentPage page = new EditorContentPage(tab, null);
 				page.setTitle(eTab.getTitle());
-				
+
 				context.setCurrPage(page);
 				createPage(page, eTab);
+				context.setCurrPage(null);
+			}
+			TabStrip bottomTabs = new TabStrip(this);
+			List<ESubTab> subTabs = config.getSubTabs();
+			for(ESubTab eSubTab : subTabs) {
+				Tab tab = bottomTabs.addTab(eSubTab.getTitle());
+				EditorContentPage page = new EditorContentPage(tab, null);
+				page.setTitle(eSubTab.getTitle());
+
+				context.setCurrPage(page);
+				Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
+				builder.buildComponents(eSubTab, page, context);
 				context.setCurrPage(null);
 			}
 		} catch (Exception e) {

@@ -46,6 +46,7 @@ public class BuilderRegistry {
 		registerBuilder(EEntityField.class, new EEntitySelectorBuilder());
 		registerBuilder(EHtmlEditor.class, new EHtmlEditorBuilder());
 		registerBuilder(ELabel.class, new ELabelBuilder());
+		registerBuilder(EListView.class, new EListViewBuilder());
 		registerBuilder(EGroup.class, new EGroupBuilder());
 		registerBuilder(EPicklistCombo.class, new EPicklistComboBuilder());
 		registerBuilder(EPicklistRadio.class, new EPicklistRadioBuilder());
