@@ -113,7 +113,7 @@ public class EditorContext implements IBuilderContext {
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
 		bindings.put("bundle", bundle);
-		bindings.put("context", this);
+		bindings.put("ctx", this);
 
 		try {
 			if (config.getGlobalScript() != null && !config.getGlobalScript().trim().isEmpty()) {
