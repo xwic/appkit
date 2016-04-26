@@ -58,6 +58,7 @@ class EntityModelImpl implements IEntityModel {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.IEntityModel#addPropertyChangeListener(java.beans.PropertyChangeListener)
 	 */
+	@Override
 	public void addPropertyChangeListener(PropertyChangeListener pListener) {
 		
 		PropertyChangeListener[] list = listeners.getPropertyChangeListeners();
@@ -73,6 +74,7 @@ class EntityModelImpl implements IEntityModel {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.IEntityModel#commit()
 	 */
+	@Override
 	public void commit() throws EntityModelException {
 		
 		try {
@@ -108,6 +110,7 @@ class EntityModelImpl implements IEntityModel {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.IEntityModel#getOriginalEntity()
 	 */
+	@Override
 	public IEntity getOriginalEntity() {
 		return entity;
 	}
@@ -115,6 +118,7 @@ class EntityModelImpl implements IEntityModel {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.IEntityModel#isModified()
 	 */
+	@Override
 	public boolean isModified() {
 		return modified;
 	}
@@ -142,6 +146,7 @@ class EntityModelImpl implements IEntityModel {
 	 * Remove a PropertyChangeListener.
 	 * @param pListener
 	 */
+	@Override
 	public void removePropertyChangeListener(PropertyChangeListener pListener) {
 		listeners.removePropertyChangeListener(pListener);
 	}
@@ -154,6 +159,7 @@ class EntityModelImpl implements IEntityModel {
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public Object getProperty(String name) throws Exception {
 		
 		if (data.containsKey(name)) {

@@ -37,6 +37,8 @@ public class EditorConfiguration {
 	private EntityDescriptor entityType = null;
 	
 	private List<ETab> tabs = new ArrayList<ETab>();
+
+	private List<ESubTab> subTabs = new ArrayList<ESubTab>();
 	private Map<String, Style> styleTemplates = new HashMap<String, Style>();
 	
 	private String globalScript = null;
@@ -134,5 +136,18 @@ public class EditorConfiguration {
 	 */
 	public void setGlobalScript(String globalScript) {
 		this.globalScript = globalScript;
+	}
+
+
+	/**
+	 * Add a sub tab to the editor.
+	 * @param tab
+	 */
+	public void addSubTab(ESubTab tab) {
+		subTabs.add(tab);
+	}
+
+	public List<ESubTab> getSubTabs() {
+		return subTabs;
 	}
 }

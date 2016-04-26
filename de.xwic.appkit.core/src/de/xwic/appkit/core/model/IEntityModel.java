@@ -61,4 +61,6 @@ public interface IEntityModel {
 	 */
 	public void removePropertyChangeListener(PropertyChangeListener pListener);
 
+	@SuppressWarnings("unchecked")
+	Object getProperty(String name) throws Exception;
 }
