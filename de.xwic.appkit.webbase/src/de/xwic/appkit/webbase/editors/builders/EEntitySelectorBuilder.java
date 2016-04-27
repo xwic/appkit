@@ -18,6 +18,8 @@ package de.xwic.appkit.webbase.editors.builders;
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
+import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.editor.EEntityField;
 import de.xwic.appkit.core.config.editor.EGroup;
 import de.xwic.appkit.core.config.editor.EPicklistCombo;
@@ -56,17 +58,30 @@ public class EEntitySelectorBuilder extends Builder<EEntityField> {
      *      de.xwic.appkit.webbase.editors.IBuilderContext)
      */
     public IControl buildComponents(EEntityField entityField, IControlContainer parent, IBuilderContext context) {
-        Class<? extends IEntity> entityType = getPropertyClass(entityField);
+
+        final PropertyDescriptor refPropDescriptor = entityField.getFinalProperty().getDescriptor();
+        Class<? extends IEntity> entityType = (Class<? extends IEntity>) refPropDescriptor.getPropertyType();
+        
+        String[] queryProp = new String[0];
+        
+        try {
+	        EntityDescriptor refEntityDescr = ConfigurationManager.getSetup().getEntityDescriptor(entityType.getName());
+	        if (refEntityDescr.getDefaultDisplayProperty() != null) {
+	        	queryProp = new String[] { refEntityDescr.getDefaultDisplayProperty() };
+	        }
+        
+        } catch (ConfigurationException ce) {
+        	log.error("Error resolving referenced entity type", ce);
+        }
+
         GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType,
-                entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName());
+                entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName(), queryProp);
+        
+        
         final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
         context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);
         return comboSelector;
     }
 
-    private Class<? extends IEntity> getPropertyClass(EEntityField entityField) {
-        final PropertyDescriptor entityDescriptor = entityField.getFinalProperty().getDescriptor();
-        return (Class<? extends IEntity>) entityDescriptor.getPropertyType();
-    }
 }

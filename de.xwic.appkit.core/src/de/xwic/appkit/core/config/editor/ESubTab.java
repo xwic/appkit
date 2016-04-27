@@ -17,9 +17,12 @@
 package de.xwic.appkit.core.config.editor;
 
 /**
- * A Tab element within an editor.
+ * Defines a tab in the bottom section of an editor. SubTab's cannot contain
+ * regular editor elements, but things like list-views and others. SubTabs are 
+ * hidden if the entity is new and not saved yet.
+ * 
  * @author Florian Lippisch
- * @editortag tab
+ * @editortag subTab
  */
 public class ESubTab extends EComposite {
 
