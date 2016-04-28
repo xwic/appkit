@@ -39,44 +39,6 @@ import de.xwic.appkit.webbase.entityviewer.EntityListViewConfiguration;
  */
 public class EListViewBuilder extends Builder<EListView> {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.xwic.appkit.webbase.editors.builders.Builder#buildComponents(de.xwic.appkit.core.config.editor.UIElement,
-	 *      de.jwic.base.IControlContainer,
-	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
-	 */
-	public IControl buildComponents(EText text, IControlContainer parent, IBuilderContext context) {
-
-		InputBox inputBox = new InputBox(parent);
-
-		inputBox.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
-		inputBox.setReadonly(text.isReadonly());
-		inputBox.setMultiLine(text.isMultiline());
-		if (text.isMultiline()) {
-			inputBox.setHeight(100);
-		}
-		Property prop = text.getFinalProperty();
-		if (prop.getMaxLength() > 0) {
-			inputBox.setMaxLength(prop.getMaxLength());
-		}
-		if (prop.getRequired()) {
-			inputBox.setEmptyInfoText("Required Field");
-		}
-		
-		Style style = text.getStyle();
-		if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
-			inputBox.setWidth(style.getStyleInt(Style.WIDTH_HINT) );
-		}
-
-		if (style.getStyleInt(Style.HEIGHT_HINT) != 0) {
-			inputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT) );
-		}
-
-		context.registerField(text.getProperty(), inputBox, text, InputboxMapper.MAPPER_ID);
-		
-		return inputBox;
-	}
 
 	@Override
 	public IControl buildComponents(EListView element, IControlContainer parent, IBuilderContext context) {
