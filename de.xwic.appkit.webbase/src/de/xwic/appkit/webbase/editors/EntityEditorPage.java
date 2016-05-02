@@ -63,8 +63,9 @@ public class EntityEditorPage extends InnerPage {
 	/**
 	 * @param container
 	 * @param name
+	 * @throws EditorConfigurationException 
 	 */
-	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) {
+	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
 		super(container, name);
 		
 		
@@ -233,8 +234,9 @@ public class EntityEditorPage extends InnerPage {
 	/**
 	 * Create the editor.
 	 * @param editorModel
+	 * @throws EditorConfigurationException 
 	 */
-	private void createContent(IEntity entity, EditorConfiguration editorConfig) {
+	private void createContent(IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
 		
 		try {
 			
@@ -253,6 +255,7 @@ public class EntityEditorPage extends InnerPage {
 		} catch (Exception e) {
 			log.error("Error creating editor", e);
 			getSessionContext().notifyMessage("Error: " + e.toString());
+			throw new EditorConfigurationException("An error occured while creating the editor.", e);
 		}
 	}
 

@@ -18,17 +18,13 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.editor.EListView;
-import de.xwic.appkit.core.config.editor.EText;
-import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
-import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
-import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
+import de.xwic.appkit.webbase.editors.mappers.ListViewMapper;
 import de.xwic.appkit.webbase.entityviewer.EntityListView;
 import de.xwic.appkit.webbase.entityviewer.EntityListViewConfiguration;
 
@@ -40,12 +36,27 @@ import de.xwic.appkit.webbase.entityviewer.EntityListViewConfiguration;
 public class EListViewBuilder extends Builder<EListView> {
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public IControl buildComponents(EListView element, IControlContainer parent, IBuilderContext context) {
 		try {
 			Class<? extends IEntity> entityClass = (Class<? extends IEntity>) Class.forName(element.getType());
 			EntityListViewConfiguration entityListViewConfiguration = new EntityListViewConfiguration(entityClass);
-			return new EntityListView(parent, entityListViewConfiguration);
+			
+			// set a base filter here, which will later be manipulated in the mapper
+			PropertyQuery query = new PropertyQuery();
+			if (element.getFilterOn() != null && !element.getFilterOn().isEmpty()) {
+				query.addEquals(element.getFilterOn(), -1);
+			}
+			
+			entityListViewConfiguration.setBaseFilter(query);
+			
+			EntityListView listView = new EntityListView(parent, entityListViewConfiguration);
+			
+			context.registerField(null, listView, element, ListViewMapper.MAPPER_ID);
+
+			return listView;
+			
 		} catch (ClassNotFoundException e) {
 			log.error(e.getMessage(), e);
 			return null;

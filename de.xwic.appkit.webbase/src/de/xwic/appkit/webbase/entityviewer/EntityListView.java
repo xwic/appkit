@@ -759,4 +759,11 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 	public boolean hasEntity() {
 		return !entityTable.getTableViewer().getModel().getSelection().isEmpty();
 	}
+
+	/**
+	 * @return the configuration
+	 */
+	public EntityListViewConfiguration getConfiguration() {
+		return configuration;
+	}
 }

@@ -231,7 +231,9 @@ public class EditorContext implements IBuilderContext {
 			}
 		}
 		//propertyPageMap.put(sb.toString(), currPage);
-		propertyPageMap.put(finalprop.getEntityDescriptor().getClassname() + "." + finalprop.getName(), currPage);
+		if (finalprop != null) {
+			propertyPageMap.put(finalprop.getEntityDescriptor().getClassname() + "." + finalprop.getName(), currPage);
+		}
 
 		registerWidget(widget, uiDef);
 
