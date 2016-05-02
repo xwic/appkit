@@ -417,6 +417,8 @@ public class EditorContext implements IBuilderContext {
 				throw new MappingException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
 			ValidationResult result = validateFields();
+			fireValidated(result, getEntityDescriptor().getClassname(), true);
+
 			if (!result.hasErrors()) {
 				model.commit();
 				boolean isNew = model.getOriginalEntity().getId() == 0;
@@ -432,7 +434,6 @@ public class EditorContext implements IBuilderContext {
 				loadFromEntity(); // load probably modified data.
 				result = dao.validateEntity(entity); // revalidate after
 														// save.
-				fireValidated(result, getEntityDescriptor().getClassname(), true);
 			}else{
 				// RCPErrorDialog.openError(UIToolsPlugin.getResourceString("error.dialog.EditorContext.validationfail"));
 			}
