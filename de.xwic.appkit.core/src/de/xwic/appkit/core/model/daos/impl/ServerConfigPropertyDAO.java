@@ -115,6 +115,8 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		if (existingProperty == null) {
 			update(property);
 		} else {
+			// always reload the property from DB
+			existingProperty = getConfigProperty(property.getKey(), true);
 			existingProperty.setValue(property.getValue());
 			update(existingProperty);
 		}
