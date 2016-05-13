@@ -102,4 +102,18 @@ public interface IServerConfigPropertyDAO extends DAO<IServerConfigProperty> {
 	 * @return IServerConfigProperty
 	 */
 	public IServerConfigProperty getConfigProperty(String key);
+	
+	/**
+	 * Returns a ServerConfigProperty with the given key. <p>
+	 * 
+	 * @param key
+	 * @param ignoreCache
+	 * @return
+	 */
+	public IServerConfigProperty getConfigProperty(String key, boolean ignoreCache);
+
+	/**
+	 * Clear the cache
+	 */
+	public void dropCache();
 }
