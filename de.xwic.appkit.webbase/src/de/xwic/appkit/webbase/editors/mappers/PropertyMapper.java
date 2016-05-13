@@ -346,11 +346,16 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (ControlProperty<T> wp : widgets) {
 			StringBuilder sbPropId = new StringBuilder();
 			sbPropId.append(baseEntity.getClassname());
-			for (Property p : wp.getProperty()) {
-				sbPropId.append(".");
-				sbPropId.append(p.getName());
+			String fullPropertyId;
+			if (wp.getProperty() != null) {
+				for (Property p : wp.getProperty()) {
+					sbPropId.append(".");
+					sbPropId.append(p.getName());
+				}
+				fullPropertyId = sbPropId.toString();
+			} else {
+				fullPropertyId = "";
 			}
-			String fullPropertyId = sbPropId.toString();
 
 			if (result.getErrorMap().containsKey(fullPropertyId)) {
 				highlightWidget(wp.getWidget(), Severity.ERROR);

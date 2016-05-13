@@ -47,8 +47,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 public class EntityEditorPage extends InnerPage {
 
 	public final static String EXTENSION_POINT_EDITOR_EXT = "enityEditorExtension";
-	public final static String EXT_ATTR_FOR_ENTITY = "forEntity";
-	
+
 	private EntityEditor editor;
 	private EditorContext context;
 
@@ -64,8 +63,9 @@ public class EntityEditorPage extends InnerPage {
 	/**
 	 * @param container
 	 * @param name
+	 * @throws EditorConfigurationException 
 	 */
-	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) {
+	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
 		super(container, name);
 		
 		
@@ -102,7 +102,7 @@ public class EntityEditorPage extends InnerPage {
 
 		// Step 1 - find and instantiate extensions...
 		String entityType = context.getEntityDescriptor().getId();
-		List<Object> extensionObjs = getExtentions(EXTENSION_POINT_EDITOR_EXT, entityType);
+		List<Object> extensionObjs = EditorExtensionUtils.getExtensions(EXTENSION_POINT_EDITOR_EXT, entityType);
 		for (Object extObj : extensionObjs) {
 			if (extObj instanceof IEntityEditorExtension) {
 				IEntityEditorExtension extension = (IEntityEditorExtension) extObj;
@@ -118,38 +118,10 @@ public class EntityEditorPage extends InnerPage {
 			extension.addActions(toolbar);
 		}
 
-		List<Object> tabExtensions = getExtentions("entityEditorActions", entityType);
-		for (Object ext : tabExtensions) {
-			if(ext instanceof ICustomEntityActionCreator) {
-				ICustomEntityActionCreator entityActionCreator = (ICustomEntityActionCreator) ext;
-				toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite(), entityType, String.valueOf(id)));
-			}
+		List<ICustomEntityActionCreator> tabExtensions = EditorExtensionUtils.getExtensions("entityEditorActions", entityType);
+		for (ICustomEntityActionCreator entityActionCreator : tabExtensions) {
+			toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite(), entityType, String.valueOf(id)));
 		}
-	}
-
-	private List<Object> getExtentions(String extPoint, String entityType) {
-		List<Object> extension = new ArrayList<Object>();
-		List<IExtension> rawExtList = ExtensionRegistry.getInstance().getExtensions(extPoint);
-		for (IExtension ext : rawExtList) {
-
-			String applyToEntity = ext.getAttribute(EXT_ATTR_FOR_ENTITY);
-			if (applyToEntity != null && entityType.equals(applyToEntity)) {
-
-				Object extObj = null;
-				try {
-					extObj = ext.createExtensionObject();
-				} catch (Exception e) {
-					log.error("Error creating EntityEditorExtension for " + entityType + " (id:" + ext.getId() + ")", e);
-					// extObj will be null, so we can continue
-				}
-
-				if (extObj != null) {
-					extension.add(extObj);
-				}
-			}
-
-		}
-        return extension;
 	}
 
 	/**
@@ -262,8 +234,9 @@ public class EntityEditorPage extends InnerPage {
 	/**
 	 * Create the editor.
 	 * @param editorModel
+	 * @throws EditorConfigurationException 
 	 */
-	private void createContent(IEntity entity, EditorConfiguration editorConfig) {
+	private void createContent(IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
 		
 		try {
 			
@@ -282,6 +255,7 @@ public class EntityEditorPage extends InnerPage {
 		} catch (Exception e) {
 			log.error("Error creating editor", e);
 			getSessionContext().notifyMessage("Error: " + e.toString());
+			throw new EditorConfigurationException("An error occured while creating the editor.", e);
 		}
 	}
 

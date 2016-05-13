@@ -16,7 +16,6 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.jwic.base.ControlContainer;
@@ -24,6 +23,7 @@ import de.jwic.base.IControlContainer;
 import de.jwic.controls.Tab;
 import de.jwic.controls.TabStrip;
 import de.xwic.appkit.core.config.ConfigurationException;
+import de.xwic.appkit.core.config.editor.ESubTab;
 import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
@@ -31,6 +31,8 @@ import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.webbase.editors.builders.Builder;
 import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;
 import de.xwic.appkit.webbase.editors.builders.EContainerBuilder;
+import de.xwic.appkit.webbase.editors.events.EditorAdapter;
+import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
 
 /**
@@ -39,9 +41,9 @@ import de.xwic.appkit.webbase.editors.mappers.MappingException;
  * @author lippisch
  */
 public class EntityEditor extends ControlContainer {
-
 	private GenericEditorInput input = null;
 	private EditorContext context = null;
+	private TabStrip bottomTabs;
 
 	/**
 	 * @param container
@@ -56,6 +58,14 @@ public class EntityEditor extends ControlContainer {
 		this.context = new EditorContext(input, getSessionContext().getLocale().getLanguage());
 		
 		createControls();
+		
+		context.addEditorListener(new EditorAdapter() {
+			@Override
+			public void entityLoaded(EditorEvent event) {
+				bottomTabs.setVisible(!context.isNew() && !bottomTabs.getTabs().isEmpty());
+			}
+		});
+		
 		try {
 			context.loadFromEntity();
 		} catch (MappingException e) {
@@ -74,21 +84,35 @@ public class EntityEditor extends ControlContainer {
 	public void createControls() {
 		try {
 			EditorConfiguration config = input.getConfig();
-			List<?> tabs = config.getTabs();
+			List<ETab> tabs = config.getTabs();
 			//setTitle(input.getName());
 
-			TabStrip mainTabs = new TabStrip(this);
-			
-			for (Iterator<?> it = tabs.iterator(); it.hasNext();) {
-				ETab eTab = (ETab) it.next();
+			TabStrip mainTabs = new TabStrip(this, "main");
+
+			for (ETab eTab : tabs) {
 				Tab tab = mainTabs.addTab(eTab.getTitle());
 				EditorContentPage page = new EditorContentPage(tab, null);
 				page.setTitle(eTab.getTitle());
-				
+
 				context.setCurrPage(page);
 				createPage(page, eTab);
 				context.setCurrPage(null);
 			}
+			
+			bottomTabs = new TabStrip(this, "bottom");
+			List<ESubTab> subTabs = config.getSubTabs();
+			for(ESubTab eSubTab : subTabs) {
+				Tab tab = bottomTabs.addTab(eSubTab.getTitle());
+				EditorContentPage page = new EditorContentPage(tab, null);
+				page.setTitle(eSubTab.getTitle());
+
+				context.setCurrPage(page);
+				createPage(page, eSubTab);
+				context.setCurrPage(null);
+			}
+			
+			bottomTabs.setVisible(false);
+			
 		} catch (Exception e) {
 			log.error("Error opening editor", e);
 			getSessionContext().notifyMessage("An error occured while initializing controls from the editor:" + e);
@@ -101,7 +125,8 @@ public class EntityEditor extends ControlContainer {
 	 * @param page
 	 * @param eTab
 	 */
-	private void createPage(EditorContentPage page, ETab eTab) {
+	@SuppressWarnings("unchecked")
+	private void createPage(EditorContentPage page, UIElement eTab) {
 		Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
 		builder.buildComponents(eTab, page, context);
 	}

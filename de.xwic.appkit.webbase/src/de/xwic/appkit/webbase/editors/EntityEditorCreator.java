@@ -69,6 +69,8 @@ public class EntityEditorCreator extends AbstractEntityEditorCreator {
 			return editorPage;
 		} catch (ConfigurationException e) {
 			throw new IllegalStateException("The editor configuration somehow disappeared??", e);
+		} catch (EditorConfigurationException e) {
+			throw new IllegalStateException("The editor cannot be initialized.", e);
 		}
 	}
 

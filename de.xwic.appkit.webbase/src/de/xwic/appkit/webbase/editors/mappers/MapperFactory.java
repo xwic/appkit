@@ -64,6 +64,7 @@ public class MapperFactory {
 		knownMappers.put(YesNoRadioGroupMapper.MAPPER_ID, YesNoRadioGroupMapper.class);
 		knownMappers.put(EntitySelectorMapper.MAPPER_ID, EntitySelectorMapper.class);
 		knownMappers.put(DatePickerMapper.MAPPER_ID, DatePickerMapper.class);
+		knownMappers.put(ListViewMapper.MAPPER_ID, ListViewMapper.class);
 		
 		
 		// register 'extensions'
