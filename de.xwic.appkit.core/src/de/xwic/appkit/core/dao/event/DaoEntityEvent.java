@@ -14,35 +14,48 @@
  * limitations under the License.
  *  
  *******************************************************************************/
-/**
- *
- */
-package de.xwic.appkit.core.dao;
+package de.xwic.appkit.core.dao.event;
 
-import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
+import de.xwic.appkit.core.dao.IEntity;
 
 /**
- * @author jbornema
- *
+ * DAO event.
+ * 
+ * Created on 20.05.2016
+ * @author dotto
  */
-public abstract class AbstractHistoryDAO<I extends IEntity, E extends Entity> extends AbstractDAOWithEvent<I, E> {
+public class DaoEntityEvent<T extends IEntity> {
 
-	{
-		// by default enable history handling
-		setHandleHistory(true);
+	public final static int UPDATE = 0;
+	public final static int DELETE = 1;
+	public final static int CACHE_CHANGE = 2;
+		
+	private int eventType = -1;
+
+	private T source = null;
+	
+	/**
+	 * Creates the event for model changes.
+	 * 
+	 * @param eventType
+	 * @param source
+	 */
+	public DaoEntityEvent(int eventType, T source) {
+		this.eventType = eventType;
+		this.source = source;
 	}
 
 	/**
-	 * @param iClass
-	 * @param eClass
+	 * @return Returns the eventType.
 	 */
-	public AbstractHistoryDAO(Class<I> iClass, Class<E> eClass) {
-		super(iClass, eClass);
+	public int getEventType() {
+		return eventType;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.AbstractDAO#getHistoryImplClass()
+	/**
+	 * @return Returns the source.
 	 */
-	@Override
-	public abstract Class<? extends IHistory> getHistoryImplClass();
+	public T getSource() {
+		return source;
+	}
 }

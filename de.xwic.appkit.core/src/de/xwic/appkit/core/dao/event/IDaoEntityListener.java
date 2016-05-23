@@ -14,35 +14,23 @@
  * limitations under the License.
  *  
  *******************************************************************************/
-/**
- *
- */
-package de.xwic.appkit.core.dao;
+package de.xwic.appkit.core.dao.event;
 
-import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
+import de.xwic.appkit.core.dao.IEntity;
 
 /**
- * @author jbornema
- *
+ * Listener for DAO changes.
+ * 
+ * Created on 20.05.2016
+ * 
+ * @author dotto
  */
-public abstract class AbstractHistoryDAO<I extends IEntity, E extends Entity> extends AbstractDAOWithEvent<I, E> {
+public interface IDaoEntityListener<T extends IEntity> {
 
-	{
-		// by default enable history handling
-		setHandleHistory(true);
-	}
-
+	
 	/**
-	 * @param iClass
-	 * @param eClass
+	 * 
+	 * @param event The EditorModelEvent
 	 */
-	public AbstractHistoryDAO(Class<I> iClass, Class<E> eClass) {
-		super(iClass, eClass);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.dao.AbstractDAO#getHistoryImplClass()
-	 */
-	@Override
-	public abstract Class<? extends IHistory> getHistoryImplClass();
+	public void daoEntityChanged(DaoEntityEvent<T> event);
 }

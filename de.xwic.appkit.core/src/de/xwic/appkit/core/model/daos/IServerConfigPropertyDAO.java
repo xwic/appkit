@@ -16,7 +16,7 @@
  *******************************************************************************/
 package de.xwic.appkit.core.model.daos;
 
-import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.event.DAOWithEvent;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 
 /**
@@ -25,7 +25,7 @@ import de.xwic.appkit.core.model.entities.IServerConfigProperty;
  * @author Ronny Pfretzschner
  *
  */
-public interface IServerConfigPropertyDAO extends DAO<IServerConfigProperty> {
+public interface IServerConfigPropertyDAO extends DAOWithEvent<IServerConfigProperty> {
 
 	/**
 	 * Creates a ServerConfigProperty with a boolean as value. <p>

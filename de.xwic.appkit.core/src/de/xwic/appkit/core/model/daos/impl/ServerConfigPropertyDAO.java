@@ -24,6 +24,8 @@ import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
+import de.xwic.appkit.core.dao.event.DaoEntityEvent;
 import de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 import de.xwic.appkit.core.model.entities.impl.ServerConfigProperty;
@@ -36,7 +38,7 @@ import de.xwic.appkit.core.model.queries.ServerConfigPropertyByKeyQuery;
  * @author Ronny Pfretzschner
  *
  */
-public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, ServerConfigProperty> implements IServerConfigPropertyDAO {
+public class ServerConfigPropertyDAO extends AbstractDAOWithEvent<IServerConfigProperty, ServerConfigProperty> implements IServerConfigPropertyDAO {
 
 	private Map<String, IServerConfigProperty> allProperties = new HashMap<String, IServerConfigProperty>();
 
@@ -233,5 +235,6 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	@Override
 	public void dropCache() {
 		allProperties.clear();
+		fireEntityChangeEvent(new DaoEntityEvent(DaoEntityEvent.CACHE_CHANGE, null));
 	}
 }

@@ -29,7 +29,6 @@ import java.util.Set;
 
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
-import de.xwic.appkit.core.dao.AbstractDAO;
 import de.xwic.appkit.core.dao.DAOCallback;
 import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DAOSystem;
@@ -37,6 +36,8 @@ import de.xwic.appkit.core.dao.DataAccessException;
 import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
+import de.xwic.appkit.core.dao.event.DaoEntityEvent;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPicklistText;
@@ -53,7 +54,7 @@ import de.xwic.appkit.core.util.CollectionUtil;
  * DAO implementation for the Pickliste object.
  * @author Florian Lippisch
  */
-public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements IPicklisteDAO {
+public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> implements IPicklisteDAO {
 
 	/** container for the picklist cache. */
 	protected PicklistCache cache = new PicklistCache();
@@ -77,7 +78,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 			throw new RuntimeException("Pickliste mit key: \"" + key + "\" existiert bereits!");
 		}
 
-	    return (IPickliste)provider.execute(new DAOCallback() {
+	    pl = (IPickliste)provider.execute(new DAOCallback() {
 			@Override
 			public Object run(DAOProviderAPI api) {
 				IPickliste picklist = new Pickliste(key, title, beschreibung);
@@ -85,6 +86,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 				return picklist;
 			}
 		});
+	    fireEntityChangeEvent(new DaoEntityEvent<IPickliste>(DaoEntityEvent.UPDATE, pl));
+	    return pl; 
 	}
 
 	/* (non-Javadoc)
@@ -148,7 +151,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
      */
     @Override
 	public IPicklistEntry createPickListEntry(final IPickliste list) {
-		return (IPicklistEntry)provider.execute(new DAOCallback() {
+		IPicklistEntry pe = (IPicklistEntry)provider.execute(new DAOCallback() {
 			@Override
 			public Object run(DAOProviderAPI api) {
 		        IPicklistEntry newEntry = new PicklistEntry(list);
@@ -156,6 +159,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		        return newEntry;
 			}
 		});
+		fireEntityChangeEvent(new DaoEntityEvent<IPicklistEntry>(DaoEntityEvent.UPDATE, pe));
+		return pe;
     }
 
     /*
@@ -164,7 +169,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
      */
     @Override
 	public IPicklistText createBezeichnung(final IPicklistEntry entry, final String langID, final String bezeichnung) {
-    	return (IPicklistText)provider.execute(new DAOCallback() {
+    	IPicklistText peText =
+    	(IPicklistText)provider.execute(new DAOCallback() {
 			@Override
 			public Object run(DAOProviderAPI api) {
 				PicklistText newText = new PicklistText(entry, langID, bezeichnung);
@@ -172,6 +178,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		        return newText;
 			}
 		});
+    	fireEntityChangeEvent(new DaoEntityEvent<IPicklistText>(DaoEntityEvent.UPDATE, peText));
+    	return peText;
     }
 
     /* (non-Javadoc)
@@ -395,6 +403,7 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 	@Override
 	public void dropCache() {
 		cache.clear();
+		fireEntityChangeEvent(new DaoEntityEvent<IEntity>(DaoEntityEvent.CACHE_CHANGE, null));
 	}
 
 	/* (non-Javadoc)
@@ -421,8 +430,8 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 		if (entity instanceof IPicklistEntry) {
 			IPicklistEntry entry = (IPicklistEntry)entity;
 			cache.removePicklistEntry(entry);
-
 		}
+		fireEntityChangeEvent(new DaoEntityEvent<IEntity>(DaoEntityEvent.DELETE, entity));
 	}
 
 	/**
@@ -532,5 +541,18 @@ public class PicklisteDAO extends AbstractDAO<IPickliste, Pickliste> implements 
 			}
 		}
 		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.dao.event.AbstractDAOWithEvent#softDelete(de.xwic.appkit.core.dao.IEntity)
+	 */
+	@Override
+	public void softDelete(IEntity entity) throws DataAccessException {
+		super.softDelete(entity);
+		if (entity instanceof IPicklistEntry) {
+			IPicklistEntry entry = (IPicklistEntry)entity;
+			cache.removePicklistEntry(entry);
+		}
+		fireEntityChangeEvent(new DaoEntityEvent<IEntity>(DaoEntityEvent.DELETE, entity));
 	}
 }
