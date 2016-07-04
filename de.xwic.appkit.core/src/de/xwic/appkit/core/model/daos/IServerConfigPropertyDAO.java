@@ -16,7 +16,7 @@
  *******************************************************************************/
 package de.xwic.appkit.core.model.daos;
 
-import de.xwic.appkit.core.dao.event.DAOWithEvent;
+import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 
 /**
@@ -25,7 +25,7 @@ import de.xwic.appkit.core.model.entities.IServerConfigProperty;
  * @author Ronny Pfretzschner
  *
  */
-public interface IServerConfigPropertyDAO extends DAOWithEvent<IServerConfigProperty> {
+public interface IServerConfigPropertyDAO extends DAO<IServerConfigProperty> {
 
 	/**
 	 * Creates a ServerConfigProperty with a boolean as value. <p>
@@ -101,19 +101,5 @@ public interface IServerConfigPropertyDAO extends DAOWithEvent<IServerConfigProp
 	 * @param key The key looking for
 	 * @return IServerConfigProperty
 	 */
-	public IServerConfigProperty getConfigProperty(String key);
-	
-	/**
-	 * Returns a ServerConfigProperty with the given key. <p>
-	 * 
-	 * @param key
-	 * @param ignoreCache
-	 * @return
-	 */
-	public IServerConfigProperty getConfigProperty(String key, boolean ignoreCache);
-
-	/**
-	 * Clear the cache
-	 */
-	public void dropCache();
+	public IServerConfigProperty getConfigProperty(String key);	
 }

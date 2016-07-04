@@ -16,20 +16,14 @@
  *******************************************************************************/
 package de.xwic.appkit.core.model.daos.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DAOCallback;
-import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.EntityList;
-import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
-import de.xwic.appkit.core.dao.event.DaoEntityEvent;
 import de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 import de.xwic.appkit.core.model.entities.impl.ServerConfigProperty;
-import de.xwic.appkit.core.model.queries.ServerConfigPropertyByKeyQuery;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
 
 /**
  * DAO implementation of the Server ConfigProperty entity.
@@ -38,9 +32,7 @@ import de.xwic.appkit.core.model.queries.ServerConfigPropertyByKeyQuery;
  * @author Ronny Pfretzschner
  *
  */
-public class ServerConfigPropertyDAO extends AbstractDAOWithEvent<IServerConfigProperty, ServerConfigProperty> implements IServerConfigPropertyDAO {
-
-	private Map<String, IServerConfigProperty> allProperties = new HashMap<String, IServerConfigProperty>();
+public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, ServerConfigProperty> implements IServerConfigPropertyDAO {
 
 	/**
 	 *
@@ -118,7 +110,7 @@ public class ServerConfigPropertyDAO extends AbstractDAOWithEvent<IServerConfigP
 			update(property);
 		} else {
 			// always reload the property from DB
-			existingProperty = getConfigProperty(property.getKey(), true);
+			existingProperty = getConfigProperty(property.getKey());
 			existingProperty.setValue(property.getValue());
 			update(existingProperty);
 		}
@@ -195,46 +187,14 @@ public class ServerConfigPropertyDAO extends AbstractDAOWithEvent<IServerConfigP
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigProperty(java.lang.String)
 	 */
 	@Override
-	public IServerConfigProperty getConfigProperty(final String key, boolean ignoreCache) {
-		if (!ignoreCache) {
-			//look in cache first...
-			IServerConfigProperty prop = allProperties.get(key);
-			if (prop != null) {
-				return prop;
-			}
-		}
-
-		//not in cache, get from db...
-		return (IServerConfigProperty) provider.execute(new DAOCallback() {
-
-			@Override
-			public Object run(DAOProviderAPI api) {
-				EntityList list = api.getEntities(ServerConfigProperty.class, null, new ServerConfigPropertyByKeyQuery(key));
-				if (list.size() != 0) {
-					IServerConfigProperty p = (IServerConfigProperty) list.get(0);
-					//register property in cache...
-					allProperties.put(key, p);
-					return p;
-				}
-				return null;
-			}
-		});
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigProperty(java.lang.String)
-	 */
-	@Override
 	public IServerConfigProperty getConfigProperty(String key) {
-		return getConfigProperty(key, false);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#dropCache()
-	 */
-	@Override
-	public void dropCache() {
-		allProperties.clear();
-		fireEntityChangeEvent(new DaoEntityEvent(DaoEntityEvent.CACHE_CHANGE, null));
+		PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("key", key);
+		List<IServerConfigProperty> results = getEntities(null, pq);
+		if (results.isEmpty()) {
+			return null;
+		} else {
+			return results.get(0);
+		}
 	}
 }
