@@ -3,7 +3,7 @@
         <!--
             ENTITY EDITOR ACTIONS
          -->
-        <extension extensionPointId="entityEditorActions" id="companyUrlOpenAction"
+        <extension extensionPointId="entityEditors" id="companyUrlOpenAction"
                    className="CompanyUrlActionCreator"
                    priority="0">
         </extension>
