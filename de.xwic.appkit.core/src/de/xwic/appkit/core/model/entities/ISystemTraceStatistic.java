@@ -32,7 +32,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Date getFromDate();
 
 	/**
-	 * @param fromDate the fromDate to set
+	 * @param fromDate
+	 *            the fromDate to set
 	 */
 	public abstract void setFromDate(Date fromDate);
 
@@ -42,7 +43,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Date getToDate();
 
 	/**
-	 * @param toDate the toDate to set
+	 * @param toDate
+	 *            the toDate to set
 	 */
 	public abstract void setToDate(Date toDate);
 
@@ -52,7 +54,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Double getAverageResponseTime();
 
 	/**
-	 * @param averageResponseTime the averageResponseTime to set
+	 * @param averageResponseTime
+	 *            the averageResponseTime to set
 	 */
 	public abstract void setAverageResponseTime(Double averageResponseTime);
 
@@ -62,7 +65,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getTotalResponseTime();
 
 	/**
-	 * @param totalResponseTime the totalResponseTime to set
+	 * @param totalResponseTime
+	 *            the totalResponseTime to set
 	 */
 	public abstract void setTotalResponseTime(Long totalResponseTime);
 
@@ -72,7 +76,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getResponseCount();
 
 	/**
-	 * @param responseCount the responseCount to set
+	 * @param responseCount
+	 *            the responseCount to set
 	 */
 	public abstract void setResponseCount(Integer responseCount);
 
@@ -82,7 +87,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getTotalDAOops();
 
 	/**
-	 * @param totalDAOops the totalDAOops to set
+	 * @param totalDAOops
+	 *            the totalDAOops to set
 	 */
 	public abstract void setTotalDAOops(Integer totalDAOops);
 
@@ -92,7 +98,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getTotalDAODuration();
 
 	/**
-	 * @param totalDAODuration the totalDAODuration to set
+	 * @param totalDAODuration
+	 *            the totalDAODuration to set
 	 */
 	public abstract void setTotalDAODuration(Long totalDAODuration);
 
@@ -102,7 +109,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getMemoryUsed();
 
 	/**
-	 * @param memoryUsed the memoryUsed to set
+	 * @param memoryUsed
+	 *            the memoryUsed to set
 	 */
 	public abstract void setMemoryUsed(Long memoryUsed);
 
@@ -112,7 +120,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getActiveUsers();
 
 	/**
-	 * @param activeUsers the activeUsers to set
+	 * @param activeUsers
+	 *            the activeUsers to set
 	 */
 	public abstract void setActiveUsers(Integer activeUsers);
 
@@ -122,7 +131,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getSessionCount();
 
 	/**
-	 * @param sessionCount the sessionCount to set
+	 * @param sessionCount
+	 *            the sessionCount to set
 	 */
 	public abstract void setSessionCount(Integer sessionCount);
 
@@ -132,7 +142,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getTotalUsersOnline();
 
 	/**
-	 * @param totalUsersOnline the totalUsersOnline to set
+	 * @param totalUsersOnline
+	 *            the totalUsersOnline to set
 	 */
 	public abstract void setTotalUsersOnline(Integer totalUsersOnline);
 
@@ -142,7 +153,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getCustomCat1Ops();
 
 	/**
-	 * @param customCat1Ops the customCat1Ops to set
+	 * @param customCat1Ops
+	 *            the customCat1Ops to set
 	 */
 	public abstract void setCustomCat1Ops(Integer customCat1Ops);
 
@@ -152,7 +164,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getCustomCat1Duration();
 
 	/**
-	 * @param customCat1Duration the customCat1Duration to set
+	 * @param customCat1Duration
+	 *            the customCat1Duration to set
 	 */
 	public abstract void setCustomCat1Duration(Long customCat1Duration);
 
@@ -162,7 +175,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getCustomCat2Ops();
 
 	/**
-	 * @param customCat2Ops the customCat2Ops to set
+	 * @param customCat2Ops
+	 *            the customCat2Ops to set
 	 */
 	public abstract void setCustomCat2Ops(Integer customCat2Ops);
 
@@ -172,7 +186,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getCustomCat2Duration();
 
 	/**
-	 * @param customCat2Duration the customCat2Duration to set
+	 * @param customCat2Duration
+	 *            the customCat2Duration to set
 	 */
 	public abstract void setCustomCat2Duration(Long customCat2Duration);
 
@@ -182,7 +197,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getCustomCat3Ops();
 
 	/**
-	 * @param customCat3Ops the customCat3Ops to set
+	 * @param customCat3Ops
+	 *            the customCat3Ops to set
 	 */
 	public abstract void setCustomCat3Ops(Integer customCat3Ops);
 
@@ -192,8 +208,23 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getCustomCat3Duration();
 
 	/**
-	 * @param customCat3Duration the customCat3Duration to set
+	 * @param customCat3Duration
+	 *            the customCat3Duration to set
 	 */
 	public abstract void setCustomCat3Duration(Long customCat3Duration);
+
+	/**
+	 * The host for which this statistic was collected
+	 * 
+	 * @param host
+	 */
+	public void setHost(String host);
+
+	/**
+	 * The host for which this statistic was collected
+	 * 
+	 * @return
+	 */
+	public String getHost();
 
 }

@@ -29,6 +29,7 @@ import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
  */
 public class SystemTraceStatistic extends Entity implements ISystemTraceStatistic {
 
+	private String host;
 	private Date fromDate;
 	private Date toDate;
 	
@@ -257,6 +258,22 @@ public class SystemTraceStatistic extends Entity implements ISystemTraceStatisti
 	 */
 	public void setCustomCat3Duration(Long customCat3Duration) {
 		this.customCat3Duration = customCat3Duration;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getHost()
+	 */
+	@Override
+	public String getHost() {
+		return host;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setHost(java.lang.String)
+	 */
+	@Override
+	public void setHost(String host) {
+		this.host = host;
 	}
 	
 	
