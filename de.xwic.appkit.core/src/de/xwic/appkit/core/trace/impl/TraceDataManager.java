@@ -24,10 +24,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,6 +40,7 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.ISystemTraceStatisticDAO;
 import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
+import de.xwic.appkit.core.model.entities.ISystemTraceStatistic.TraceStats;
 import de.xwic.appkit.core.trace.ITraceCategory;
 import de.xwic.appkit.core.trace.ITraceContext;
 import de.xwic.appkit.core.trace.ITraceDataManager;
@@ -61,11 +66,9 @@ public class TraceDataManager implements ITraceDataManager {
 	private boolean keepHistory = false;
 	private LinkedList<ITraceContext> traceHistory = new LinkedList<ITraceContext>();
 
-	protected String customCat1Name = null;
-	protected String customCat2Name = null;
-	protected String customCat3Name = null;
-
 	private String hostName;
+	private final List<String> systemTraceLogCategories = new ArrayList<String>();
+	private int[] traceIntervalBuckets = { 0 };
 
 	/**
 	 * 
@@ -310,13 +313,42 @@ public class TraceDataManager implements ITraceDataManager {
 	@Override
 	public void saveSystemTraceStatistic(long interval) {
 
-		ISystemTraceStatisticDAO stsDAO = (ISystemTraceStatisticDAO) DAOSystem.getDAO(ISystemTraceStatisticDAO.class);
+		ISystemTraceStatisticDAO stsDAO = DAOSystem.getDAO(ISystemTraceStatisticDAO.class);
 		ISystemTraceStatistic sts = (ISystemTraceStatistic) stsDAO.createEntity();
 
 		List<ITraceContext> history = getTraceHistory();
 		populateSystemTraceStatistic(sts, interval, history);
 
 		stsDAO.update(sts);
+
+	}
+
+	/**
+	 * Add a trace category name to be saved in the system trace log
+	 * 
+	 * @param categoryName
+	 */
+	@Override
+	public void addSystemTraceLogCategory(String categoryName) {
+		systemTraceLogCategories.add(categoryName);
+	}
+
+	/**
+	 * Set a list of intervals in milliseconds for grouping traces.
+	 * 
+	 * Example: setTraceIntervals(1000,5000,10000) will group the traces in 4 intervals: 0 to 1000ms, 1000 to 5000ms, 5000 to 10000ms, and
+	 * over 10000ms
+	 * 
+	 * @param values
+	 */
+	@Override
+	public void setTraceIntervals(int... values) {
+		if (values.length == 0) {
+			return;
+		}
+		//add a 0 to the values
+		traceIntervalBuckets = Arrays.copyOf(values, values.length + 1);
+		Arrays.sort(traceIntervalBuckets);
 
 	}
 
@@ -329,12 +361,12 @@ public class TraceDataManager implements ITraceDataManager {
 	protected void populateSystemTraceStatistic(ISystemTraceStatistic sts, long interval, List<ITraceContext> history) {
 
 		Runtime rt = Runtime.getRuntime();
-		long used = rt.totalMemory() - rt.freeMemory();
+		long used = (rt.totalMemory() - rt.freeMemory()) >> 20; //show memory in MB
 
 		sts.setMemoryUsed(used);
 		sts.setHost(hostName);
 
-		if (history.size() != 0) {
+		if (!history.isEmpty()) {
 
 			long max = System.currentTimeMillis() - (interval + 10); // make an "overlap of 10ms"
 			long hisStart = history.get(0).getStartTime();
@@ -354,30 +386,36 @@ public class TraceDataManager implements ITraceDataManager {
 			int daoOps = 0;
 			long daoDuration = 0;
 
-			int[] customOps = { 0, 0, 0 };
-			long[] customDur = { 0, 0, 0 };
+			List<TraceStats> traceStats = new ArrayList<ISystemTraceStatistic.TraceStats>();
+
+			for (String catName : systemTraceLogCategories) {
+				TraceStats ts = new TraceStats();
+				ts.setName(catName);
+				traceStats.add(ts);
+			}
+
+			LinkedHashMap<Integer, TraceStats> traceIntervals = new LinkedHashMap<Integer, ISystemTraceStatistic.TraceStats>(
+					traceIntervalBuckets.length);
+			for (int x : traceIntervalBuckets) {
+				TraceStats ts = new TraceStats();
+				ts.setName("Duration-" + x);
+				traceIntervals.put(x, ts);
+			}
 
 			for (ITraceContext tx : history) {
 				if (tx.getStartTime() >= from) { // skip older entries
 					count++;
 					total += tx.getDuration();
-
+					putInIntervalBucket(tx, traceIntervals);
 					ITraceCategory daoCategory = tx.getTraceCategory(DAO.TRACE_CAT);
 					if (daoCategory != null) {
 						daoOps += daoCategory.getCount();
 						daoDuration += daoCategory.getTotalDuration();
 					}
 
-					if (customCat1Name != null) {
-						countCat(customOps, customDur, 0, customCat1Name, tx);
+					for (TraceStats ts : traceStats) {
+						countCat(ts, tx);
 					}
-					if (customCat2Name != null) {
-						countCat(customOps, customDur, 1, customCat2Name, tx);
-					}
-					if (customCat3Name != null) {
-						countCat(customOps, customDur, 2, customCat3Name, tx);
-					}
-
 				}
 			}
 
@@ -388,75 +426,43 @@ public class TraceDataManager implements ITraceDataManager {
 			sts.setTotalDAODuration(daoDuration);
 			sts.setTotalDAOops(daoOps);
 
-			sts.setCustomCat1Duration(customDur[0]);
-			sts.setCustomCat1Ops(customOps[0]);
-			sts.setCustomCat2Duration(customDur[1]);
-			sts.setCustomCat2Ops(customOps[1]);
-			sts.setCustomCat3Duration(customDur[2]);
-			sts.setCustomCat3Ops(customOps[2]);
-
+			traceStats.addAll(traceIntervals.values());
+			sts.setTraceStats(traceStats);
 		}
-
 	}
 
 	/**
-	 * @param customOps
-	 * @param customDur
-	 * @param i
+	 * Determine in which of the predefined intervals the trace context duration falls
+	 * 
 	 * @param tx
-	 * @param customCat1Name2
+	 * @param intervals
 	 */
-	private void countCat(int[] customOps, long[] customDur, int i, String catName, ITraceContext tx) {
-		ITraceCategory tCat = tx.getTraceCategory(catName);
-		if (tCat != null) {
-			customOps[i] += tCat.getCount();
-			customDur[i] += tCat.getTotalDuration();
+	private void putInIntervalBucket(ITraceContext tx, Map<Integer, TraceStats> intervals) {
+		int duration = (int) tx.getDuration();
+		int key = 0;
+		for (int x : traceIntervalBuckets) {
+			if (duration >= x) {
+				key = x;
+			} else {
+				break;
+			}
+		}
+		TraceStats bucket = intervals.get(key);
+		if (bucket != null) {
+			bucket.setCount(bucket.getCount() + 1);
+			bucket.setDuration(bucket.getDuration() + duration);
 		}
 	}
 
 	/**
-	 * @return the customCat1Name
+	 * @param stat
+	 * @param tx
 	 */
-	public String getCustomCat1Name() {
-		return customCat1Name;
+	private void countCat(TraceStats stat, ITraceContext tx) {
+		ITraceCategory tCat = tx.getTraceCategory(stat.getName());
+		if (tCat != null) {
+			stat.setCount(stat.getCount() + tCat.getCount());
+			stat.setDuration(stat.getDuration() + tCat.getTotalDuration());
+		}
 	}
-
-	/**
-	 * @param customCat1Name
-	 *            the customCat1Name to set
-	 */
-	public void setCustomCat1Name(String customCat1Name) {
-		this.customCat1Name = customCat1Name;
-	}
-
-	/**
-	 * @return the customCat2Name
-	 */
-	public String getCustomCat2Name() {
-		return customCat2Name;
-	}
-
-	/**
-	 * @param customCat2Name
-	 *            the customCat2Name to set
-	 */
-	public void setCustomCat2Name(String customCat2Name) {
-		this.customCat2Name = customCat2Name;
-	}
-
-	/**
-	 * @return the customCat3Name
-	 */
-	public String getCustomCat3Name() {
-		return customCat3Name;
-	}
-
-	/**
-	 * @param customCat3Name
-	 *            the customCat3Name to set
-	 */
-	public void setCustomCat3Name(String customCat3Name) {
-		this.customCat3Name = customCat3Name;
-	}
-
 }

@@ -18,6 +18,7 @@
 package de.xwic.appkit.core.model.entities;
 
 import java.util.Date;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.IEntity;
 
@@ -148,70 +149,14 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract void setTotalUsersOnline(Integer totalUsersOnline);
 
 	/**
-	 * @return the customCat1Ops
+	 * @return the trace statistics in JSON format
 	 */
-	public abstract Integer getCustomCat1Ops();
+	public String getJsonStats();
 
 	/**
-	 * @param customCat1Ops
-	 *            the customCat1Ops to set
+	 * @param jsonStats
 	 */
-	public abstract void setCustomCat1Ops(Integer customCat1Ops);
-
-	/**
-	 * @return the customCat1Duration
-	 */
-	public abstract Long getCustomCat1Duration();
-
-	/**
-	 * @param customCat1Duration
-	 *            the customCat1Duration to set
-	 */
-	public abstract void setCustomCat1Duration(Long customCat1Duration);
-
-	/**
-	 * @return the customCat2Ops
-	 */
-	public abstract Integer getCustomCat2Ops();
-
-	/**
-	 * @param customCat2Ops
-	 *            the customCat2Ops to set
-	 */
-	public abstract void setCustomCat2Ops(Integer customCat2Ops);
-
-	/**
-	 * @return the customCat2Duration
-	 */
-	public abstract Long getCustomCat2Duration();
-
-	/**
-	 * @param customCat2Duration
-	 *            the customCat2Duration to set
-	 */
-	public abstract void setCustomCat2Duration(Long customCat2Duration);
-
-	/**
-	 * @return the customCat3Ops
-	 */
-	public abstract Integer getCustomCat3Ops();
-
-	/**
-	 * @param customCat3Ops
-	 *            the customCat3Ops to set
-	 */
-	public abstract void setCustomCat3Ops(Integer customCat3Ops);
-
-	/**
-	 * @return the customCat3Duration
-	 */
-	public abstract Long getCustomCat3Duration();
-
-	/**
-	 * @param customCat3Duration
-	 *            the customCat3Duration to set
-	 */
-	public abstract void setCustomCat3Duration(Long customCat3Duration);
+	public void setJsonStats(String jsonStats);
 
 	/**
 	 * The host for which this statistic was collected
@@ -227,4 +172,94 @@ public interface ISystemTraceStatistic extends IEntity {
 	 */
 	public String getHost();
 
+	/**
+	 * Not managed by hibernate
+	 * 
+	 * @return
+	 */	
+	public List<TraceStats> getTraceStats();
+
+	/**
+	 * Not managed by hibernate
+	 * 
+	 * @param stats
+	 */
+	public void setTraceStats(List<TraceStats> stats);
+
+	/**
+	 * Holds trace statistics
+	 * 
+	 * @author Andrei Pat
+	 *
+	 */
+	public class TraceStats {
+
+		private String name;
+		private int count;
+		private long duration;
+
+		/**
+		 * 
+		 */
+		public TraceStats() {
+			//NOP
+		}
+
+		/**
+		 * @param name
+		 * @param count
+		 * @param duration
+		 */
+		public TraceStats(String name, int count, long duration) {
+			super();
+			this.name = name;
+			this.count = count;
+			this.duration = duration;
+		}
+
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * @param name
+		 *            the name to set
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * @return the count
+		 */
+		public int getCount() {
+			return count;
+		}
+
+		/**
+		 * @param count
+		 *            the count to set
+		 */
+		public void setCount(int count) {
+			this.count = count;
+		}
+
+		/**
+		 * @return the duration
+		 */
+		public long getDuration() {
+			return duration;
+		}
+
+		/**
+		 * @param duration
+		 *            the duration to set
+		 */
+		public void setDuration(long duration) {
+			this.duration = duration;
+		}
+	}
 }

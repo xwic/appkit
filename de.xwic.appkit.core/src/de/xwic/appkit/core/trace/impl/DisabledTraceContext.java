@@ -116,13 +116,6 @@ public class DisabledTraceContext extends DisabledTraceOperation implements ITra
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.trace.ITraceOperation#setEndTime(long)
-	 */
-	@Override
-	public void setEndTime(long endTime) {
-	}
-
-	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#setInfo(java.lang.String)
 	 */
 	@Override

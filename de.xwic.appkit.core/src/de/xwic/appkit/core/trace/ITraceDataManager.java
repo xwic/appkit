@@ -18,7 +18,10 @@
 package de.xwic.appkit.core.trace;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 /**
@@ -113,35 +116,7 @@ public interface ITraceDataManager {
 	 */
 	public abstract void saveSystemTraceStatistic(long interval);
 
-	/**
-	 * @return the customCat1Name
-	 */
-	public String getCustomCat1Name();
+	void setTraceIntervals(int... values);
 
-	/**
-	 * @param customCat1Name the customCat1Name to set
-	 */
-	public void setCustomCat1Name(String customCat1Name);
-
-	/**
-	 * @return the customCat2Name
-	 */
-	public String getCustomCat2Name();
-
-	/**
-	 * @param customCat2Name the customCat2Name to set
-	 */
-	public void setCustomCat2Name(String customCat2Name);
-
-	/**
-	 * @return the customCat3Name
-	 */
-	public String getCustomCat3Name();
-
-	/**
-	 * @param customCat3Name the customCat3Name to set
-	 */
-	public void setCustomCat3Name(String customCat3Name);
-
-	
+	void addSystemTraceLogCategory(String categoryName);
 }

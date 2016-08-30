@@ -78,6 +78,10 @@
 			<dependency>
 			    <groupId>org.apache.poi</groupId>
 			    <artifactId>poi-ooxml-schemas</artifactId>
+			</dependency>			
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>			
 			</dependency>
 
         <dependency>
