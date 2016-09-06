@@ -543,7 +543,7 @@
 			
 			<dependency>
 				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-ehcache</artifactId>
+				<artifactId>hibernate-infinispan</artifactId>
 				<version>${hibernate.version}</version>
 			</dependency>
 
