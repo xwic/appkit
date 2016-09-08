@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.14</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.15</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<hibernate.version>4.3.11.Final</hibernate.version>
