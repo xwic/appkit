@@ -173,6 +173,20 @@ public interface ISystemTraceStatistic extends IEntity {
 	public String getHost();
 
 	/**
+	 * The instanceId for which this statistic was collected
+	 * 
+	 * @return
+	 */
+	public String getInstanceId();
+
+	/**
+	 * The instanceId for which this statistic was collected
+	 * 
+	 * @param instanceId
+	 */
+	public void setInstanceId(String instanceId);
+
+	/**
 	 * Not managed by hibernate
 	 * 
 	 * @return

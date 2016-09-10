@@ -33,6 +33,7 @@ import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
  */
 public class SystemTraceStatistic extends Entity implements ISystemTraceStatistic {
 
+	private String instanceId;
 	private String host;
 	private Date fromDate;
 	private Date toDate;
@@ -280,6 +281,26 @@ public class SystemTraceStatistic extends Entity implements ISystemTraceStatisti
 	@Override
 	public void setHost(String host) {
 		this.host = host;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getInstanceId()
+	 */
+	@Override
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setInstanceId(java.lang.String)
+	 */
+	@Override
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	/*

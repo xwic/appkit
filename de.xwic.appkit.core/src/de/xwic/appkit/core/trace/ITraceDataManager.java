@@ -103,6 +103,16 @@ public interface ITraceDataManager {
 	void setMaxHistory(int maxHistory);
 
 	/**
+	 * @return
+	 */
+	String getInstanceId();
+
+	/**
+	 * @param instanceId
+	 */
+	void setInstanceId(String instanceId);
+
+	/**
 	 * Returns the history, with the latest entry at the end of the list. 
 	 * @return
 	 */
