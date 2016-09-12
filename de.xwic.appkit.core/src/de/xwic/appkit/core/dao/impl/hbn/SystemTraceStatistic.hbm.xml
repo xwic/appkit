@@ -16,6 +16,7 @@
  		<property name="deleted" column="DELETED" not-null="true"/>
         <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
 		
+		<property name="instanceId" column="INSTANCE_ID"/>
 		<property name="host" column="HOST"/>
  		<property name="fromDate" column="FROM_DATE" type="timestamp"/>
  		<property name="toDate" column="TO_DATE" type="timestamp"/>

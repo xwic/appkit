@@ -52,6 +52,10 @@ import de.xwic.appkit.core.trace.StackTraceSnapShot;
  * 
  * @author lippisch
  */
+/**
+ * @author eugen
+ *
+ */
 public class TraceDataManager implements ITraceDataManager {
 
 	protected final Log log = LogFactory.getLog(getClass());
@@ -67,6 +71,7 @@ public class TraceDataManager implements ITraceDataManager {
 	private LinkedList<ITraceContext> traceHistory = new LinkedList<ITraceContext>();
 
 	private String hostName;
+	private String instanceId;
 	private final List<String> systemTraceLogCategories = new ArrayList<String>();
 	private int[] traceIntervalBuckets = { 0 };
 
@@ -294,6 +299,23 @@ public class TraceDataManager implements ITraceDataManager {
 	}
 
 	/**
+	 * @return the instance ID
+	 */
+	@Override
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	/**
+	 * @param instanceId
+	 * 			the instance ID to set
+	 */
+	@Override
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	/**
 	 * @return the traceHistory
 	 */
 	@Override
@@ -365,6 +387,7 @@ public class TraceDataManager implements ITraceDataManager {
 
 		sts.setMemoryUsed(used);
 		sts.setHost(hostName);
+		sts.setInstanceId(instanceId);
 
 		if (!history.isEmpty()) {
 
