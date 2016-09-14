@@ -307,15 +307,24 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
      * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
      */
 	@Override
-    public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
-    	
-    	String hql = "select elements(obj." + propertyId + ") from " + entityImplClass.getName() + " obj where obj.id = ?";
-    	Query query = session.createQuery(hql);
-    	query.setParameter(0, entityId);
-    	
-    	List<?> result = query.list();
-     	return result;
-    }
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
+		ITraceOperation traceOp = null;
+		if (Trace.isEnabled()) {
+			traceOp = Trace.startOperation(DAO.TRACE_CAT);
+		}
+		try {
+			String hql = "select elements(obj." + propertyId + ") from " + entityImplClass.getName() + " obj where obj.id = ?";
+			Query query = session.createQuery(hql);
+			query.setParameter(0, entityId);
+
+			List<?> result = query.list();
+			return result;
+		} finally {
+			if (traceOp != null) {
+				traceOp.finished();
+			}
+		}
+	}
 
 	/**
 	 * 
