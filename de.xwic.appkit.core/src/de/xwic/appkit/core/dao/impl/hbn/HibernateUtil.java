@@ -24,6 +24,7 @@ package de.xwic.appkit.core.dao.impl.hbn;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 
 /**
  * @author Florian Lippisch
@@ -43,7 +44,7 @@ public class HibernateUtil {
      * @return
      */
     public static boolean isInitialized() {
-    	return sessionFactory != null;
+    	return sessionFactory != null;    
     }
     
     /**
@@ -63,6 +64,7 @@ public class HibernateUtil {
     	if (sessionFactory != null) {
     		throw new IllegalStateException("HibernateUtil already initialized.");
     	}
+    	
     	HibernateUtil.configuration = config;
     	
         sessionFactory = config.buildSessionFactory();

@@ -18,29 +18,30 @@
 package de.xwic.appkit.core.trace.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.xwic.appkit.core.trace.ITraceCategory;
 import de.xwic.appkit.core.trace.ITraceOperation;
 
 /**
- * Manages a group of durations elements. A category is used for similar traces that 
- * are done within one cycle, i.e. for database access.
+ * Manages a group of durations elements. A category is used for similar traces that are done within one cycle, i.e. for database access.
+ * 
  * @author lippisch
  */
 public class TraceCategory implements ITraceCategory {
 
-	private List<TraceOperation> operations = new ArrayList<TraceOperation>();
-	
+	private List<TraceOperation> operations = Collections.synchronizedList(new ArrayList<TraceOperation>());
+
 	private String name;
-	
+
 	/**
-	 * Construct a new category. 
+	 * Construct a new category.
 	 */
 	public TraceCategory() {
 		super();
 	}
-	
+
 	/**
 	 * @param name
 	 */
@@ -49,49 +50,59 @@ public class TraceCategory implements ITraceCategory {
 		this.name = name;
 	}
 
-
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceCategory#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceCategory#setName(java.lang.String)
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceCategory#getCount()
 	 */
 	public int getCount() {
 		return operations.size();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceCategory#startOperation()
 	 */
 	public ITraceOperation startOperation() {
 		return startOperation(null);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceCategory#startOperation(java.lang.String)
 	 */
 	public ITraceOperation startOperation(String name) {
 		if (name == null) {
-			name = this.name + "-" + operations.size();
+			name = createOperationName();
 		}
 		TraceOperation td = new TraceOperation(name);
 		operations.add(td);
 		return td;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceCategory#getTotalDuration()
 	 */
 	@Override
@@ -109,5 +120,29 @@ public class TraceCategory implements ITraceCategory {
 	public List<TraceOperation> getTraceOperations() {
 		return operations;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.trace.ITraceCategory#addOperation(de.xwic.appkit.core.trace.ITraceOperation)
+	 */
+	@Override
+	public void addOperation(String name, long duration, String info) {
+		String opName = name;
+		if (opName == null) {
+			opName = createOperationName();
+		}
+		long now = System.currentTimeMillis();
+		TraceOperation to = new TraceOperation(opName, now - duration, now);
+		to.setInfo(info);
+		operations.add(to);
+	}
+
+	/**
+	 * @return
+	 */
+	private String createOperationName() {
+		return this.name + "-" + operations.size();
+	}
+
 }

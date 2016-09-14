@@ -49,6 +49,17 @@ public class TraceOperation implements ITraceOperation {
 		this.name = name;
 	}
 
+	/**
+	 * @param name
+	 * @param startTime
+	 * @param endTime
+	 */
+	public TraceOperation(String name, long startTime, long endTime) {
+		this(name);
+		this.startTime = startTime;
+		this.endTime = endTime;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -67,9 +78,15 @@ public class TraceOperation implements ITraceOperation {
 	 */
 	@Override
 	public long getDuration() {
-		long stop = endDuration != 0 ? endDuration : System.nanoTime();
+		if (startDuration != 0) {
+			//we are measuring the operation, it's in nanos
+			long stop = endDuration != 0 ? endDuration : System.nanoTime();
+			return (stop - startDuration) / 1000000;
+		} else {
+			//we received the start and end time, they were measured externally
+			return endTime - startTime;
+		}
 
-		return (stop - startDuration) / 1000000;
 	}
 
 	/*
