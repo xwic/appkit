@@ -62,6 +62,18 @@ public interface IScope extends IEntity {
 	public void setDescription(String description);
 	
 	/**
+	 * @return the restrictGrantToPeers
+	 */
+	public Boolean getSecuredScope();
+
+	/**
+	 * Set this to true in case it's a secured flag. Only users with SYS_ADMIN scope assigned
+	 * can modify / select the scope in role edior.
+	 * @param securedScope the restrictGrantToPeers to set
+	 */
+	public void setSecuredScope(Boolean securedScope);
+	
+	/**
 	 * Returns the directly assigned actions.
 	 * @return Set of IAction
 	 */
@@ -91,6 +103,4 @@ public interface IScope extends IEntity {
 	 * @return
 	 */
 	public Set<IEntity> getAllActions();
-	
-	
 }

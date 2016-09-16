@@ -1,0 +1,9 @@
+#if($control.messages.size() > 0)
+<div class="xwic-ed-msg $!control.styleClass">
+	<ul>
+	#foreach($msg in $control.messages)
+		<li>$msg</li>
+	#end
+	</ul>
+</div>
+#end

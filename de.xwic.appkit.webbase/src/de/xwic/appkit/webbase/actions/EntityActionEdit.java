@@ -53,10 +53,11 @@ public class EntityActionEdit extends AbstractEntityAction {
 	@Override
 	public void run() {
 		try {
-			EditorHelper.getInstance().openEditor(site, entityProvider.getEntity(), entityProvider.getBaseEntity());
+			EditorHelper.getInstance().openEditor(site, entityProvider.getEntity(), entityProvider.getBaseEntity(), false);
 		} catch (Exception e) {
 			log.error("Error while executing EntityActionEdit", e);
 			throw new RuntimeException(e);
 		}
 	}
+
 }

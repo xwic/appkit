@@ -35,6 +35,11 @@ import de.xwic.appkit.core.cluster.INode;
  */
 public class ValidationResult {
 
+	public enum Severity {
+		ERROR,
+		WARN
+	}
+	
 	/** The field must contain data */
 	public final static String FIELD_REQUIRED = "entity.validate.error.field.required";
 	/** The field data exceeds the maximum number of characters */

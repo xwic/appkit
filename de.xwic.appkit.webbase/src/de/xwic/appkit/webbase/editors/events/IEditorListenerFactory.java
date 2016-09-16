@@ -14,12 +14,18 @@
  * limitations under the License.
  *  
  *******************************************************************************/
-package de.xwic.appkit.core.config.editor;
+package de.xwic.appkit.webbase.editors.events;
+
+import de.xwic.appkit.webbase.editors.EditorContext;
 
 /**
- * @author Andra Iacovici
+ * Factory interface for extending editor listener.
  *
+ * @author Vitaliy Zhovtyuk
  */
-public class EDateTime extends ETime {
-
+public interface IEditorListenerFactory {
+	/**
+	 * @return editor listener object.
+	 */
+	EditorListener createListener();
 }

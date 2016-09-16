@@ -44,8 +44,10 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 	private ScrollableContainer configControlsContainer;
 	private List<UserViewConfigurationControl> configControls;
 	
+	
 	/**
-	 * @param container
+	 * @param site
+	 * @param tableModel
 	 */
 	public LoadProfileWindow(Site site, final EntityTableModel tableModel) {
 		super(site);
@@ -53,7 +55,7 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 		this.tableModel = tableModel;
 		
 		setWidth(460);
-		setHeight(270);
+		setHeight(440);
 		
 		configControls = new ArrayList<UserViewConfigurationControl>();
 		
@@ -89,9 +91,9 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 		
 		configControlsContainer = new ScrollableContainer(container, "configControls");
 		configControlsContainer.setTemplateName(getClass().getName() + "_controlsContainer");
-		configControlsContainer.setHeight(isCurrentUserConfigDirty() ? "127px" : "170px");
+		configControlsContainer.setHeight(isCurrentUserConfigDirty() ? "300px" : "355px");
 		
-		List<IUserViewConfiguration> list = ((IUserViewConfigurationDAO) DAOSystem.getDAO(IUserViewConfigurationDAO.class)).getPublicUserConfigurationsForView(tableModel.getCurrentUser(), tableModel.getEntityClass().getName(), tableModel.getViewId());
+		List<IUserViewConfiguration> list = DAOSystem.getDAO(IUserViewConfigurationDAO.class).getPublicUserConfigurationsForView(tableModel.getCurrentUser(), tableModel.getEntityClass().getName(), tableModel.getViewId());
 		for (IUserViewConfiguration config : list) {
 			createUserConfigControl(config);
 		}
@@ -115,6 +117,7 @@ public class LoadProfileWindow extends AbstractPopUpDialogWindow {
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.dialog.AbstractDialogWindow#show()
 	 */
+	@Override
 	public void show() {
 		if (baseContainer == null) {
 			createControls();

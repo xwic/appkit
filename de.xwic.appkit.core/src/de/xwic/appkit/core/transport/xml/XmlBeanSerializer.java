@@ -663,7 +663,7 @@ public class XmlBeanSerializer {
 			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 			IEntity refEntity;
 
-			if (refId == Entities.NEW_ENTITY_ID) {
+			if (refId == Entities.NEW_ENTITY_ID && elProp.attributeValue(EtoSerializer.ETO_PROPERTY) != null) {
 				refEntity = EtoSerializer.newEntity(elProp.attributeValue(EtoSerializer.ETO_PROPERTY), forceLoadCollection);
 			} else if (elProp.element(XmlEntityTransport.ELM_ENTITY) != null) {
 

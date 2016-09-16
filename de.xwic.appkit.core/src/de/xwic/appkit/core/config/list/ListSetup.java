@@ -43,6 +43,8 @@ public class ListSetup {
 	public final static String ACTION_DELETE = "DELETE";
 	/** edit selected entity */
 	public final static String ACTION_EDIT = "EDIT";
+	/** Open an entity in read-only mode */
+	public final static String ACTION_OPEN = "OPEN";
 	
 	//public static String ID_USER = "dummy";
 	private String listId;

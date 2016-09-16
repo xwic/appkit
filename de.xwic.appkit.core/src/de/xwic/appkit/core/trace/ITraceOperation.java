@@ -28,12 +28,6 @@ public interface ITraceOperation {
 	public abstract void finished();
 
 	/**
-	 * Set the end time.
-	 * @param endTime
-	 */
-	public abstract void setEndTime(long endTime);
-
-	/**
 	 * Returns the duration from start to end time. If the end time
 	 * is not yet set (because its not ended yet), it returns the time since the start.
 	 * @return

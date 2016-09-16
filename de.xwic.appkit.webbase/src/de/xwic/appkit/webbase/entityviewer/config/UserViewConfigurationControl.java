@@ -116,7 +116,11 @@ public class UserViewConfigurationControl extends ControlContainer {
 		lblName.setText(userConfig.getName());
 		lblDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");
 		lblDate.setText(sdf.format(userConfig.getCreatedAt()));
-		lblOwner.setText(userConfig.getOwner().getNachname() + ", " + userConfig.getOwner().getVorname());
+		if (userConfig.getOwner() != null) {
+			lblOwner.setText(userConfig.getOwner().getNachname() + ", " + userConfig.getOwner().getVorname());
+		} else {
+			lblOwner.setText("- Unknown -");
+		}
 		
 		ibName.setText(userConfig.getName());
 		ibDescription.setText(userConfig.getDescription() != null ? userConfig.getDescription() : "");

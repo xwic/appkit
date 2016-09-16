@@ -64,6 +64,7 @@ public class HibernateUtil {
     		throw new IllegalStateException("HibernateUtil already initialized.");
     	}
     	HibernateUtil.configuration = config;
+    	
         sessionFactory = config.buildSessionFactory();
     }
     

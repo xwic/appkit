@@ -17,6 +17,7 @@
 package de.xwic.appkit.webbase.utils.picklist;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -143,7 +144,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	 * 
 	 * @param entries
 	 */
-	public void selectEntries(List<IPicklistEntry> plEntries) {
+	public void selectEntries(Collection<IPicklistEntry> plEntries) {
 		if (null != plEntries) {
 			String key = CollectionUtil.join(plEntries, Picklists.GET_KEY, ";");
 			setSelectedKey(key);

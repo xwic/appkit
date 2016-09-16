@@ -70,7 +70,6 @@ import de.xwic.appkit.core.model.queries.PicklistEntryQuery;
 import de.xwic.appkit.core.model.queries.PicklistQuery;
 import de.xwic.appkit.core.model.queries.PicklistTextQuery;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
-import de.xwic.appkit.core.model.queries.ServerConfigPropertyByKeyQuery;
 import de.xwic.appkit.core.model.queries.SetRelatedQuery;
 import de.xwic.appkit.core.model.queries.UniqueSTQuery;
 import de.xwic.appkit.core.model.queries.resolver.hbn.AllUNBetreuerQueryResolver;
@@ -80,7 +79,6 @@ import de.xwic.appkit.core.model.queries.resolver.hbn.PickListQueryResolver;
 import de.xwic.appkit.core.model.queries.resolver.hbn.PicklistEntryQueryResolver;
 import de.xwic.appkit.core.model.queries.resolver.hbn.PicklistTextQueryResolver;
 import de.xwic.appkit.core.model.queries.resolver.hbn.PropertyQueryResolver;
-import de.xwic.appkit.core.model.queries.resolver.hbn.ServerConfigPropertyByKeyResolver;
 import de.xwic.appkit.core.model.queries.resolver.hbn.SetRelatedQueryResolver;
 import de.xwic.appkit.core.model.queries.resolver.hbn.UniqueSTQueryResolver;
 import de.xwic.appkit.core.security.daos.IActionDAO;
@@ -189,7 +187,6 @@ public class DefaultDAOFactory implements DAOFactory {
         provider.registerQuery(PicklistEntryQuery.class, new PicklistEntryQueryResolver());
         provider.registerQuery(PicklistQuery.class, new PickListQueryResolver());
         provider.registerQuery(HsqlQuery.class, new HsqlQueryResolver());
-        provider.registerQuery(ServerConfigPropertyByKeyQuery.class, new ServerConfigPropertyByKeyResolver());
         provider.registerQuery(SetRelatedQuery.class, new SetRelatedQueryResolver());
 
 		// security DAOs

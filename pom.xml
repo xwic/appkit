@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.2.45-SNAPSHOT</version>
+    <version>5.3.18-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - AppKit</name>
@@ -87,9 +87,10 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.2.11</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.15</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+		<hibernate.version>4.3.11.Final</hibernate.version>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>				
     </properties>
@@ -507,6 +508,12 @@
 			    <version>3.10-FINAL</version>
 			</dependency>
 			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.7</version>
+			</dependency>
+			
+			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-core</artifactId>
 				<version>${mvnDependencyVersionxWicjWic}</version>
@@ -514,6 +521,11 @@
 			<dependency>
 				<groupId>de.xwic.jwic</groupId>
 				<artifactId>jwic-controls</artifactId>
+				<version>${mvnDependencyVersionxWicjWic}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.xwic.jwic</groupId>
+				<artifactId>jwic-web</artifactId>
 				<version>${mvnDependencyVersionxWicjWic}</version>
 			</dependency>
 	
@@ -526,10 +538,22 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
-				<version>4.3.11.Final</version>
+				<version>${hibernate.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-infinispan</artifactId>
+				<version>${hibernate.version}</version>
 			</dependency>
 
-			<dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-entitymanager</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+
+            <dependency>
 			    <groupId>javax.transaction</groupId>
 			    <artifactId>jta</artifactId>
 			    <version>1.1</version>
@@ -541,7 +565,12 @@
                 <version>4.11</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>1.9.5</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

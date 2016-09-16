@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping default-lazy="false">
 
@@ -16,6 +16,8 @@
  		<property name="deleted" column="DELETED" not-null="true"/>
         <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
 		
+		<property name="instanceId" column="INSTANCE_ID"/>
+		<property name="host" column="HOST"/>
  		<property name="fromDate" column="FROM_DATE" type="timestamp"/>
  		<property name="toDate" column="TO_DATE" type="timestamp"/>
  		<property name="averageResponseTime" column="AVG_RESPONSE_TIME" />
@@ -27,12 +29,7 @@
  		<property name="activeUsers" column="ACTIVE_USERS" />
  		<property name="sessionCount" column="SESSION_COUNT" />
  		<property name="totalUsersOnline" column="TOTAL_USERS" />
- 		<property name="customCat1Ops" column="CUSTOM_CAT1_OPS" />
- 		<property name="customCat1Duration" column="CUSTOM_CAT1_DUR" />
- 		<property name="customCat2Ops" column="CUSTOM_CAT2_OPS" />
- 		<property name="customCat2Duration" column="CUSTOM_CAT2_DUR" />
- 		<property name="customCat3Ops" column="CUSTOM_CAT3_OPS" />
- 		<property name="customCat3Duration" column="CUSTOM_CAT3_DUR" />
+ 		<property name="jsonStats" column="JSON_STATS" length="2000" />
 		
 		<!-- additional object properties -->
 

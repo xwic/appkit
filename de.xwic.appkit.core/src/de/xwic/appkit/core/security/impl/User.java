@@ -22,6 +22,7 @@ import java.util.Set;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.security.IRole;
 import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.core.security.ScopeActionKey;
 import de.xwic.appkit.core.security.daos.IUserDAO;
@@ -37,7 +38,7 @@ public class User extends Entity implements IUser {
 	private String name = null;
 	private String logonName = null;
 	private String passwordHash = null;
-	private Set<IEntity> roles = null;
+	private Set<IRole> roles = null;
 	private String profileName = null;
 	private String language = null;
 	
@@ -73,9 +74,9 @@ public class User extends Entity implements IUser {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IUser#getRoles()
 	 */
-	public Set<IEntity> getRoles() {
+	public Set<IRole> getRoles() {
 		if (roles == null) {
-			roles = new HashSet<IEntity>();
+			roles = new HashSet<IRole>();
 		}
 		return roles;
 	}
@@ -83,7 +84,7 @@ public class User extends Entity implements IUser {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IUser#setRoles(java.util.Set)
 	 */
-	public void setRoles(Set<IEntity> roles) {
+	public void setRoles(Set<IRole> roles) {
 		this.roles = roles;
 	}
 

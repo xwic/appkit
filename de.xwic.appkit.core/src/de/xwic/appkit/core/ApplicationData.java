@@ -51,6 +51,9 @@ public class ApplicationData {
 	/** Scope to access the System-User Administration */
 	public final static String SCOPE_SYSADMIN = "SYS_ADMIN";
 
+	/** Scope to be able to grant access on all roles */
+	public final static String CAN_MANAGE_ALL_ROLES = "CAN_MANAGE_ALL_ROLES";
+
 	/** Scope to access the Picklist-Administration */
 	public final static String SCOPE_PICKLISTADMIN = "PL_ADMIN";
 

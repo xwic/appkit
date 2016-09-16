@@ -16,6 +16,8 @@
  *******************************************************************************/
 package de.xwic.appkit.core.security;
 
+import java.util.Set;
+
 import de.xwic.appkit.core.dao.IEntity;
 
 /**
@@ -36,4 +38,23 @@ public interface IRole extends IEntity {
 	 */
 	public void setName(String name);
 	
+	/**
+	 * @return the restrictGrantToPeers
+	 */
+	public Boolean getRestrictGrantToPeers();
+	
+	/**
+	 * @param restrictGrantToPeers the restrictGrantToPeers to set
+	 */
+	public void setRestrictGrantToPeers(Boolean restrictGrantToPeers);
+	
+	/**
+	 * @return the assignableRoles
+	 */
+	public Set<IRole> getAssignableRoles();
+
+	/**
+	 * @param assignableRoles the assignableRoles to set
+	 */
+	public void setAssignableRoles(Set<IRole> assignableRoles);
 }

@@ -81,9 +81,9 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 
 		if (methodName.startsWith("get")) {
 			// is a getter -> find out the property name
-			return handleGetter(methodName, 3);
+			return handleGetter(methodName, 3, args);
 		} else if (methodName.startsWith("is")) {
-			return handleGetter(methodName, 2);
+			return handleGetter(methodName, 2, args);
 
 		} else if (methodName.startsWith("set")) {
 			return handleSetter(methodName, args);
@@ -165,20 +165,26 @@ public class ETOProxyHandler implements InvocationHandler, IEntityInvocationHand
 
 	/**
 	 * @param methodName
+	 * @param args 
 	 * @param i
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private Object handleGetter(String methodName, int prefixLength) {
+	private Object handleGetter(String methodName, int prefixLength, Object[] args) {
 
 		if (methodName.length() > prefixLength) {
-
+			
 			if (IPicklistEntry.class.isAssignableFrom(eto.getEntityClass()) && methodName.equals("getBezeichnung")) {
 				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 
 				IPicklistEntry pe = dao.getPickListEntryByID(eto.getEntityId());
 
-				IPicklistText text = dao.getPicklistText(pe, "en");
+				String langId = "en";				
+				if (args != null && args.length > 0 && (args[0] instanceof String)) {
+					langId = (String) args[0];
+				}
+				
+				IPicklistText text = dao.getPicklistText(pe, langId);
 
 				return text != null ? text.getBezeichnung() : "";
 			}

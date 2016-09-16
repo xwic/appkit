@@ -43,7 +43,7 @@ public class JWicTraceDataManager extends TraceDataManager {
 	 * 
 	 */
 	public JWicTraceDataManager() {
-		this.customCat1Name = "entity-table-viewer";
+		super();
 	}
 	
 	/* (non-Javadoc)

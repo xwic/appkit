@@ -7,50 +7,52 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
+import de.xwic.appkit.core.dao.*;
+import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
+import de.xwic.appkit.webbase.editors.events.ValidationEvent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import de.jwic.base.IControl;
-import de.jwic.controls.InputBox;
-import de.jwic.controls.Tab;
-import de.jwic.events.SelectionEvent;
-import de.jwic.events.SelectionListener;
 import de.xwic.appkit.core.config.Bundle;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
+import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
-import de.xwic.appkit.core.dao.DAO;
-import de.xwic.appkit.core.dao.DAOSystem;
-import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.dao.IHistory;
-import de.xwic.appkit.core.dao.ValidationResult;
+import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
 import de.xwic.appkit.core.model.IEntityModel;
+import de.xwic.appkit.core.script.ScriptEngineProvider;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
-import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
 import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
+import de.xwic.appkit.webbase.editors.mappers.MapperFactory;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
- * 
+ *
  * @author Florian Lippisch
  */
 public class EditorContext implements IBuilderContext {
@@ -59,8 +61,17 @@ public class EditorContext implements IBuilderContext {
 	static final int EVENT_LOADED = 1;
 	static final int EVENT_BEFORESAVE = 2;
 	static final int EVENT_PAGES_CREATED = 3;
-	
-	private GenericEntityEditor editor = null;
+
+	private final static Log log = LogFactory.getLog(EditorContext.class);
+	/**
+	 * Editor entity listener custom extension point name.
+	 */
+	private static final String EP_EDITOR_LISTENER = "editorListener";
+	/**
+	 * Editor entity validator custom extension point name.
+	 */
+	private static final String EP_EDITOR_VALIDATOR = "editorValidator";
+
 	private GenericEditorInput input = null;
 	private EditorConfiguration config = null;
 	private IEntityModel model = null;
@@ -70,80 +81,64 @@ public class EditorContext implements IBuilderContext {
 
 	/** indicates if the fields are modified during save/load operation */
 	private boolean inTransaction = false;
-	private List mappers = new ArrayList();
-
-	// default mappers
-	private InputboxMapper textMapper;
-	//TODO
-//	private PicklistComboPropertyMapper plComboMapper;
-//	private DateMapper dateMapper;
-//	private CheckboxPropertyMapper checkMapper;
+	private Map<String, PropertyMapper<IControl>> mappers = new HashMap<String, PropertyMapper<IControl>>();
 
 	// properties - page assignment
-	private Tab currPage = null;
-	private Map propertyPageMap = new HashMap();
-	private Map widgetMap = new HashMap();
-	private List pages = new ArrayList();
-	private List listeners = new ArrayList();
+	private EditorContentPage currPage = null;
+	private Map<String, EditorContentPage> propertyPageMap = new HashMap<String, EditorContentPage>();
+	private Map<String, IControl> widgetMap = new HashMap<String, IControl>();
+	private List<EditorContentPage> pages = new ArrayList<EditorContentPage>();
+	private List<EditorListener> listeners = new ArrayList<EditorListener>();
+	private List<HideWhenWidgetWrapper> hideWhenWidgets = new ArrayList<HideWhenWidgetWrapper>();
 
-	// default listeners
-//	private ModifyListener defaultModifyListener = new ModifyListener() {
-//		public void modifyText(ModifyEvent e) {
-//			setDirty(true);
-//		}
-//	};
+	/** This list contains errors that happened during the start. They are displayed to the user. */
+	private List<String> initErrors = new ArrayList<String>();
 
-	private SelectionListener defaultSelectionListener = new SelectionListener() {
-		public void objectSelected(SelectionEvent event) {
-			setDirty(true);
-		}
-	};
+	private ScriptEngine scriptEngine;
 
 	/**
 	 * @param input
 	 * @throws ConfigurationException
 	 * @throws EntityModelException
 	 */
-	public EditorContext(GenericEntityEditor editor) throws ConfigurationException,
+	public EditorContext(GenericEditorInput input, String langId) throws ConfigurationException,
 			EntityModelException {
-//		this.input = (GenericEditorInput) editor.getEditorInput();
-		this.editor = editor;
-		//TODO: just to escape warning, remove this in future
-//		this.editor.getTitle();
+		this.input = input;
 		this.config = input.getConfig();
-		this.bundle = config.getEntityType().getDomain().getBundle(Locale.getDefault().getLanguage());
+		this.bundle = config.getEntityType().getDomain().getBundle(langId);
 		this.model = EntityModelFactory.createModel(input.getEntity());
 		this.dirty = input.getEntity().getId() == 0; // is a new entity.
-		
-		DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
-		this.editable = dao.hasRight(input.getEntity(), "UPDATE") 
+
+		DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+		this.editable = dao.hasRight(input.getEntity(), "UPDATE")
 							&& !input.getEntity().isDeleted()
 							&& !(input.getEntity() instanceof IHistory);
-		createStandardMappers();
-	}
+		
+		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType().getId() + ":" + config.getId() + ")");
+		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+		bindings.put("entity", model);
+		bindings.put("bundle", bundle);
+		bindings.put("ctx", this);
 
-	/**
-	 * 
-	 */
-	private void createStandardMappers() {
-
-		textMapper = new InputboxMapper(config.getEntityType());
-		mappers.add(textMapper);
-
-//		plComboMapper = new PicklistComboPropertyMapper(config.getEntityType());
-//		mappers.add(plComboMapper);
-//
-//		dateMapper = new DateMapper(config.getEntityType());
-//		mappers.add(dateMapper);
-//
-//		checkMapper = new CheckboxPropertyMapper(config.getEntityType());
-//		mappers.add(checkMapper);
-
-	}
+		try {
+			if (config.getGlobalScript() != null && !config.getGlobalScript().trim().isEmpty()) {
+				scriptEngine.eval(config.getGlobalScript());
+			}
+		} catch (ScriptException se) {
+			initErrors.add("ScriptException in GlobalScript for editor configuration (" + se + ")");
+			log.error("Error evaluating global script in Editor(" + config.getEntityType() + ":" + config.getId() + ")", se);
+		}
+        final String entityType = getEntityDescriptor().getClassname();
+        final List<IEditorListenerFactory> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_LISTENER, entityType);
+        for (IEditorListenerFactory listenerExtension : listenerExtensions) {
+            EditorListener editorListener = listenerExtension.createListener();
+            addEditorListener(editorListener);
+        }
+    }
 
 	/**
 	 * Add an EditorListener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public synchronized void addEditorListener(EditorListener listener) {
@@ -152,7 +147,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Remove an EditorListener.
-	 * 
+	 *
 	 * @param listener
 	 */
 	public synchronized void removeEditorListener(EditorListener listener) {
@@ -161,7 +156,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Fire an event.
-	 * 
+	 *
 	 * @param event
 	 */
 	void fireEvent(int eventId, boolean isNewEntity) {
@@ -179,58 +174,48 @@ public class EditorContext implements IBuilderContext {
 				case EVENT_BEFORESAVE:
 					listener.beforeSave(event);
 					break;
-				case EVENT_PAGES_CREATED: 
+				case EVENT_PAGES_CREATED:
 					listener.pagesCreated(event);
 					break;
-			} 
+			}
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String)
-	 */
-	public void registerField(Property[] property, IControl widget, String id) {
-		registerField(property, widget, id, null);
 	}
 
 	/**
 	 * Register a field that uses a custom mapper.
-	 * 
+	 *
 	 * @param property
 	 * @param widget
 	 * @param id
 	 * @param customMapper
 	 */
-	public void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper) {
-		registerField(property, widget, id, customMapper, false);
+	public void registerField(Property[] property, IControl widget, UIElement uiDef, String mapperId) {
+		registerField(property, widget, uiDef, mapperId, false);
 	}
 
 	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, de.xwic.appkit.core.client.uitools.editors.mapper.PropertyMapper)
+	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, java.lang.String, boolean)
 	 */
-	public void registerField(Property[] property, IControl widget, String id, PropertyMapper customMapper, boolean infoMode) {
+	public void registerField(Property[] property, IControl widget, UIElement uiDef, String mapperId, boolean infoMode) {
 
-		PropertyMapper mapper = null;
-		if (customMapper != null) {
-			mappers.add(customMapper);
-			mapper = customMapper;
-		} else {
-			if (widget instanceof InputBox) {
-				mapper = textMapper;
-//			} else if (widget instanceof PicklistEntryCombo) {
-//				mapper = plComboMapper;
-//			} else if (widget instanceof DateInputControl) {
-//				mapper = dateMapper;
-//			} else if (widget instanceof CheckboxControl) {
-//				mapper = checkMapper;
-			} else {
-				//throw new IllegalArgumentException("No default mapper for such a widget (" + widget.getClass().getName() + ")");
+		PropertyMapper<IControl> mapper = mappers.get(mapperId);
+		if (mapper == null) {
+			try {
+				mapper = MapperFactory.instance().createMapper(mapperId, getEntityDescriptor());
+			} catch (Exception e) {
+				String msg = "Error creating mapper " + mapperId;
+				log.error(msg, e);
+				initErrors.add(msg + " (" + e.toString() + ")");
+				return;
 			}
-			if (null != mapper) {
-				mapper.registerProperty(widget, property, infoMode);
-			}
+			mappers.put(mapperId, mapper);
 		}
+		mapper.registerProperty(widget, property, infoMode);
+
 		if (currPage == null) {
+			// This is a problem when the editor container is not creating the tabs properly.
+			// before creating a tab, the current page should be set and after creating the
+			// currPage should be set to null again.
 			throw new IllegalStateException("No current page assigned!");
 		}
 		// build property name
@@ -245,14 +230,44 @@ public class EditorContext implements IBuilderContext {
 				sb.append(property[i].getName());
 			}
 		}
-		propertyPageMap.put(sb.toString(), currPage);
-
-		if (id != null) {
-			widgetMap.put(id, widget);
+		//propertyPageMap.put(sb.toString(), currPage);
+		if (finalprop != null) {
+			propertyPageMap.put(finalprop.getEntityDescriptor().getClassname() + "." + finalprop.getName(), currPage);
 		}
+
+		registerWidget(widget, uiDef);
 
 		// set initial editable flag.
 		mapper.setEditable(widget, property, editable && (finalprop == null || finalprop.hasReadWriteAccess()));
+	}
+
+	/**
+	 * Register a widget with the given id. If the id is <code>null</code>, the widget
+	 * will not be registered but no exception is thrown.
+	 * <p>This is useful for widgets that should be accessible from script but are not a field by
+	 * itself, like a container.
+	 *
+	 * @param id
+	 * @param widget
+	 */
+	public void registerWidget(IControl widget, UIElement uiDef) {
+		// register widget
+		String id = uiDef.getId();
+		if (id != null && !id.isEmpty()) {
+			if (widgetMap.containsKey(id)) {
+				// print a warning, in case this already exists. Either an id was used twice (where it
+				// should be unique), or a builder has called registerWidget for a widget where
+				// registerField(..) was already invoked.
+				log.warn("A widget with the id '" + id + "' is already registered!");
+			}
+			widgetMap.put(id, widget);
+		}
+
+		if (uiDef.getHideWhen() != null && !uiDef.getHideWhen().trim().isEmpty()) {
+			// the widget has some logic that is to be evaluated after refreshes. Add the
+			// control to the hideWhenField list
+			hideWhenWidgets.add(new HideWhenWidgetWrapper(widget, uiDef.getHideWhen()));
+		}
 	}
 
 	/**
@@ -261,8 +276,7 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setAllEditable(boolean editable) {
 		if (!editable || this.editable) {
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.setEditable(editable);
 			}
 		}
@@ -275,28 +289,26 @@ public class EditorContext implements IBuilderContext {
 	 */
 	public void setFieldEditable(boolean editable, String propertyKey) {
 		if (!editable || this.editable) { // prevent listeners to enable editable when the entity is not editable.
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.setFieldEditable(editable, propertyKey);
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the values from the entity model into the fields.
-	 * 
+	 *
 	 * @throws MappingException
 	 */
 	public void loadFromEntity() throws MappingException {
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity)model;
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.loadContent(entity);
 			}
 			fireEvent(EVENT_LOADED, entity.getId() == 0);
-			
+
 			// if not new, validate
 			if (entity.getId() != 0) {
 				displayValidationResults(validateFields());
@@ -307,15 +319,33 @@ public class EditorContext implements IBuilderContext {
 				// on new entities.
 				displayValidationResults(new ValidationResult());
 			}
-			
+
+			evaluateHideWhens();
+
 		} finally {
 			inTransaction = false;
 		}
 	}
 
 	/**
+	 * Run through all widgets with a hideWhen formula and execute it to
+	 * hide/show those widgets.
+	 */
+	private void evaluateHideWhens() {
+
+		for (HideWhenWidgetWrapper hwWidget : hideWhenWidgets) {
+			try {
+				hwWidget.evaluate(scriptEngine);
+			} catch (ScriptException e) {
+				log.error("Error evaluating 'hideWhen'", e);
+			}
+		}
+
+	}
+
+	/**
 	 * Validates the fields on the form.
-	 * 
+	 *
 	 * @return A ValidationResult containing all errors
 	 * @throws MappingException
 	 */
@@ -323,22 +353,44 @@ public class EditorContext implements IBuilderContext {
 		inTransaction = true;
 		ValidationResult result = new ValidationResult();
 		try {
-			for (Iterator it = mappers.iterator(); it.hasNext();) {
-				PropertyMapper mapper = (PropertyMapper) it.next();
+			// perform UI side validation first...
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				ValidationResult tempResult = mapper.validateWidgets();
 				result.addErrors(tempResult.getErrorMap());
 				result.addWarnings(tempResult.getWarningMap());
 			}
-			DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+
+			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
 				throw new DataAccessException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
+			// then perform DAO (backend) side validation
 			ValidationResult daoResult = dao.validateEntity((IEntity) model);
 			result.addErrors(daoResult.getErrorMap());
 			result.addWarnings(daoResult.getWarningMap());
+
+			fireValidated(result, getEntityDescriptor().getClassname(), false);
+			// now that all validations are done, highlight fields with errors
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
+				mapper.highlightValidationResults(result);
+			}
 			return result;
 		} finally {
 			inTransaction = false;
+		}
+	}
+
+	/**
+	 * Validate entity model using extension validator.
+	 * Iterate all possible validation extensions and perform validation.
+	 *
+	 * @param result validation result
+	 * @param entityType type of entity to validate
+	 */
+	private void fireValidated(ValidationResult result, String entityType, boolean onSave) {
+		final List<IEditorValidatorListener> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
+		for (IEditorValidatorListener editorValidator : listenerExtensions) {
+			editorValidator.modelValidated(new ValidationEvent(model, result, onSave));
 		}
 	}
 
@@ -349,17 +401,24 @@ public class EditorContext implements IBuilderContext {
 	 * @throws EntityModelException
 	 */
 	public ValidationResult saveToEntity() throws ValidationException, MappingException, EntityModelException {
+
+		if (!initErrors.isEmpty()) {
+			throw new IllegalStateException("Save is disabled as there have been exceptions during initialization of the editor.");
+		}
+
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity) model;
 			fireEvent(EVENT_BEFORESAVE, entity.getId() == 0);
 			updateModel();
 
-			DAO dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
+			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
 				throw new MappingException("Can not find a DAO for entity type " + config.getEntityType().getClassname());
 			}
-			ValidationResult result = dao.validateEntity(entity);
+			ValidationResult result = validateFields();
+			fireValidated(result, getEntityDescriptor().getClassname(), true);
+
 			if (!result.hasErrors()) {
 				model.commit();
 				boolean isNew = model.getOriginalEntity().getId() == 0;
@@ -385,17 +444,52 @@ public class EditorContext implements IBuilderContext {
 			inTransaction = false;
 		}
 	}
-	
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.IBuilderContext#fieldChanged(de.xwic.appkit.core.config.model.Property[])
+	 */
+	@Override
+	public void fieldChanged(Property[] property) {
+
+		long t = System.currentTimeMillis();
+
+		if (inTransaction) {
+			// ignore the events when the editor is in a transaction, i.e. loading or saving.
+			return;
+		}
+
+		// something changed? set dirty.
+		setDirty(true);
+
+		// update the property on the entity (model), to perform the hideWhen evaluation
+		IEntity entity = (IEntity) model;
+		try {
+			for (PropertyMapper<IControl> mapper : mappers.values()) {
+				mapper.storeContent(entity, property);
+			}
+		} catch (Exception me) {
+			// Just log an error, do not notify users
+			log.warn("Error handling field change", me);
+		}
+
+		evaluateHideWhens();
+
+		long dur = System.currentTimeMillis() - t;
+		if (dur > 100) {
+			log.info("fieldChange handling took more than 100ms in Editor for " + this.config.getEntityType().getClassname());
+		}
+
+	}
+
 	/**
 	 * Write the property values to the model without saving (commiting) the model.
 	 * @throws MappingException
 	 * @throws ValidationException
 	 */
 	public void updateModel() throws MappingException, ValidationException {
-		
+
 		IEntity entity = (IEntity) model;
-		for (Iterator it = mappers.iterator(); it.hasNext();) {
-			PropertyMapper mapper = (PropertyMapper) it.next();
+		for (PropertyMapper<IControl> mapper : mappers.values()) {
 			mapper.storeContent(entity);
 		}
 	}
@@ -403,81 +497,73 @@ public class EditorContext implements IBuilderContext {
 	/**
 	 * @param result
 	 */
-	void displayValidationResults(ValidationResult result) {
+	public void displayValidationResults(ValidationResult result) {
 
-		// clear all warnings
-		//TODO
-//		for (Iterator it = pages.iterator(); it.hasNext();) {
-//			Tab page = (Tab) it.next();
-//			page.resetMessages();
-//		}
-//		Tab mainPage = (Tab) pages.get(0);
+		for (EditorContentPage page : pages) {
+			page.resetMessages();
+		}
+		EditorContentPage mainPage = pages.get(0);
+
+		// add any initialization error
+		for (String msg : initErrors) {
+			mainPage.addError(msg);
+		}
 
 		// assign warnings
-//		Map warnings = result.getWarningMap();
-//		String prefix = config.getEntityType().getClassname();
-//		for (Iterator it = warnings.keySet().iterator(); it.hasNext();) {
-//			String prop = (String) it.next();
-//			String msg = (String) warnings.get(prop);
-//			Tab page = (Tab) propertyPageMap.get(prop);
-//			String title;
-//			if (prop.startsWith("#")) {
-//				title = bundle.getString(prop.substring(1));
-//			} else {
-//				title = bundle.getString(prefix + "." + prop);
-//			}
-//			String message = title + ": " + bundle.getString(msg);
-//			if (page != null) {
-//				page.addWarningMessage(message);
-//			} else {
-//				mainPage.addWarningMessage(message);
-//			}
-//		}
-//
-//		// assign warnings
-//		Map errors = result.getErrorMap();
-//		for (Iterator it = errors.keySet().iterator(); it.hasNext();) {
-//			String prop = (String) it.next();
-//			String msg = (String) errors.get(prop);
-//			GenericPage page = (GenericPage) propertyPageMap.get(prop);
-//			String title;
-//			if (prop.startsWith("#")) {
-//				title = bundle.getString(prop.substring(1));
-//			} else {
-//				title = bundle.getString(prefix + "." + prop);
-//			}
-//			String message = title + ": " + bundle.getString(msg);
-//			if (page != null) {
-//				page.addErrorMessage(message);
-//			} else {
-//				mainPage.addErrorMessage(message);
-//			}
-//		}
-//
-//		int idx = 0;
-//		for (Iterator it = pages.iterator(); it.hasNext(); idx++) {
-//			GenericPage page = (GenericPage) it.next();
-//			int lvl = page.writeMessages();
-//			Image img;
-//			switch (lvl) {
-//				case 1:
-//					img = UIToolsPlugin.getDefault().getImage(UIToolsPlugin.IMG_WARNING);
-//					break;
-//				case 2:
-//					img = UIToolsPlugin.getDefault().getImage(UIToolsPlugin.IMG_ERROR);
-//					break;
-//				default:
-//					img = null;
-//					break;
-//			}
-//			editor.setPageImage(idx, img);
-//		}
+		Map<String, String> warnings = result.getWarningMap();
+		for (String prop : warnings.keySet()) {
+			String msg = (String) warnings.get(prop);
+			EditorContentPage page = propertyPageMap.get(prop);
+			String title;
+			if (prop.startsWith("#")) {
+				title = bundle.getString(prop.substring(1));
+			} else {
+				title = bundle.getString(prop);
+			}
+			String message = title + ": " + bundle.getString(msg);
+			if (page != null) {
+				page.addWarn(message);
+			} else {
+				mainPage.addWarn(message);
+			}
+		}
+
+		// assign errors
+		Map<String, String> errors = result.getErrorMap();
+		for (String prop : errors.keySet()) {
+			String msg = (String) errors.get(prop);
+			EditorContentPage page = propertyPageMap.get(prop);
+			String title;
+			if (prop.startsWith("#")) {
+				title = bundle.getString(prop.substring(1));
+			} else {
+				title = bundle.getString(prop);
+			}
+			String message = title + ": " + bundle.getString(msg);
+			if (page != null) {
+				page.addError(message);
+			} else {
+				mainPage.addError(message);
+			}
+		}
+
+		for (EditorContentPage page : pages) {
+			if (page.hasErrors()) {
+				page.setStateIndicator(Severity.ERROR);
+			} else if (page.hasWarnings()) {
+				page.setStateIndicator(Severity.WARN);
+			} else if (page.hasInfos()) {
+				page.setStateIndicator(null);
+			} else {
+				page.setStateIndicator(null);
+			}
+		}
 
 	}
 
 	/**
 	 * Returns the EditorConfiguration.
-	 * 
+	 *
 	 * @return
 	 */
 	public EditorConfiguration getEditorConfiguration() {
@@ -509,21 +595,14 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * @return the defaultSelectionListener
-	 */
-	public SelectionListener getDefaultSelectionListener() {
-		return defaultSelectionListener;
-	}
-
-	/**
 	 * When a page is rendered, it must set itself as current page so that the
 	 * context can assign created properties to the page. Warnings and Error
 	 * messages for properties can then be assigned to the right page.
-	 * 
+	 *
 	 * @param currPage
 	 *            the currPage to set
 	 */
-	public void setCurrPage(Tab currPage) {
+	public void setCurrPage(EditorContentPage currPage) {
 		if (this.currPage != null && currPage != null) {
 			throw new IllegalStateException("Another process is still creating properties on a page.");
 		}
@@ -590,6 +669,14 @@ public class EditorContext implements IBuilderContext {
 
 	public IControl getControlById(String id) {
 		return (IControl) widgetMap.get(id);
+	}
+
+	/**
+	 * Returns true if the entity being edited is new and unsaved.
+	 * @return
+	 */
+	public boolean isNew() {
+		return ((IEntity)model).getId() == 0;
 	}
 
 }

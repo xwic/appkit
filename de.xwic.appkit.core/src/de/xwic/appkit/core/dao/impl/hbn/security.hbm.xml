@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="de.xwic.appkit.core.security.impl">
 
@@ -105,6 +105,10 @@
             <column name="NAME" length="100"/>
         </property>
 
+		<property name="securedScope" type="java.lang.Boolean">
+            <column name="SECURED_SCOPE"/>
+        </property>
+        
         <property name="description">
             <column name="DESCRIPTION" length="100"/>
         </property>
@@ -215,6 +219,10 @@
         <property name="name">
             <column name="NAME" length="50"/>
         </property>
+        
+        <property name="restrictGrantToPeers" type="java.lang.Boolean">
+            <column name="RESTRICT_GRANT_TO_PEERS"/>
+        </property>
 
 		<!-- additional object properties -->
 
@@ -233,6 +241,10 @@
 		<property name="lastModifiedAt" type="timestamp">
 			<column name="LASTMODIFIED_AT"/>
 		</property>
+		<set name="assignableRoles" table="SECURITY_ASSIGNABLE_ROLE" lazy="false">
+			<key column="ROLE_ID"/>
+			<many-to-many class="Role" column="ASSIGNABLE_ROLE_ID"/>
+		</set>
 		
     </class>
 

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+<title>Configuration Dump - $setup.appTitle</title>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<style type="text/css">
+
+	.tbl-label {
+		font-weight: bold;
+	}
+	
+	.tag {
+		color: #fff;
+		font-weight: bold;
+		background-color: #55f;
+		border-radius: 5px;
+		padding: 3px;
+		font-size: 11px;
+	}
+
+</style>
+
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="page-header">
+		  <h1>$setup.appTitle ($setup.version)</h1>
+		  <p class="lead">XWic AppKit configuration dump of the current configuration on this server.</p>
+		</div>
+
+		<h3>Platform</h3>
+		<div class="row">
+			<div class="col-md-2 tbl-label">ID:</div>
+			<div class="col-md-10">$setup.id</div>
+			<div class="col-md-2 tbl-label">Title:</div>
+			<div class="col-md-10">$setup.appTitle</div>
+			<div class="col-md-2 tbl-label">Version:</div>
+			<div class="col-md-10">$setup.version</div>
+		</div>
+
+		<h3>Apps</h3>
+		#if($setup.apps.size() == 0)
+			<p>No Apps Configured</p>
+		#else
+			<table class="table table-striped">
+				<colgroup>
+					<col width="30%">
+				</colgroup>
+				<tr>
+					<th>ID</th>
+					<th>Title</th>
+				</tr>
+				#foreach($app in $setup.apps)
+					<tr>
+						<td>$!app.id</td>
+						<td>$!app.title</td>
+					</tr>
+				#end
+			</table>
+		#end
+
+
+		<h3>Languages</h3>
+		#if($setup.languages.size() == 0)
+			<p>No Languages Configured</p>
+		#else
+			<table class="table table-striped">
+				<colgroup>
+					<col width="30%">
+				</colgroup>
+				<tr>
+					<th>ID</th>
+					<th>Title</th>
+				</tr>
+				#foreach($lang in $setup.languages)
+					<tr>
+						<td>$!lang.id  #if($setup.defaultLangId == $lang.id) <span class="tag">Default</span> #end</td>
+						<td>$!lang.title</td>
+					</tr>
+				#end
+			</table>
+		#end
+
+
+		<h3>Domains</h3>
+		#foreach($domainId in $util.sorted($setup.domains))
+			#set($domain = $setup.getDomain($domainId))
+			#set($bundle = $domain.getBundle("en"))
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">$domainId</h3>
+				</div>
+				<div class="panel-body">
+					<h4>Model</h4>
+					#set($model = $domain.model)
+					
+					<table class="table table-striped">
+						<tr>
+							<th>Entity</th>
+							<th>Entity Title</th>
+							<th>Title Pattern</th>
+						</tr>
+					#foreach($entityId in $util.sorted($model.managedEntities))
+						#set($ed = $model.getEntityDescriptor($entityId))
+						#set($title = $bundle.getString($entityId))
+						#if($title.charAt(0) == "!") #set($title = "<i>Unnamed</i>") #end
+						<tr>
+							<td>$entityId</td>
+							<td>$title</td>
+							<td>
+								$!ed.titlePattern
+							</td>
+					#end
+					</table>
+					
+				</div>
+			</div>
+		#end
+
+		<h3>Profiles</h3>
+		#foreach($profileId in $util.sorted($setup.profiles.keySet()))
+			#set($profile = $setup.getProfile($profileId))
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">$profileId</h3>
+				</div>
+				<div class="panel-body">
+					<h4>Features</h4>
+					<table class="table table-striped">
+						<tr>
+							<th>Feature</th>
+							<th>Enabled</th>
+						</tr>
+					#foreach($feature in $util.sorted($profile.features.keySet()))
+						<tr>
+							<td>$feature</td>
+							<td>#if($profile.isFeatureEnabled($feature)) Yes #else No #end</td>
+						</tr>
+					#end
+					</table>
+					
+					<h4>Editors</h4>
+					<table class="table table-striped">
+						<tr>
+							<th>EntityClass</th>
+							<th>Editor Id</th>
+						</tr>
+					#foreach($edEntity in $util.sorted($profile.supportedEditors))
+						<tr>
+							<td>$edEntity</td>
+							<td>
+								#foreach($editorId in $profile.getEditorConfigsForEntity($edEntity))
+									$editorId<br>
+								#end
+							</td>
+						</tr>
+					#end
+					</table>
+				</div>
+			</div>		
+		#end
+
+
+		<h3>Properties</h3>
+		<table class="table table-striped">
+			<tr>
+				<th>Key</th><th>Value</th>
+			</tr>
+			#foreach($property in $util.sorted($setup.properties.stringPropertyNames()))
+				<tr>
+					<td>$property</td>
+					<td><pre>$setup.getProperty($property, "")</pre></td>
+				</tr>
+			#end
+		</table>
+		
+	</div>
+	
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+</body>
+</html>

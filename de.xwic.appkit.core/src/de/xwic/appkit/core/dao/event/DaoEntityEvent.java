@@ -14,30 +14,48 @@
  * limitations under the License.
  *  
  *******************************************************************************/
-package de.xwic.appkit.core.config.editor;
+package de.xwic.appkit.core.dao.event;
 
+import de.xwic.appkit.core.dao.IEntity;
 
 /**
- * Time field.
- *
- * @author Aron Cotrau
- * @editortag time
+ * DAO event.
+ * 
+ * Created on 20.05.2016
+ * @author dotto
  */
-public class ETime extends EField {
+public class DaoEntityEvent<T extends IEntity> {
+
+	public final static int UPDATE = 0;
+	public final static int DELETE = 1;
+	public final static int CACHE_CHANGE = 2;
+		
+	private int eventType = -1;
+
+	private T source = null;
 	
-    boolean seconds = false;
-    
-    /**
-	 * @return Returns the seconds.
-	 */
-	public boolean getSeconds() {
-		return seconds;
-	}
 	/**
-	 * @param seconds The seconds to set.
-	 * @default false
+	 * Creates the event for model changes.
+	 * 
+	 * @param eventType
+	 * @param source
 	 */
-	public void setSeconds(boolean seconds) {
-		this.seconds = seconds;
+	public DaoEntityEvent(int eventType, T source) {
+		this.eventType = eventType;
+		this.source = source;
+	}
+
+	/**
+	 * @return Returns the eventType.
+	 */
+	public int getEventType() {
+		return eventType;
+	}
+
+	/**
+	 * @return Returns the source.
+	 */
+	public T getSource() {
+		return source;
 	}
 }

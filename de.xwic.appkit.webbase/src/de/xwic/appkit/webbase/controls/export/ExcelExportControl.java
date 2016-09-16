@@ -146,7 +146,6 @@ public class ExcelExportControl extends Button {
 						type = result.getClass().getName();
 					}
 					log.error("Unkown result type: " + type, new IllegalStateException());
-					apd.setVisible(false);
 					throw new RuntimeException("Unknown result type");
 				}				
 				requireRedraw();
@@ -166,7 +165,6 @@ public class ExcelExportControl extends Button {
 	
 	protected void onError(AsyncProcessDialog window, Throwable result){
 		log.error("Error occured while generating the report ", result);
-		window.setVisible(false);
 		throw new RuntimeException("Error occured while generating the report");
 	}
 	

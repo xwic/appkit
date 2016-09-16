@@ -24,8 +24,8 @@ package de.xwic.appkit.core.model.daos;
 import java.util.Collection;
 import java.util.Set;
 
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.event.DAOWithEvent;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPicklistText;
 import de.xwic.appkit.core.model.entities.IPickliste;
@@ -37,7 +37,7 @@ import de.xwic.appkit.core.model.entities.IPickliste;
  *
  * @author Florian Lippisch
  */
-public interface IPicklisteDAO extends DAO<IPickliste> {
+public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
 
 	/**
  	 * Create a new IPickliste instance. <p>

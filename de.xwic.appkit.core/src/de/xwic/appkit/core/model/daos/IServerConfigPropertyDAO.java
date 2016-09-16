@@ -101,5 +101,5 @@ public interface IServerConfigPropertyDAO extends DAO<IServerConfigProperty> {
 	 * @param key The key looking for
 	 * @return IServerConfigProperty
 	 */
-	public IServerConfigProperty getConfigProperty(String key);
+	public IServerConfigProperty getConfigProperty(String key);	
 }

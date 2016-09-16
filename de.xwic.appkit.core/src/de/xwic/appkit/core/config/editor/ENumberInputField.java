@@ -23,7 +23,26 @@ package de.xwic.appkit.core.config.editor;
  * @editortag number
  */
 public class ENumberInputField extends EField {
-	private String format = "double";
+
+    private static final String DOUBLE_FORMAT = "double";
+    private static final String LONG_FORMAT = "long";
+    /**
+     * Number formatting, double by default.
+     */
+	private String format = DOUBLE_FORMAT;
+    /**
+     * Currency symbol if applicable.
+     */
+	private String currencySymbol;
+    /**
+     * Currency placement symbol relative to amount.
+     * Values supported: left side to "p", right side to "s".
+     */
+	private String currencySymbolPlacement = "RIGHT";
+    /**
+     * Decimal points, will override values defined by format.
+     */
+	private Integer decimalPoints;
 
 	/**
 	 * @return Returns the number format.
@@ -40,4 +59,39 @@ public class ENumberInputField extends EField {
 	public void setFormat(String format) {
 		this.format = format;
 	}
+
+
+	public String getCurrencySymbol() {
+		return currencySymbol;
+	}
+
+	public void setCurrencySymbol(String currencySymbol) {
+		this.currencySymbol = currencySymbol;
+	}
+
+	public String getCurrencySymbolPlacement() {
+		return currencySymbolPlacement;
+	}
+
+	public void setCurrencySymbolPlacement(String currencySymbolPlacement) {
+		this.currencySymbolPlacement = currencySymbolPlacement;
+	}
+
+    public Integer getDecimalPoints() {
+        return decimalPoints;
+    }
+
+    public void setDecimalPoints(Integer decimalPoints) {
+        this.decimalPoints = decimalPoints;
+    }
+
+    @Override
+    public String toString() {
+        return "ENumberInputField{" +
+                "format='" + format + '\'' +
+                ", currencySymbol='" + currencySymbol + '\'' +
+                ", currencySymbolPlacement='" + currencySymbolPlacement + '\'' +
+                ", decimalPoints=" + decimalPoints +
+                '}';
+    }
 }

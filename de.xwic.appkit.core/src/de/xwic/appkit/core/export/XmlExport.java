@@ -256,6 +256,7 @@ public class XmlExport {
 		OutputStream out = new FileOutputStream(file);
 		// this "hack" is required to preserve the LBCR's in strings... 
 		XMLWriter writer = new XMLWriter(out, prettyFormat) {
+			@Override
 			public void write(Document arg0) throws IOException {
 				//this.preserve = true;
 				super.write(arg0);
@@ -272,7 +273,7 @@ public class XmlExport {
 	 */
 	private void addPicklisten(Element data) {
 		
-		IPicklisteDAO dao = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+		IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
 		List<Language> langs = ConfigurationManager.getSetup().getLanguages();
 		
 		List<?> list = dao.getEntities(null); // get all Picklisten
@@ -312,14 +313,16 @@ public class XmlExport {
 					for (Iterator<Language> itT = langs.iterator(); itT.hasNext(); ) {
 						Language language = itT.next();
 						IPicklistText pt = dao.getPicklistText(entry, language.getId());
-						Element elText = elEntry.addElement("text");
-						elText.addAttribute("id", Integer.toString(pt.getId()));
-						elText.addAttribute("version", Long.toString(pt.getVersion()));
-						elText.addAttribute("lang", pt.getLanguageID());
-						if (pt.getBeschreibung() != null && pt.getBeschreibung().length() != 0) {
-							elText.addAttribute("description", pt.getBeschreibung());
+						if (pt != null) {
+							Element elText = elEntry.addElement("text");
+							elText.addAttribute("id", Integer.toString(pt.getId()));
+							elText.addAttribute("version", Long.toString(pt.getVersion()));
+							elText.addAttribute("lang", pt.getLanguageID());
+							if (pt.getBeschreibung() != null && pt.getBeschreibung().length() != 0) {
+								elText.addAttribute("description", pt.getBeschreibung());
+							}
+							elText.setText(pt.getBezeichnung());
 						}
-						elText.setText(pt.getBezeichnung());
 					}
 				}
 				
@@ -374,7 +377,7 @@ public class XmlExport {
 				String propertyName = it.next();
 
 				if (exportAll || !SKIP_PROPS.contains(propertyName)) {
-					Property property = (Property)descr.getProperty(propertyName);
+					Property property = descr.getProperty(propertyName);
 					
 					
 					Method mRead = property.getDescriptor().getReadMethod();

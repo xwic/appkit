@@ -16,6 +16,8 @@
  *******************************************************************************/
 package de.xwic.appkit.core.security.impl;
 
+import java.util.Set;
+
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.security.IRole;
 
@@ -25,13 +27,13 @@ import de.xwic.appkit.core.security.IRole;
 public class Role extends Entity implements IRole {
 
 	private String name = null;
-	
-	private int myHash = 0;
-	private boolean hashCalculated = false;
+	private Boolean restrictGrantToPeers;
+	private Set<IRole> assignableRoles;
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
@@ -39,55 +41,93 @@ public class Role extends Entity implements IRole {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.security.IRole#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IRole#getRestrictGrantToPeers()
+	 */
+	@Override
+	public Boolean getRestrictGrantToPeers() {
+		return restrictGrantToPeers;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IRole#setRestrictGrantToPeers(java.lang.Boolean)
+	 */
+	@Override
+	public void setRestrictGrantToPeers(Boolean restrictGrantToPeers) {
+		this.restrictGrantToPeers = restrictGrantToPeers;
 	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return "role: " + name;
 	}
 
 	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
+	 * @see java.lang.Object#hashCode()
 	 */
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		
-		if (!obj.getClass().equals(getClass())) {
-			return false;
-		}
-		
-		Role role = (Role)obj;
-		if (name == null) {
-			if (role.name != null) {
-				return false;
-			}
-			return getId() == role.getId();
-		} else {
-			return getId() == role.getId() && name.equals(role.name);
-		}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((restrictGrantToPeers == null) ? 0 : restrictGrantToPeers.hashCode());
+		return result;
 	}
 	
 	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	 * @see de.xwic.appkit.core.security.IRole#getAssignableRoles()
 	 */
-	public int hashCode() {
-		if (!hashCalculated) {
-			myHash = 17;
-			myHash = 37 * myHash + (name != null ? name.hashCode() : 0);
-			myHash = 37 * myHash + getId();
-			hashCalculated = true;
-		}
-		return myHash;
+	@Override
+	public Set<IRole> getAssignableRoles() {
+		return assignableRoles;
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IRole#setAssignableRoles(java.util.Set)
+	 */
+	@Override
+	public void setAssignableRoles(Set<IRole> assignableRoles) {
+		this.assignableRoles = assignableRoles;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Role other = (Role) obj;
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (restrictGrantToPeers == null) {
+			if (other.restrictGrantToPeers != null) {
+				return false;
+			}
+		} else if (!restrictGrantToPeers.equals(other.restrictGrantToPeers)) {
+			return false;
+		}
+		return true;
+	}
 }
