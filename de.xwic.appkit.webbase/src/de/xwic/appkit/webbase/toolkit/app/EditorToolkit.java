@@ -52,6 +52,9 @@ import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitMultiAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitPicklistSelectionMultiControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitSingleAttachmentControl;
+import de.xwic.appkit.webbase.toolkit.app.modeladapters.EditorToolkitBeanModelAdapter;
+import de.xwic.appkit.webbase.toolkit.app.modeladapters.EditorToolkitEntityModelAdapter;
+import de.xwic.appkit.webbase.toolkit.app.modeladapters.IEditorToolkitModelAdapter;
 import de.xwic.appkit.webbase.toolkit.attachment.SingleAttachmentControl;
 import de.xwic.appkit.webbase.toolkit.comment.SingleCommentEditorControl;
 import de.xwic.appkit.webbase.toolkit.components.EmployeeSelectionCombo;
@@ -77,9 +80,8 @@ public class EditorToolkit {
 	public final static String FIELD_NAME_PREFIX = "fld";
 
 	private EditorModel model = null;
-	private String langId = null;
-
-	private Object baseObj;
+	
+	private IEditorToolkitModelAdapter modelAdapter;
 
 	static {
 		allControls.put(DatePicker.class, new ToolkitDateInputControl());
@@ -98,14 +100,37 @@ public class EditorToolkit {
 	 * @param model
 	 * @param langId
 	 */
+	@Deprecated
 	public EditorToolkit(EditorModel model, String langId) {
-		this.model = model;
-		this.langId = langId;
-		this.controlStyles = new HashMap<String, String>();
+		this(model);
 	}
-
+	/**
+	 * Create the editor toolkit with an EditorModel/entity as backing model
+	 * 
+	 * @param model
+	 * @param langId
+	 */
+	public EditorToolkit(EditorModel model) {
+		this(new EditorToolkitEntityModelAdapter(model.getEntity()));
+		this.model = model;
+		this.controlStyles = new HashMap<String, String>();		
+	}
+	
+	/**
+	 * Create the editor toolkit with a POJO as backing model
+	 * 
+	 * @param model
+	 * @param langId
+	 */
 	public EditorToolkit(Object baseObj) {
-		this.baseObj = baseObj;
+		this(new EditorToolkitBeanModelAdapter(baseObj));		
+	}
+	
+	/**
+	 * @param modelAdapter
+	 */
+	public EditorToolkit(IEditorToolkitModelAdapter modelAdapter) {
+		this.modelAdapter = modelAdapter;
 	}
 
 	/**
@@ -264,45 +289,15 @@ public class EditorToolkit {
 	 * Loads the field values into the controls. Entity is coming by internal editor model.
 	 */
 	public void loadFieldValues() {
-		Object obj = null;
-		Class<?> clazz = null;
-		if (null != baseObj) {
-			obj = baseObj;
-			clazz = obj.getClass();
-		} else if (null != model) {
-			obj = model.getEntity();
-			clazz = ((IEntity) obj).type();
-		}
-
-		for (Iterator<String> iterator = registeredControls.keySet().iterator(); iterator.hasNext();) {
-			String controlId = iterator.next();
-			IControl control = registeredControls.get(controlId);
-
+		for (IControl control : registeredControls.values()) {
 			String propName = getPropertyName(control);
-
-			Object value = null;
-
-			try {
-				PropertyDescriptor propInfo = new PropertyDescriptor(propName, clazz);
-				value = propInfo.getReadMethod().invoke(obj, (Object[]) null);
-			} catch (Exception ex) {
-				throw new RuntimeException("Property not found: " + propName, ex);
-			}
-
+			
 			IToolkitControlHelper helper = allControls.get(control.getClass());
-
 			if (helper == null) {
 				throw new RuntimeException("Could not find control helper: " + control.getClass());
 			}
-
-			Object controlValue;
-			ITypeConverter converter = registeredConverters.get(propName);
-			if (converter != null) {
-				//if we have a type converter registered for the property, convert the entity type to the control value type first
-				controlValue = converter.convertLeft(value);
-			} else {
-				controlValue = value;
-			}
+			
+			Object controlValue = modelAdapter.read(propName, registeredConverters.get(propName));
 
 			helper.loadContent(control, controlValue);
 		}
@@ -314,34 +309,16 @@ public class EditorToolkit {
 	public void saveFieldValues() {
 
 		Object obj = null;
-		Class<?> clazz = null;
-		if (null != baseObj) {
-			obj = baseObj;
-			clazz = obj.getClass();
-		} else if (null != model) {
-			obj = model.getEntity();
-			clazz = ((IEntity) obj).type();
-		}
 
-		for (Iterator<IControl> iterator = registeredControls.values().iterator(); iterator.hasNext();) {
 
-			IControl control = iterator.next();
+		for (IControl control : registeredControls.values()) {
+
 			String propName = getPropertyName(control);
-
-			PropertyDescriptor propInfo = null;
-
-			try {
-				propInfo = new PropertyDescriptor(propName, clazz);
-			} catch (IntrospectionException ex) {
-				throw new RuntimeException(
-						"Could find property: " + propName + " of entityclass: " + (obj == null ? "No entity!" : obj.getClass().getName()),
-						ex);
-			}
 
 			if (!control.isVisible()) {
 				continue;
 			}
-
+			
 			if (control instanceof IHTMLElement) {
 				IHTMLElement htmlElement = (IHTMLElement) control;
 				if (!htmlElement.isEnabled()) {
@@ -355,71 +332,11 @@ public class EditorToolkit {
 				throw new RuntimeException("Could not find control helper: " + control.getClass());
 			}
 
-			Object value;
 			Object controlValue = helper.getContent(control);
 
 			ITypeConverter converter = registeredConverters.get(propName);
-			if (converter != null) {
-				//if we have a type converter registered for the property, convert the control value type to the entity value type first
-				value = converter.convertRight(controlValue);
-			} else {
-				value = autoConvertToEntityType(propInfo, controlValue);
-			}
-
-			try {
-				propInfo.getWriteMethod().invoke(obj, new Object[] { value });
-			} catch (Exception ex) {
-				throw new RuntimeException("Could not write property: " + propName + " of entityclass: "
-						+ (obj == null ? "No entity!" : obj.getClass().getName()), ex);
-			}
+			modelAdapter.write(propName, controlValue, converter);
 		}
-	}
-
-	/**
-	 * Try some common type mappings
-	 * 
-	 * @param propInfo
-	 * @param controlValue
-	 * @return
-	 */
-	private Object autoConvertToEntityType(PropertyDescriptor propInfo, Object controlValue) {
-
-		Class propertyType = propInfo.getPropertyType();
-		Class controlType = null;
-		if (controlValue == null) {
-			//for primitives, null gets mapped to the default value 
-			if (int.class.equals(propertyType) || long.class.equals(propertyType) || double.class.equals(propertyType)
-					|| float.class.equals(propertyType) || byte.class.equals(propertyType) || short.class.equals(propertyType)) {
-				return 0;
-			}
-			if (boolean.class.equals(propertyType)) {
-				return false;
-			}
-			if (char.class.equals(propertyType)) {
-				return '\u0000';
-			}
-		} else {
-			controlType = controlValue.getClass();
-		}
-
-		ITypeConverter converter = null;
-		if (String.class.equals(controlType)) {
-			if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
-				converter = IntegerStringConverter.INSTANCE;
-			} else if (Long.class.equals(propertyType) || long.class.equals(propertyType)) {
-				converter = LongStringConverter.INSTANCE;
-			} else if (Float.class.equals(propertyType) || float.class.equals(propertyType)) {
-				converter = FloatStringConverter.INSTANCE;
-			} else if (Double.class.equals(propertyType) || double.class.equals(propertyType)) {
-				converter = DoubleStringConverter.INSTANCE;
-			} else if (Boolean.class.equals(propertyType) || boolean.class.equals(propertyType)) {
-				converter = BooleanStringConverter.INSTANCE;
-			}
-			if (converter != null) {
-				return converter.convertRight(controlValue);
-			}
-		}
-		return controlValue;
 	}
 
 	/**
