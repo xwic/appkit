@@ -9,13 +9,11 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
-
 /**
  * @author Andrei Pat
  *
  */
-public class LongStringConverter implements ITypeConverter<Long, String> {
+public class LongStringConverter extends AbstractModelViewConverter<Long, String> {
 
 	public static final LongStringConverter INSTANCE = new LongStringConverter();
 
@@ -32,7 +30,7 @@ public class LongStringConverter implements ITypeConverter<Long, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertLeft(java.lang.Object)
 	 */
 	@Override
-	public String convertLeft(Long t1) {
+	public String convertToViewType(Long t1) {
 		if (t1 == null) {
 			return null;
 		}
@@ -45,7 +43,7 @@ public class LongStringConverter implements ITypeConverter<Long, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertRight(java.lang.Object)
 	 */
 	@Override
-	public Long convertRight(String t2) {
+	public Long convertToModelType(String t2) {
 		if (t2 == null) {
 			return null;
 		}

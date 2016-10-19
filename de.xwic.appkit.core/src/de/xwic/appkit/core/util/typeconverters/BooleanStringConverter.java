@@ -9,15 +9,13 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
-
 /**
  * Converts a Boolean into a String and viceversa
  * 
  * @author Andrei Pat
  *
  */
-public class BooleanStringConverter implements ITypeConverter<Boolean, String> {
+public class BooleanStringConverter extends AbstractModelViewConverter<Boolean, String> {
 
 	public static final BooleanStringConverter INSTANCE = new BooleanStringConverter();
 
@@ -34,7 +32,7 @@ public class BooleanStringConverter implements ITypeConverter<Boolean, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertLeft(java.lang.Object)
 	 */
 	@Override
-	public String convertLeft(Boolean t1) {
+	public String convertToViewType(Boolean t1) {
 		if (t1 == null) {
 			return null;
 		}
@@ -47,7 +45,7 @@ public class BooleanStringConverter implements ITypeConverter<Boolean, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertRight(java.lang.Object)
 	 */
 	@Override
-	public Boolean convertRight(String t2) {
+	public Boolean convertToModelType(String t2) {
 		if (t2 == null) {
 			return null;
 		}

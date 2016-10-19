@@ -9,7 +9,7 @@
 
 package de.xwic.appkit.webbase.toolkit.app.modeladapters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.IModelViewTypeConverter;
 
 /**
  * Interface that allows the editor toolkit to read and write values to its backing model
@@ -26,7 +26,7 @@ public interface IEditorToolkitModelAdapter {
 	 * @param converter
 	 * @return
 	 */
-	public Object read(String propertyName, ITypeConverter converter);
+	public Object read(String propertyName, IModelViewTypeConverter converter);
 
 	/**
 	 * Writes the value from the control to the model's property specified by "propertyName". If a type converter is set, the value is
@@ -36,5 +36,5 @@ public interface IEditorToolkitModelAdapter {
 	 * @param controlValue
 	 * @param converter
 	 */
-	public void write(String propertyName, Object controlValue, ITypeConverter converter);
+	public void write(String propertyName, Object controlValue, IModelViewTypeConverter converter);
 }

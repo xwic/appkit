@@ -12,7 +12,7 @@ package de.xwic.appkit.webbase.toolkit.app.modeladapters;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 
-import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.IModelViewTypeConverter;
 import de.xwic.appkit.core.util.typeconverters.BooleanStringConverter;
 import de.xwic.appkit.core.util.typeconverters.DoubleStringConverter;
 import de.xwic.appkit.core.util.typeconverters.FloatStringConverter;
@@ -40,7 +40,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 	 * de.xwic.appkit.core.util.ITypeConverter)
 	 */
 	@Override
-	public Object read(String propertyName, ITypeConverter converter) {
+	public Object read(String propertyName, IModelViewTypeConverter converter) {
 		Object value = null;
 		try {
 			PropertyDescriptor propInfo = new PropertyDescriptor(propertyName, getBeanClazz());
@@ -50,7 +50,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 		}
 		if (converter != null) {
 			//if we have a type converter registered for the property, convert the entity type to the control value type first
-			return converter.convertLeft(value);
+			return converter.convertToViewType(value);
 		} else {
 			return value;
 		}
@@ -63,7 +63,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 	 * de.xwic.appkit.core.util.ITypeConverter)
 	 */
 	@Override
-	public void write(String propertyName, Object controlValue, ITypeConverter converter) {
+	public void write(String propertyName, Object controlValue, IModelViewTypeConverter converter) {
 		PropertyDescriptor propInfo = null;
 
 		try {
@@ -75,7 +75,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 		Object value;
 		if (converter != null) {
 			//if we have a type converter registered for the property, convert the control value type to the entity value type first
-			value = converter.convertRight(controlValue);
+			value = converter.convertToModelType(controlValue);
 		} else {
 			value = autoConvertToEntityType(propInfo, controlValue);
 		}
@@ -115,7 +115,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 			controlType = controlValue.getClass();
 		}
 
-		ITypeConverter converter = null;
+		IModelViewTypeConverter converter = null;
 		if (String.class.equals(controlType)) {
 			if (Integer.class.equals(propertyType) || int.class.equals(propertyType)) {
 				converter = IntegerStringConverter.INSTANCE;
@@ -129,7 +129,7 @@ public class EditorToolkitBeanModelAdapter implements IEditorToolkitModelAdapter
 				converter = BooleanStringConverter.INSTANCE;
 			}
 			if (converter != null) {
-				return converter.convertRight(controlValue);
+				return converter.convertToModelType(controlValue);
 			}
 		}
 		return controlValue;

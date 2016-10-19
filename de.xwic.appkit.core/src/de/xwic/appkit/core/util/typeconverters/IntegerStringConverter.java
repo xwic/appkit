@@ -9,7 +9,7 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.IModelViewTypeConverter;
 
 /**
  * Converts an Integer to a String and viceversa
@@ -17,7 +17,7 @@ import de.xwic.appkit.core.util.ITypeConverter;
  * @author Andrei Pat
  *
  */
-public class IntegerStringConverter implements ITypeConverter<Integer, String> {
+public class IntegerStringConverter  extends AbstractModelViewConverter<Integer, String> {
 
 	public static final IntegerStringConverter INSTANCE = new IntegerStringConverter();
 
@@ -34,7 +34,7 @@ public class IntegerStringConverter implements ITypeConverter<Integer, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertLeft(java.lang.Object)
 	 */
 	@Override
-	public String convertLeft(Integer t1) {
+	public String convertToViewType(Integer t1) {
 		if (t1 == null) {
 			return null;
 		}
@@ -47,7 +47,7 @@ public class IntegerStringConverter implements ITypeConverter<Integer, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertRight(java.lang.Object)
 	 */
 	@Override
-	public Integer convertRight(String t2) {
+	public Integer convertToModelType(String t2) {
 		if (t2 == null) {
 			return null;
 		}

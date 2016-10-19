@@ -38,7 +38,7 @@ import de.jwic.controls.InputBox;
 import de.jwic.util.IHTMLElement;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
-import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.IModelViewTypeConverter;
 import de.xwic.appkit.core.util.typeconverters.BooleanStringConverter;
 import de.xwic.appkit.core.util.typeconverters.DoubleStringConverter;
 import de.xwic.appkit.core.util.typeconverters.FloatStringConverter;
@@ -73,7 +73,7 @@ public class EditorToolkit {
 
 	public static Map<Class<? extends IControl>, IToolkitControlHelper> allControls = new HashMap<Class<? extends IControl>, IToolkitControlHelper>();
 	private Map<String, IControl> registeredControls = new HashMap<String, IControl>();
-	private Map<String, ITypeConverter> registeredConverters = new HashMap<String, ITypeConverter>();
+	private Map<String, IModelViewTypeConverter> registeredConverters = new HashMap<String, IModelViewTypeConverter>();
 
 	private Map<String, String> controlStyles = null;
 
@@ -160,7 +160,7 @@ public class EditorToolkit {
 	 * @return a control
 	 */
 	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName,
-			ITypeConverter converter) {
+			IModelViewTypeConverter converter) {
 		return createControl(controlType, container, propertyName, null, converter);
 	}
 
@@ -183,7 +183,7 @@ public class EditorToolkit {
 	}
 
 	public <C extends IControl> C createControl(final Class<C> controlType, final IControlContainer container, final String propertyName,
-			final Object optionalParam, ITypeConverter converter) {
+			final Object optionalParam, IModelViewTypeConverter converter) {
 
 		final IToolkitControlHelper<C> implclass = allControls.get(controlType);
 		if (implclass == null) {
@@ -334,7 +334,7 @@ public class EditorToolkit {
 
 			Object controlValue = helper.getContent(control);
 
-			ITypeConverter converter = registeredConverters.get(propName);
+			IModelViewTypeConverter converter = registeredConverters.get(propName);
 			modelAdapter.write(propName, controlValue, converter);
 		}
 	}
