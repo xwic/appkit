@@ -19,8 +19,6 @@
  */
 package de.xwic.appkit.webbase.toolkit.app;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,14 +34,8 @@ import de.jwic.controls.CheckBoxGroup;
 import de.jwic.controls.DatePicker;
 import de.jwic.controls.InputBox;
 import de.jwic.util.IHTMLElement;
-import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.util.IModelViewTypeConverter;
-import de.xwic.appkit.core.util.typeconverters.BooleanStringConverter;
-import de.xwic.appkit.core.util.typeconverters.DoubleStringConverter;
-import de.xwic.appkit.core.util.typeconverters.FloatStringConverter;
-import de.xwic.appkit.core.util.typeconverters.IntegerStringConverter;
-import de.xwic.appkit.core.util.typeconverters.LongStringConverter;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitCheckBoxControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitDateInputControl;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitEmployeeControl;
@@ -84,9 +76,9 @@ public class EditorToolkit {
 	private IEditorToolkitModelAdapter modelAdapter;
 
 	static {
+		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(DatePicker.class, new ToolkitDateInputControl());
 		allControls.put(EmployeeSelectionCombo.class, new ToolkitEmployeeControl());
-		allControls.put(InputBox.class, new ToolkitInputBoxControl());
 		allControls.put(PicklistEntryControl.class, new ToolkitPicklistSelectionControl());
 		allControls.put(PicklistEntryMultiSelectControl.class, new ToolkitPicklistSelectionMultiControl());
 		allControls.put(CheckBoxGroup.class, new ToolkitCheckBoxControl());

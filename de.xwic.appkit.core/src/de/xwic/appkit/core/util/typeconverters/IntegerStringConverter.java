@@ -9,8 +9,6 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.IModelViewTypeConverter;
-
 /**
  * Converts an Integer to a String and viceversa
  * 

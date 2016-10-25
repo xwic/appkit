@@ -16,7 +16,7 @@ import de.xwic.appkit.core.util.IModelViewTypeConverter;
  *
  */
 public abstract class AbstractModelViewConverter<M, V> implements IModelViewTypeConverter<M, V> {
-	
+
 	/**
 	 * Handy if you have a type converter already set up, but you want to switch the model type with the view type
 	 * 
@@ -38,4 +38,24 @@ public abstract class AbstractModelViewConverter<M, V> implements IModelViewType
 		};
 	}
 
+	/**
+	 * Daisychains two converters together so the output of one converter becomes the input of the other converter
+	 * 
+	 * @param otherConverter
+	 * @return
+	 */
+	public <M1> IModelViewTypeConverter<M1, V> chain(final IModelViewTypeConverter<M1, M> otherConverter) {		
+		return new IModelViewTypeConverter<M1, V>() {
+
+			@Override
+			public V convertToViewType(M1 modelValue) {
+				return AbstractModelViewConverter.this.convertToViewType(otherConverter.convertToViewType(modelValue));
+			}
+
+			@Override
+			public M1 convertToModelType(V viewValue) {
+				return otherConverter.convertToModelType(AbstractModelViewConverter.this.convertToModelType(viewValue));
+			}
+		};
+	}
 }
