@@ -19,13 +19,6 @@ public class BooleanStringConverter extends AbstractModelViewConverter<Boolean, 
 
 	public static final BooleanStringConverter INSTANCE = new BooleanStringConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private BooleanStringConverter() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

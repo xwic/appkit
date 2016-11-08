@@ -21,13 +21,6 @@ public class FloatStringConverter extends AbstractModelViewConverter<Float, Stri
 
 	public static final FloatStringConverter INSTANCE = new FloatStringConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private FloatStringConverter() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

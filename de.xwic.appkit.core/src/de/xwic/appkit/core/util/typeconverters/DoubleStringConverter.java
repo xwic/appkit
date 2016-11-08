@@ -19,13 +19,6 @@ public class DoubleStringConverter extends AbstractModelViewConverter<Double, St
 
 	public static final DoubleStringConverter INSTANCE = new DoubleStringConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private DoubleStringConverter() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -19,13 +19,6 @@ public class IntegerStringConverter  extends AbstractModelViewConverter<Integer,
 
 	public static final IntegerStringConverter INSTANCE = new IntegerStringConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private IntegerStringConverter() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

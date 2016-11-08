@@ -17,13 +17,6 @@ public class LongStringConverter extends AbstractModelViewConverter<Long, String
 
 	public static final LongStringConverter INSTANCE = new LongStringConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private LongStringConverter() {
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

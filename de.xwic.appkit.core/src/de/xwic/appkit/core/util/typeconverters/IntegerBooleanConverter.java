@@ -17,13 +17,6 @@ package de.xwic.appkit.core.util.typeconverters;
 public class IntegerBooleanConverter extends AbstractModelViewConverter<Integer, Boolean> {
 	public static final IntegerBooleanConverter INSTANCE = new IntegerBooleanConverter();
 
-	/**
-	 * hide constructor
-	 */
-	private IntegerBooleanConverter() {
-
-	}
-
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.util.IModelViewTypeConverter#convertToViewType(java.lang.Object)
 	 */
