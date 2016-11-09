@@ -16,8 +16,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.junit.Test;
-
 @Retention(RUNTIME)
 @Target(TYPE)
 @Inherited
@@ -30,6 +28,5 @@ public @interface GridRenderer {
 	/**
 	 * @return
 	 */
-	@Test
 	int columns() default 1;
 }
