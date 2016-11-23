@@ -60,5 +60,5 @@ public interface IUserViewConfigurationDAO extends DAO<IUserViewConfiguration> {
 	 * @param currentId
 	 * @return
 	 */
-	public boolean configNameExists(IMitarbeiter owner, String entityClassName, String viewId, String name, int currentId);
+	public boolean configNameExists(IMitarbeiter owner, String entityClassName, String viewId, String name, long currentId);
 }

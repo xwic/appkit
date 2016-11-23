@@ -69,7 +69,7 @@ public class ColumnSelectorControl extends ControlContainer implements IColumnSe
 	private String userListProfileName;
 	private UserProfileWrapper profile;
 
-	private int ownerId = 0;
+	private long ownerId = 0L;
 	
 	/**
 	 * @param container

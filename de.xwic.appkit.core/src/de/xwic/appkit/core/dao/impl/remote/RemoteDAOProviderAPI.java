@@ -60,7 +60,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public IEntity getEntity(Class<? extends Object> clazz, int id) throws DataAccessException {
+	public IEntity getEntity(Class<? extends Object> clazz, long id) throws DataAccessException {
 		try {
 			Class<? extends Object> trueClass = EntityUtil.type(clazz);
 			EntityTransferObject eto = client.getETO(trueClass.getName(), id);
@@ -185,7 +185,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	 * java.lang.String)
 	 */
 	@Override
-	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId,
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, long entityId,
 			String propertyId) {
 		try {
 			Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);

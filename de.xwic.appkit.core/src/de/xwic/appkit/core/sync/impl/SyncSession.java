@@ -109,7 +109,7 @@ public class SyncSession implements ISyncSession {
 	 * @param entityId
 	 * @return
 	 */
-	public int getSyncState(String entityType, int entityId) {
+	public int getSyncState(String entityType, long entityId) {
 
 		String key = entityType + " " + entityId;
 		Integer cacheState = entitySyncMap.get(key);
@@ -151,7 +151,7 @@ public class SyncSession implements ISyncSession {
 			syncState = (ISyncState) ssDAO.createEntity();
 			syncState.setApplicationId(syncProfile.getApplicationId());
 			syncState.setDeviceId(syncProfile.getDeviceId());
-			syncState.setUserId(Integer.toString(syncProfile.getUser().getId()));
+			syncState.setUserId(Long.toString(syncProfile.getUser().getId()));
 			syncState.setExtItemId(syncItemId);
 		
 		}
@@ -175,7 +175,7 @@ public class SyncSession implements ISyncSession {
 		disconnectItems(syncItem.getExternalId());
 	}
 
-	public void setSynchronized(String syncItemId, String internalEntityType, int internalEntityId) {
+	public void setSynchronized(String syncItemId, String internalEntityType, long internalEntityId) {
 
 		int state = ISyncSession.SYNC_STATE_SYNCD;
 		ISyncStateDAO ssDAO = (ISyncStateDAO) DAOSystem.getDAO(ISyncStateDAO.class);
@@ -188,7 +188,7 @@ public class SyncSession implements ISyncSession {
 			syncState = (ISyncState) ssDAO.createEntity();
 			syncState.setApplicationId(syncProfile.getApplicationId());
 			syncState.setDeviceId(syncProfile.getDeviceId());
-			syncState.setUserId(Integer.toString(syncProfile.getUser().getId()));
+			syncState.setUserId(Long.toString(syncProfile.getUser().getId()));
 			syncState.setExtItemId(syncItemId);
 		}
 

@@ -83,13 +83,13 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
     /* (non-Javadoc)
      * @see de.xwic.appkit.core.dao.DAOProvider#getEntity(int)
      */
-	public IEntity getEntity(Class<? extends Object> clazz, int id) throws DataAccessException {
+	public IEntity getEntity(Class<? extends Object> clazz, long id) throws DataAccessException {
 		ITraceOperation traceOp = null;
 		if (Trace.isEnabled()) {
 			traceOp = Trace.startOperation(DAO.TRACE_CAT);
 		}
 		try {
-			return (IEntity) session.get(clazz, new Integer(id));
+			return (IEntity) session.get(clazz, new Long(id));
 		} finally {
 			if (traceOp != null) {
 				traceOp.finished();
@@ -285,7 +285,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
      * @see de.xwic.appkit.core.dao.DAOProviderAPI#getCollectionProperty(java.lang.Class, int, java.lang.String)
      */
 	@Override
-	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId) {
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, long entityId, String propertyId) {
 		ITraceOperation traceOp = null;
 		if (Trace.isEnabled()) {
 			traceOp = Trace.startOperation(DAO.TRACE_CAT);
@@ -331,7 +331,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
 		for (Iterator<Object> it = result.iterator(); it.hasNext(); ) {
 			IEntity entity = (IEntity)it.next();
 			Object[] row = new Object[cols.size() + 1];
-			row[0] = new Integer(entity.getId());
+			row[0] = new Long(entity.getId());
 			for (int i = 0; i < colSize; i++) {
 				Object data = resolver[i].getData(entity);
 				row[i + 1] = data;
@@ -389,7 +389,7 @@ public class HibernateDAOProviderAPI implements DAOProviderAPI {
 
 			List<String> badRefList = new ArrayList<String>();
 
-			Integer intEntityId = new Integer(entity.getId());
+			Long intEntityId = new Long(entity.getId());
 			// iterate through references (and check them)
 			for (Iterator<Property> it = refList.iterator(); it.hasNext();) {
 				Property prop = it.next();

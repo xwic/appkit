@@ -110,7 +110,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 			for (Iterator<?> it = entryList.iterator(); it.hasNext();) {
 				IPicklistEntry entry = (IPicklistEntry) it.next();
 				if (!entry.isVeraltet()) {
-					Object key = entry.getKey() != null ? entry.getKey() : new Integer(entry.getId());
+					Object key = entry.getKey() != null ? entry.getKey() : new Long(entry.getId());
 					entries.put(key.toString(), entry);
 				}
 			}
@@ -122,7 +122,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 			for (int i = 0; i < entryList.size(); i++) {
 				IPicklistEntry entry = entryList.get(i);
 				if (!entry.isVeraltet()) {
-					Object key = entry.getKey() != null ? entry.getKey() : new Integer(entry.getId());
+					Object key = entry.getKey() != null ? entry.getKey() : new Long(entry.getId());
 					addElement(entry.getBezeichnung(lang), key.toString());
 				}
 			}
@@ -135,7 +135,7 @@ public class PicklistEntryCheckboxControl extends CheckBoxGroup {
 	 * @param entry
 	 */
 	public void selectEntry(IPicklistEntry entry) {
-		Object key = entry.getKey() != null ? entry.getKey() : new Integer(entry.getId());
+		Object key = entry.getKey() != null ? entry.getKey() : new Long(entry.getId());
 		setSelectedKey(key.toString());
 	}
 

@@ -53,7 +53,7 @@ public class UniqueScopeResolver implements IEntityQueryResolver {
 		  .append("obj.name LIKE ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, scope.getId());
+		q.setLong(0, scope.getId());
 		q.setString(1, scope.getName());
 		
 		return q;

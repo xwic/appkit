@@ -40,11 +40,11 @@ public class AttachmentWrapper implements IAttachmentWrapper {
     private long contentLength = 0;
     
     private String entityType = null;
-    private int entityId = 0;
+    private long entityId = 0;
     
     private IEntity entity;
     
-    private int fileId = 0;
+    private long fileId = 0;
     
     private boolean deleted = false;
     
@@ -83,11 +83,11 @@ public class AttachmentWrapper implements IAttachmentWrapper {
     /* (non-Javadoc)
 	 * @see de.jwic.entitytools.file.uc.IAttachmentWrapper#getFileId()
 	 */
-    public int getFileId() {
+    public long getFileId() {
     	return fileId;
     }
     
-    public void setFileId(int fileId) {
+    public void setFileId(long fileId) {
     	this.fileId = fileId;
     }
     /* (non-Javadoc)
@@ -108,7 +108,7 @@ public class AttachmentWrapper implements IAttachmentWrapper {
 	/* (non-Javadoc)
 	 * @see de.jwic.entitytools.file.uc.IAttachmentWrapper#getEntity()
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entity != null ? entity.getId() : entityId;
 	}
 	

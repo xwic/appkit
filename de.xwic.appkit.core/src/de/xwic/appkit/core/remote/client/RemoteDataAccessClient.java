@@ -78,12 +78,12 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 */
 	@Override
 	@SuppressWarnings("rawtypes")
-	public EntityTransferObject getETO(final String entityType, final int id) throws RemoteDataAccessException, TransportException {
+	public EntityTransferObject getETO(final String entityType, final long id) throws RemoteDataAccessException, TransportException {
 
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_ENTITY);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
-		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Integer.toString(id));
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Long.toString(id));
 
 		Document doc = postRequest(param);
 
@@ -126,11 +126,11 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getETOCollection(java.lang.String, int, java.lang.String)
 	 */
 	@Override
-	public List<?> getETOCollection(final String entityType, final int entityId, final String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
+	public List<?> getETOCollection(final String entityType, final long entityId, final String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_COLLECTION);
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_TYPE, entityType);
-		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Integer.toString(entityId));
+		param.put(RemoteDataAccessServlet.PARAM_ENTITY_ID, Long.toString(entityId));
 		param.put(RemoteDataAccessServlet.PARAM_ENTITY_PROPERTY, propertyName);
 
 		Document doc = postRequest(param);
@@ -176,7 +176,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#deleteETO(java.lang.String, de.xwic.appkit.core.transfer.EntityTransferObject, boolean)
 	 */
 	@Override
-	public void delete(final String entityType, final int id, final long version, final boolean softDelete) {
+	public void delete(final String entityType, final long id, final long version, final boolean softDelete) {
 		Map<String, String> param = new HashMap<String, String>();
 
 		String action = softDelete ? RemoteDataAccessServlet.ACTION_SOFT_DELETE : RemoteDataAccessServlet.ACTION_DELETE;
@@ -213,7 +213,7 @@ public class RemoteDataAccessClient implements IRemoteDataAccessClient {
 	 * @see de.xwic.appkit.core.remote.client.IRemoteDataAccessClient#getUserRights(int)
 	 */
 	@Override
-	public Set<ScopeActionKey> getUserRights(int userId) throws TransportException {
+	public Set<ScopeActionKey> getUserRights(long userId) throws TransportException {
 		Map<String, String> param = new HashMap<String, String>();
 
 		param.put(RemoteDataAccessServlet.PARAM_ACTION, RemoteDataAccessServlet.ACTION_GET_USER_RIGHTS);

@@ -25,7 +25,7 @@ import de.xwic.appkit.core.dao.IEntity;
  */
 public class RowData {
 
-	private int entityId = 0;
+	private long entityId = 0;
 	
 	private Object[] array = null;
 	private IEntity entity = null;
@@ -79,7 +79,7 @@ public class RowData {
 	 * @return
 	 */
 	public String getUniqueKey() {
-		return Integer.toString(entityId);
+		return Long.toString(entityId);
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class RowData {
 	/**
 	 * @return the entityId
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entityId;
 	}
 

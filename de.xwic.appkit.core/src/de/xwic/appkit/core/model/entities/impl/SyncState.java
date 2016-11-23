@@ -33,7 +33,7 @@ public class SyncState extends Entity implements ISyncState {
 	private String extItemId;
 	private int state = ISyncSession.SYNC_STATE_UNKNOWN;
 	private String entityType;
-	private int entityId;
+	private long entityId;
 	private Date lastSyncTime;
 
 	/**
@@ -82,7 +82,7 @@ public class SyncState extends Entity implements ISyncState {
 	/**
 	 * @return the entityId
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entityId;
 	}
 
@@ -90,7 +90,7 @@ public class SyncState extends Entity implements ISyncState {
 	 * @param entityId
 	 *            the entityId to set
 	 */
-	public void setEntityId(int entityId) {
+	public void setEntityId(long entityId) {
 		this.entityId = entityId;
 	}
 

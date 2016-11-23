@@ -258,7 +258,7 @@ public class EntityTable extends ControlContainer {
 			public void elementSelected(ElementSelectedEvent event) {
 				if (event.getElement() instanceof String) {
 					String s = (String)event.getElement();
-					fireSelectionEvent(s.isEmpty() ? null : Integer.parseInt(s), event.isDblClick());
+					fireSelectionEvent(s.isEmpty() ? null : Long.parseLong(s), event.isDblClick());
 				} else {
 					fireSelectionEvent(null, event.isDblClick());
 				}
@@ -274,7 +274,7 @@ public class EntityTable extends ControlContainer {
 	 * Dispatch selection event to listeners.
 	 * @param integer
 	 */
-	private void fireSelectionEvent(Integer entityId, boolean isDblClick) {
+	private void fireSelectionEvent(Long entityId, boolean isDblClick) {
 		ElementSelectedEvent event = new ElementSelectedEvent(this, entityId, isDblClick);
 		
 		ElementSelectedListener l[] = new ElementSelectedListener[elmSelListeners.size()];

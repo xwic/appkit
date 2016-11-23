@@ -186,7 +186,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPickListTextByID(int)
      */
     @Override
-	public IPicklistText getPickListTextByID(final int id) {
+	public IPicklistText getPickListTextByID(final long id) {
         //look in cache first...
     	// must scan all entries
     	IPicklistText pt = cache.getPicklistTextById(id);
@@ -311,7 +311,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPickListEntryByID(int)
      */
     @Override
-	public IPicklistEntry getPickListEntryByID(final int id) {
+	public IPicklistEntry getPickListEntryByID(final long id) {
         //look in cache first...
 		IPicklistEntry entry = cache.getPicklistEntry(id);
 		if (entry != null) {

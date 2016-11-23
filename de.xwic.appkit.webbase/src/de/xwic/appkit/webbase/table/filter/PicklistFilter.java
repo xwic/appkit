@@ -113,9 +113,9 @@ public class PicklistFilter extends AbstractFilterControl {
 		if (propId != null) {
 			String[] keys = chkGroup.getSelectedKeys();
 			if (keys.length == 1) {
-				Integer val = null;
+				Long val = null;
 				if (!"null".equals(keys[0])) {
-					val = Integer.parseInt(keys[0]);
+					val = Long.parseLong(keys[0]);
 				}
 				qe = new QueryElement(propId, QueryElement.EQUALS, val);
 				qe.setCollectionElement(isCol);
@@ -123,9 +123,9 @@ public class PicklistFilter extends AbstractFilterControl {
 			} else if (keys.length > 1) {
 				PropertyQuery q = new PropertyQuery();
 				for (String k : keys) {
-					Integer val = null;
+					Long val = null;
 					if (!"null".equals(k)) {
-						val = Integer.parseInt(k);
+						val = Long.parseLong(k);
 					}
 					QueryElement qx = q.addOrEquals(propId, val);
 					qx.setCollectionElement(isCol);
@@ -176,7 +176,7 @@ public class PicklistFilter extends AbstractFilterControl {
 			Collections.sort(allEntriesToList, new PicklistEntryComparator(langId));
 			
 			for (IPicklistEntry pe : allEntriesToList) {
-				chkGroup.addElement(pe.getBezeichnung(langId), Integer.toString(pe.getId()));
+				chkGroup.addElement(pe.getBezeichnung(langId), Long.toString(pe.getId()));
 			}
 		}
 		
@@ -209,6 +209,8 @@ public class PicklistFilter extends AbstractFilterControl {
 			} else if (queryElement.getValue() instanceof String) {
 				key = (String)queryElement.getValue();
 			} else if (queryElement.getValue() instanceof Integer) {
+				key = ((Integer)queryElement.getValue()).toString();
+			} else if (queryElement.getValue() instanceof Long) {
 				key = ((Integer)queryElement.getValue()).toString();
 			}
 			

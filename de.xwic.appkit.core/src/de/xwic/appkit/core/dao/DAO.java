@@ -79,7 +79,7 @@ public interface DAO<I extends IEntity> {
 	 * @param id
 	 * @return
 	 */
-	public I getEntity(int id) throws DataAccessException;
+	public I getEntity(long id) throws DataAccessException;
 
     /**
 	 * Update the entity in the database.
@@ -137,7 +137,7 @@ public interface DAO<I extends IEntity> {
 	 * @param propertyId
 	 * @return
 	 */
-	public Collection<?> getCollectionProperty(int entityId, String propertyId);
+	public Collection<?> getCollectionProperty(long entityId, String propertyId);
 
 	/**
 	 * Returns a list of history entities filtered by the EntityFilter. If the filter argument
@@ -154,7 +154,7 @@ public interface DAO<I extends IEntity> {
 	 * @param id
 	 * @return
 	 */
-	public IEntity getHistoryEntity(final int id) throws DataAccessException;
+	public IEntity getHistoryEntity(final long id) throws DataAccessException;
 
     /**
 	 * Checks an entity on its validate state. <p>

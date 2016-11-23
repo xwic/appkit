@@ -105,7 +105,7 @@ public class EntityTableViewer extends ControlContainer implements IEnhancedTabl
 
 	private ColumnSelector columnSelector;
 	
-	private int ownerId = 0;
+	private long ownerId = 0L;
 
 	private IColumnSelectorListener listener = new IColumnSelectorListener() {
 

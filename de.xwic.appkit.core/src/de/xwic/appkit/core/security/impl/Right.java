@@ -166,9 +166,9 @@ public class Right extends Entity implements IRight {
 		// But since the ID usualy never changes, it is ok to do so.
 		if (!hashCalculated) {
 			myHash = 17;
-			myHash = 37 * myHash + (action != null ? action.getId() : 0);
-			myHash = 37 * myHash + (role != null ? role.getId() : 0);
-			myHash = 37 * myHash + (scope != null ? scope.getId() : 0);
+			myHash = 37 * myHash + (action != null ? (int) (action.getId() ^ (action.getId() >>> 32)) : 0);
+			myHash = 37 * myHash + (role != null ? (int) (role.getId() ^ (role.getId() >>> 32)) : 0);
+			myHash = 37 * myHash + (scope != null ? (int) (scope.getId() ^ (scope.getId() >>> 32)) : 0);
 			hashCalculated = true;
 		}
 		return myHash;

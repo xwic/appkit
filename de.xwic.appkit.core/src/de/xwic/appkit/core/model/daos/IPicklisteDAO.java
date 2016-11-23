@@ -108,7 +108,7 @@ public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
      * @param id
      * @return IPicklistEntry
      */
-    public IPicklistEntry getPickListEntryByID(int id);
+    public IPicklistEntry getPickListEntryByID(long id);
 
     /**
      * @param id
@@ -121,7 +121,7 @@ public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
      * @param id
      * @return
      */
-    public IPicklistText getPickListTextByID(int id);
+    public IPicklistText getPickListTextByID(long id);
 
     /**
      * Get a Pickliste from the database by the given key. <p>

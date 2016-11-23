@@ -52,13 +52,13 @@ public interface ISyncState extends IEntity {
 	/**
 	 * @return the entityId
 	 */
-	public int getEntityId();
+	public long getEntityId();
 
 	/**
 	 * @param entityId
 	 *            the entityId to set
 	 */
-	public void setEntityId(int entityId);
+	public void setEntityId(long entityId);
 
 	/**
 	 * @return the entityType

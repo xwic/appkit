@@ -245,9 +245,9 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		assertValue(version, "Version not specified");
 
 		if (softDelete) {
-			accessHandler.softDelete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+			accessHandler.softDelete(entityType, Long.parseLong(entityId), Long.parseLong(version));
 		} else {
-			accessHandler.delete(entityType, Integer.parseInt(entityId), Long.parseLong(version));
+			accessHandler.delete(entityType, Long.parseLong(entityId), Long.parseLong(version));
 		}
 
 		printResponse(pwOut, RESPONSE_OK);
@@ -272,7 +272,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		assertValue(entityId, "Entity Id not specified");
 		assertValue(propName, "Entity PropertyName not specified");
 
-		int eId = Integer.parseInt(entityId);
+		long eId = Long.parseLong(entityId);
 
 		Object collection = accessHandler.getETOCollection(entityType, eId, propName);
 
@@ -383,7 +383,7 @@ public class RemoteDataAccessServlet extends HttpServlet {
 		assertValue(entityId, "Entity Id not specified");
 
 		EntityDescriptor entityDescriptor = DAOSystem.getEntityDescriptor(entityType);
-		EntityTransferObject eto = accessHandler.getETO(entityType, Integer.parseInt(entityId));
+		EntityTransferObject eto = accessHandler.getETO(entityType, Long.parseLong(entityId));
 
 		XmlEntityTransport et = new XmlEntityTransport(ETOSessionCache.getInstance().getSessionCache());
 		et.write(pwOut, eto, entityDescriptor, false);

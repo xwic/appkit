@@ -53,7 +53,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 	 * de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
 	 */
 	@Override
-	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass,
+	public Object parseElement(Element elmEntity, Map<EntityKey, Long> context, Class entityClass,
 			EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache, boolean forceLoadCollection) throws TransportException {
 		String sId = elmEntity.attributeValue("id");
 		String sVersion = elmEntity.attributeValue("version");
@@ -79,7 +79,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 			}
 		}
 		
-		EntityKey key = new EntityKey(descr.getClassname(), Integer.parseInt(sId));
+		EntityKey key = new EntityKey(descr.getClassname(), Long.parseLong(sId));
 		if(sessionCache.containsKey(key)){
 			log.debug("Cache hit for Entity: " + key.toString());
 			return sessionCache.get(key);
@@ -119,7 +119,7 @@ public final class EtoEntityNodeParser implements IEntityNodeParser {
 				if ((isEntityRef && !isPicklistRef)) {
 					String id = elmProp.attributeValue("id");
 					if (id != null && !id.isEmpty()) {
-						int refId = Integer.parseInt(id);
+						long refId = Long.parseLong(id);
 						pv.setEntityId(refId);
 
 						// String etoStr = elmProp.attributeValue("eto");

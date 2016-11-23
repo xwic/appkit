@@ -38,7 +38,7 @@ public class Entity implements IEntity {
 	@Id
 	@GeneratedValue
 	@Column(name = "ID")
-	private int id;
+	private long id;
 	@Column(name = "SRVENTITY_ID")
     private int serverEntityId;
 	@Column(name = "CREATED_AT")
@@ -75,14 +75,14 @@ public class Entity implements IEntity {
      * Returns the unique id that identifies this object.
      * @return
      */
-    public int getId() {
+    public long getId() {
         return id;
     }
     /**
      * Set the unique id. This method shall only be used by the orm tool.
      * @param newId
      */
-    public void setId(int newId) {
+    public void setId(long newId) {
         this.id = newId;
     }
 

@@ -46,7 +46,7 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 	@Override
 	public void selectEntry(E entity){
 		if (entity != null) {
-			setSelectedKey(Integer.toString(entity.getId()));
+			setSelectedKey(Long.toString(entity.getId()));
 		}
 		else {
 			setSelectedKey("0");
@@ -63,10 +63,10 @@ public abstract class AbstractEntityComboControl<E extends IEntity> extends List
 			return null;
 		}
 
-		int i = Integer.parseInt(selectedKey);
+		long l = Long.parseLong(selectedKey);
 
-		if (i > 0){
-			return getEntityDao().getEntity(i);
+		if (l > 0){
+			return getEntityDao().getEntity(l);
 		}
 		return null;
 	}

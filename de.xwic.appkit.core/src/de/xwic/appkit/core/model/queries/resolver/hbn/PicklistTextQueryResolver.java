@@ -69,7 +69,7 @@ public class PicklistTextQueryResolver implements IEntityQueryResolver {
 
 		Query q = session.createQuery(sb.toString());
 		if (query.getPicklistEntryID() > 0) {
-			q.setInteger(0, query.getPicklistEntryID());
+			q.setLong(0, query.getPicklistEntryID());
 			if (query.getLanguageId() != null) {
 				q.setString(1, query.getLanguageId().toUpperCase());
 				q.setString(2, query.getLanguageId().toLowerCase());
@@ -83,7 +83,7 @@ public class PicklistTextQueryResolver implements IEntityQueryResolver {
 					q.setString(idx++, query.getBezeichnung());
 				}
 				if (query.getPicklisteID() > 0) {
-					q.setInteger(idx++, query.getPicklisteID());
+					q.setLong(idx++, query.getPicklisteID());
 				}
 			}
 		}

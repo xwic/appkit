@@ -50,7 +50,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
 public class EntityTransferObject {
 	
 	private final Class<? extends IEntity> entityClass;
-	private int entityId;
+	private long entityId;
 	private long entityVersion;
 
 	private boolean modified = false;
@@ -69,7 +69,7 @@ public class EntityTransferObject {
 	 * @param entityClass
 	 */
 	public EntityTransferObject(final String entityId, final String entityVersion, final Class<? extends IEntity> entityClass) {
-		this.entityId = Integer.parseInt(entityId);
+		this.entityId = Long.parseLong(entityId);
 		this.entityVersion = Integer.parseInt(entityVersion);
 		this.entityClass = entityClass;
 	}
@@ -275,7 +275,7 @@ public class EntityTransferObject {
 	/**
 	 * @return Returns the entityId.
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entityId;
 	}
 
@@ -301,7 +301,7 @@ public class EntityTransferObject {
 		final int PRIME = 31;
 		int result = 1;
 		result = PRIME * result + ((entityClass == null) ? 0 : entityClass.hashCode());
-		result = PRIME * result + entityId;
+		result = PRIME * result + (int) (entityId ^ (entityId >>> 32));
 		result = PRIME * result + (int) (entityVersion ^ (entityVersion >>> 32));
 		//result = PRIME * result + ((propertyValues == null) ? 0 : propertyValues.hashCode());
 		return result;
@@ -359,7 +359,7 @@ public class EntityTransferObject {
 			throw new IllegalArgumentException("The entity type is different.");
 		}
 		// not new but different
-		if (entityId != 0 && response.entityId != entityId) {
+		if (entityId != 0l && response.entityId != entityId) {
 			throw new IllegalArgumentException("The entity ID is not the same.");
 		}
 		

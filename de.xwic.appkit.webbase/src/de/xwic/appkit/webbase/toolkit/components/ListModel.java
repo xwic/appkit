@@ -33,7 +33,7 @@ import de.xwic.appkit.core.dao.IEntity;
 public abstract class ListModel extends SerObservable {
 
 	private EntityQuery query;
-	private int selectedEntryId;
+	private long selectedEntryId;
 
 	/**
 	 * Creates a model.
@@ -69,7 +69,7 @@ public abstract class ListModel extends SerObservable {
 	 * 
 	 * @param entityId
 	 */
-	public void delete(int entityId) {
+	public void delete(long entityId) {
 		try {
 			IEntity entity = getDAO().getEntity(entityId);
 			getDAO().delete(entity);
@@ -108,7 +108,7 @@ public abstract class ListModel extends SerObservable {
 	/**
 	 * @return the selectedEntryId
 	 */
-	public int getSelectedEntryId() {
+	public long getSelectedEntryId() {
 		return selectedEntryId;
 	}
 
@@ -116,7 +116,7 @@ public abstract class ListModel extends SerObservable {
 	 * @param selectedEntryId
 	 *            the selectedEntryId to set
 	 */
-	public void setSelectedEntryId(int selectedEntryId) {
+	public void setSelectedEntryId(long selectedEntryId) {
 		this.selectedEntryId = selectedEntryId;
 	}
 }

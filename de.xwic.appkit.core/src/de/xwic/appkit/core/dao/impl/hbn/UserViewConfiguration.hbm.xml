@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.UserViewConfiguration" table="USER_VIEW_CONFIG">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="USER_VIEW_CONFIG_ID" not-null="true"/>
             <generator class="native"/>
         </id>

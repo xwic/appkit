@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.UserListProfile" table="USER_LIST_PROFILE">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="USER_PROFILE_ID" not-null="true"/>
             <generator class="native"/>
         </id>

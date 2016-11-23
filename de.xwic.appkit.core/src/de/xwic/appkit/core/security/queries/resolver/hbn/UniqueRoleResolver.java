@@ -53,7 +53,7 @@ public class UniqueRoleResolver implements IEntityQueryResolver {
 		  .append("obj.name LIKE ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, role.getId());
+		q.setLong(0, role.getId());
 		q.setString(1, role.getName());
 		
 		return q;
