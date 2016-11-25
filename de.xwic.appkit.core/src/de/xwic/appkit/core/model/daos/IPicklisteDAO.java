@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 /*
  * de.xwic.appkit.core.model.daos.IPicklisteDAO
@@ -114,7 +114,7 @@ public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
      * @param id
      * @return
      */
-    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Integer> id);
+    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Long> id);
 
     /**
      * Returns the picklistText object with the specified id.
