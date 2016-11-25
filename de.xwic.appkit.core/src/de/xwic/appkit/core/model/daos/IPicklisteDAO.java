@@ -114,7 +114,7 @@ public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
      * @param id
      * @return
      */
-    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Integer> id);
+    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Long> id);
 
     /**
      * Returns the picklistText object with the specified id.
