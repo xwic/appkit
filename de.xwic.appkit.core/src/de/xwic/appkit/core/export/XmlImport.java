@@ -560,7 +560,7 @@ public class XmlImport {
 				Long newId = importedEntities.get(new EntityKey(type.getName(), refId));
 				if (newId != null) {
 					// its an imported object
-					refId = newId.intValue();
+					refId = newId.longValue();
 				}
 				DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 				IEntity refEntity = refDAO.getEntity(refId);

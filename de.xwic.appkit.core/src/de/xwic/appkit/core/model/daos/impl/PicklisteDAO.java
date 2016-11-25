@@ -340,11 +340,11 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
 	@Override
 	public Set<IPicklistEntry> getPicklistEntriesByID(final Collection<Long> id) {
 		final Set<IPicklistEntry> entries = new LinkedHashSet<IPicklistEntry>();
-		for (final Long integer : id) {
-			if (null == integer) {
+		for (final Long idVal : id) {
+			if (null == idVal) {
 				continue;
 			}
-			CollectionUtil.addIfNotNull(getPickListEntryByID(integer), entries);
+			CollectionUtil.addIfNotNull(getPickListEntryByID(idVal), entries);
 		}
 		return entries;
 	}
