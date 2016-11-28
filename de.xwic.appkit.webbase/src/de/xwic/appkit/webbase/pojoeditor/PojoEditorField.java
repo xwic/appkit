@@ -69,7 +69,6 @@ public class PojoEditorField {
 		this.control = control;
 	}
 
-	
 	/**
 	 * @return the propertyName
 	 */
@@ -77,9 +76,9 @@ public class PojoEditorField {
 		return propertyName;
 	}
 
-	
 	/**
-	 * @param propertyName the propertyName to set
+	 * @param propertyName
+	 *            the propertyName to set
 	 */
 	public void setPropertyName(String propertyName) {
 		this.propertyName = propertyName;

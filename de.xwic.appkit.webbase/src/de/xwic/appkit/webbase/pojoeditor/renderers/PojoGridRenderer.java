@@ -21,10 +21,13 @@ import org.apache.commons.logging.LogFactory;
 import de.jwic.base.Control;
 import de.jwic.base.ControlContainer;
 import de.jwic.base.IControlRenderer;
+import de.jwic.base.IHaveEnabled;
 import de.jwic.base.JWicRuntime;
 import de.jwic.base.RenderContext;
+import de.jwic.controls.InputBox;
 import de.xwic.appkit.core.pojoeditor.annotations.GridRender;
 import de.xwic.appkit.core.pojoeditor.annotations.GridRenderer;
+import de.xwic.appkit.webbase.pojoeditor.IPojoEditorFieldRenderLogic;
 import de.xwic.appkit.webbase.pojoeditor.PojoEditorControl;
 import de.xwic.appkit.webbase.pojoeditor.PojoEditorFactory;
 import de.xwic.appkit.webbase.pojoeditor.PojoEditorField;
@@ -37,23 +40,17 @@ public class PojoGridRenderer implements IPojoRenderer {
 
 	private static final Log log = LogFactory.getLog(PojoGridRenderer.class);
 
-	private static final String DEFAULT_CONTROL_RENDERER = "jwic.renderer.Default";
-
-	private Class pojoClass;
-	private List<PojoEditorField> fields;
-	private PojoEditorControl editor;
+	protected Class<?> pojoClass;
+	protected List<PojoEditorField> fields;
+	protected PojoEditorControl editor;
+	protected IPojoEditorFieldRenderLogic fieldRenderLogic;
 
 	private int columns;
 
 	/**
 	 * @param pojoClass
 	 */
-	public PojoGridRenderer(Class pojoClass, PojoEditorControl editor, List<PojoEditorField> fields) {
-		this.pojoClass = pojoClass;
-		this.fields = fields;
-		this.editor = editor;
-		GridRenderer gr = (GridRenderer) pojoClass.getAnnotation(GridRenderer.class);
-		this.columns = gr.columns();
+	public PojoGridRenderer() {
 
 	}
 
@@ -80,22 +77,44 @@ public class PojoGridRenderer implements IPojoRenderer {
 
 		PrintWriter writer = context.getWriter();
 		writer.write("<table>");
-		int i = 1;
+		int column = 1;
 		writer.write("<tr>");
 
 		for (GridCell c : cells) {
-			if (shouldRenderControl(c)) {
+			String fieldName = c.field.getPropertyName();
+			if (fieldRenderLogic.isRenderField(fieldName)) {
+				enableControl(c.field, fieldRenderLogic.isEnabled(fieldName));
+
 				renderControl(c, context, controlRenderer);
 
-				if (i % columns == 0) {
+				column += c.colspan;
+
+				if (column > columns) {
 					writer.write("</tr><tr>");
+					column = 1;
 				}
-				i += c.colspan;
 			}
 
 		}
 		writer.write("</tr>");
 		writer.write("</table>");
+
+	}
+
+	/**
+	 * Enable/disable control
+	 * 
+	 * @param c
+	 * @param isEnabled
+	 */
+	protected void enableControl(PojoEditorField field, boolean isEnabled) {
+
+		Control control = field.getControl();
+		if (control instanceof IHaveEnabled) {
+			((IHaveEnabled) control).setEnabled(isEnabled);
+		} else if (control instanceof InputBox) {
+			((InputBox) control).setReadonly(!isEnabled);
+		}
 
 	}
 
@@ -128,14 +147,6 @@ public class PojoGridRenderer implements IPojoRenderer {
 		} else {
 			return "";
 		}
-	}
-
-	/**
-	 * @param c
-	 * @return
-	 */
-	private boolean shouldRenderControl(GridCell c) {
-		return true;
 	}
 
 	/**
@@ -206,6 +217,46 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 */
 	public void setColumns(int columns) {
 		this.columns = columns;
+	}
+
+	/**
+	 * @param pojoClass
+	 *            the pojoClass to set
+	 */
+	@Override
+	public void setPojoClass(Class pojoClass) {
+		this.pojoClass = pojoClass;
+		GridRenderer gr = (GridRenderer) pojoClass.getAnnotation(GridRenderer.class);
+		this.columns = gr.columns();
+	}
+
+	/**
+	 * @param fields
+	 *            the fields to set
+	 */
+	@Override
+	public void setFields(List<PojoEditorField> fields) {
+		this.fields = fields;
+	}
+
+	/**
+	 * @param editor
+	 *            the editor to set
+	 */
+	@Override
+	public void setEditorControl(PojoEditorControl editor) {
+		this.editor = editor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.webbase.pojoeditor.renderers.IPojoRenderer#setFieldRenderLogic(de.xwic.appkit.webbase.pojoeditor.
+	 * IPojoEditorFieldRenderLogic)
+	 */
+	@Override
+	public void setFieldRenderLogic(IPojoEditorFieldRenderLogic logic) {
+		this.fieldRenderLogic = logic;
 	}
 
 }
