@@ -44,7 +44,7 @@ public class RowData {
 		object = data;
 		if (data.getClass().isArray()) {
 			array = (Object[])data;
-			entityId = (Integer)array[0];
+			entityId = (Long)array[0];
 		} else if (data instanceof IEntity) {
 			entity = (IEntity)data;
 			entityId = entity.getId();

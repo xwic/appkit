@@ -232,9 +232,9 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			} else {
 				value = element.getObject();
 			}
-			if (isPicklistEntry && value != null && value instanceof Integer) {
+			if (isPicklistEntry && value != null && value instanceof Long) {
 				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
-				value = dao.getPickListEntryByID((Integer)value);
+				value = dao.getPickListEntryByID((Long)value);
 			}
 			return value;
 		} catch (InvocationTargetException ite) {
@@ -283,9 +283,11 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		} else if (value instanceof Calendar) {
 			Calendar c = (Calendar)value;
 			text = dateFormatter.format(c.getTime());
-		} else if (value instanceof Long) {
+		// Dotto: Commenting Number Format for Long values, as this would change the behavior.
+		// Before Integer values got got labeled just with toString(). It has side effects in case we change this.
+		/*} else if (value instanceof Long) {
 			NumberFormat nf = NumberFormat.getNumberInstance(locale);
-			text = nf.format(((Long)value).longValue());
+			text = nf.format(((Long)value).longValue());*/
 		} else if (value instanceof Double) {
 			NumberFormat nf = NumberFormat.getNumberInstance(locale);
 			nf.setMinimumFractionDigits(2);
