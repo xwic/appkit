@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 package de.xwic.appkit.webbase.table;
 
@@ -52,18 +52,18 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 import de.xwic.appkit.webbase.utils.StringUtils;
 
 /**
- * Holds information about a column in a table and transforms a property 
+ * Holds information about a column in a table and transforms a property
  * to text. This class is able to read the String value of a property from
  * a row object. The required information to read the properties is cached
  * within this object. It is beeing build up the first time getText(..) is called. The
  * object type for any further call must be the same as the first one.
- * 
+ *
  * @author Florian Lippisch
  */
 public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
 	private final static Object[] noArgs = new Object[0];
 
 	protected ListColumn column = null;
@@ -73,24 +73,24 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	protected int dataIdx = 0;
 
 	protected Locale locale = null;
-	
+
 	protected String myProperty = null;
 	protected boolean isPicklistEntry = false;
 	protected boolean isCollection = false;
 	protected DAO<?> collFetchDAO = null;
-	
+
 	protected DateFormat dateFormatter;
 
 	private Class<? extends IEntity> entityClass;
 	private boolean customProperty;
 
 	/**
-	 * 
+	 *
 	 */
 	public DefaultColumnLabelProvider() {
 		locale = Locale.getDefault();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#initialize(java.util.TimeZone, java.util.Locale, de.xwic.appkit.webbase.table.Column)
 	 */
@@ -139,10 +139,10 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 				dateFormatter = new SimpleDateFormat("dd-MMM-yyyy", locale);
 			}
 			break;
-			
+
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#getCellLabel(de.xwic.appkit.webbase.table.RowData)
 	 */
@@ -158,8 +158,8 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			} else {
 				cell.image = ImageLibrary.ICON_UNCHECKED;
 			}
-			
-			cell.object = value; 
+
+			cell.object = value;
 		} else {
 			cell.text = toString(value);
 			cell.object = value;
@@ -170,7 +170,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		}
 		return cell;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.IColumnLabelProvider#getRequiredProperties(java.lang.String)
 	 */
@@ -182,7 +182,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		}
 		Property prop = listColumn.getFinalProperty();
 		if (prop.isEntity()) {
-			
+
 			myProperty = propertyId + ".id";
 			try {
 				EntityDescriptor ed = ConfigurationManager.getSetup().getEntityDescriptor(prop.getEntityType());
@@ -192,7 +192,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			} catch (ConfigurationException e) {
 				log.warn("Can not find EntityDescriptor for entity type " + prop.getEntityType());
 			}
-			
+
 		} else if (prop.isCollection() || prop.getEntityType().equals("java.util.Set")) {
 			// do not add "this" column
 			isCollection = true;
@@ -201,17 +201,17 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		}
 		return new String[] { myProperty };
 	}
-	
+
 	/**
 	 * Read the property value as text from the element.
 	 * @param element
 	 * @return
 	 */
 	public Object getData(RowData element) {
-		
+
 		try {
 			Object value;
-		
+
 			if (element.isArray()) {
 				if (isCollection) {
 					value = fetchSet(myProperty, element);
@@ -224,7 +224,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 					// We have not introspected the beans for the propertyPath yet
 					buildReadPath(entity);
 				}
-				
+
 				value = entity;
 				for (int i = 0; i < readMethods.length && value != null; i++) {
 					value = readMethods[i].invoke(value, noArgs);
@@ -232,9 +232,9 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			} else {
 				value = element.getObject();
 			}
-			if (isPicklistEntry && value != null && value instanceof Integer) {
+			if (isPicklistEntry && value != null && value instanceof Long) {
 				IPicklisteDAO dao = DAOSystem.getDAO(IPicklisteDAO.class);
-				value = dao.getPickListEntryByID((Integer)value);
+				value = dao.getPickListEntryByID((Long)value);
 			}
 			return value;
 		} catch (InvocationTargetException ite) {
@@ -247,7 +247,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 			log.error("Failed to render column", e);
 			return "ERR: Failed to render column!";
 		}
-		
+
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	 * @return
 	 */
 	protected Object fetchSet(String propId, RowData element) {
-		
+
 		if (collFetchDAO != null) {
 			return collFetchDAO.getCollectionProperty(element.getEntityId(), propId);
 		}
@@ -270,11 +270,11 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	 */
 	public String getText(RowData element) {
 		return toString(getData(element));
-	}	
-	
+	}
+
 	private String toString(Object value) {
 		String text;
-		
+
 		if (value == null) {
 			text = "";
 		} else if (value instanceof Date) {
@@ -327,15 +327,15 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 		return text;
 
 	}
-	
+
 	/**
-	 * @throws IntrospectionException 
-	 * 
+	 * @throws IntrospectionException
+	 *
 	 */
 	private void buildReadPath(Object element) throws IntrospectionException {
 		StringTokenizer stk = new StringTokenizer(column.getPropertyId(), ".");
 		readMethods = new Method[stk.countTokens()];
-		
+
 		int idx = 0;
 		Class<?> clazz = element.getClass();
 		while (stk.hasMoreTokens()) {
@@ -363,7 +363,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	}
 	/**
 	 * sets the column
-	 * 
+	 *
 	 * @param column
 	 */
 	public void setColumn(ListColumn column) {
@@ -386,7 +386,7 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 
 	/**
 	 * sets the data index
-	 * 
+	 *
 	 * @param dataIdx
 	 */
 	public void setDataIdx(int dataIdx) {
@@ -402,6 +402,6 @@ public class DefaultColumnLabelProvider implements IColumnLabelProvider {
 	public boolean renderExcelCell(Cell cell, CellLabel label) {
 		return false;
 	}
-	
+
 }
 
