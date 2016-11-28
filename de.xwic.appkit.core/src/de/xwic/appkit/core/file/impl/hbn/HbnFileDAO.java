@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 package de.xwic.appkit.core.file.impl.hbn;
 
@@ -35,22 +35,23 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 
 /**
  * DAO implementation for the HbnFile object.
- * 
+ *
  * This implementation is hibernate specific.
- * 
+ *
  * @author Florian Lippisch
  */
 public class HbnFileDAO implements IFileHandler {
 
 	/**
 	 * Store a file in the database.
-	 * 
+	 *
 	 * @param filename
 	 * @param dataHandler
 	 * @return
 	 */
+	@Override
 	public long storeFile(final String filename) throws DataAccessException {
-		Integer res = (Integer) new UseCase() {
+		Long res = (Long) new UseCase() {
 
 			@Override
 			protected Object execute(DAOProviderAPI api) {
@@ -99,7 +100,7 @@ public class HbnFileDAO implements IFileHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
 	 */
 	@Override
@@ -120,7 +121,7 @@ public class HbnFileDAO implements IFileHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)
 	 */
 	@Override
@@ -130,9 +131,10 @@ public class HbnFileDAO implements IFileHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.pol.crm.dao.IFileHandler#loadFileInputStream(int)
 	 */
+	@Override
 	public InputStream loadFileInputStream(final long id) throws DataAccessException {
 		InputStream stream = null;
 
@@ -154,7 +156,7 @@ public class HbnFileDAO implements IFileHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFileInUC(java.lang.String)
 	 */
 	@Override
@@ -165,7 +167,7 @@ public class HbnFileDAO implements IFileHandler {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFileInUC(int)
 	 */
 	@Override
