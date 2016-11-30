@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 
 package de.xwic.appkit.webbase.table.filter;
@@ -42,7 +42,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryComparator;
 public class PicklistFilter extends AbstractFilterControl {
 
 	private CheckBoxGroup chkGroup;
-	
+
 	/**
 	 * @param container
 	 * @param name
@@ -52,7 +52,7 @@ public class PicklistFilter extends AbstractFilterControl {
 
 		chkGroup = new CheckBoxGroup(this, "chkGroup");
 		chkGroup.setColumns(1);
-				
+
 		Button btAll = new Button(this, "btAll");
 		btAll.setTitle("All");
 		btAll.setCssClass("j-button j-btn-small");
@@ -78,9 +78,9 @@ public class PicklistFilter extends AbstractFilterControl {
 				touchAll(false);
 			}
 		});
-		
+
 	}
-	
+
 	/**
 	 * @param b
 	 */
@@ -100,16 +100,16 @@ public class PicklistFilter extends AbstractFilterControl {
 	@Override
 	public QueryElement getQueryElement() {
 		QueryElement qe = null;
-		
+
 		String propId = null;
 		boolean isCol = false;
 		if (column.getListColumn().getFinalProperty().isCollection()) {
 			propId = column.getListColumn().getPropertyId();
 			isCol = true;
-		} else if (column.getPropertyIds().length > 0) { 
+		} else if (column.getPropertyIds().length > 0) {
 			propId = column.getPropertyIds()[0];
 		}
-		
+
 		if (propId != null) {
 			String[] keys = chkGroup.getSelectedKeys();
 			if (keys.length == 1) {
@@ -119,7 +119,7 @@ public class PicklistFilter extends AbstractFilterControl {
 				}
 				qe = new QueryElement(propId, QueryElement.EQUALS, val);
 				qe.setCollectionElement(isCol);
-				
+
 			} else if (keys.length > 1) {
 				PropertyQuery q = new PropertyQuery();
 				for (String k : keys) {
@@ -132,11 +132,11 @@ public class PicklistFilter extends AbstractFilterControl {
 				}
 				qe = new QueryElement(QueryElement.AND, q);
 			}
-		
+
 		}
 		return qe;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#getPreferredHeight()
 	 */
@@ -151,7 +151,7 @@ public class PicklistFilter extends AbstractFilterControl {
 		}
 		return height;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.webbase.table.filter.AbstractFilterControl#loadFilter(de.xwic.appkit.webbase.table.Column, de.xwic.appkit.core.model.queries.QueryElement)
@@ -160,26 +160,26 @@ public class PicklistFilter extends AbstractFilterControl {
 	@Override
 	public void initialize(Column column, QueryElement queryElement) {
 		this.column = column;
-		
+
 		Property prop = column.getListColumn().getFinalProperty();
 
 		chkGroup.clear();
 		if (!prop.isCollection()) {
 			chkGroup.addElement("<i>No Value</i>", "null");
 		}
-		
+
 		String langId = getSessionContext().getLocale().getLanguage();
 		if (prop.getPicklistId() != null && !prop.getPicklistId().isEmpty()) {
-			IPicklisteDAO plDAO = (IPicklisteDAO)DAOSystem.getDAO(IPicklisteDAO.class);
+			IPicklisteDAO plDAO = DAOSystem.getDAO(IPicklisteDAO.class);
 			List<IPicklistEntry> allEntriesToList = plDAO.getAllEntriesToList(prop.getPicklistId());
 
 			Collections.sort(allEntriesToList, new PicklistEntryComparator(langId));
-			
+
 			for (IPicklistEntry pe : allEntriesToList) {
 				chkGroup.addElement(pe.getBezeichnung(langId), Long.toString(pe.getId()));
 			}
 		}
-		
+
 		// select elements
 		if (queryElement != null) {
 			StringBuilder sbKeys = new StringBuilder();
@@ -193,15 +193,15 @@ public class PicklistFilter extends AbstractFilterControl {
 			}
 			chkGroup.setSelectedKey(sbKeys.toString());
 		}
-		
+
 	}
 
 	/**
 	 * @param queryElement
-	 * @param sbKeys 
+	 * @param sbKeys
 	 */
 	private void checkElement(QueryElement queryElement, StringBuilder sbKeys) {
-		
+
 		if (QueryElement.EQUALS.equals(queryElement.getOperation())) {
 			String key = null;
 			if (queryElement.getValue() == null) {
@@ -211,9 +211,9 @@ public class PicklistFilter extends AbstractFilterControl {
 			} else if (queryElement.getValue() instanceof Integer) {
 				key = ((Integer)queryElement.getValue()).toString();
 			} else if (queryElement.getValue() instanceof Long) {
-				key = ((Integer)queryElement.getValue()).toString();
+				key = ((Long)queryElement.getValue()).toString();
 			}
-			
+
 			if (key != null && chkGroup.getContentProvider().getObjectFromKey(key) != null) {
 				if (sbKeys.length() != 0) {
 					sbKeys.append(";");
@@ -221,7 +221,7 @@ public class PicklistFilter extends AbstractFilterControl {
 				sbKeys.append(key);
 			}
 		}
-		
+
 	}
 
 }
