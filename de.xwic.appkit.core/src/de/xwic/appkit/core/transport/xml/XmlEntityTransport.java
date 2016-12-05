@@ -98,7 +98,7 @@ public class XmlEntityTransport {
 	/**
 	 * Cache used on the server, to avoid transferring an ETO twice.
 	 */
-	Map<EntityKey, Integer> serverContext = new HashMap<EntityKey, Integer>();
+	Map<EntityKey, Long> serverContext = new HashMap<EntityKey, Long>();
 	
 	/**
 	 * Used on client side. Contains all ETOs transferred during request / response cycle.
@@ -250,7 +250,7 @@ public class XmlEntityTransport {
 			String entityClassName = DAOSystem.findDAOforEntity(descr.getClassname()).getEntityClass().getName();
 			EntityKey key = new EntityKey(entityClassName, eto.getEntityId());
 			Element elm = entities.addElement(ELM_ENTITY);
-			elm.addAttribute("id", Integer.toString(eto.getEntityId()));
+			elm.addAttribute("id", Long.toString(eto.getEntityId()));
 			elm.addAttribute("version", Long.toString(eto.getEntityVersion()));
 			elm.addAttribute("type", eto.getEntityClass().getName());
 			if (Boolean.TRUE.equals(eto.getPropertyValue("deleted").getValue())) {
@@ -298,7 +298,7 @@ public class XmlEntityTransport {
 		try {
 			EntityKey key = new EntityKey(entity.type().getName(), entity.getId());
 			Element elm = entities.addElement(ELM_ENTITY);
-			elm.addAttribute("id", Integer.toString(entity.getId()));
+			elm.addAttribute("id", Long.toString(entity.getId()));
 			elm.addAttribute("version", Long.toString(entity.getVersion()));
 			
 			Class clasz = null;
@@ -420,7 +420,7 @@ public class XmlEntityTransport {
 		int size = sSize != null && sSize.length() != 0 ? Integer.parseInt(sSize) : 0;
 		int totalSize = sTotalSize != null && sTotalSize.length() != 0 ? Integer.parseInt(sTotalSize) : size;
 
-		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
+		Map<EntityKey, Long> context = new HashMap<EntityKey, Long>();
 
 		List data = new ArrayList();
 		EntityList list = new EntityList(data, limit, totalSize);

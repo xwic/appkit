@@ -47,7 +47,7 @@ public class Action extends Entity implements IAction {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.Entity#setId(int)
 	 */
-	public void setId(int newId) {
+	public void setId(long newId) {
 		super.setId(newId);
 		hashCalculated = false;
 	}
@@ -81,7 +81,7 @@ public class Action extends Entity implements IAction {
 		if (!hashCalculated) {
 			myHash = 17;
 			myHash = 37 * myHash + (name != null ? name.hashCode() : 0);
-			myHash = 37 * myHash + getId();
+			myHash = 37 * myHash + (int) (getId() ^ (getId() >>> 32));
 			hashCalculated = true;
 		}
 		return myHash;

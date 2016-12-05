@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.file.impl.hbn.HbnFile" table="FILES">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="FILE_ID" not-null="true"/>
             <generator class="native"/>
         </id>

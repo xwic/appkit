@@ -140,7 +140,7 @@ public class UserListUtil {
 	 * @param description
 	 * @return
 	 */
-	public static int toUserProfile(ListSetup ls, String description) {
+	public static long toUserProfile(ListSetup ls, String description) {
 		UserListSetup userLS = toUserListSetup(ls);
 
 		String profileId = createGenericKey(description);
@@ -198,7 +198,7 @@ public class UserListUtil {
 	 * @param userLS
 	 * @return the updated or created, but unsaved IUserListProfile. 
 	 */
-	public static IUserListProfile toUserProfile(UserListSetup userLS, String description, int ownerId) {
+	public static IUserListProfile toUserProfile(UserListSetup userLS, String description, long ownerId) {
 		IUserListProfileDAO dao = (IUserListProfileDAO) DAOSystem.getDAO(IUserListProfileDAO.class);
 		IUserListProfile profile = null;
 

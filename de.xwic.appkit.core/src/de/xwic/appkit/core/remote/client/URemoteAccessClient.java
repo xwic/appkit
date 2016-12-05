@@ -102,12 +102,12 @@ public final class URemoteAccessClient {
 	 * @param config
 	 * @return
 	 */
-	public static int multipartRequestInt(final MultipartEntity builder,
+	public static long multipartRequestLong(final MultipartEntity builder,
 			final RemoteSystemConfiguration config) {
 		try {
 			MultipartRequestHelper requestHelper = new MultipartRequestHelper(builder, config);
 			byte[] byteArray = postRequest(requestHelper, config);
-			return Integer.valueOf(new String(byteArray));
+			return Long.valueOf(new String(byteArray));
 		} catch (RemoteDataAccessException rdae) {
 			throw rdae;
 		} catch (Exception e) {

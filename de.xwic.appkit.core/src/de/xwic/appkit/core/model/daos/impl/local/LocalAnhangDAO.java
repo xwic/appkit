@@ -38,7 +38,7 @@ public class LocalAnhangDAO extends AnhangDAO {
 		IAnhang anhang = (IAnhang)entity;
 		
 		//get fileID
-		int tempFileID = anhang.getFileID(); 
+		long tempFileID = anhang.getFileID(); 
 		
 		//delete object
 		super.delete(anhang);

@@ -52,7 +52,7 @@ public class RightQueryResolver implements IEntityQueryResolver {
 		  .append("obj.role = ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, role.getId());
+		q.setLong(0, role.getId());
 		
 		return q;
 		

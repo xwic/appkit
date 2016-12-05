@@ -179,7 +179,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	public QueryElement addEquals(String property, Object value) {
 		if (value instanceof IEntity) {
 			// store the id instead of the entity.
-			value = new Integer(((IEntity)value).getId());
+			value = new Long(((IEntity)value).getId());
 			if (!property.endsWith(".id")) {
 				property += ".id";
 			}
@@ -196,7 +196,7 @@ public class PropertyQuery extends EntityQuery implements IPropertyQuery {
 	public QueryElement addOrEquals(String property, Object value) {
 		if (value instanceof IEntity) {
 			// store the id instead of the entity.
-			value = new Integer(((IEntity)value).getId());
+			value = new Long(((IEntity)value).getId());
 			if (!property.endsWith(".id")) {
 				property += ".id";
 			}

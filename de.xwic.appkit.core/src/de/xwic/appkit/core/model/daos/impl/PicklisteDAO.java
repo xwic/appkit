@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 /*
  * de.xwic.appkit.core.model.daos.impl.PicklisteDAO
@@ -87,7 +87,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
 			}
 		});
 	    fireEntityChangeEvent(new DaoEntityEvent<IPickliste>(DaoEntityEvent.UPDATE, pl));
-	    return pl; 
+	    return pl;
 	}
 
 	/* (non-Javadoc)
@@ -186,7 +186,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPickListTextByID(int)
      */
     @Override
-	public IPicklistText getPickListTextByID(final int id) {
+	public IPicklistText getPickListTextByID(final long id) {
         //look in cache first...
     	// must scan all entries
     	IPicklistText pt = cache.getPicklistTextById(id);
@@ -226,10 +226,10 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
 			@Override
 			public Object run(DAOProviderAPI api) {
 		    	EntityList list = api.getEntities(PicklistText.class, null, new PicklistTextQuery(entry, langID));
-		    	if (list.size() == 0) {		    		
+		    	if (list.size() == 0) {
 		    		// AI 02-Mar-2016: do not automatically create an empty PicklistText. This will cause wrong entries to be created in the DB.
 		    		// Make sure the getPicklistText method is always null checked
-		    		
+
 //		    	    IPicklistText newTextWithNewID = createBezeichnung(entry, langID, "<nicht gepflegt>");
 //		    	    cache.putPicklistText(newTextWithNewID);
 //		    	    return newTextWithNewID;
@@ -311,7 +311,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPickListEntryByID(int)
      */
     @Override
-	public IPicklistEntry getPickListEntryByID(final int id) {
+	public IPicklistEntry getPickListEntryByID(final long id) {
         //look in cache first...
 		IPicklistEntry entry = cache.getPicklistEntry(id);
 		if (entry != null) {
@@ -338,13 +338,13 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
      * @see de.xwic.appkit.core.model.daos.IPicklisteDAO#getPicklistEntriesByID(java.util.Collection)
      */
 	@Override
-	public Set<IPicklistEntry> getPicklistEntriesByID(final Collection<Integer> id) {
+	public Set<IPicklistEntry> getPicklistEntriesByID(final Collection<Long> id) {
 		final Set<IPicklistEntry> entries = new LinkedHashSet<IPicklistEntry>();
-		for (final Integer integer : id) {
-			if (null == integer) {
+		for (final Long idVal : id) {
+			if (null == idVal) {
 				continue;
 			}
-			CollectionUtil.addIfNotNull(getPickListEntryByID(integer), entries);
+			CollectionUtil.addIfNotNull(getPickListEntryByID(idVal), entries);
 		}
 		return entries;
 	}
@@ -542,7 +542,7 @@ public class PicklisteDAO extends AbstractDAOWithEvent<IPickliste, Pickliste> im
 		}
 		return null;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.event.AbstractDAOWithEvent#softDelete(de.xwic.appkit.core.dao.IEntity)
 	 */

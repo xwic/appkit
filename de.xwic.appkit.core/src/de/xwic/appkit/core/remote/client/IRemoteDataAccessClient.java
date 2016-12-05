@@ -45,7 +45,7 @@ public interface IRemoteDataAccessClient {
 	 * @throws RemoteDataAccessException
 	 * @throws TransportException
 	 */
-	public EntityTransferObject getETO(String entityType, int id) throws RemoteDataAccessException, TransportException;
+	public EntityTransferObject getETO(String entityType, long id) throws RemoteDataAccessException, TransportException;
 
 	/**
 	 * @param entityType
@@ -81,14 +81,14 @@ public interface IRemoteDataAccessClient {
 	 * @throws IOException
 	 * @throws ConfigurationException
 	 */
-	public List<?> getETOCollection(String entityType, int entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
+	public List<?> getETOCollection(String entityType, long entityId, String propertyName) throws RemoteDataAccessException, TransportException, IOException, ConfigurationException;
 
 	/**
 	 * @param entityType
 	 * @param eto
 	 * @param softDelete
 	 */
-	public void delete(String entityType, int id, long version, boolean softDelete);
+	public void delete(String entityType, long id, long version, boolean softDelete);
 
 	/**
 	 * @return
@@ -101,7 +101,7 @@ public interface IRemoteDataAccessClient {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Set<ScopeActionKey> getUserRights(int userId) throws TransportException;
+	public Set<ScopeActionKey> getUserRights(long userId) throws TransportException;
 	
 	/**
 	 * @return

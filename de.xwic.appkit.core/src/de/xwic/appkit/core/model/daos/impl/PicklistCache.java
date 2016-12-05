@@ -34,7 +34,7 @@ public class PicklistCache {
 
 	private Map<String, IPickliste> allLists = new HashMap<String, IPickliste>();
 	/** map of all entries - is needed in local dao */
-	protected Map<Integer, IPicklistEntry> allEntries = new HashMap<Integer, IPicklistEntry>();
+	protected Map<Long, IPicklistEntry> allEntries = new HashMap<Long, IPicklistEntry>();
 	private Map<LangKey, IPicklistText> allTexts = new HashMap<LangKey, IPicklistText>();
 	private Map<String, EntityList> allListsWithEntries = new HashMap<String, EntityList>();
 	
@@ -42,7 +42,7 @@ public class PicklistCache {
 	 * @param id
 	 * @return
 	 */
-	public IPicklistText getPicklistTextById(int id) {
+	public IPicklistText getPicklistTextById(long id) {
     	
 		for (Iterator<IPicklistText> it = allTexts.values().iterator(); it.hasNext(); ) {
     		IPicklistText pt = it.next();
@@ -66,7 +66,7 @@ public class PicklistCache {
 	 * @param langID
 	 * @return
 	 */
-	public IPicklistText getPicklistText(int entryId, String langId) {
+	public IPicklistText getPicklistText(long entryId, String langId) {
 		IPicklistText text = allTexts.get(new LangKey(entryId, langId));
 		return text;
 	}
@@ -91,7 +91,7 @@ public class PicklistCache {
 	 * @param e
 	 */
 	public void putPicklistEntry(IPicklistEntry e) {
-		allEntries.put(new Integer(e.getId()), e);
+		allEntries.put(new Long(e.getId()), e);
 		
 		String key = e.getPickliste().getKey();
 		EntityList sublist = allListsWithEntries.get(key);
@@ -126,8 +126,8 @@ public class PicklistCache {
 	 * @param id
 	 * @return
 	 */
-	public IPicklistEntry getPicklistEntry(int id) {
-		return allEntries.get(new Integer(id));
+	public IPicklistEntry getPicklistEntry(long id) {
+		return allEntries.get(new Long(id));
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class PicklistCache {
 	 * @param entry
 	 */
 	public void removePicklistEntry(IPicklistEntry entry) {
-		allEntries.remove(new Integer(entry.getId()));
+		allEntries.remove(new Long(entry.getId()));
 		String key = entry.getPickliste().getKey();
 		EntityList sublist = allListsWithEntries.get(key);
 		if (sublist != null) {

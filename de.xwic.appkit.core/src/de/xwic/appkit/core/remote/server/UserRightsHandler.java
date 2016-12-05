@@ -60,7 +60,7 @@ public class UserRightsHandler implements IRequestHandler {
 			throw new IllegalArgumentException("The string is empty!");
 		}
 		
-		int userId = Integer.valueOf(strUser);
+		long userId = Long.valueOf(strUser);
 		
 		IUserDAO dao = DAOSystem.getDAO(IUserDAO.class);
 		

@@ -27,8 +27,8 @@ import de.xwic.appkit.core.dao.IEntity;
  */
 public final class Entities {
 
-	public static final int NEW_ENTITY_ID = 0;
-	public static final int LOWEST_POSSIBLE_ID = 1;
+	public static final long NEW_ENTITY_ID = 0l;
+	public static final long LOWEST_POSSIBLE_ID = 1l;
 
 	/**
 	 *
@@ -40,7 +40,7 @@ public final class Entities {
 	 * @param entity
 	 * @return
 	 */
-	public static int getId(final IEntity entity) {
+	public static long getId(final IEntity entity) {
 		if (entity != null) {
 			return entity.getId();
 		}
@@ -51,7 +51,7 @@ public final class Entities {
 	 * @param entity
 	 * @return
 	 */
-	public static Integer getIdOrNull(final IEntity entity) {
+	public static Long getIdOrNull(final IEntity entity) {
 		if (entity == null) {
 			return null;
 		}

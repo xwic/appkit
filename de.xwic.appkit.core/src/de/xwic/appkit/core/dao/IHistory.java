@@ -54,13 +54,13 @@ public interface IHistory extends IEntity {
 	 * Returns the ID of the object this history object belongs to.
 	 * @return
 	 */
-	public int getEntityID();
+	public long getEntityID();
 	
 	/**
 	 * Sets the ID of the object this history object belongs to.
 	 * @param id
 	 */
-	public void setEntityID(int id);
+	public void setEntityID(long id);
 	
 	/**
 	 * Returns the version number of the entity.

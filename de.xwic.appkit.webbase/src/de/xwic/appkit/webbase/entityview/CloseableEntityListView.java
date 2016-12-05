@@ -92,7 +92,7 @@ public class CloseableEntityListView<I extends IEntity> extends EntityListView<I
 		Collection<?> sel = entityTable.getTableViewer().getModel().getSelection();
 		if (!sel.isEmpty()) {
 			String key = (String) sel.iterator().next();
-			int id = Integer.parseInt(key);
+			long id = Long.parseLong(key);
 
 			model.setSelectedEntityId(id);
 		}

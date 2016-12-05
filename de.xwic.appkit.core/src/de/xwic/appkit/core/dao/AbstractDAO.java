@@ -101,6 +101,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public I createEntity() throws DataAccessException {
 		Class<E> entityImplClass = getEntityImplClass();
@@ -155,7 +156,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getEntity(int)
 	 */
-	public I getEntity(final int id) throws DataAccessException {
+	public I getEntity(final long id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
@@ -193,7 +194,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getHistoryEntity(int)
 	 */
-	public IEntity getHistoryEntity(final int id) throws DataAccessException {
+	public IEntity getHistoryEntity(final long id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
@@ -311,7 +312,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see de.xwic.appkit.core.dao.DAO#getCollectionProperty(int, java.lang.String)
 	 */
 	@Override
-	public Collection<?> getCollectionProperty(final int entityId, final String propertyId) {
+	public Collection<?> getCollectionProperty(final long entityId, final String propertyId) {
 		
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
@@ -546,7 +547,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 		return (EntityList) provider.execute(new DAOCallback() {
 			public Object run(DAOProviderAPI api) {
 				PropertyQuery query = new PropertyQuery();
-				query.addEquals("entityID", new Integer(entity.getId()));
+				query.addEquals("entityID", new Long(entity.getId()));
 				query.setSortField("entityVersion");
 				query.setSortDirection(PropertyQuery.SORT_DIRECTION_UP);
 				return api.getEntities(getHistoryImplClass(), null, query);

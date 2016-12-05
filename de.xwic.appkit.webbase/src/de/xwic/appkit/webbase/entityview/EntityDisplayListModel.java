@@ -74,7 +74,7 @@ public class EntityDisplayListModel extends ListModel {
 		return DAOSystem.findDAOforEntity(entityClass);
 	}
 
-	public void delete(int entityId) {
+	public void delete(long entityId) {
 		IEntity entity = getDAO().getEntity(entityId);
 		getDAO().softDelete(entity);
 	}

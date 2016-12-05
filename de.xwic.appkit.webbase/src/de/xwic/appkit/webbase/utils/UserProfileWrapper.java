@@ -34,7 +34,7 @@ public class UserProfileWrapper {
 	private String className;
 	private String description;
 	private String xmlContent;
-	private int ownerId;
+	private long ownerId;
 	private String profileId;
 	
 	private boolean publicProfile = false;
@@ -107,7 +107,7 @@ public class UserProfileWrapper {
 	/**
 	 * @return the owner
 	 */
-	public int getOwnerId() {
+	public long getOwnerId() {
 		return ownerId;
 	}
 
@@ -115,7 +115,7 @@ public class UserProfileWrapper {
 	 * @param owner
 	 *            the owner to set
 	 */
-	public void setOwnerId(int owner) {
+	public void setOwnerId(long owner) {
 		this.ownerId = owner;
 	}
 

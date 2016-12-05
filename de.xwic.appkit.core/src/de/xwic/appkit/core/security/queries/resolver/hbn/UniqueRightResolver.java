@@ -55,14 +55,14 @@ public class UniqueRightResolver implements IEntityQueryResolver {
 		  .append("obj.action = ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, right.getId());
-		q.setInteger(1, right.getRole().getId());
+		q.setLong(0, right.getId());
+		q.setLong(1, right.getRole().getId());
 		if (right.getScope() == null) {
 			q.setSerializable(2, null);
 		} else {
-			q.setInteger(2, right.getScope().getId());
+			q.setLong(2, right.getScope().getId());
 		}
-		q.setInteger(3, right.getAction().getId());
+		q.setLong(3, right.getAction().getId());
 		
 		
 		return q;

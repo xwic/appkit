@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.PicklistText" table="PICKLIST_TEXT">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="PT_ID" not-null="true"/>
             <generator class="native"/>
         </id>

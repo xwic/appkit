@@ -40,7 +40,7 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 
 	private String lang = "DE";
 	private boolean allowEmptySelection = true;
-	protected Map<Integer, IPicklistEntry> entries;
+	protected Map<Long, IPicklistEntry> entries;
 
 	private IPicklisteDAO plDao = null;
 	private String picklistKey = null;
@@ -107,12 +107,12 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 
 
 		if (null != entryList){
-			entries = new HashMap<Integer, IPicklistEntry>();
+			entries = new HashMap<Long, IPicklistEntry>();
 
 			for (IPicklistEntry iPicklistEntry : entryList) {
 				IPicklistEntry entry = iPicklistEntry;
 				if (!entry.isVeraltet()) {
-					entries.put(new Integer(entry.getId()), entry);
+					entries.put(new Long(entry.getId()), entry);
 					this.picklistKey = entry.getPickliste().getKey();
 				}
 			}
@@ -122,7 +122,7 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 
 			//add empty selection
 			if (allowEmptySelection){
-				entries.put(new Integer(0), null);
+				entries.put(new Long(0), null);
 				addElement(emptySelectionText, "0");
 			}
 
@@ -132,11 +132,11 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 			for (int i = 0; i < entryList.size(); i++) {
 				IPicklistEntry entry = entryList.get(i);
 				if (!entry.isVeraltet()) {
-					addElement(entry.getBezeichnung(lang), Integer.toString(entry.getId()));
+					addElement(entry.getBezeichnung(lang), Long.toString(entry.getId()));
 				}
 
 				if (i == 0) {
-					preSelection = Integer.toString(entry.getId());
+					preSelection = Long.toString(entry.getId());
 				}
 
 			}
@@ -186,15 +186,15 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 		if (null != entries && null != pEntry) {
 			boolean found = false;
 
-			int id = pEntry.getId();
-			if (entries.containsKey(new Integer(id))) {
+			long id = pEntry.getId();
+			if (entries.containsKey(new Long(id))) {
 				found = true;
-				key = Integer.toString(id);
+				key = Long.toString(id);
 			}
 
 			if (!found && pEntry.isVeraltet()) {
-				entries.put(new Integer(id), pEntry);
-				addElement("[" + pEntry.getBezeichnung(lang) + "]", Integer.toString(id));
+				entries.put(new Long(id), pEntry);
+				addElement("[" + pEntry.getBezeichnung(lang) + "]", Long.toString(id));
 				key = Integer.toString(entries.size() - 1);
 			}
 
@@ -238,11 +238,11 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 			return null;
 		}
 
-		int i = Integer.parseInt(idString);
+		long l = Long.parseLong(idString);
 
 		if (null != entries){
-			if (entries.containsKey(new Integer(i))){
-				IPicklistEntry entry = entries.get(new Integer(i));
+			if (entries.containsKey(new Long(l))){
+				IPicklistEntry entry = entries.get(new Long(l));
 				return entry;
 			}
 		}

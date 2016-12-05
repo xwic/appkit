@@ -101,7 +101,7 @@ public class EntityComboContentProvider<E extends IEntity> implements IContentPr
 		if (uniqueKey == null || uniqueKey.isEmpty()) {
 			return null;
 		}
-		return (E) dao.getEntity(Integer.parseInt(uniqueKey));
+		return (E) dao.getEntity(Long.parseLong(uniqueKey));
 	}
 
 	/* (non-Javadoc)
@@ -117,7 +117,7 @@ public class EntityComboContentProvider<E extends IEntity> implements IContentPr
 	 */
 	@Override
 	public String getUniqueKey(IEntity entity) {
-		return Integer.toString(entity.getId());
+		return Long.toString(entity.getId());
 	}
 
 	/* (non-Javadoc)

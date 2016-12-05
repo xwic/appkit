@@ -34,7 +34,7 @@ import de.xwic.appkit.core.dao.impl.hbn.HibernateUtil;
 
 public class HbnFileOracleFixDAO extends HbnFileDAO {
 
-	protected int storeFile(final String fileName, Session session) throws DataAccessException {
+	protected long storeFile(final String fileName, Session session) throws DataAccessException {
 		final HbnFile hFile = new HbnFile();
 
 		File file = new File(fileName);
@@ -73,13 +73,13 @@ public class HbnFileOracleFixDAO extends HbnFileDAO {
 	 * @see de.xwic.appkit.core.file.impl.hbn.HbnFileDAO#loadFileInputStream(int)
 	 */
 	@Override
-	public InputStream loadFileInputStream(final int id) throws DataAccessException {
+	public InputStream loadFileInputStream(final long id) throws DataAccessException {
 		InputStream stream = null;
 		
 		Session session = HibernateUtil.currentSession();
 		Transaction tx = session.beginTransaction();
 
-		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Integer(id));
+		HbnFile hFile = (HbnFile)session.load(HbnFile.class, new Long(id));
 		tx.commit();
 
 		if (hFile != null) {

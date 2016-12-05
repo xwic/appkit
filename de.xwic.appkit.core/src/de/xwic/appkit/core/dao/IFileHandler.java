@@ -28,14 +28,14 @@ public interface IFileHandler {
 	 * Delete the file with the specified id.
 	 * @param id
 	 */
-	public void deleteFile(int id);
+	public void deleteFile(long id);
 	
 	/**
 	 * Stores the specified file and returns a unique ID.
 	 * @param filename
 	 * @return
 	 */
-	public int storeFile(String filename) throws DataAccessException;
+	public long storeFile(String filename) throws DataAccessException;
 	
 	
 	/**
@@ -45,7 +45,7 @@ public interface IFileHandler {
 	 * @param destination
 	 * @return a File handle to the loaded file.
 	 */
-	public File loadFile(int id, String destination) throws DataAccessException;
+	public File loadFile(long id, String destination) throws DataAccessException;
 	
 	
 	/**
@@ -54,9 +54,9 @@ public interface IFileHandler {
 	 * @param id
 	 * @return an InputStream
 	 */
-	public InputStream loadFileInputStream(int id) throws DataAccessException;
+	public InputStream loadFileInputStream(long id) throws DataAccessException;
 	
-	public int storeFileInUC(final String fileName) throws DataAccessException;
+	public long storeFileInUC(final String fileName) throws DataAccessException;
 	
-	public void deleteFileInUC(final int id);
+	public void deleteFileInUC(final long id);
 }

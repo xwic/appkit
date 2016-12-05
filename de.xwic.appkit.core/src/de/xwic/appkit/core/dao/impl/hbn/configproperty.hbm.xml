@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.ServerConfigProperty" table="CONF_PROP">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="CONF_PROP_ID" not-null="true"/>
             <generator class="native"/>
         </id>

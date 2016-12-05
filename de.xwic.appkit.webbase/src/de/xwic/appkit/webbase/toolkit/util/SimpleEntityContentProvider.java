@@ -102,7 +102,7 @@ public class SimpleEntityContentProvider<E extends IEntity> implements IContentP
 		if (uniqueKey == null || uniqueKey.isEmpty()) {
 			return null;
 		}
-		return (E) dao.getEntity(Integer.parseInt(uniqueKey));
+		return (E) dao.getEntity(Long.parseLong(uniqueKey));
 	}
 
 	/* (non-Javadoc)
@@ -118,7 +118,7 @@ public class SimpleEntityContentProvider<E extends IEntity> implements IContentP
 	 */
 	@Override
 	public String getUniqueKey(E object) {
-		return Integer.toString(object.getId());
+		return Long.toString(object.getId());
 	}
 
 	/* (non-Javadoc)

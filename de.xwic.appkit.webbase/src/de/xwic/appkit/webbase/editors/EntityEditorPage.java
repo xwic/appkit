@@ -98,7 +98,7 @@ public class EntityEditorPage extends InnerPage {
 	 * Search for editor extensions and initialize them.
      * @param id editor entity id
      */
-	private void createExtensions(Integer id) {
+	private void createExtensions(Long id) {
 
 		// Step 1 - find and instantiate extensions...
 		String entityType = context.getEntityDescriptor().getId();

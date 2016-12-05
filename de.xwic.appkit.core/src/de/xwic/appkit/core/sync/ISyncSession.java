@@ -72,7 +72,7 @@ public interface ISyncSession {
 	 * @param internalEntityType
 	 * @param internalEntityId
 	 */
-	public void setSynchronized(String syncItemId, String internalEntityType, int internalEntityId);
+	public void setSynchronized(String syncItemId, String internalEntityType, long internalEntityId);
 
 	/**
 	 * Disconnects an external item from an internal item. The item is no longer
@@ -99,5 +99,5 @@ public interface ISyncSession {
 	 * @param entityId
 	 * @return the sync state for the given parameters. refers to ISISS entities
 	 */
-	public int getSyncState(String entityType, int entityId);
+	public int getSyncState(String entityType, long entityId);
 }

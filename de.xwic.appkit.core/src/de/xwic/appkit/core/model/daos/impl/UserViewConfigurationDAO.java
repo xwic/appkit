@@ -98,7 +98,7 @@ public class UserViewConfigurationDAO extends AbstractDAO<IUserViewConfiguration
 	 * @see de.xwic.appkit.core.model.daos.IUserViewConfigurationDAO#configNameExists(de.xwic.appkit.core.model.entities.IMitarbeiter, java.lang.String, java.lang.String, java.lang.String, int)
 	 */
 	@Override
-	public boolean configNameExists(IMitarbeiter owner, String entityClassName, String viewId, String name, int currentId) {
+	public boolean configNameExists(IMitarbeiter owner, String entityClassName, String viewId, String name, long currentId) {
 		PropertyQuery pq = new PropertyQuery();
 
 		pq.addEquals("owner", owner);

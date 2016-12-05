@@ -53,7 +53,7 @@ public class UniqueActionSetResolver implements IEntityQueryResolver {
 		  .append("obj.name LIKE ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, actionSet.getId());
+		q.setLong(0, actionSet.getId());
 		q.setString(1, actionSet.getName());
 		
 		return q;

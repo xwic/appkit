@@ -24,9 +24,9 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  */
 public class PicklistTextQuery extends EntityQuery {
 
-	private int picklistEntryID = -1;
+	private long picklistEntryID = -1l;
 	private String bezeichnung = null;
-	private int picklisteID = -1;
+	private long picklisteID = -1l;
 	private boolean excludeDeletedParents = false;
 	
 	/**
@@ -77,14 +77,14 @@ public class PicklistTextQuery extends EntityQuery {
 	/**
 	 * @return Returns the picklistEntryID.
 	 */
-	public int getPicklistEntryID() {
+	public long getPicklistEntryID() {
 		return picklistEntryID;
 	}
 
 	/**
 	 * @param picklistEntryID The picklistEntryID to set.
 	 */
-	public void setPicklistEntryID(int picklistEntryID) {
+	public void setPicklistEntryID(long picklistEntryID) {
 		this.picklistEntryID = picklistEntryID;
 	}
 
@@ -105,14 +105,14 @@ public class PicklistTextQuery extends EntityQuery {
 	/**
 	 * @return the picklisteID
 	 */
-	public int getPicklisteID() {
+	public long getPicklisteID() {
 		return picklisteID;
 	}
 
 	/**
 	 * @param picklisteID the picklisteID to set
 	 */
-	public void setPicklisteID(int picklisteID) {
+	public void setPicklisteID(long picklisteID) {
 		this.picklisteID = picklisteID;
 	}
 
