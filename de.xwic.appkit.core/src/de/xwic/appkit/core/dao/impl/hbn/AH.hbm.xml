@@ -21,7 +21,7 @@
         <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
  		
         <property name="dateiName">
-        	<column name="DATEINAME" length="100"/>
+        	<column name="DATEINAME" length="250"/>
         </property>
 
         <property name="dateiGroesse" type="long">
