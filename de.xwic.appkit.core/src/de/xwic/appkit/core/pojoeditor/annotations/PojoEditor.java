@@ -9,6 +9,7 @@
 
 package de.xwic.appkit.core.pojoeditor.annotations;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -21,7 +22,7 @@ import java.lang.annotation.Target;
  *
  */
 @Retention(RUNTIME)
-@Target(TYPE)
+@Target({TYPE, FIELD})
 @Inherited
 public @interface PojoEditor {
 

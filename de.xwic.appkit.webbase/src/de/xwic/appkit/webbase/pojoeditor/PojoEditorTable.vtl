@@ -1,0 +1,15 @@
+#if ($control.isEditMode())
+
+	<div style="border: 1px solid #aaaaaa;">
+		$insert.control("editor")
+	</div>
+
+	<div style="padding-top:10px">
+		$insert.control("saveButton")
+		$insert.control("cancelButton")		
+	</div>
+
+#else
+	$insert.control("toolbar")	
+	$insert.control("table")
+#end

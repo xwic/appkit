@@ -4,12 +4,12 @@
  * Unauthorized copying of this file, via any medium is strictly prohibited.
  * Proprietary and confidential.
  * 
- * com.netapp.pulse.system.dyneditor.two.annotations.DynEditorRenderer 
+ * com.netapp.pulse.system.dyneditor.two.annotations.DynGrid 
  */
 
 package de.xwic.appkit.core.pojoeditor.annotations;
 
-import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Inherited;
@@ -17,26 +17,25 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
-@Target(TYPE)
+@Target(FIELD)
 @Inherited
 /**
  * @author Andrei Pat
  *
  */
-public @interface GridRenderer {
-
-	public enum LabelPosition {
-		TOP,
-		SIDE
-	}
+public @interface GridCell {
 
 	/**
+	 * allows specifying an order for the controls
+	 * 
 	 * @return
 	 */
-	int columns() default 1;
+	int order() default Integer.MAX_VALUE;
 
 	/**
+	 * how many columns does a control need to span
 	 * 
+	 * @return
 	 */
-	LabelPosition labelPosition() default LabelPosition.SIDE;
+	int colspan() default 1;
 }
