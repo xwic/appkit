@@ -30,7 +30,7 @@ public class EntityComment extends Entity implements IEntityComment {
 
 	private String entityType;
 	private String comment;
-	private int entityId;
+	private long entityId;
 	
 	private IAnhang attachment;
 	private boolean readonlyComment;
@@ -84,14 +84,14 @@ public class EntityComment extends Entity implements IEntityComment {
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.impl.IEntityComment#getEntityId()
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entityId;
 	}
 	
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.impl.IEntityComment#setEntityId(int)
 	 */
-	public void setEntityId(int entityId) {
+	public void setEntityId(long entityId) {
 		this.entityId = entityId;
 	}
 	

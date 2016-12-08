@@ -81,7 +81,7 @@ public class DAOContentProvider implements IContentProvider {
 		if (entity == null) {
 			return "";
 		}
-		return Integer.toString(entity.getId());
+		return Long.toString(entity.getId());
 	}
 
 	/**

@@ -42,7 +42,7 @@ public class PropertyValue {
 	/** indicates if the value has been loaded **/
 	private boolean loaded = true;
 	private boolean entityType = false;
-	private int entityId = 0;
+	private long entityId = 0L;
 	
 	/**
 	 * Used by Axis to know which properties should be transfered with attributes.
@@ -105,14 +105,14 @@ public class PropertyValue {
 	/**
 	 * @return Returns the entityId.
 	 */
-	public int getEntityId() {
+	public long getEntityId() {
 		return entityId;
 	}
 
 	/**
 	 * @param entityId The entityId to set.
 	 */
-	public void setEntityId(int entityId) {
+	public void setEntityId(long entityId) {
 		this.entityId = entityId;
 	}
 
@@ -208,7 +208,7 @@ public class PropertyValue {
 		final int PRIME = 31;
 		int result = 1;
 		result = PRIME * result + access;
-		result = PRIME * result + entityId;
+		result = PRIME * result + (int) (entityId ^ (entityId >>> 32));
 		result = PRIME * result + (entityType ? 1231 : 1237);
 		result = PRIME * result + (loaded ? 1231 : 1237);
 		result = PRIME * result + (modified ? 1231 : 1237);

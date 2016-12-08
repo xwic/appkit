@@ -7,7 +7,7 @@
 
     <class name="Action" table="SECURITY_ACTION">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="ACTION_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -46,7 +46,7 @@
 	
     <class name="ActionSet" table="SECURITY_ACTIONSET">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="ACTIONSET_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -89,7 +89,7 @@
 
 	<class name="Scope" table="SECURITY_SCOPE">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="SCOPE_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -145,7 +145,7 @@
     
 	<class name="User" table="SECURITY_USER">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="USER_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -204,7 +204,7 @@
 
 	<class name="Role" table="SECURITY_ROLE">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="ROLE_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -250,7 +250,7 @@
 
 	<class name="Right" table="SECURITY_RIGHT">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="RIGHT_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -288,7 +288,7 @@
 
 	<class name="UserSession" table="SECURITY_USER_SESSION">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="USER_SESSION_ID" not-null="true"/>
             <generator class="native"/>
         </id>

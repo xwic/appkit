@@ -177,7 +177,7 @@ public class AccessHandler {
 	 * @throws RemoteException
 	 * @throws DataAccessException
 	 */
-	 public void delete(String entityType, int entityId, long version) {
+	 public void delete(String entityType, long entityId, long version) {
 
     	if (log.isDebugEnabled()) {
     		log.debug("DELETE " + entityType + " ID#" + entityId + " by user " + getCurrentUsername());
@@ -295,7 +295,7 @@ public class AccessHandler {
 	 * @param id
 	 * @return
 	 */
-	public EntityTransferObject getETO(String classname, int id) {
+	public EntityTransferObject getETO(String classname, long id) {
 
     	if (log.isDebugEnabled()) {
     		log.debug("getETO " + classname + " ID#" + id + " by user " + getCurrentUsername());
@@ -314,7 +314,7 @@ public class AccessHandler {
 	 * @param property
 	 * @return
 	 */
-	public Object getETOCollection(String classname, int id, String property) {
+	public Object getETOCollection(String classname, long id, String property) {
 
     	if (log.isDebugEnabled()) {
     		log.debug("getETOCollection: " + classname + "." + property + " ID#" + id + " by user " + getCurrentUsername());
@@ -362,7 +362,7 @@ public class AccessHandler {
 	 * @param id
 	 * @return
 	 */
-	private IEntity getEntityById(String classname, int id) {
+	private IEntity getEntityById(String classname, long id) {
 		DAO dao = DAOSystem.findDAOforEntity(classname);
     	IEntity entity;
 
@@ -580,7 +580,7 @@ public class AccessHandler {
 	 * @return
 	 * @throws DataAccessException
 	 */
-	private IEntity toEntity(final String name, final int entityId) throws DataAccessException {
+	private IEntity toEntity(final String name, final long entityId) throws DataAccessException {
 		return DAOSystem.findDAOforEntity(name).getEntity(entityId);
 	}
 
@@ -607,7 +607,7 @@ public class AccessHandler {
 	 * @param entityId
 	 * @param version
 	 */
-	public void softDelete(String entityType, int entityId, long version) {
+	public void softDelete(String entityType, long entityId, long version) {
 		
     	if (log.isDebugEnabled()) {
     		log.debug("softDelete: " + entityType + " ID#" + entityId + " by user " + getCurrentUsername());

@@ -62,19 +62,19 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	 * @see de.xwic.appkit.core.file.impl.hbn.RemoteFileDAO#storeFile(java.lang.String, long, java.io.InputStream)
 	 */
 	@Override
-	protected int storeFile(final File file) throws IOException {
+	protected long storeFile(final File file) throws IOException {
 		MultipartEntity multipartEntity = new MultipartEntity(HttpMultipartMode.STRICT);
 		multipartEntity.addPart(PARAM_ACTION, new StringBody(ACTION_FILE_HANDLE));
 		multipartEntity.addPart(PARAM_FH_ACTION, new StringBody(PARAM_FH_ACTION_UPLOAD));
 		multipartEntity.addPart(PARAM_FH_STREAM, new FileBody(file));
-		return URemoteAccessClient.multipartRequestInt(multipartEntity, config);
+		return URemoteAccessClient.multipartRequestLong(multipartEntity, config);
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFile(int)
 	 */
 	@Override
-	public void deleteFile(final int id) {
+	public void deleteFile(final long id) {
 		Map<String, String> createParams = createParams(id, PARAM_FH_ACTION_DELETE);
 		URemoteAccessClient.postRequest(createParams, config);
 	}
@@ -83,7 +83,7 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	 * @see de.xwic.appkit.core.file.impl.hbn.IRemoteFileDAOClient#loadFileInputStream(int)
 	 */
 	@Override
-	public InputStream loadFileInputStream(final int id) {
+	public InputStream loadFileInputStream(final long id) {
 		Map<String, String> createParams = createParams(id, PARAM_FH_ACTION_LOAD);
 		// It's somehow bad to load the attachment to memory instead of streaming it,
 		// on the other side, response has to be correctly closed.
@@ -95,7 +95,7 @@ public class RemoteFileAccessClient extends RemoteFileDAO {
 	 * @param action
 	 * @return
 	 */
-	private final Map<String, String> createParams(final int id, final String action) {
+	private final Map<String, String> createParams(final long id, final String action) {
 		Map<String, String> param = new HashMap<String, String>();
 		param.put(PARAM_ACTION, ACTION_FILE_HANDLE);
 		param.put(PARAM_FH_ID, String.valueOf(id));

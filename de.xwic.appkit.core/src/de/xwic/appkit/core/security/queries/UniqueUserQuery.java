@@ -25,7 +25,7 @@ import de.xwic.appkit.core.security.IUser;
 public class UniqueUserQuery extends EntityQuery {
 
 	private String userLogonName;
-	private int userId;
+	private long userId;
 	
 	/**
 	 * Used for deserializing!
@@ -46,7 +46,7 @@ public class UniqueUserQuery extends EntityQuery {
 	 * @param userLogonName
 	 * @param userId
 	 */
-	public UniqueUserQuery(String userLogonName, int userId) {
+	public UniqueUserQuery(String userLogonName, long userId) {
 		this.userLogonName = userLogonName;
 		this.userId = userId;
 	}
@@ -68,14 +68,14 @@ public class UniqueUserQuery extends EntityQuery {
 	/**
 	 * @return the id
 	 */
-	public int getUserId() {
+	public long getUserId() {
 		return userId;
 	}
 	
 	/**
 	 * @param userId the userId to set
 	 */
-	public void setUserId(int userId) {
+	public void setUserId(long userId) {
 		this.userId = userId;
 	}
 }

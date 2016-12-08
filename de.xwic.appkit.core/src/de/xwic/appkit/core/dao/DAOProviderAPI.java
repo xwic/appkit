@@ -53,7 +53,7 @@ public interface DAOProviderAPI {
      * @param id
      * @return
      */
-    public IEntity getEntity(Class<? extends Object> clazz, int id) throws DataAccessException;
+    public IEntity getEntity(Class<? extends Object> clazz, long id) throws DataAccessException;
     
     /**
      * Update the entity in the database. 
@@ -84,6 +84,6 @@ public interface DAOProviderAPI {
 	 * @param propertyId
 	 * @return
 	 */
-	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, int entityId, String propertyId);
+	public Collection<?> getCollectionProperty(Class<? extends IEntity> entityImplClass, long entityId, String propertyId);
 
 }

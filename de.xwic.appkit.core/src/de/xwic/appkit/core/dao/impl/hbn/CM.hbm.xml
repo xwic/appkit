@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" table="PEOPLE">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="CM_ID" not-null="true"/>
             <generator class="native"/>
         </id>

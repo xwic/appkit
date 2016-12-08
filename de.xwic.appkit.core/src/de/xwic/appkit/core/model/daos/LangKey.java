@@ -28,7 +28,7 @@ public class LangKey {
 
 	private boolean hashDone = false;
 
-	private int id;
+	private long id;
 
 	private String langID;
 
@@ -38,7 +38,7 @@ public class LangKey {
 	 * @param entryID
 	 * @param langID
 	 */
-	public LangKey(int entryID, String langID) {
+	public LangKey(long entryID, String langID) {
 		this.id = entryID;
 		this.langID = langID;
 	}
@@ -46,7 +46,7 @@ public class LangKey {
 	/**
 	 * @return Returns the id.
 	 */
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -54,7 +54,7 @@ public class LangKey {
 	 * @param id
 	 *            The id to set.
 	 */
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -72,7 +72,7 @@ public class LangKey {
 	public void setLangID(String langID) {
 		this.langID = langID;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -111,9 +111,10 @@ public class LangKey {
 			int multiplier = 59;
 
 			hashCode = hashCode * multiplier + (langID != null ? langID.toLowerCase().hashCode() : 0);
-			hashCode = hashCode * multiplier + id;
+			hashCode = hashCode * multiplier + (int) (id ^ (id >>> 32));
 			hashDone = true;
 		}
 		return hashCode;
 	}
+	
 }

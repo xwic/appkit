@@ -706,7 +706,7 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 		String selection = getEntityKey();
 
 		if (selection.trim().length() > 0) {
-			int id = Integer.parseInt(selection);
+			long id = Long.parseLong(selection);
 			return (I) dao.getEntity(id);
 		}
 

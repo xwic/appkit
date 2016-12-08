@@ -245,7 +245,7 @@ public class ColumnsConfigurationSerializer {
 				return DATE + SDF_DATE.format((Date) value);				
 			}
 		} else if (value instanceof IEntity) {
-			return INT + String.valueOf(((IEntity) value).getId());
+			return LONG + String.valueOf(((IEntity) value).getId());
 		} else {
 			throw new IllegalArgumentException("Invalid value type: " + value.getClass());
 		}

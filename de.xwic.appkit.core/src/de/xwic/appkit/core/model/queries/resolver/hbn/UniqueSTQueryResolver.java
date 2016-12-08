@@ -54,7 +54,7 @@ public class UniqueSTQueryResolver implements IEntityQueryResolver {
 		  .append("obj.bezeichnung like ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, st.getId());
+		q.setLong(0, st.getId());
 		q.setString(1, st.getBezeichnung());
 		
 		return q;

@@ -185,13 +185,13 @@ public class EntityComboSelector<E extends IEntity> extends ControlContainer imp
 		combo.setText(text);
 	}
 
-	public int getSelectedEntityId() {
+	public long getSelectedEntityId() {
 		return contributor.getSelectionModel().getSelectedEntityId();
 	}
 
 	@SuppressWarnings("unchecked")
 	public E getSelectedEntity() {
-		int selectedId = getSelectedEntityId();
+		long selectedId = getSelectedEntityId();
 		DAO dao = contributor.getListModel().getDAO();
 		return (E)dao.getEntity(selectedId);
 	}
@@ -200,7 +200,7 @@ public class EntityComboSelector<E extends IEntity> extends ControlContainer imp
 	public void modelContentChanged(ModelEvent event) {
 		if (event.getEventType() == EntitySelectionModel.CLOSE_ENTITY_SELECTION) {
 			EntitySelectionModel customerModel = (EntitySelectionModel) event.getSource();
-			int selectedId = customerModel.getSelectedEntityId();
+			long selectedId = customerModel.getSelectedEntityId();
 
 			// see if something was selected
 			if (selectedId > 0) {

@@ -27,7 +27,7 @@ package de.xwic.appkit.core.model.queries;
 public class SetRelatedQuery extends PropertyQuery {
 	
 	private String setProperty = null;
-	private int entityID = -1;
+	private long entityID = -1L;
 	private String relatedEntityImplClazzName = null;
 	
 	/**
@@ -50,7 +50,7 @@ public class SetRelatedQuery extends PropertyQuery {
 	/**
 	 * @return the entityID
 	 */
-	public int getEntityID() {
+	public long getEntityID() {
 		return entityID;
 	}
 
@@ -58,7 +58,7 @@ public class SetRelatedQuery extends PropertyQuery {
 	/**
 	 * @param entityID the entityID to set
 	 */
-	public void setEntityID(int entityID) {
+	public void setEntityID(long entityID) {
 		this.entityID = entityID;
 	}
 

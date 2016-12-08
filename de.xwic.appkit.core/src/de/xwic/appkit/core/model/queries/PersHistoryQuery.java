@@ -28,11 +28,11 @@ import de.xwic.appkit.core.dao.EntityQuery;
  */
 public class PersHistoryQuery extends EntityQuery {
 
-	private int entityID = 0;
+	private long entityID = 0L;
 	private int persHisTyp = 0;
-	private int rolleID = -1;
-	private int kontaktID = -1;
-	private int mitarbeiterID = -1;
+	private long rolleID = -1L;
+	private long kontaktID = -1L;
+	private long mitarbeiterID = -1L;
 	private Date von = null;
 	private Date bis = null;
 	private boolean findLastOne = false;
@@ -46,14 +46,14 @@ public class PersHistoryQuery extends EntityQuery {
 	/**
 	 * @return Returns the entityID.
 	 */
-	public int getEntityID() {
+	public long getEntityID() {
 		return entityID;
 	}
 
 	/**
 	 * @param entityID The entityID to set.
 	 */
-	public void setEntityID(int entityID) {
+	public void setEntityID(long entityID) {
 		this.entityID = entityID;
 	}
 
@@ -74,42 +74,42 @@ public class PersHistoryQuery extends EntityQuery {
 	/**
 	 * @return Returns the kontaktID.
 	 */
-	public int getKontaktID() {
+	public long getKontaktID() {
 		return kontaktID;
 	}
 
 	/**
 	 * @param kontaktID The kontaktID to set.
 	 */
-	public void setKontaktID(int kontaktID) {
+	public void setKontaktID(long kontaktID) {
 		this.kontaktID = kontaktID;
 	}
 
 	/**
 	 * @return Returns the mitarbeiterID.
 	 */
-	public int getMitarbeiterID() {
+	public long getMitarbeiterID() {
 		return mitarbeiterID;
 	}
 
 	/**
 	 * @param mitarbeiterID The mitarbeiterID to set.
 	 */
-	public void setMitarbeiterID(int mitarbeiterID) {
+	public void setMitarbeiterID(long mitarbeiterID) {
 		this.mitarbeiterID = mitarbeiterID;
 	}
 
 	/**
 	 * @return Returns the rolleID.
 	 */
-	public int getRolleID() {
+	public long getRolleID() {
 		return rolleID;
 	}
 
 	/**
 	 * @param rolleID The rolleID to set.
 	 */
-	public void setRolleID(int rolleID) {
+	public void setRolleID(long rolleID) {
 		this.rolleID = rolleID;
 	}
 

@@ -31,13 +31,13 @@ import de.xwic.appkit.core.model.entities.ISalesTeam;
  */
 public class CMFastSearchQuery extends EntityQuery {
 	
-    private int svID = -1;
-    private int dokID = -1;
+    private long svID = -1l;
+    private long dokID = -1l;
 
-	private int einheitPeID = -1;
+	private long einheitPeID = -1l;
 	private String nachname = null;
 	private String vorname = null;
-	private int salesTeamID = -1;
+	private long salesTeamID = -1l;
 	private String logonName = null;
 
 	/**
@@ -67,14 +67,14 @@ public class CMFastSearchQuery extends EntityQuery {
 	/**
 	 * @return Returns the einheitPeID.
 	 */
-	public int getEinheitPeID() {
+	public long getEinheitPeID() {
 		return einheitPeID;
 	}
 
 	/**
 	 * @param einheitPeID The einheitPeID to set.
 	 */
-	public void setEinheitPeID(int einheitPeID) {
+	public void setEinheitPeID(long einheitPeID) {
 		this.einheitPeID = einheitPeID;
 	}
 
@@ -109,14 +109,14 @@ public class CMFastSearchQuery extends EntityQuery {
 	/**
 	 * @return Returns the salesTeamID.
 	 */
-	public int getSalesTeamID() {
+	public long getSalesTeamID() {
 		return salesTeamID;
 	}
 
 	/**
 	 * @param salesTeamID The salesTeamID to set.
 	 */
-	public void setSalesTeamID(int salesTeamID) {
+	public void setSalesTeamID(long salesTeamID) {
 		this.salesTeamID = salesTeamID;
 	}
 
@@ -137,28 +137,28 @@ public class CMFastSearchQuery extends EntityQuery {
 	/**
 	 * @return the dokID
 	 */
-	public int getDokID() {
+	public long getDokID() {
 		return dokID;
 	}
 
 	/**
 	 * @param dokID the dokID to set
 	 */
-	public void setDokID(int dokID) {
+	public void setDokID(long dokID) {
 		this.dokID = dokID;
 	}
 
 	/**
 	 * @return the svID
 	 */
-	public int getSvID() {
+	public long getSvID() {
 		return svID;
 	}
 
 	/**
 	 * @param svID the svID to set
 	 */
-	public void setSvID(int svID) {
+	public void setSvID(long svID) {
 		this.svID = svID;
 	}
 }

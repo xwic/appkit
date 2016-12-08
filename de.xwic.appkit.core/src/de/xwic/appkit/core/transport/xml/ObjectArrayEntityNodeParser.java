@@ -38,7 +38,7 @@ public class ObjectArrayEntityNodeParser implements IEntityNodeParser {
 	 * @see de.xwic.appkit.core.transport.xml.IEntityNodeParser#parseElement(org.dom4j.Element, java.util.Map, de.xwic.appkit.core.config.model.EntityDescriptor, de.xwic.appkit.core.transport.xml.XmlBeanSerializer)
 	 */
 	@Override
-	public Object parseElement(Element elmEntity, Map<EntityKey, Integer> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache, boolean forceLoadCollection) throws TransportException {
+	public Object parseElement(Element elmEntity, Map<EntityKey, Long> context, Class entityClass, EntityDescriptor descr, XmlBeanSerializer xmlBeanSerializer, Map<EntityKey, EntityTransferObject> sessionCache, boolean forceLoadCollection) throws TransportException {
 		
 		Object[] result = new Object[elmEntity.elements().size()];
 		int i = 0;

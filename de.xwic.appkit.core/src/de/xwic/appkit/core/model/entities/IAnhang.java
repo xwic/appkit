@@ -33,12 +33,12 @@ public interface IAnhang extends IEntity {
 	/**
 	 * @return the entityID
 	 */
-	public int getEntityID();
+	public long getEntityID();
 
 	/**
 	 * @param entityID the entityID to set
 	 */
-	public void setEntityID(int entityID);
+	public void setEntityID(long entityID);
 
 	/**
 	 * @return the entityType
@@ -73,12 +73,12 @@ public interface IAnhang extends IEntity {
 	/**
 	 * @return Returns the fileID.
 	 */
-	public int getFileID();
+	public long getFileID();
 
 	/**
 	 * @param fileID The fileID to set.
 	 */
-	public void setFileID(int fileID);
+	public void setFileID(long fileID);
 	
 
 	/**

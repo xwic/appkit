@@ -57,10 +57,10 @@ public class PicklistEntryQueryResolver implements IEntityQueryResolver {
 
 		Query q = session.createQuery(sb.toString());
 		if (query.getPickListID() > 0) {
-			q.setInteger(0, query.getPickListID());
+			q.setLong(0, query.getPickListID());
 		}
 		else if (query.getEntryID() > 0) {
-		    q.setInteger(0, query.getEntryID());
+		    q.setLong(0, query.getEntryID());
 		}
 
 		return q;

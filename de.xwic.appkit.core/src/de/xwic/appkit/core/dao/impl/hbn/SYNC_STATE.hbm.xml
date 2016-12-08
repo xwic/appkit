@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.SyncState" table="SYNC_STATE">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="SS_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -44,7 +44,7 @@
         	<column name="ENTITY_TYPE" length="255"/>
         </property>        
 
-        <property name="entityId" type="int">
+        <property name="entityId" type="long">
         	<column name="ENTITY_ID"/>
         </property>
         
