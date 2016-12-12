@@ -25,8 +25,9 @@ import de.jwic.base.IHaveEnabled;
 import de.jwic.base.JWicRuntime;
 import de.jwic.base.RenderContext;
 import de.jwic.controls.InputBox;
-import de.xwic.appkit.core.pojoeditor.annotations.GridRender;
+import de.xwic.appkit.core.pojoeditor.annotations.GridCell;
 import de.xwic.appkit.core.pojoeditor.annotations.GridRenderer;
+import de.xwic.appkit.core.pojoeditor.annotations.GridRenderer.LabelPosition;
 import de.xwic.appkit.webbase.pojoeditor.IPojoEditorFieldRenderLogic;
 import de.xwic.appkit.webbase.pojoeditor.PojoEditorControl;
 import de.xwic.appkit.webbase.pojoeditor.PojoEditorFactory;
@@ -45,7 +46,8 @@ public class PojoGridRenderer implements IPojoRenderer {
 	protected PojoEditorControl editor;
 	protected IPojoEditorFieldRenderLogic fieldRenderLogic;
 
-	private int columns;
+	private int columns = 1;
+	protected LabelPosition labelPosition = LabelPosition.SIDE;
 
 	/**
 	 * @param pojoClass
@@ -62,7 +64,7 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 */
 	@Override
 	public void render(RenderContext context) {
-		List<GridCell> cells = parseGridConfig(pojoClass, fields);
+		List<PojoGridCell> cells = parseGridConfig(pojoClass, fields);
 		renderGrid(editor, cells, context);
 	}
 
@@ -71,20 +73,18 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 * @param cells
 	 * @param context
 	 */
-	private void renderGrid(ControlContainer editor, List<GridCell> cells, RenderContext context) {
-
-		IControlRenderer controlRenderer = JWicRuntime.getRenderer(DEFAULT_CONTROL_RENDERER);
+	private void renderGrid(ControlContainer editor, List<PojoGridCell> cells, RenderContext context) {
 
 		PrintWriter writer = context.getWriter();
-		writer.write("<table>");
+		writer.write("<table style=\"border-collapse: separate; border-spacing: 10px 10px; \">");
 		int column = 1;
 		writer.write("<tr>");
 
-		for (GridCell c : cells) {
+		for (PojoGridCell c : cells) {
 			String fieldName = c.field.getPropertyName();
 			if (fieldRenderLogic.isRenderField(fieldName)) {
 				enableControl(c.field, fieldRenderLogic.isEnabled(fieldName));
-
+				IControlRenderer controlRenderer = JWicRuntime.getRenderer(c.field.getControl().getRendererId());
 				renderControl(c, context, controlRenderer);
 
 				column += c.colspan;
@@ -108,14 +108,12 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 * @param isEnabled
 	 */
 	protected void enableControl(PojoEditorField field, boolean isEnabled) {
-
 		Control control = field.getControl();
 		if (control instanceof IHaveEnabled) {
 			((IHaveEnabled) control).setEnabled(isEnabled);
 		} else if (control instanceof InputBox) {
 			((InputBox) control).setReadonly(!isEnabled);
 		}
-
 	}
 
 	/**
@@ -123,14 +121,24 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 * @param context
 	 * @param controlRenderer
 	 */
-	private void renderControl(GridCell cell, RenderContext context, IControlRenderer controlRenderer) {
+	protected void renderControl(PojoGridCell cell, RenderContext context, IControlRenderer controlRenderer) {
 
 		Control ctrl = cell.field.getControl();
 		PrintWriter w = context.getWriter();
-		w.write("<th style=\"padding-right:15px\">");
-		w.write(cell.field.getLabel());
-		w.write("</th><td " + colspan(cell.colspan) + " style=\"padding-right:15px\">");
+
+		if (labelPosition == LabelPosition.SIDE) {
+			w.write("<th style=\"padding-right:15px\">");
+			w.write(cell.field.getLabel());
+			w.write("</th>");
+		}
+		w.write("<td " + colspan(cell.colspan) + ">");
+
+		if (labelPosition == LabelPosition.TOP) {
+			w.write("<label for=" + ctrl.getControlID() + " style=\"font-weight:bold\">" + cell.field.getLabel() + "</label><br />");
+		}
+		w.write("<div>");
 		controlRenderer.renderControl(ctrl, context);
+		w.write("</div>");
 		w.write("</td>");
 	}
 
@@ -154,8 +162,8 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 * @param fields
 	 * @return
 	 */
-	private static List<GridCell> parseGridConfig(Class pojoClass, List<PojoEditorField> fields) {
-		List<GridCell> gridCells = new ArrayList<PojoGridRenderer.GridCell>();
+	private static List<PojoGridCell> parseGridConfig(Class pojoClass, List<PojoEditorField> fields) {
+		List<PojoGridCell> gridCells = new ArrayList<PojoGridRenderer.PojoGridCell>();
 		for (PojoEditorField field : fields) {
 			Field f = PojoEditorFactory.findField(pojoClass, field.getPropertyName());
 			if (f == null) {
@@ -165,13 +173,13 @@ public class PojoGridRenderer implements IPojoRenderer {
 
 			int order = Integer.MAX_VALUE;
 			int colspan = 1;
-			if (f.isAnnotationPresent(GridRender.class)) {
-				GridRender annotation = f.getAnnotation(GridRender.class);
+			if (f.isAnnotationPresent(GridCell.class)) {
+				GridCell annotation = f.getAnnotation(GridCell.class);
 				order = annotation.order();
 				colspan = annotation.colspan();
 
 			}
-			GridCell cell = new GridCell(field, order, colspan);
+			PojoGridCell cell = new PojoGridCell(field, order, colspan);
 			gridCells.add(cell);
 
 		}
@@ -180,13 +188,13 @@ public class PojoGridRenderer implements IPojoRenderer {
 
 	}
 
-	private static class GridCell implements Comparable<GridCell> {
+	protected static class PojoGridCell implements Comparable<PojoGridCell> {
 
 		private PojoEditorField field;
 		private int order;
 		private int colspan;
 
-		public GridCell(PojoEditorField field, int order, int colspan) {
+		public PojoGridCell(PojoEditorField field, int order, int colspan) {
 			super();
 			this.field = field;
 			this.order = order;
@@ -199,7 +207,7 @@ public class PojoGridRenderer implements IPojoRenderer {
 		 * @see java.lang.Comparable#compareTo(java.lang.Object)
 		 */
 		@Override
-		public int compareTo(GridCell o) {
+		public int compareTo(PojoGridCell o) {
 			return (order < o.order) ? -1 : ((order == o.order) ? 0 : 1);
 		}
 	}
@@ -227,6 +235,7 @@ public class PojoGridRenderer implements IPojoRenderer {
 	public void setPojoClass(Class pojoClass) {
 		this.pojoClass = pojoClass;
 		GridRenderer gr = (GridRenderer) pojoClass.getAnnotation(GridRenderer.class);
+		this.labelPosition = gr.labelPosition();
 		this.columns = gr.columns();
 	}
 

@@ -23,19 +23,12 @@ import java.lang.annotation.Target;
  * @author Andrei Pat
  *
  */
-public @interface GridRender {
+public @interface PojoTable {
 
 	/**
-	 * allows specifying an order for the controls
+	 * Class of the collection elements
 	 * 
 	 * @return
 	 */
-	int order() default Integer.MAX_VALUE;
-
-	/**
-	 * how many columns does a control need to span
-	 * 
-	 * @return
-	 */
-	int colspan() default 1;
+	Class<?> clazz();
 }
