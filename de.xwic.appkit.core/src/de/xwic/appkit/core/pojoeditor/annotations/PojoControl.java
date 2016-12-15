@@ -40,6 +40,11 @@ public @interface PojoControl {
 	 * @return
 	 */
 	Class<? extends Control> controlClass();
+	
+	/**
+	 * @return
+	 */
+	int size() default -1;
 
 	/**
 	 * Converter to be used to map the property value to the control

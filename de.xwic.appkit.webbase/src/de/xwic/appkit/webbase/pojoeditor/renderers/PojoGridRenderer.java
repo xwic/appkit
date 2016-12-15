@@ -73,10 +73,17 @@ public class PojoGridRenderer implements IPojoRenderer {
 	 * @param cells
 	 * @param context
 	 */
-	private void renderGrid(ControlContainer editor, List<PojoGridCell> cells, RenderContext context) {
+	private void renderGrid(PojoEditorControl editor, List<PojoGridCell> cells, RenderContext context) {
 
 		PrintWriter writer = context.getWriter();
-		writer.write("<table style=\"border-collapse: separate; border-spacing: 10px 10px; \">");
+
+		writer.write("<table style=\"border-collapse: separate; border-spacing: 10px 10px; ");
+		if (editor.getWidth() > 0) {
+			writer.write("width:" + editor.getWidth() + "px");
+		} else {
+			writer.write("width:100%");
+		}
+		writer.write("\">");
 		int column = 1;
 		writer.write("<tr>");
 

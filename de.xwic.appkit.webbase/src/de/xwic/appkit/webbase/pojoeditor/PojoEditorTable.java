@@ -77,7 +77,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 			public void objectSelected(SelectionEvent event) {
 				editor.save();
 				editorModel.save();
-				
+
 				editMode = false;
 				PojoEditorTable.this.requireRedraw();
 
@@ -92,7 +92,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 			public void objectSelected(SelectionEvent event) {
 				editMode = false;
 				editorModel.cancel();
-				
+
 				PojoEditorTable.this.requireRedraw();
 			}
 		});
@@ -113,6 +113,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 		table.setScrollable(true);
 		table.setResizeableColumns(true);
 		table.setFillWidth(true);
+
 		table.getModel().setSelectionMode(TableModel.SELECTION_SINGLE);
 		table.getModel().addElementSelectedListener(new ElementSelectedListener() {
 
@@ -177,7 +178,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 			@Override
 			public void objectSelected(SelectionEvent event) {
 				Object selectedElement = table.getModel().getContentProvider().getObjectFromKey(table.getModel().getFirstSelectedKey());
-				editorModel.remove(selectedElement);				
+				editorModel.remove(selectedElement);
 				table.requireRedraw();
 				table.getModel().clearSelection();
 				toggleButtons();
@@ -206,6 +207,9 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 			if (f.isAnnotationPresent(PojoControl.class) && fieldRenderLogic.isRenderField(f.getName())) {
 				PojoControl annotation = f.getAnnotation(PojoControl.class);
 				TableColumn column = new TableColumn(annotation.label());
+				if (annotation.size() > 0) {
+					column.setWidth(annotation.size());
+				}
 				column.setUserObject(f);
 				table.getModel().addColumn(column);
 			}
