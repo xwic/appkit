@@ -145,8 +145,6 @@ public class PojoEditorFactory {
 
 					PojoEditorTable table = new PojoEditorTable(editor, field.getName(), clazz, fieldRenderLogic);
 					
-					table.createTableColumns(clazz);
-
 					field.setAccessible(true);
 					List<?> contents = (List) field.get(pojo);					
 					table.setData(contents);
