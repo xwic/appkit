@@ -80,20 +80,23 @@
     </developers>
 
     <properties>
-        <compileSource>1.6</compileSource>
-        <compileTarget>1.6</compileTarget>
+        <compileSource>1.8</compileSource>
+        <compileTarget>1.8</compileTarget>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.18</mvnDependencyVersionxWicjWic>
-   		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
+		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
+   		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
+
+		<sonar.language>java</sonar.language>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<hibernate.version>4.3.11.Final</hibernate.version>
 		<poi.version>3.14</poi.version>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>				
+		<additionalparam>-Xdoclint:none</additionalparam>
     </properties>
 
     <build>
@@ -159,7 +162,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.4.2</version>
+                    <version>2.5.3</version>
+					<configuration>
+						<preparationGoals>clean verify sonar:sonar -Dsonar.branch=master</preparationGoals>
+					</configuration>
                 </plugin>
 
                 <plugin>
@@ -189,7 +195,7 @@
 
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.3.1</version>
+                    <version>3.0.2</version>
                     <inherited>true</inherited>
                     <executions>
                         <execution>
@@ -206,13 +212,18 @@
                                 <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                                 <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             </manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>	
                         </archive>
                     </configuration>
                 </plugin>
 
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
+                    <version>3.0.1</version>
                     <inherited>true</inherited>
                     <executions>
                         <execution>
@@ -244,6 +255,9 @@
                                 <goal>jar</goal>
                                 <goal>test-jar</goal>
                             </goals>
+                            <configuration>
+                                <includePom>true</includePom>
+                            </configuration>
                         </execution>
                     </executions>
                     <configuration>
@@ -267,8 +281,19 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>2.6</version>
                     <configuration>
+						<archive>
+							<manifest>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<Specification-Title>${project.name}</Specification-Title>
+								<Specification-Version>${project.version}</Specification-Version>
+								<Implementation-Version>${mvnBuildJenkinsID}</Implementation-Version>
+							</manifestEntries>
+						</archive>
                         <!-- Name of the WEB folder -->
                         <warSourceDirectory>web_root</warSourceDirectory>
 
@@ -376,9 +401,14 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.1.1</version>
+			</plugin>
+			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.4.201502262128</version>
+				<version>0.7.7.201606060606</version>
 				<executions>
 					<execution>
 						<goals>
