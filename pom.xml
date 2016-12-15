@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.3.22-SNAPSHOT</version>
+    <version>5.3.23-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - AppKit</name>
@@ -91,6 +91,7 @@
    		<mvnDependencyVersionxWicCube>5.2.6</mvnDependencyVersionxWicCube>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<hibernate.version>4.3.11.Final</hibernate.version>
+		<poi.version>3.14</poi.version>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>				
     </properties>
@@ -495,17 +496,17 @@
 			<dependency>
 			    <groupId>org.apache.poi</groupId>
 			    <artifactId>poi</artifactId>
-			    <version>3.10-FINAL</version>
+			    <version>${poi.version}</version>
 			</dependency>			
 			<dependency>
 			    <groupId>org.apache.poi</groupId>
 			    <artifactId>poi-ooxml</artifactId>
-			    <version>3.10-FINAL</version>
+			    <version>${poi.version}</version>
 			</dependency>			
 			<dependency>
 			    <groupId>org.apache.poi</groupId>
 			    <artifactId>poi-ooxml-schemas</artifactId>
-			    <version>3.10-FINAL</version>
+			    <version>${poi.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
