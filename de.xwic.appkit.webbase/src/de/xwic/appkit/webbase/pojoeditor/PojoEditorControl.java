@@ -29,6 +29,7 @@ public class PojoEditorControl extends ControlContainer implements ISelfRenderin
 
 	private IPojoRenderer renderer;
 	private EditorToolkit toolkit;
+	private int width;
 	
 	private List<IPojoEditorControl> childControls = new ArrayList<IPojoEditorControl>();
 
@@ -83,5 +84,21 @@ public class PojoEditorControl extends ControlContainer implements ISelfRenderin
 
 	public void addChildControl(IPojoEditorControl control) {
 		childControls.add(control);
+	}
+
+	
+	/**
+	 * @return the width
+	 */
+	public int getWidth() {
+		return width;
+	}
+
+	
+	/**
+	 * @param width the width to set
+	 */
+	public void setWidth(int width) {
+		this.width = width;
 	}
 }

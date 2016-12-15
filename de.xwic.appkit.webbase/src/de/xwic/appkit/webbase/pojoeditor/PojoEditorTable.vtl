@@ -1,5 +1,6 @@
-#if ($control.isEditMode())
+<div pojoTableContainer>
 
+#if ($control.isEditMode())
 	<div style="border: 1px solid #aaaaaa;">
 		$insert.control("editor")
 	</div>
@@ -13,3 +14,5 @@
 	$insert.control("toolbar")	
 	$insert.control("table")
 #end
+
+</div>
