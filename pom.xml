@@ -27,8 +27,8 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:https://github.com/xwic/appkit.git</connection>
-        <developerConnection>scm:git:https://github.com/xwic/appkit.git</developerConnection>
+        <connection>scm:git:git@github.com:xwic/appkit.git</connection>
+        <developerConnection>scm:git:git@github.com:xwic/appkit.git</developerConnection>
         <url>https://github.com/xwic/appkit</url>
         <tag>master</tag>
     </scm>
@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.19</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.20</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 
 		<sonar.language>java</sonar.language>
