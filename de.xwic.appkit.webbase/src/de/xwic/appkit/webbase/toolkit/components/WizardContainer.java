@@ -309,7 +309,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 		
 	}
 
-	private String validationExceptionToString(ValidationException ve) {
+	protected String validationExceptionToString(ValidationException ve) {
 		
 		StringBuffer excString = new StringBuffer();
 		
