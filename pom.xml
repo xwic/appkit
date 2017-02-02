@@ -572,6 +572,7 @@
         <module>de.xwic.appkit.core</module>
 
         <module>de.xwic.appkit.webbase</module>
+        <module>appkit-dev</module>
     </modules>
 
     <profiles>

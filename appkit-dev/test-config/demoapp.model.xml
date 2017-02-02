@@ -1,0 +1,32 @@
+<model>
+	
+	<entities domain="demoapp" project="demoapp-model" package="de.xwic.test.demoapp.model">
+	
+		<entity name="BizFunction">
+			<property name="name" type="String" length="50" required="true"/>
+		</entity>
+		
+		<entity name="BizUnit" idColumn="BIZ_UNIT_ID">
+			<property name="name" type="String" length="50" required="true"/>
+			<property name="BizFunction" type="BizFunction" required="true"/>
+		</entity>
+		
+		<entity name="Vendor">
+			<property name="name" type="String" length="255" required="true"/>
+		</entity>
+		
+		<entity name="Technology">
+			<property name="name" type="String" length="150" required="true"/>
+			<property name="altNames" type="String" length="2000"/>
+			<property name="type" type="PicklistEntry">
+				<picklistEntry key="package" defaultTitle="Package (On-Prem)"/>
+				<picklistEntry key="saas" defaultTitle="Package (SaaS)"/>
+				<picklistEntry key="custom" defaultTitle="Custom (On-Prem)"/>
+				<picklistEntry key="tool" defaultTitle="Tool"/>
+			</property>
+			<property name="vendor" type="Vendor"/>
+		</entity>
+		
+	</entities>
+	
+</model>
