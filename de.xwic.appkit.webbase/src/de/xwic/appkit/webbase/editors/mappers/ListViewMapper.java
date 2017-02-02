@@ -51,6 +51,7 @@ public class ListViewMapper extends PropertyMapper<EntityListView<IEntity>> {
 		}
 		listView.requireRedraw();
 		
+		listView.getConfiguration().setBaseEntity(entity);
 		
 	}
 
