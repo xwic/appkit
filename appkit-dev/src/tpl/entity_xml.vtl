@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entities>
+	<entity class="${package}.entities.I${entity.name}" autoLoadProperties="true" history="false" defaultDisplayProperty="${entity.defaultDisplayProperty}">
+#if("$!entity.defaultDisplayProperty" != "")
+		<title>${${entity.defaultDisplayProperty}}</title>
+#end
+		
+#foreach($prop in $entity.properties)
+#if($prop.type == "IPicklistEntry" && $prop.picklistId != "")
+		<property name="$prop.name" picklistId="$prop.picklistId">
+#foreach($pe in $prop.picklistEntries)
+		     <picklistentry #if($!pe.key != "") key="$pe.key" #end>
+		         <name lang="en">$pe.defaultTitle</name>
+		     </picklistentry>
+#end
+		</property>
+#else
+		<property name="$prop.name" #if($!prop.length != "")maxLength="$prop.length"#end #if($prop.required)required="true" #end/>
+#end
+#end
+
+	</entity>
+</entities>

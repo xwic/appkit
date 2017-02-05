@@ -1,0 +1,30 @@
+
+package ${package}.entities.impl;
+
+import ${package}.entities;
+import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+
+/**
+#if ($entity.description)
+ * $!{entity.description} 
+#else
+ * TODO: Add ${entity.name} description.
+#end
+ */
+public interface I${entity.name} extends IEntity {
+
+#foreach($prop in $entity.properties)
+	/**
+	 * Returns the value of ${prop.name}.
+	 */
+	public $prop.type ${prop.nameGetter}();
+	
+	/**
+	 * Set value for ${prop.name}.
+	 */
+	public void ${prop.nameSetter}($prop.type $prop.name);
+	
+#end
+
+}

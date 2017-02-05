@@ -1,0 +1,46 @@
+
+package ${package}.entities.impl;
+
+import ${package}.entities;
+import de.xwic.appkit.core.dao.Entity;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+
+/**
+#if ($entity.description)
+ * $!{entity.description} 
+#else
+ * ${entity.name} implementation class.
+#end
+ */
+public class ${entity.name} extends Entity implements I${entity.name}  {
+
+#foreach($prop in $entity.properties)
+	private $prop.type $prop.name;
+#end
+
+
+	/**
+	 * Default constructor.
+	 */
+	public ${entity.name}() {
+	
+	}
+	
+#foreach($prop in $entity.properties)
+	/**
+	 * Returns the value of ${prop.name}.
+	 */
+	public $prop.type ${prop.nameGetter}() {
+		return $prop.name;
+	}
+	
+	/**
+	 * Set value for ${prop.name}.
+	 */
+	public void ${prop.nameSetter}($prop.type $prop.name) {
+		this.${prop.name} = ${prop.name};
+	}
+	
+#end
+
+}

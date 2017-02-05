@@ -1,0 +1,17 @@
+
+package ${package}.dao;
+
+import ${package}.entities.I${entity.name};
+import de.xwic.appkit.core.dao.AbstractDAO;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+
+/**
+#if ($entity.description)
+ * $!{entity.description} 
+#else
+ * TODO: Add ${entity.name} DAO implementation class description.
+#end
+ */
+public interface I${entity.name}DAO extends DAO<I${entity.name}> {
+
+}

@@ -1,8 +1,12 @@
 <model>
 	
-	<entities domain="demoapp" project="demoapp-model" package="de.xwic.test.demoapp.model">
+	<domain>demoapp</domain>
+ 	<project>demoapp-model</project>
+ 	<package>de.xwic.test.demoapp.model</package>
 	
-		<entity name="BizFunction">
+	<entities>
+	
+		<entity name="BizFunction" table="BIZ_FUNC" defaultDisplayProperty="name">
 			<property name="name" type="String" length="50" required="true"/>
 		</entity>
 		
@@ -15,16 +19,17 @@
 			<property name="name" type="String" length="255" required="true"/>
 		</entity>
 		
-		<entity name="Technology">
+		<entity name="Technology" defaultDisplayProperty="name">
 			<property name="name" type="String" length="150" required="true"/>
 			<property name="altNames" type="String" length="2000"/>
-			<property name="type" type="PicklistEntry">
+			<property name="type" type="IPicklistEntry" picklistId="Technology.Type">
 				<picklistEntry key="package" defaultTitle="Package (On-Prem)"/>
 				<picklistEntry key="saas" defaultTitle="Package (SaaS)"/>
 				<picklistEntry key="custom" defaultTitle="Custom (On-Prem)"/>
 				<picklistEntry key="tool" defaultTitle="Tool"/>
 			</property>
 			<property name="vendor" type="Vendor"/>
+			<property name="userCount" type="int"/>
 		</entity>
 		
 	</entities>

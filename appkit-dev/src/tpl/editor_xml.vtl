@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor xmlns="http://www.xwic.de" 
+		xsi:schemaLocation="http://www.xwic.de editor.xsd"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <id>default</id>
+    <entity>${package}.entities.I${entity.name}</entity>
+    <script><![CDATA[
+		
+	]]></script>
+	
+	<templates>
+		<style id="form">
+			padding: 5;
+		</style>
+		<style id="field">
+			width: 350;
+		</style>
+	</templates>
+	
+	<!-- The layout-->
+	<layout>
+		<!-- The root node of an editor is always a tab... -->
+		<tab title="General">
+			<composite layout="grid" cols="2" style="padding: 2">
+				<group title="General" layout="grid" cols="2" template="form" colWidth="150;-1">
+					
+#foreach($prop in $entity.properties)
+					<label property="$prop.name"/>
+#if($prop.type == "String")
+					<text property = "$prop.name" template="field"/>
+#elseif ($prop.type == "IPicklistEntry")
+					<plCombo property="$prop.name" template="field"/>
+#elseif ($prop.type == "Integer" || $prop.type == "int" || $prop.type == "Long" || $prop.type == "long")
+					<number property="$prop.name" template="field" format="integer"/>
+#elseif ($prop.type == "Double" || $prop.type == "double" || $prop.type == "Float" || $prop.type == "float")
+					<number property="$prop.name" template="field" format="double"/>
+#elseif ($prop.type == "Date")
+					<date property="$prop.name" template="field"/>
+#else
+					<label text="Unknown type, can't place edit field"/>
+#end
+
+#end
+
+				</group>
+
+ 			</composite>
+		</tab>
+
+	<!-- Place sub-tabs here -
+        <subTabs>
+            <subTab title="Title">
+                <listView type="entity-class" filterOn="property" listProfile="default"/>
+            </subTab>
+        </subTabs>
+    -->
+    </layout>
+
+</editor>

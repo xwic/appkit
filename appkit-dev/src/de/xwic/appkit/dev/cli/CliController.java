@@ -9,6 +9,11 @@
 
 package de.xwic.appkit.dev.cli;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -16,7 +21,11 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import de.xwic.appkit.dev.engine.AppContext;
 import de.xwic.appkit.dev.engine.BuilderEngine;
+import de.xwic.appkit.dev.engine.ConfigurationException;
+import de.xwic.appkit.dev.engine.model.DataModel;
+import de.xwic.appkit.dev.engine.model.DataModelFactory;
 
 /**
  * Starts the command line version of AppKit Dev Tools. 
@@ -38,13 +47,11 @@ public class CliController {
 			"Generate java and config files based upon the model definition"
 	};
 	
-	private BuilderEngine engine;
-	
 	/**
 	 * Constructor.
 	 */
 	public CliController() {
-		engine = new BuilderEngine();
+
 	}
 	
 
@@ -67,9 +74,6 @@ public class CliController {
 					
 					// check engine attributes
 					
-					// launch the engine
-					engine.start();
-					
 					if (CMD_BUILD.equals(command)) {
 						prepareAndRunBuild(cmd);
 					} else {
@@ -78,8 +82,9 @@ public class CliController {
 					
 				} catch (ParseException pe) {
 					System.out.println("Error parsing arguments: " + pe);
-				} finally {
-					engine.shutdown();
+				} catch (ConfigurationException ce) {
+					System.err.println("There seems to be a problem with the configuration:");
+					ce.printStackTrace();
 				}
 			}
 		}
@@ -88,21 +93,70 @@ public class CliController {
 
 	/**
 	 * @param cmd
+	 * @throws ConfigurationException 
 	 */
-	private void prepareAndRunBuild(CommandLine cmd) {
+	private void prepareAndRunBuild(CommandLine cmd) throws ConfigurationException {
 		
 		String[] args = cmd.getArgs();
 		
 		if (args.length < 2) {
-			System.err.println("Missing the location. Use: jcp scan location [options]");
-			System.err.println("                      Example:  jcp scan smb://server/share/folder -report");
+			System.err.println("Missing the model definition file. Use: akd build filename");
+			System.err.println("Example: akd build admin.model.xml");
 			return;
 		}
 		
-		String location = args[1];
+		
+		AppContext context = initContext();
+		
+		File modelFile = new File(args[1]);
+		if (!modelFile.exists()) {
+			System.err.println("The specified model file '" + args[1] + "' does not exist.");
+			return;
+		}
+
+		// load model
+		DataModel model = DataModelFactory.createModel(modelFile);
+				
+		BuilderEngine engine = new BuilderEngine(context);
+		engine.start();
+		
+		engine.generateFiles(model, 
+				cmd.hasOption("all") || cmd.hasOption("dao"),
+				cmd.hasOption("all") || cmd.hasOption("listsetup"),
+				cmd.hasOption("all") || cmd.hasOption("editors"));
+		
 		
 	}
 
+	/**
+	 * Initialize the context.
+	 * @return
+	 * @throws ConfigurationException
+	 */
+	private AppContext initContext() throws ConfigurationException {
+
+		// load configuration file
+		File configFile = new File("akdev.properties");
+		if (!configFile.exists()) {
+			throw new ConfigurationException("The configuration file akdev.properties is not found.");
+		}
+		
+		try {
+			Properties prop = new Properties();
+			FileInputStream fin = new FileInputStream(configFile);
+			try {
+				prop.load(fin);
+			} finally {
+				fin.close();
+			}
+			AppContext ctx = new AppContext(prop);
+			return ctx;
+		} catch (IOException ie) {
+			throw new ConfigurationException("Error reading configuration", ie);
+		}
+		
+	}
+	
 	/**
 	 * Define the command line options available.
 	 * @return
@@ -112,9 +166,10 @@ public class CliController {
 		Options opt = new Options();
 		
 		if (command.equals(CMD_BUILD)) {
-			opt.addOption("r", "report", false, "Display a summary report after the scan.");
-			opt.addOption("f", "filter", true, "Only count/find files matching the given filter");
-			opt.addOption("s", "save", true, "Save the file list in the specified file");
+			opt.addOption("d", "dao", false, "Generate DAO files including entity and hbm mapping.");
+			opt.addOption("l", "listsetup", false, "Generate listsetup");
+			opt.addOption("e", "editors", false, "Generate editors");
+			opt.addOption("a", "all", false, "Generate all files");
 		}
 		
 		return opt;
@@ -161,7 +216,8 @@ public class CliController {
 	 */
 	public void printHeader() {
 		
-		p("AppKit Dev Tool - Version " + engine.getVersion());
+		p("AppKit Dev Tool");
+		p("===============");
 		p("");
 		
 	}
@@ -171,9 +227,9 @@ public class CliController {
 	 * 
 	 */
 	private void printBasicHelp() {
-		p("Usage: jcp command <options>");
+		p("Usage: akd command <options>");
 		p("");
-		p("  Enter jcp help for more details.");
+		p("  Enter akd help for more details.");
 	}
 
 	/**
@@ -191,14 +247,14 @@ public class CliController {
 			}
 			
 			p("");
-			p("Use jcp help <command> to show command specific options.");
+			p("Use akd help <command> to show command specific options.");
 		
 		} else {
 			String helpCommand = args[1];
 			
 			Options options = buildOptions(helpCommand);
 			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp( "jcp " + helpCommand, options );
+			formatter.printHelp( "akd " + helpCommand, options );
 		}
 	}
 

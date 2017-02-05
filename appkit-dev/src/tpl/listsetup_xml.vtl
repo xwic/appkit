@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<table type="${package}.entities.I${entity.name}" id="default" default-sort="server" queryEntities="false">
+
+	<action>CREATE</action>
+	<action>EDIT</action>
+	<action>DELETE</action>
+
+#foreach($prop in $entity.properties)
+	<column id="${prop.name}" default="1" width="150"/>
+#end
+
+	<column id="createdAt" default="0" width="120" />
+	<column id="createdFrom" default="0" width="120" />
+	<column id="lastModifiedAt" default="0" width="120" />
+	<column id="lastModifiedFrom" default="0" width="120" />
+	
+</table>
