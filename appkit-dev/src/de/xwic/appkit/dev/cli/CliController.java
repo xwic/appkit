@@ -20,6 +20,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import de.xwic.appkit.dev.engine.AppContext;
 import de.xwic.appkit.dev.engine.BuilderEngine;
@@ -36,7 +38,8 @@ public class CliController {
 
 	public final static String CMD_HELP = "help";
 	public final static String CMD_BUILD = "build";
-	
+
+	private final Log log = LogFactory.getLog(getClass());
 	
 	private final String[] COMMANDS = {
 			CMD_HELP,
@@ -60,6 +63,7 @@ public class CliController {
 	 * @param cmd
 	 */
 	public void run(String[] args) {
+		
 		
 		if (args.length == 0) {
 			printBasicHelp();
@@ -120,10 +124,23 @@ public class CliController {
 		BuilderEngine engine = new BuilderEngine(context);
 		engine.start();
 		
-		engine.generateFiles(model, 
-				cmd.hasOption("all") || cmd.hasOption("dao"),
-				cmd.hasOption("all") || cmd.hasOption("listsetup"),
-				cmd.hasOption("all") || cmd.hasOption("editors"));
+		try {
+			engine.generateFiles(model, 
+					cmd.hasOption("all") || cmd.hasOption("dao"),
+					cmd.hasOption("all") || cmd.hasOption("listsetup"),
+					cmd.hasOption("all") || cmd.hasOption("editors"));
+			
+			if (cmd.hasOption("all") || cmd.hasOption("bundle")) {
+				engine.updateBundles(model, cmd.hasOption("ob"));
+			}
+			
+		} catch (Exception e) {
+			log.error(e);
+		} finally {
+			engine.shutdown();
+		}
+		
+		log.info("Build completed - " + context.getFilesCreated() + " files created.");
 		
 		
 	}
@@ -170,6 +187,8 @@ public class CliController {
 			opt.addOption("l", "listsetup", false, "Generate listsetup");
 			opt.addOption("e", "editors", false, "Generate editors");
 			opt.addOption("a", "all", false, "Generate all files");
+			opt.addOption("b", "bundle", false, "Generate bundle file - by default it keeps old values");
+			opt.addOption("ob", "overridebundle", false, "Override all bundle values");
 		}
 		
 		return opt;

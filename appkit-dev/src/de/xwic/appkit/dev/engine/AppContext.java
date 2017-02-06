@@ -24,6 +24,8 @@ public class AppContext {
 	
 	private String sourceFolderName = "src";
 	
+	private int filesCreated = 0; 
+	
 	/**
 	 * Instantiate from configuration properties, usually loaded from 
 	 * a file.
@@ -63,6 +65,20 @@ public class AppContext {
 	 */
 	public String getSourceFolderName() {
 		return sourceFolderName;
+	}
+
+	/**
+	 * A file was created.
+	 */
+	public void countFileCreated() {
+		filesCreated++;
+	}
+	
+	/**
+	 * @return the filesCreated
+	 */
+	public int getFilesCreated() {
+		return filesCreated;
 	}
 	
 }

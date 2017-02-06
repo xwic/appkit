@@ -4,10 +4,14 @@
 package de.xwic.appkit.dev.engine;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +21,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import de.xwic.appkit.dev.engine.model.DataModel;
 import de.xwic.appkit.dev.engine.model.EntityModel;
+import de.xwic.appkit.dev.engine.model.EntityProperty;
 
 /**
  * @author lippisch
@@ -90,8 +95,9 @@ public class BuilderEngine {
 
 	/**
 	 * @param model
+	 * @throws IOException 
 	 */
-	public void generateFiles(DataModel model, boolean daoFiles, boolean listSetup, boolean editors) {
+	public void generateFiles(DataModel model, boolean daoFiles, boolean listSetup, boolean editors) throws IOException {
 		
 		log.info("Domain: " + model.getDomainId());
 		
@@ -100,7 +106,7 @@ public class BuilderEngine {
 				context.getSourceFolderName() + "/" + 
 				model.getPackageName().replace('.', '/'));
 
-		log.info("Source File Base: " + srcBase.getAbsolutePath());
+		log.info("Source File Base: " + srcBase.getCanonicalPath());
 		
 		if (!srcBase.exists()) {
 			srcBase.mkdirs();
@@ -204,10 +210,86 @@ public class BuilderEngine {
 			template.merge(veCtx, fw);
 			fw.flush();
 			fw.close();
+			context.countFileCreated();
 		} catch (IOException ioe) {
 			log.error("Error writing template", ioe);
 		}
 
+	}
+
+	/**
+	 * Bundles are properties files with the labels. By default we try to 'keep' the old values as they
+	 * may have been adjusted.
+	 * @param model
+	 * @throws IOException 
+	 * @throws ConfigurationException 
+	 */
+	public void updateBundles(DataModel model, boolean override) throws IOException, ConfigurationException {
+
+		if (!context.getProductConfigFolder().exists()) {
+			context.getProductConfigFolder().mkdirs();
+		}
+		File bundleFolder = new File(context.getProductConfigFolder(), model.getDomainId() + "/bundles");
+		bundleFolder.mkdirs();
+
+		File entityBundle = new File(bundleFolder, model.getDomainId() + ".entities.resources_en.properties");
+		
+		Properties oldProperties = new Properties();
+		if (entityBundle.exists() && !override) {
+			FileReader fr = new FileReader(entityBundle);
+			oldProperties.load(fr);
+			fr.close();
+		}
+		
+		Set<String> keysUsed = new HashSet<String>();
+		
+		FileWriter writer = new FileWriter(entityBundle);
+		PrintWriter pw = new PrintWriter(writer);
+		try {
+			
+			pw.println("# Entity Bundle for " + model.getDomainId() + " entities.");
+			pw.println("# Created by AppKitDev ");
+			pw.println("");
+			
+			for (EntityModel entity : model.getEntities()) {
+				pw.println("# " + entity.getName());
+				String fullClass = model.getPackageName() + "." + entity.getName();
+				writeBundleLine(pw, oldProperties, keysUsed, fullClass, entity.getName());
+				for(EntityProperty prop : entity.getProperties()) {
+					String propTitle = prop.getName().substring(0, 1).toUpperCase() + prop.getName().substring(1);
+					writeBundleLine(pw, oldProperties, keysUsed, fullClass + "." + prop.getName(), propTitle);
+				}
+				pw.println("");
+			}
+			
+			// write those entries that have not been written yet
+			for (Object key : oldProperties.keySet()) {
+				String sKey = (String)key;
+				if (!keysUsed.contains(sKey)) {
+					pw.println(sKey + "=" + oldProperties.getProperty(sKey, ""));
+				}
+			}
+			
+		} finally {
+			pw.flush();
+			pw.close();
+			writer.close();
+		}
+		
+	}
+
+	/**
+	 * @param pw 
+	 * @param oldProperties
+	 * @param keysUsed
+	 * @param string
+	 * @param name
+	 */
+	private void writeBundleLine(PrintWriter pw, Properties oldProperties, Set<String> keysUsed, String key, String val) {
+		
+		pw.println(key + "=" + oldProperties.getProperty(key, val));
+		keysUsed.add(key);
+				
 	}
 	
 }
