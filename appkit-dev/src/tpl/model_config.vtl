@@ -1,0 +1,32 @@
+package ${package};
+
+import ${package}.dao.*;
+import ${package}.dao.impl.*;
+
+import de.xwic.appkit.core.dao.DAOFactory;
+import de.xwic.appkit.core.dao.DAOSystem;
+
+/**
+ * Registers the available DAOs in this model with the DAO factory and provides
+ * convenient methods to access DAOs in this model.
+ */
+public class ${domain}ModelConfig {
+	/**
+	 * @param factory
+	 */
+	public static void register(DAOFactory factory) {
+#foreach($entity in $model.entities)
+		factory.registerDao(I${entity.name}DAO.class, new ${entity.name}DAO());
+#end
+	}
+
+#foreach($entity in $model.entities)
+	/**
+	 * Return the ${entity.name} DAO.
+	 * @return
+	 */
+	public static I${entity.name}DAO get${entity.name}DAO() {
+		return (I${entity.name}DAO) DAOSystem.getDAO(I${entity.name}DAO.class);
+	}
+#end
+}

@@ -1,7 +1,6 @@
 
-package ${package}.entities.impl;
+package ${package}.entities;
 
-import ${package}.entities;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
@@ -35,12 +34,12 @@ public interface I${entity.name} extends IEntity {
 	/**
 	 * Returns the value of ${prop.name}.
 	 */
-	public $prop.type ${prop.nameGetter}();
+	public $prop.resolvedType ${prop.nameGetter}();
 	
 	/**
 	 * Set value for ${prop.name}.
 	 */
-	public void ${prop.nameSetter}($prop.type $prop.name);
+	public void ${prop.nameSetter}($prop.resolvedType $prop.name);
 	
 #end
 

@@ -165,5 +165,20 @@ public class XMLEntityProperty implements EntityProperty {
 		return entries;
 
 	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#getResolvedType()
+	 */
+	@Override
+	public String getResolvedType() {
+		if (isBasicType()) {
+			return type;
+		} else {
+			if (type.equals("IPicklistEntry")) {
+				return type;
+			}
+			return "I" + type;
+		}
+	}
 	
 }

@@ -1,7 +1,7 @@
 
 package ${package}.entities.impl;
 
-import ${package}.entities;
+import ${package}.entities.*;
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
@@ -15,7 +15,7 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
 public class ${entity.name} extends Entity implements I${entity.name}  {
 
 #foreach($prop in $entity.properties)
-	private $prop.type $prop.name;
+	private $prop.resolvedType $prop.name;
 #end
 
 
@@ -30,14 +30,14 @@ public class ${entity.name} extends Entity implements I${entity.name}  {
 	/**
 	 * Returns the value of ${prop.name}.
 	 */
-	public $prop.type ${prop.nameGetter}() {
+	public $prop.resolvedType ${prop.nameGetter}() {
 		return $prop.name;
 	}
 	
 	/**
 	 * Set value for ${prop.name}.
 	 */
-	public void ${prop.nameSetter}($prop.type $prop.name) {
+	public void ${prop.nameSetter}($prop.resolvedType $prop.name) {
 		this.${prop.name} = ${prop.name};
 	}
 	

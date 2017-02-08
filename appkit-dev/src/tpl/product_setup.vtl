@@ -1,0 +1,13 @@
+<!-- Copy & Paste this part into your product.setup.xml -->
+	<domain id="${domain}">
+		<entities>
+ #foreach($entity in $model.entities)
+  			<entity class="${package}.entities.I${entity.name}" file="${domain}/entities/${entity.name}.xml">
+  				<list file="${domain}/listsetup/${entity.name}-default.list.xml" />
+  				<editor file="${domain}/editors/${entity.name}-default.editor.xml" />
+  			</entity>
+#end
+			
+		</entities>
+  		<bundle basename="${domain}/bundles/${domain}.entities.resources"/>
+	</domain>

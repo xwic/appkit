@@ -57,6 +57,12 @@ public interface EntityProperty {
 	public boolean isBasicType();
 	
 	/**
+	 * Returns the raw type name if it is a basic type or the interface name.
+	 * @return
+	 */
+	public String getResolvedType();
+	
+	/**
 	 * Returns the picklist id used by this property if it is a PicklistEntry.
 	 * @return
 	 */

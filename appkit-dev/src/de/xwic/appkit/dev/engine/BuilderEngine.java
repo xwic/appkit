@@ -44,6 +44,10 @@ public class BuilderEngine {
 	private Template tplListsetupXml;
 	private Template tplEditorXml;
 
+	private Template tplModelConfig;
+
+	private Template tplProductSetup;
+
 	/**
 	 * Construct new BuilderEngine on given context.
 	 * @param context
@@ -75,6 +79,8 @@ public class BuilderEngine {
 		tplEntityXml = ve.getTemplate("tpl/entity_xml.vtl");
 		tplListsetupXml = ve.getTemplate("tpl/listsetup_xml.vtl");
 		tplEditorXml = ve.getTemplate("tpl/editor_xml.vtl");
+		tplModelConfig = ve.getTemplate("tpl/model_config.vtl");
+		tplProductSetup = ve.getTemplate("tpl/product_setup.vtl");
 
 	}
 
@@ -153,8 +159,8 @@ public class BuilderEngine {
 				File daoFolder = new File(srcBase, "dao");
 				File daoJavaFile = new File(daoFolder, "I" + entity.getName() + "DAO.java");
 				generateFile(daoJavaFile, veCtx, tplDAOInterface);
+				
 			}
-			
 			
 			// add the entity.xml in the product configuration
 			if (!context.getProductConfigFolder().exists()) {
@@ -187,7 +193,28 @@ public class BuilderEngine {
 			
 		}
 		
+		if (daoFiles) {
+			VelocityContext veCtx = new VelocityContext();
+			veCtx.put("package", model.getPackageName());
+			veCtx.put("model", model);
+
+			String javaDomainName = model.getDomainId().substring(0, 1).toUpperCase() + model.getDomainId().substring(1);
+			File modelConfigFile = new File(srcBase, javaDomainName + "ModelConfig.java");
+			
+			veCtx.put("domain", javaDomainName);
+			generateFile(modelConfigFile, veCtx, tplModelConfig);
+		}
+
+		// product setup part
+		VelocityContext veCtx = new VelocityContext();
+		veCtx.put("package", model.getPackageName());
+		veCtx.put("model", model);
+
+		File prodSetupPartFile = new File(context.getProductConfigFolder(), "product.setup-part.xml");
 		
+		veCtx.put("domain", model.getDomainId());
+		generateFile(prodSetupPartFile, veCtx, tplProductSetup, false);
+
 		
 	}
 
