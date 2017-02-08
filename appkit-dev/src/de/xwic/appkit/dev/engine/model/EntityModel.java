@@ -44,4 +44,10 @@ public interface EntityModel {
 	 */
 	public String getDefaultDisplayProperty();
 	
+	/**
+	 * Return the description attribute of the entity.
+	 * @return
+	 */
+	public String getDescription();
+	
 }

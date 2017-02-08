@@ -6,7 +6,7 @@ import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
-#if ($entity.description)
+#if ($!entity.description != "")
  * $!{entity.description} 
 #else
  * ${entity.name} implementation class.

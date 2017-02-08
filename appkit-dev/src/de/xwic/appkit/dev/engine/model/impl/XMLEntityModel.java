@@ -22,11 +22,13 @@ public class XMLEntityModel implements EntityModel {
 	private Node node;
 	private String name;
 	private String defaultDisplayProperty;
+	private String description;
 	
 	public XMLEntityModel(Node node) {
 		this.node = node;
 		this.name = node.valueOf("@name");
 		this.defaultDisplayProperty = node.valueOf("@defaultDisplayProperty");
+		this.description = node.valueOf("@description");
 	}
 
 	/**
@@ -87,4 +89,12 @@ public class XMLEntityModel implements EntityModel {
 		return defaultDisplayProperty;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.dev.engine.model.EntityModel#getDescription()
+	 */
+	@Override
+	public String getDescription() {
+		return description;
+	}
+	
 }

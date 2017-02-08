@@ -6,7 +6,8 @@ import de.xwic.appkit.core.dao.AbstractDAO;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
-#if ($entity.description)
+#if ($!entity.description != "")
+ * DAO for ${entity.name}.
  * $!{entity.description} 
 #else
  * TODO: Add ${entity.name} DAO implementation class description.

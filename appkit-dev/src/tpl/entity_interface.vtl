@@ -6,13 +6,30 @@ import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
-#if ($entity.description)
+#if ($!entity.description != "")
  * $!{entity.description} 
 #else
  * TODO: Add ${entity.name} description.
 #end
  */
 public interface I${entity.name} extends IEntity {
+
+#* Generate Picklist constants *#
+#foreach($prop in $entity.properties)
+#if($prop.type == "IPicklistEntry")
+#if("$!prop.picklistId" == "")
+	#set($pid = "${entity.name}.${prop.name}")
+#else
+	#set($pid = $prop.picklistId)
+#end
+	public final static String PL_${pid.toUpperCase().replace(".", "_")} = "${pid}";
+#foreach($pe in $prop.picklistEntries)
+#if($!pe.key != "")
+	public final static String PE_${pid.toUpperCase().replace(".", "_")}_${pe.key.toUpperCase()} = "$pe.key";
+#end
+#end
+#end
+#end
 
 #foreach($prop in $entity.properties)
 	/**

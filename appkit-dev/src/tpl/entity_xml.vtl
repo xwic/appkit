@@ -6,8 +6,13 @@
 #end
 		
 #foreach($prop in $entity.properties)
-#if($prop.type == "IPicklistEntry" && $prop.picklistId != "")
-		<property name="$prop.name" picklistId="$prop.picklistId">
+#if($prop.type == "IPicklistEntry")
+#if("$!prop.picklistId" == "")
+	#set($pid = "${entity.name}.${prop.name}")
+#else
+	#set($pid = $prop.picklistId)
+#end
+		<property name="$prop.name" picklistId="$pid">
 #foreach($pe in $prop.picklistEntries)
 		     <picklistentry #if($!pe.key != "") key="$pe.key" #end>
 		         <name lang="en">$pe.defaultTitle</name>

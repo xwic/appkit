@@ -75,6 +75,7 @@ public class XMLEntityProperty implements EntityProperty {
 			this.columnName = EngineUtil.toDBName(name);
 		}
 		
+		
 	}
 
 	/**
