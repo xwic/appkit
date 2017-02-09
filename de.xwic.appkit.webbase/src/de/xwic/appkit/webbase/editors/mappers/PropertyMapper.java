@@ -263,23 +263,23 @@ public abstract class PropertyMapper<T extends IControl> {
 		if (value != null && !value.getClass().equals(targetType)) {
 			if (value instanceof String) { // String to
 				String sValue = (String)value;
-				if (targetType.equals(Integer.class)) { // .. Integer
+				if (targetType.equals(Integer.class) || targetType.equals(int.class)) { // .. Integer
 					value = new Integer(sValue); 
-				} else if (targetType.equals(Double.class)) { // .. Double
+				} else if (targetType.equals(Double.class) || targetType.equals(double.class)) { // .. Double
 					value = new Double(sValue);
 				}
 			} else if (value instanceof Integer) { // Integer to..
 				Integer iValue = (Integer)value;
 				if (targetType.equals(String.class)) {
 					value = iValue.toString();
-				} else if (targetType.equals(Double.class)) {
+				} else if (targetType.equals(Double.class) || targetType.equals(double.class)) {
 					value = iValue.doubleValue();
 				}
 			} else if (value instanceof Double) { // Double to..
 				Double iValue = (Double)value;
 				if (targetType.equals(String.class)) {
 					value = iValue.toString();
-				} else if (targetType.equals(Integer.class)) {
+				} else if (targetType.equals(Integer.class) || targetType.equals(int.class)) {
 					value = iValue.intValue();
 				} else if (targetType.equals(BigDecimal.class)) {
 					value = new BigDecimal(iValue);
