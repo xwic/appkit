@@ -37,8 +37,10 @@
 					<number property="$prop.name" template="field" format="double"/>
 #elseif ($prop.type == "Date")
 					<date property="$prop.name" template="field"/>
+#elseif ($prop.type == "Boolean" || $prop.type == "boolean")
+					<yesNoRadio property="$prop.name" template="field"/>
 #else
-					<entity property="$prop.name"/>
+					<entity property="$prop.name" template="field"/>
 #end
 
 #end
