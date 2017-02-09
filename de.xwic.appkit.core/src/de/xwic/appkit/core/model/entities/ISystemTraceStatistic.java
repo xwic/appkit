@@ -189,13 +189,6 @@ public interface ISystemTraceStatistic extends IEntity {
 	/**
 	 * Not managed by hibernate
 	 * 
-	 * @return
-	 */	
-	public List<TraceStats> getTraceStats();
-
-	/**
-	 * Not managed by hibernate
-	 * 
 	 * @param stats
 	 */
 	public void setTraceStats(List<TraceStats> stats);

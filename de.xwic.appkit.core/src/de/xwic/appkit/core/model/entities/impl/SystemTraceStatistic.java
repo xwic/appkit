@@ -17,11 +17,14 @@
 
 package de.xwic.appkit.core.model.entities.impl;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
@@ -321,17 +324,6 @@ public class SystemTraceStatistic extends Entity implements ISystemTraceStatisti
 	@Override
 	public void setJsonStats(String jsonStats) {
 		this.jsonStats = jsonStats;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getTraceStats()
-	 */
-	@Override
-	public List<TraceStats> getTraceStats() {
-		Gson gson = new Gson();
-		return Collections.unmodifiableList(gson.fromJson(jsonStats, List.class));
 	}
 
 	/*
