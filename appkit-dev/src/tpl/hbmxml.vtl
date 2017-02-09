@@ -40,10 +40,12 @@
       
 #foreach($prop in $entity.properties)
 #if($prop.basicType)
-		<property name="$prop.name" type="$prop.type" column="$prop.columnName" #if($!prop.length != "")length="$prop.length"#end/>
+		<property name="$prop.name" column="$prop.columnName" #if($!prop.length != "")length="$prop.length"#end/>
 #else
 #if($prop.type == "IPicklistEntry")
 	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="$prop.columnName" not-null="false" lazy="false"/>
+#elseif($prop.type == "Mitarbeiter")
+	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="$prop.columnName" not-null="false" lazy="false"/>
 #else
 	    <many-to-one name="$prop.name" class="${package}.entities.impl.${prop.type}" column="$prop.columnName" not-null="false" lazy="false"/>
 #end

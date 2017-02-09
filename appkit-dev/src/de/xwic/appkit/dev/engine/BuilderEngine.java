@@ -280,12 +280,16 @@ public class BuilderEngine {
 			
 			for (EntityModel entity : model.getEntities()) {
 				pw.println("# " + entity.getName());
-				String fullClass = model.getPackageName() + "." + entity.getName();
+				String fullClass = model.getPackageName() + ".entities.I" + entity.getName();
 				writeBundleLine(pw, oldProperties, keysUsed, fullClass, entity.getName());
 				for(EntityProperty prop : entity.getProperties()) {
 					String propTitle = prop.getName().substring(0, 1).toUpperCase() + prop.getName().substring(1);
 					writeBundleLine(pw, oldProperties, keysUsed, fullClass + "." + prop.getName(), propTitle);
 				}
+				writeBundleLine(pw, oldProperties, keysUsed, fullClass + ".createdAt", "Created At");
+				writeBundleLine(pw, oldProperties, keysUsed, fullClass + ".createdFrom", "Created From");
+				writeBundleLine(pw, oldProperties, keysUsed, fullClass + ".lastModifiedAt", "Last Modified At");
+				writeBundleLine(pw, oldProperties, keysUsed, fullClass + ".lastModifiedFrom", "Last Modified From");
 				pw.println("");
 			}
 			

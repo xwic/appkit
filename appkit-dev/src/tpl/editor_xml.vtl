@@ -38,7 +38,7 @@
 #elseif ($prop.type == "Date")
 					<date property="$prop.name" template="field"/>
 #else
-					<label title="Unknown type, can't place edit field"/>
+					<entity property="$prop.name"/>
 #end
 
 #end
