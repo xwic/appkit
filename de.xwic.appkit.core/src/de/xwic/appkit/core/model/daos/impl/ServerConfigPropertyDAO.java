@@ -16,28 +16,23 @@
  *******************************************************************************/
 package de.xwic.appkit.core.model.daos.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.AbstractDAO;
-import de.xwic.appkit.core.dao.DAOCallback;
-import de.xwic.appkit.core.dao.DAOProviderAPI;
 import de.xwic.appkit.core.dao.DataAccessException;
-import de.xwic.appkit.core.dao.EntityList;
 import de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO;
 import de.xwic.appkit.core.model.entities.IServerConfigProperty;
 import de.xwic.appkit.core.model.entities.impl.ServerConfigProperty;
-import de.xwic.appkit.core.model.queries.ServerConfigPropertyByKeyQuery;
+import de.xwic.appkit.core.model.queries.PropertyQuery;
 
 /**
- * DAO implementation of the Server ConfigProperty entity. <p>
+ * DAO implementation of the Server ConfigProperty entity.
+ * <p>
  *
  * @author Ronny Pfretzschner
  *
  */
 public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, ServerConfigProperty> implements IServerConfigPropertyDAO {
-
-	private Map<String, IServerConfigProperty> allProperties = new HashMap<String, IServerConfigProperty>();
 
 	/**
 	 *
@@ -46,7 +41,9 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		super(IServerConfigProperty.class, ServerConfigProperty.class);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#createEntity()
 	 */
 	@Override
@@ -57,19 +54,20 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	}
 
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#setConfigProperty(java.lang.String, boolean)
 	 */
 	@Override
 	public void setConfigProperty(String key, boolean val) {
-
 
 		IServerConfigProperty prop = new ServerConfigProperty(key, Boolean.toString(val));
 		updateConfigProperty(prop);
 	}
 
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#setConfigProperty(java.lang.String, int)
 	 */
 	@Override
@@ -79,7 +77,8 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	}
 
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#setConfigProperty(java.lang.String, double)
 	 */
 	@Override
@@ -89,7 +88,8 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	}
 
 	/*
-	 *  (non-Javadoc)
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#setConfigProperty(java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -99,27 +99,30 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 	}
 
 	/**
-	 * Checks whether the property already exists and if so updates this
-	 * property. If the property does not exist, a new property will be created.
+	 * Checks whether the property already exists and if so updates this property. If the property does not exist, a new property will be
+	 * created.
 	 *
 	 * @param property
 	 */
 	private void updateConfigProperty(IServerConfigProperty property) {
 		IServerConfigProperty existingProperty = getConfigProperty(property.getKey());
-		if(existingProperty == null) {
+		if (existingProperty == null) {
 			update(property);
-		}else {
+		} else {
+			// always reload the property from DB
+			existingProperty = getConfigProperty(property.getKey());
 			existingProperty.setValue(property.getValue());
 			update(existingProperty);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigBoolean(java.lang.String)
 	 */
 	@Override
 	public boolean getConfigBoolean(final String key) {
-
 
 		//not in cache, get from db...
 		IServerConfigProperty prop = getConfigProperty(key);
@@ -130,7 +133,9 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		return Boolean.valueOf(prop.getValue()).booleanValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigInteger(java.lang.String)
 	 */
 	@Override
@@ -144,7 +149,9 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		return Integer.valueOf(prop.getValue()).intValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigInteger(java.lang.String)
 	 */
 	@Override
@@ -158,7 +165,9 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		return Double.parseDouble(prop.getValue());
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigString(java.lang.String)
 	 */
 	@Override
@@ -172,30 +181,20 @@ public class ServerConfigPropertyDAO extends AbstractDAO<IServerConfigProperty, 
 		return prop.getValue();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.daos.IServerConfigPropertyDAO#getConfigProperty(java.lang.String)
 	 */
 	@Override
-	public IServerConfigProperty getConfigProperty(final String key) {
-		//look in cache first...
-		IServerConfigProperty prop = allProperties.get(key);
-		if (prop != null) {
-			return prop;
+	public IServerConfigProperty getConfigProperty(String key) {
+		PropertyQuery pq = new PropertyQuery();
+		pq.addEquals("key", key);
+		List<IServerConfigProperty> results = getEntities(null, pq);
+		if (results.isEmpty()) {
+			return null;
+		} else {
+			return results.get(0);
 		}
-
-		//not in cache, get from db...
-		return (IServerConfigProperty)provider.execute(new DAOCallback() {
-    		@Override
-			public Object run(DAOProviderAPI api) {
-    			EntityList list = api.getEntities(ServerConfigProperty.class, null, new ServerConfigPropertyByKeyQuery(key));
-		    	if (list.size() != 0) {
-		    		IServerConfigProperty p = (IServerConfigProperty)list.get(0);
-		    		//register property in cache...
-		    		allProperties.put(key, p);
-		    		return p;
-		    	}
-		    	return null;
-    		}
-        });
 	}
 }

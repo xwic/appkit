@@ -68,7 +68,7 @@ public class HistoryContentProvider implements IContentProvider {
 	 */
 	public String getUniqueKey(Object object) {
 		if (object instanceof IEntity) {
-			return Integer.toString(((IEntity) object).getId());
+			return Long.toString(((IEntity) object).getId());
 		}
 		
 		return Integer.toString(object.hashCode());

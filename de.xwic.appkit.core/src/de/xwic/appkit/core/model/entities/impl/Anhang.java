@@ -29,11 +29,11 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
 public class Anhang extends Entity implements IAnhang {
 
 	private String entityType = null;
-	private int entityID = -1;
+	private long entityID = -1L;
 	
 	private String dateiName = "";
 	private long dateiGroesse = 0;
-	private int fileID = -1;
+	private long fileID = -1L;
 	
 	private boolean indirectReference = false;
 
@@ -80,7 +80,7 @@ public class Anhang extends Entity implements IAnhang {
 	 *  (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IAnhang#getFileID()
 	 */
-	public int getFileID() {
+	public long getFileID() {
 		return fileID;
 	}
 
@@ -88,7 +88,7 @@ public class Anhang extends Entity implements IAnhang {
 	 *  (non-Javadoc)
 	 * @see de.xwic.appkit.core.model.entities.IAnhang#setFileID(int)
 	 */
-	public void setFileID(int fileID) {
+	public void setFileID(long fileID) {
 		this.fileID = fileID;
 	}
 
@@ -103,14 +103,14 @@ public class Anhang extends Entity implements IAnhang {
 	/**
 	 * @return the entityID
 	 */
-	public int getEntityID() {
+	public long getEntityID() {
 		return entityID;
 	}
 
 	/**
 	 * @param entityID the entityID to set
 	 */
-	public void setEntityID(int entityID) {
+	public void setEntityID(long entityID) {
 		this.entityID = entityID;
 	}
 

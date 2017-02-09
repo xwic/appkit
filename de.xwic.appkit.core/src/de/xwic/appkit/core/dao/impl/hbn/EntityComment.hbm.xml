@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.EntityComment" table="ENTITY_COMMENT">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="EC_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -28,7 +28,7 @@
         	<column name="ENT_COMMENT" />
         </property>
         
-        <property name="entityId" column="ENTITY_ID" type="int"/>
+        <property name="entityId" column="ENTITY_ID" type="long"/>
         
         
         <property name="readonlyComment" type="boolean">

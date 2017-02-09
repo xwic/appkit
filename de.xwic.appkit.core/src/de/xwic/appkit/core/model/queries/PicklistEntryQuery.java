@@ -24,9 +24,9 @@ import de.xwic.appkit.core.model.entities.IPickliste;
  */
 public class PicklistEntryQuery extends EntityQuery {
 
-    private int pickListID = -1;
+    private long pickListID = -1l;
     
-    private int entryID;
+    private long entryID;
     
     /**
      * Constructor.
@@ -54,7 +54,7 @@ public class PicklistEntryQuery extends EntityQuery {
      * 
      * @param id of entry which should be searched. 
      */
-    public PicklistEntryQuery(int id) {
+    public PicklistEntryQuery(long id) {
         if (id < 1) {
             throw new IllegalArgumentException("Error in constructor in class: " + getClass().getName() + "! Arguments not allowed!");
         }
@@ -66,27 +66,27 @@ public class PicklistEntryQuery extends EntityQuery {
     /**
 	 * @return Returns the pickListID.
 	 */
-	public int getPickListID() {
+	public long getPickListID() {
 		return pickListID;
 	}
 
 	/**
 	 * @param pickListID The pickListID to set.
 	 */
-	public void setPickListID(int pickListID) {
+	public void setPickListID(long pickListID) {
 		this.pickListID = pickListID;
 	}
 
 	/**
      * @return Returns the entryID.
      */
-    public int getEntryID() {
+    public long getEntryID() {
         return entryID;
     }
     /**
      * @param entryID The entryID to set.
      */
-    public void setEntryID(int entryID) {
+    public void setEntryID(long entryID) {
         this.entryID = entryID;
     }
 }

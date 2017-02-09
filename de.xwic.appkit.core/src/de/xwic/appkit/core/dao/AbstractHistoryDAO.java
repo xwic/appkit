@@ -19,11 +19,13 @@
  */
 package de.xwic.appkit.core.dao;
 
+import de.xwic.appkit.core.dao.event.AbstractDAOWithEvent;
+
 /**
  * @author jbornema
  *
  */
-public abstract class AbstractHistoryDAO<I extends IEntity, E extends Entity> extends AbstractDAO<I, E> {
+public abstract class AbstractHistoryDAO<I extends IEntity, E extends Entity> extends AbstractDAOWithEvent<I, E> {
 
 	{
 		// by default enable history handling

@@ -22,13 +22,13 @@ package de.xwic.appkit.core.dao;
 public class EntityKey {
 
 	private String type = null;
-	private int id = 0;
+	private long id = 0;
 	
 	/**
 	 * @param type
 	 * @param id
 	 */
-	public EntityKey(String type, int id) {
+	public EntityKey(String type, long id) {
 		super();
 		this.type = type;
 		this.id = id;
@@ -49,7 +49,7 @@ public class EntityKey {
 	public int hashCode() {
 		final int PRIME = 31;
 		int result = 1;
-		result = PRIME * result + id;
+		result = PRIME * result + (int) (id ^ (id >>> 32));
 		result = PRIME * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
@@ -78,14 +78,14 @@ public class EntityKey {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
 	/**
 	 * @param id the id to set
 	 */
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

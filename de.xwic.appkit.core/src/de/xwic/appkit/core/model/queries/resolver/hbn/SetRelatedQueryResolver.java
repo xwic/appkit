@@ -41,7 +41,7 @@ public class SetRelatedQueryResolver extends PropertyQueryResolver {
 		List<String> customWhereClauses = new ArrayList<String>();
 		List<Object> customValues = new ArrayList<Object>();
 		
-		int entityID = query.getEntityID();
+		long entityID = query.getEntityID();
 		String propertyName = query.getSetProperty();
 		String relatedEntityClazzName = query.getRelatedEntityImplClazzName();
 		
@@ -52,7 +52,7 @@ public class SetRelatedQueryResolver extends PropertyQueryResolver {
 		sb.append(" base where base.id = ?)");
 		
 		customWhereClauses.add(sb.toString());
-		customValues.add(new Integer(entityID));
+		customValues.add(new Long(entityID));
 
 		return super.resolve(entityClass, query, justCount, customFromClauses, customWhereClauses, customValues);
 	}

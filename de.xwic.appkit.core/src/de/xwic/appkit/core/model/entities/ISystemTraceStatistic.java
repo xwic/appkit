@@ -18,6 +18,7 @@
 package de.xwic.appkit.core.model.entities;
 
 import java.util.Date;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.IEntity;
 
@@ -32,7 +33,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Date getFromDate();
 
 	/**
-	 * @param fromDate the fromDate to set
+	 * @param fromDate
+	 *            the fromDate to set
 	 */
 	public abstract void setFromDate(Date fromDate);
 
@@ -42,7 +44,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Date getToDate();
 
 	/**
-	 * @param toDate the toDate to set
+	 * @param toDate
+	 *            the toDate to set
 	 */
 	public abstract void setToDate(Date toDate);
 
@@ -52,7 +55,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Double getAverageResponseTime();
 
 	/**
-	 * @param averageResponseTime the averageResponseTime to set
+	 * @param averageResponseTime
+	 *            the averageResponseTime to set
 	 */
 	public abstract void setAverageResponseTime(Double averageResponseTime);
 
@@ -62,7 +66,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getTotalResponseTime();
 
 	/**
-	 * @param totalResponseTime the totalResponseTime to set
+	 * @param totalResponseTime
+	 *            the totalResponseTime to set
 	 */
 	public abstract void setTotalResponseTime(Long totalResponseTime);
 
@@ -72,7 +77,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getResponseCount();
 
 	/**
-	 * @param responseCount the responseCount to set
+	 * @param responseCount
+	 *            the responseCount to set
 	 */
 	public abstract void setResponseCount(Integer responseCount);
 
@@ -82,7 +88,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getTotalDAOops();
 
 	/**
-	 * @param totalDAOops the totalDAOops to set
+	 * @param totalDAOops
+	 *            the totalDAOops to set
 	 */
 	public abstract void setTotalDAOops(Integer totalDAOops);
 
@@ -92,7 +99,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getTotalDAODuration();
 
 	/**
-	 * @param totalDAODuration the totalDAODuration to set
+	 * @param totalDAODuration
+	 *            the totalDAODuration to set
 	 */
 	public abstract void setTotalDAODuration(Long totalDAODuration);
 
@@ -102,7 +110,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Long getMemoryUsed();
 
 	/**
-	 * @param memoryUsed the memoryUsed to set
+	 * @param memoryUsed
+	 *            the memoryUsed to set
 	 */
 	public abstract void setMemoryUsed(Long memoryUsed);
 
@@ -112,7 +121,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getActiveUsers();
 
 	/**
-	 * @param activeUsers the activeUsers to set
+	 * @param activeUsers
+	 *            the activeUsers to set
 	 */
 	public abstract void setActiveUsers(Integer activeUsers);
 
@@ -122,7 +132,8 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getSessionCount();
 
 	/**
-	 * @param sessionCount the sessionCount to set
+	 * @param sessionCount
+	 *            the sessionCount to set
 	 */
 	public abstract void setSessionCount(Integer sessionCount);
 
@@ -132,68 +143,137 @@ public interface ISystemTraceStatistic extends IEntity {
 	public abstract Integer getTotalUsersOnline();
 
 	/**
-	 * @param totalUsersOnline the totalUsersOnline to set
+	 * @param totalUsersOnline
+	 *            the totalUsersOnline to set
 	 */
 	public abstract void setTotalUsersOnline(Integer totalUsersOnline);
 
 	/**
-	 * @return the customCat1Ops
+	 * @return the trace statistics in JSON format
 	 */
-	public abstract Integer getCustomCat1Ops();
+	public String getJsonStats();
 
 	/**
-	 * @param customCat1Ops the customCat1Ops to set
+	 * @param jsonStats
 	 */
-	public abstract void setCustomCat1Ops(Integer customCat1Ops);
+	public void setJsonStats(String jsonStats);
 
 	/**
-	 * @return the customCat1Duration
+	 * The host for which this statistic was collected
+	 * 
+	 * @param host
 	 */
-	public abstract Long getCustomCat1Duration();
+	public void setHost(String host);
 
 	/**
-	 * @param customCat1Duration the customCat1Duration to set
+	 * The host for which this statistic was collected
+	 * 
+	 * @return
 	 */
-	public abstract void setCustomCat1Duration(Long customCat1Duration);
+	public String getHost();
 
 	/**
-	 * @return the customCat2Ops
+	 * The instanceId for which this statistic was collected
+	 * 
+	 * @return
 	 */
-	public abstract Integer getCustomCat2Ops();
+	public String getInstanceId();
 
 	/**
-	 * @param customCat2Ops the customCat2Ops to set
+	 * The instanceId for which this statistic was collected
+	 * 
+	 * @param instanceId
 	 */
-	public abstract void setCustomCat2Ops(Integer customCat2Ops);
+	public void setInstanceId(String instanceId);
 
 	/**
-	 * @return the customCat2Duration
-	 */
-	public abstract Long getCustomCat2Duration();
+	 * Not managed by hibernate
+	 * 
+	 * @return
+	 */	
+	public List<TraceStats> getTraceStats();
 
 	/**
-	 * @param customCat2Duration the customCat2Duration to set
+	 * Not managed by hibernate
+	 * 
+	 * @param stats
 	 */
-	public abstract void setCustomCat2Duration(Long customCat2Duration);
+	public void setTraceStats(List<TraceStats> stats);
 
 	/**
-	 * @return the customCat3Ops
+	 * Holds trace statistics
+	 * 
+	 * @author Andrei Pat
+	 *
 	 */
-	public abstract Integer getCustomCat3Ops();
+	public class TraceStats {
 
-	/**
-	 * @param customCat3Ops the customCat3Ops to set
-	 */
-	public abstract void setCustomCat3Ops(Integer customCat3Ops);
+		private String name;
+		private int count;
+		private long duration;
 
-	/**
-	 * @return the customCat3Duration
-	 */
-	public abstract Long getCustomCat3Duration();
+		/**
+		 * 
+		 */
+		public TraceStats() {
+			//NOP
+		}
 
-	/**
-	 * @param customCat3Duration the customCat3Duration to set
-	 */
-	public abstract void setCustomCat3Duration(Long customCat3Duration);
+		/**
+		 * @param name
+		 * @param count
+		 * @param duration
+		 */
+		public TraceStats(String name, int count, long duration) {
+			super();
+			this.name = name;
+			this.count = count;
+			this.duration = duration;
+		}
 
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * @param name
+		 *            the name to set
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * @return the count
+		 */
+		public int getCount() {
+			return count;
+		}
+
+		/**
+		 * @param count
+		 *            the count to set
+		 */
+		public void setCount(int count) {
+			this.count = count;
+		}
+
+		/**
+		 * @return the duration
+		 */
+		public long getDuration() {
+			return duration;
+		}
+
+		/**
+		 * @param duration
+		 *            the duration to set
+		 */
+		public void setDuration(long duration) {
+			this.duration = duration;
+		}
+	}
 }

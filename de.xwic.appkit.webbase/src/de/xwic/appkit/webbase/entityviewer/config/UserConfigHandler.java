@@ -82,7 +82,7 @@ public class UserConfigHandler {
 			
 			try {
 				IPreferenceStore userConfigPrefStore = Platform.getContextPreferenceProvider().getPreferenceStore("de.xwic.appkit.webbase.UserViewConfiguration");
-				int userConfigId = Integer.parseInt(userConfigPrefStore.getString(model.getViewId(), "-1"));
+				long userConfigId = Long.parseLong(userConfigPrefStore.getString(model.getViewId(), "-1"));
 				if (userConfigId > 0) {
 					IUserViewConfiguration uvc = (IUserViewConfiguration) userConfigDao.getEntity(userConfigId);
 					if (uvc != null) {
@@ -374,14 +374,14 @@ public class UserConfigHandler {
 	 * @param currentId
 	 * @return
 	 */
-	public boolean configNameExists(String name, int currentId) {
+	public boolean configNameExists(String name, long currentId) {
 		return userConfigDao.configNameExists(model.getCurrentUser(), model.getEntityClass().getName(), model.getViewId(), name, currentId);
 	}
 	
 	/**
 	 * @param userConfigId
 	 */
-	public void deleteConfig(int id) {
+	public void deleteConfig(long id) {
 		if (id > 0) {
 			IEntity uvc = userConfigDao.getEntity(id);
 			if (uvc != null) {
@@ -559,7 +559,7 @@ public class UserConfigHandler {
 	 * @return
 	 */
 	public boolean isCurrentConfig(IUserViewConfiguration uvc) {
-		int id = mainConfig.getRelatedConfiguration() != null ? mainConfig.getRelatedConfiguration().getId() : mainConfig.getId();		
+		long id = mainConfig.getRelatedConfiguration() != null ? mainConfig.getRelatedConfiguration().getId() : mainConfig.getId();		
 		return id == uvc.getId();
 	}
 

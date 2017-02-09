@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.Anhang" table="ATTACHMENT">
 
-        <id name="id" type="int">
+        <id name="id" type="long">
             <column name="AH_ID" not-null="true"/>
             <generator class="native"/>
         </id>
@@ -21,18 +21,18 @@
         <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
  		
         <property name="dateiName">
-        	<column name="DATEINAME" length="100"/>
+        	<column name="DATEINAME" length="250"/>
         </property>
 
         <property name="dateiGroesse" type="long">
         	<column name="DATEIGROESSE"/>
         </property>
 
-        <property name="fileID" type="int">
+        <property name="fileID" type="long">
         	<column name="FILE_ID"/>
         </property>
 
-        <property name="entityID" type="int">
+        <property name="entityID" type="long">
         	<column name="ENTITY_ID"/>
         </property>
         <property name="entityType">

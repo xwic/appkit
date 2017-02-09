@@ -24,7 +24,9 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.model.daos.ISystemTraceStatisticDAO;
 import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
+import de.xwic.appkit.core.model.entities.ISystemTraceStatistic.TraceStats;
 import de.xwic.appkit.core.trace.ITraceCategory;
 import de.xwic.appkit.core.trace.ITraceContext;
 import de.xwic.appkit.core.trace.ITraceDataManager;
@@ -43,32 +46,51 @@ import de.xwic.appkit.core.trace.ITraceOperation;
 import de.xwic.appkit.core.trace.StackTraceSnapShot;
 
 /**
- * Manages the results of a trace. Ops may be stored if a certain threshold is exceeded 
+ * Manages the results of a trace. Ops may be stored if a certain threshold is exceeded
+ * 
  * @author lippisch
+ */
+/**
+ * @author eugen
+ *
  */
 public class TraceDataManager implements ITraceDataManager {
 
 	protected final Log log = LogFactory.getLog(getClass());
-	
+
 	private boolean logTraceAboveThreshold = false;
 	private long logThreshold = 3000;
 	private File traceLogFile = null;
-	
+
 	private TraceLevel traceLevel = TraceLevel.BASIC;
-	
+
 	private int maxHistory = 2000;
 	private boolean keepHistory = false;
 	private LinkedList<ITraceContext> traceHistory = new LinkedList<ITraceContext>();
-	
-	protected String customCat1Name = null;
-	protected String customCat2Name = null;
-	protected String customCat3Name = null;
-	
-	/* (non-Javadoc)
+
+	private String hostName;
+	private String instanceId;
+	private final List<String> systemTraceLogCategories = new ArrayList<String>();
+	private int[] traceIntervalBuckets = { 0 };
+
+	/**
+	 * 
+	 */
+	public TraceDataManager() {
+		try {
+			hostName = java.net.InetAddress.getLocalHost().getHostName();
+		} catch (Exception e) {
+			log.error("Unable to get hostname", e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceDataManager#handleTraceResult(de.xwic.appkit.core.trace.ITraceContext)
 	 */
 	public void handleTraceResult(ITraceContext traceContext) {
-		
+
 		if (logTraceAboveThreshold && traceContext.getDuration() > logThreshold) {
 			log.info("Trace cycle exceeded threshold: " + traceContext.getDuration());
 			try {
@@ -87,9 +109,9 @@ public class TraceDataManager implements ITraceDataManager {
 				log.error("Error writing trace log file", e);
 
 			}
-			
+
 		}
-		
+
 		if (keepHistory) {
 			// Add an element to the end of the list to keep track of the history.
 			synchronized (traceHistory) {
@@ -98,18 +120,18 @@ public class TraceDataManager implements ITraceDataManager {
 				}
 				traceHistory.add(traceContext);
 			}
-			
+
 		}
-		
+
 	}
 
 	/**
 	 * @param traceContext
 	 */
 	private synchronized void logContext(ITraceContext tx, OutputStream out) {
-		
+
 		if (traceLogFile != null) {
-			
+
 			long start = tx.getStartTime();
 			PrintWriter pw = new PrintWriter(out);
 			pw.println("---------------------------------------------------------------------");
@@ -126,7 +148,7 @@ public class TraceDataManager implements ITraceDataManager {
 			for (String key : attrs.keySet()) {
 				pw.println("   " + key + "=" + attrs.get(key));
 			}
-			if (traceLevel != TraceLevel.BASIC) { 
+			if (traceLevel != TraceLevel.BASIC) {
 				pw.println();
 				Map<String, ITraceCategory> catMap = tx.getTraceCategories();
 				for (String cat : catMap.keySet()) {
@@ -134,14 +156,15 @@ public class TraceDataManager implements ITraceDataManager {
 					pw.println("[ " + cat + " (" + category.getCount() + " op(s) / " + category.getTotalDuration() + "ms)]");
 					if (traceLevel == TraceLevel.DETAILED) {
 						for (ITraceOperation op : category.getTraceOperations()) {
-							pw.println(String.format("# %s [start: %d; end: %d; total: %d ms]", op.getName(), op.getStartTime() - start, op.getEndTime() - start, op.getDuration()));
+							pw.println(String.format("# %s [start: %d; end: %d; total: %d ms]", op.getName(), op.getStartTime() - start,
+									op.getEndTime() - start, op.getDuration()));
 							if (op.getInfo() != null) {
 								pw.println(op.getInfo());
 							}
 						}
 					}
 				}
-				
+
 				List<StackTraceSnapShot> snapShots = tx.getStackTraceSnapShots();
 				if (snapShots.size() > 0) {
 					pw.println();
@@ -163,40 +186,46 @@ public class TraceDataManager implements ITraceDataManager {
 						pw.println("----");
 					}
 				}
-				
-				
+
 			}
 			pw.flush();
 
-			
 		} else {
 			log.warn("Can not log trace details as no traceLogFile is defined.");
 		}
-		
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceDataManager#isLogTraceAboveThreshold()
 	 */
 	public boolean isLogTraceAboveThreshold() {
 		return logTraceAboveThreshold;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceDataManager#setLogTraceAboveThreshold(boolean)
 	 */
 	public void setLogTraceAboveThreshold(boolean logTraceAboveThreshold) {
 		this.logTraceAboveThreshold = logTraceAboveThreshold;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceDataManager#getLogThreshold()
 	 */
 	public long getLogThreshold() {
 		return logThreshold;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.impl.ITraceDataManager#setLogThreshold(long)
 	 */
 	public void setLogThreshold(long logThreshold) {
@@ -211,7 +240,8 @@ public class TraceDataManager implements ITraceDataManager {
 	}
 
 	/**
-	 * @param traceLogFile the traceLogFile to set
+	 * @param traceLogFile
+	 *            the traceLogFile to set
 	 */
 	public void setTraceLogFile(File traceLogFile) {
 		this.traceLogFile = traceLogFile;
@@ -225,7 +255,8 @@ public class TraceDataManager implements ITraceDataManager {
 	}
 
 	/**
-	 * @param traceLevel the traceLevel to set
+	 * @param traceLevel
+	 *            the traceLevel to set
 	 */
 	public void setTraceLevel(TraceLevel traceLevel) {
 		this.traceLevel = traceLevel;
@@ -240,7 +271,8 @@ public class TraceDataManager implements ITraceDataManager {
 	}
 
 	/**
-	 * @param keepHistory the keepHistory to set
+	 * @param keepHistory
+	 *            the keepHistory to set
 	 */
 	@Override
 	public void setKeepHistory(boolean keepHistory) {
@@ -256,11 +288,29 @@ public class TraceDataManager implements ITraceDataManager {
 	}
 
 	/**
-	 * @param maxHistory the maxHistory to set
+	 * @param maxHistory
+	 *            the maxHistory to set
 	 */
 	@Override
 	public void setMaxHistory(int maxHistory) {
 		this.maxHistory = maxHistory;
+	}
+
+	/**
+	 * @return the instance ID
+	 */
+	@Override
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	/**
+	 * @param instanceId
+	 * 			the instance ID to set
+	 */
+	@Override
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
 
 	/**
@@ -275,41 +325,75 @@ public class TraceDataManager implements ITraceDataManager {
 		return temp;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceDataManager#saveSystemTraceStatistic(long)
 	 */
 	@Override
 	public void saveSystemTraceStatistic(long interval) {
-		
-		ISystemTraceStatisticDAO stsDAO =  (ISystemTraceStatisticDAO) DAOSystem.getDAO(ISystemTraceStatisticDAO.class);
+
+		ISystemTraceStatisticDAO stsDAO = DAOSystem.getDAO(ISystemTraceStatisticDAO.class);
 		ISystemTraceStatistic sts = (ISystemTraceStatistic) stsDAO.createEntity();
-		
+
 		List<ITraceContext> history = getTraceHistory();
 		populateSystemTraceStatistic(sts, interval, history);
-		
+
 		stsDAO.update(sts);
-		
+
+	}
+
+	/**
+	 * Add a trace category name to be saved in the system trace log
+	 * 
+	 * @param categoryName
+	 */
+	@Override
+	public void addSystemTraceLogCategory(String categoryName) {
+		systemTraceLogCategories.add(categoryName);
+	}
+
+	/**
+	 * Set a list of intervals in milliseconds for grouping traces.
+	 * 
+	 * Example: setTraceIntervals(1000,5000,10000) will group the traces in 4 intervals: 0 to 1000ms, 1000 to 5000ms, 5000 to 10000ms, and
+	 * over 10000ms
+	 * 
+	 * @param values
+	 */
+	@Override
+	public void setTraceIntervals(int... values) {
+		if (values.length == 0) {
+			return;
+		}
+		//add a 0 to the values
+		traceIntervalBuckets = Arrays.copyOf(values, values.length + 1);
+		Arrays.sort(traceIntervalBuckets);
+
 	}
 
 	/**
 	 * Store statistic data.
+	 * 
 	 * @param sts
-	 * @param history 
+	 * @param history
 	 */
 	protected void populateSystemTraceStatistic(ISystemTraceStatistic sts, long interval, List<ITraceContext> history) {
-		
+
 		Runtime rt = Runtime.getRuntime();
-		long used = rt.totalMemory() - rt.freeMemory();
-		
+		long used = (rt.totalMemory() - rt.freeMemory()) >> 20; //show memory in MB
+
 		sts.setMemoryUsed(used);
-		
-		if (history.size() != 0) {
-			
+		sts.setHost(hostName);
+		sts.setInstanceId(instanceId);
+
+		if (!history.isEmpty()) {
+
 			long max = System.currentTimeMillis() - (interval + 10); // make an "overlap of 10ms"
 			long hisStart = history.get(0).getStartTime();
 			long from = hisStart < max ? max : hisStart;
 			long to = history.get(history.size() - 1).getStartTime();
-			
+
 			sts.setFromDate(new Date(from));
 			if (to >= from) {
 				sts.setToDate(new Date(to));
@@ -319,112 +403,87 @@ public class TraceDataManager implements ITraceDataManager {
 
 			int count = 0;
 			long total = 0;
-			
+
 			int daoOps = 0;
 			long daoDuration = 0;
-			
-			int[] customOps = { 0, 0, 0 };
-			long[] customDur = { 0, 0, 0 };
-			
-			
+
+			List<TraceStats> traceStats = new ArrayList<ISystemTraceStatistic.TraceStats>();
+
+			for (String catName : systemTraceLogCategories) {
+				TraceStats ts = new TraceStats();
+				ts.setName(catName);
+				traceStats.add(ts);
+			}
+
+			LinkedHashMap<Integer, TraceStats> traceIntervals = new LinkedHashMap<Integer, ISystemTraceStatistic.TraceStats>(
+					traceIntervalBuckets.length);
+			for (int x : traceIntervalBuckets) {
+				TraceStats ts = new TraceStats();
+				ts.setName("Duration-" + x);
+				traceIntervals.put(x, ts);
+			}
+
 			for (ITraceContext tx : history) {
 				if (tx.getStartTime() >= from) { // skip older entries
 					count++;
 					total += tx.getDuration();
-					
+					putInIntervalBucket(tx, traceIntervals);
 					ITraceCategory daoCategory = tx.getTraceCategory(DAO.TRACE_CAT);
 					if (daoCategory != null) {
 						daoOps += daoCategory.getCount();
 						daoDuration += daoCategory.getTotalDuration();
 					}
-					
-					if (customCat1Name != null) {
-						countCat(customOps, customDur, 0, customCat1Name, tx);
+
+					for (TraceStats ts : traceStats) {
+						countCat(ts, tx);
 					}
-					if (customCat2Name != null) {
-						countCat(customOps, customDur, 1, customCat2Name, tx);
-					}
-					if (customCat3Name != null) {
-						countCat(customOps, customDur, 2, customCat3Name, tx);
-					}
-					
 				}
 			}
-			
+
 			sts.setResponseCount(count);
 			sts.setTotalResponseTime(total);
 			sts.setAverageResponseTime(count != 0 ? total / count : 0d);
-			
+
 			sts.setTotalDAODuration(daoDuration);
 			sts.setTotalDAOops(daoOps);
-			
-			sts.setCustomCat1Duration(customDur[0]);
-			sts.setCustomCat1Ops(customOps[0]);
-			sts.setCustomCat2Duration(customDur[1]);
-			sts.setCustomCat2Ops(customOps[1]);
-			sts.setCustomCat3Duration(customDur[2]);
-			sts.setCustomCat3Ops(customOps[2]);
-			
+
+			traceStats.addAll(traceIntervals.values());
+			sts.setTraceStats(traceStats);
 		}
-		
-		
 	}
 
 	/**
-	 * @param customOps
-	 * @param customDur
-	 * @param i
-	 * @param tx 
-	 * @param customCat1Name2
+	 * Determine in which of the predefined intervals the trace context duration falls
+	 * 
+	 * @param tx
+	 * @param intervals
 	 */
-	private void countCat(int[] customOps, long[] customDur, int i, String catName, ITraceContext tx) {
-		ITraceCategory tCat = tx.getTraceCategory(catName);
+	private void putInIntervalBucket(ITraceContext tx, Map<Integer, TraceStats> intervals) {
+		int duration = (int) tx.getDuration();
+		int key = 0;
+		for (int x : traceIntervalBuckets) {
+			if (duration >= x) {
+				key = x;
+			} else {
+				break;
+			}
+		}
+		TraceStats bucket = intervals.get(key);
+		if (bucket != null) {
+			bucket.setCount(bucket.getCount() + 1);
+			bucket.setDuration(bucket.getDuration() + duration);
+		}
+	}
+
+	/**
+	 * @param stat
+	 * @param tx
+	 */
+	private void countCat(TraceStats stat, ITraceContext tx) {
+		ITraceCategory tCat = tx.getTraceCategory(stat.getName());
 		if (tCat != null) {
-			customOps[i] += tCat.getCount();
-			customDur[i] += tCat.getTotalDuration();
+			stat.setCount(stat.getCount() + tCat.getCount());
+			stat.setDuration(stat.getDuration() + tCat.getTotalDuration());
 		}
 	}
-
-	/**
-	 * @return the customCat1Name
-	 */
-	public String getCustomCat1Name() {
-		return customCat1Name;
-	}
-
-	/**
-	 * @param customCat1Name the customCat1Name to set
-	 */
-	public void setCustomCat1Name(String customCat1Name) {
-		this.customCat1Name = customCat1Name;
-	}
-
-	/**
-	 * @return the customCat2Name
-	 */
-	public String getCustomCat2Name() {
-		return customCat2Name;
-	}
-
-	/**
-	 * @param customCat2Name the customCat2Name to set
-	 */
-	public void setCustomCat2Name(String customCat2Name) {
-		this.customCat2Name = customCat2Name;
-	}
-
-	/**
-	 * @return the customCat3Name
-	 */
-	public String getCustomCat3Name() {
-		return customCat3Name;
-	}
-
-	/**
-	 * @param customCat3Name the customCat3Name to set
-	 */
-	public void setCustomCat3Name(String customCat3Name) {
-		this.customCat3Name = customCat3Name;
-	}
-	
 }

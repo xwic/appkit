@@ -15,7 +15,7 @@ package de.xwic.appkit.core.util;
  * @author Andrei Pat
  *
  */
-public interface ITypeConverter<T1, T2> {
+public interface IModelViewTypeConverter<M, V> {
 
 	/**
 	 * Converts the first generic type to the second generic type (left)
@@ -23,7 +23,7 @@ public interface ITypeConverter<T1, T2> {
 	 * @param t1
 	 * @return
 	 */
-	public T2 convertLeft(T1 t1);
+	public V convertToViewType(M modelValue);
 
 	/**
 	 * Converts the second generic type to the first generic type (right)
@@ -31,5 +31,5 @@ public interface ITypeConverter<T1, T2> {
 	 * @param t2
 	 * @return
 	 */
-	public T1 convertRight(T2 t2);
+	public M convertToModelType(V viewValue);
 }

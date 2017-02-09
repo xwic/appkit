@@ -26,120 +26,120 @@ public class TraceOperation implements ITraceOperation {
 
 	protected long startTime;
 	protected long endTime = 0;
-	
+
+	private long startDuration;
+	private long endDuration;
+
 	protected String name = null;
 	protected String info = null;
-	
+
 	/**
 	 * Start a new duration based on the current system time.
 	 */
 	public TraceOperation() {
 		startTime = System.currentTimeMillis();
+		startDuration = System.nanoTime();
 	}
-	
+
 	/**
 	 * @param name
 	 */
 	public TraceOperation(String name) {
-		super();
+		this();
 		this.name = name;
-		startTime = System.currentTimeMillis();
 	}
 
-	/**
-	 * @param startTime
-	 * @param endTime
-	 */
-	public TraceOperation(long startTime) {
-		super();
-		this.startTime = startTime;
-	}
-
-	/**
-	 * @param startTime
-	 * @param endTime
-	 */
-	public TraceOperation(long startTime, long endTime) {
-		super();
-		this.startTime = startTime;
-		this.endTime = endTime;
-	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#stop()
 	 */
+	@Override
 	public void finished() {
 		endTime = System.currentTimeMillis();
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.trace.ITraceOperation#setEndTime(long)
-	 */
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.trace.ITraceOperation#getDuration()
-	 */
-	public long getDuration() {
-		if (endTime != 0) {
-			return endTime - startTime;
-		}
-		return System.currentTimeMillis() - startTime;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.trace.ITraceOperation#restart()
-	 */
-	public void restart() {
-		if (endTime != 0) { // already ended
-			
-		}
+		endDuration = System.nanoTime();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.trace.ITraceOperation#getDuration()
+	 */
+	@Override
+	public long getDuration() {
+		long stop = endDuration != 0 ? endDuration : System.nanoTime();
+
+		return (stop - startDuration) / 1000000;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.trace.ITraceOperation#restart()
+	 */
+	@Override
+	public void restart() {
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#getName()
 	 */
+	@Override
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#getInfo()
 	 */
+	@Override
 	public String getInfo() {
 		return info;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#setInfo(java.lang.String)
 	 */
+	@Override
 	public void setInfo(String info) {
 		this.info = info;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#getEndTime()
 	 */
 	@Override
 	public long getEndTime() {
 		return endTime;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.trace.ITraceOperation#getStartTime()
 	 */
 	@Override
 	public long getStartTime() {
 		return startTime;
 	}
-	
+
 }

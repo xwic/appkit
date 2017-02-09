@@ -113,7 +113,7 @@ public class HistorySelectionModel {
 		
 		for (IEntity entity : history) {
 			for (Object obj : getSelectedHisKeys()) {
-				int id = Integer.parseInt(obj.toString());
+				long id = Long.parseLong(obj.toString());
 				if (entity.getId() == id) {
 					entities.add(entity);
 					break;

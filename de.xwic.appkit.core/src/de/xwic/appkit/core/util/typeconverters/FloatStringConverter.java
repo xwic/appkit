@@ -9,7 +9,7 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
+import de.xwic.appkit.core.util.IModelViewTypeConverter;
 
 /**
  * Converts a Float to a String and viceversa
@@ -17,16 +17,9 @@ import de.xwic.appkit.core.util.ITypeConverter;
  * @author Andrei Pat
  *
  */
-public class FloatStringConverter implements ITypeConverter<Float, String> {
+public class FloatStringConverter extends AbstractModelViewConverter<Float, String> {
 
 	public static final FloatStringConverter INSTANCE = new FloatStringConverter();
-
-	/**
-	 * hide constructor
-	 */
-	private FloatStringConverter() {
-
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -34,7 +27,7 @@ public class FloatStringConverter implements ITypeConverter<Float, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertLeft(java.lang.Object)
 	 */
 	@Override
-	public String convertLeft(Float t1) {
+	public String convertToViewType(Float t1) {
 		if (t1 == null) {
 			return null;
 		}
@@ -47,7 +40,7 @@ public class FloatStringConverter implements ITypeConverter<Float, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertRight(java.lang.Object)
 	 */
 	@Override
-	public Float convertRight(String t2) {
+	public Float convertToModelType(String t2) {
 		if (t2 == null) {
 			return null;
 		}

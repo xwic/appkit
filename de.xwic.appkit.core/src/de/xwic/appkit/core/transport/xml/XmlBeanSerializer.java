@@ -294,7 +294,7 @@ public class XmlBeanSerializer {
 				if (pv.isLoaded() && pv.getValue() == null) {
 					value = null;
 				} else {
-					elm.addAttribute("id", Integer.toString(pv.getEntityId()));
+					elm.addAttribute("id", Long.toString(pv.getEntityId()));
 					elm.addAttribute("entityType", ATTRVALUE_TRUE);
 					if (pv.isLoaded()) {
 						value = pv.getValue();
@@ -351,7 +351,7 @@ public class XmlBeanSerializer {
 				elm.addAttribute("key", entry.getKey());
 			}
 			elm.addAttribute("picklistid", entry.getPickliste().getKey());
-			elm.addAttribute("entryid", Integer.toString(entry.getId()));
+			elm.addAttribute("entryid", Long.toString(entry.getId()));
 			elm.addAttribute("langid", "de");
 			elm.setText(entry.getBezeichnung("de")); // use german language in export, as it is most
 														// common
@@ -369,7 +369,7 @@ public class XmlBeanSerializer {
 				}
 
 			}
-			elm.addAttribute("id", Integer.toString(entity.getId()));
+			elm.addAttribute("id", Long.toString(entity.getId()));
 			
 		} else if (value instanceof EntityTransferObject) {
 			EntityTransferObject eto = (EntityTransferObject) value;
@@ -382,7 +382,7 @@ public class XmlBeanSerializer {
 			} catch (ConfigurationException e) {
 				throw new TransportException(e);
 			}
-			elm.addAttribute("id", Integer.toString(eto.getEntityId()));
+			elm.addAttribute("id", Long.toString(eto.getEntityId()));
 
 		} else if (value instanceof Set) {
 			Set<?> set = (Set<?>) value;
@@ -423,7 +423,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 */
 	public Object deserializeBean(Element elm, boolean forceLoadCollection) throws TransportException {
-		Map<EntityKey, Integer> context = new HashMap<EntityKey, Integer>();
+		Map<EntityKey, Long> context = new HashMap<EntityKey, Long>();
 		return deserializeBean(elm, context, forceLoadCollection);
 	}
 	
@@ -443,7 +443,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context) throws TransportException {
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Long> context) throws TransportException {
 		deserializeBean(bean, elm, context, false);
 	}
 
@@ -455,7 +455,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public Object deserializeBean(Element elm, Map<EntityKey, Integer> context, boolean forceLoadCollection) throws TransportException {
+	public Object deserializeBean(Element elm, Map<EntityKey, Long> context, boolean forceLoadCollection) throws TransportException {
 		Element firstElem = (Element) elm.elementIterator().next();
 		if (firstElem != null
 				&& (ELM_LIST.equals(firstElem.getName()) || ELM_SET.equals(firstElem.getName()))) {
@@ -495,7 +495,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Integer> context, boolean forceLoadCollection)
+	public void deserializeBean(Object bean, Element elm, Map<EntityKey, Long> context, boolean forceLoadCollection)
 			throws TransportException {
 		// now read the properties
 		try {
@@ -528,7 +528,7 @@ public class XmlBeanSerializer {
 	 * @throws TransportException
 	 */
 	@SuppressWarnings("unchecked")
-	public Object readValue(Map<EntityKey, Integer> context, Element elProp, PropertyDescriptor pd, boolean forceLoadCollection)
+	public Object readValue(Map<EntityKey, Long> context, Element elProp, PropertyDescriptor pd, boolean forceLoadCollection)
 			throws TransportException {
 
 		// check if value is null
@@ -605,7 +605,7 @@ public class XmlBeanSerializer {
 				String strId = elProp.attributeValue("id");
 
 				if (strId != null && !strId.isEmpty()) {
-					int id = Integer.parseInt(strId);
+					long id = Long.parseLong(strId);
 					entry = plDAO.getPickListEntryByID(id);
 				}
 
@@ -652,12 +652,12 @@ public class XmlBeanSerializer {
 
 		} else if (IEntity.class.isAssignableFrom(type)) {
 			// entity type
-			int refId = Integer.parseInt(elProp.attributeValue("id"));
+			long refId = Long.parseLong(elProp.attributeValue("id"));
 			if (context != null) {
-				Integer newId = context.get(new EntityKey(type.getName(), refId));
+				Long newId = context.get(new EntityKey(type.getName(), refId));
 				if (newId != null) {
 					// its an imported object
-					refId = newId.intValue();
+					refId = newId.longValue();
 				}
 			}
 			DAO<?> refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
@@ -736,7 +736,7 @@ public class XmlBeanSerializer {
 	 * @return
 	 * @throws TransportException
 	 */
-	private Map<?, ?> deserializeMap(final Map<EntityKey, Integer> context, final Element elProp, boolean forceLoadCollection)
+	private Map<?, ?> deserializeMap(final Map<EntityKey, Long> context, final Element elProp, boolean forceLoadCollection)
 			throws TransportException {
 		final Element element = elProp.element(ELM_MAP);
 		if (element == null) {

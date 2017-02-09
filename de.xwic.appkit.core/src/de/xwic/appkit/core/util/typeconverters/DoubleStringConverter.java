@@ -9,24 +9,15 @@
 
 package de.xwic.appkit.core.util.typeconverters;
 
-import de.xwic.appkit.core.util.ITypeConverter;
-
 /**
  * Converts an Double to a String and viceversa
  * 
  * @author Andrei Pat
  *
  */
-public class DoubleStringConverter implements ITypeConverter<Double, String> {
+public class DoubleStringConverter extends AbstractModelViewConverter<Double, String> {
 
 	public static final DoubleStringConverter INSTANCE = new DoubleStringConverter();
-
-	/**
-	 * hide constructor
-	 */
-	private DoubleStringConverter() {
-
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -34,7 +25,7 @@ public class DoubleStringConverter implements ITypeConverter<Double, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertLeft(java.lang.Object)
 	 */
 	@Override
-	public String convertLeft(Double t1) {
+	public String convertToViewType(Double t1) {
 		if (t1 == null) {
 			return null;
 		}
@@ -47,7 +38,7 @@ public class DoubleStringConverter implements ITypeConverter<Double, String> {
 	 * @see de.xwic.appkit.core.util.ITypeConverter#convertRight(java.lang.Object)
 	 */
 	@Override
-	public Double convertRight(String t2) {
+	public Double convertToModelType(String t2) {
 		if (t2 == null) {
 			return null;
 		}

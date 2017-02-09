@@ -17,7 +17,11 @@
 
 package de.xwic.appkit.core.model.entities.impl;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
+import com.google.gson.Gson;
 
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
@@ -29,236 +33,316 @@ import de.xwic.appkit.core.model.entities.ISystemTraceStatistic;
  */
 public class SystemTraceStatistic extends Entity implements ISystemTraceStatistic {
 
+	private String instanceId;
+	private String host;
 	private Date fromDate;
 	private Date toDate;
-	
+
 	private Double averageResponseTime;
 	private Long totalResponseTime;
 	private Integer responseCount;
-	
+
 	private Integer totalDAOops;
 	private Long totalDAODuration;
-	
+
 	private Long memoryUsed;
-	
+
 	private Integer activeUsers;
 	private Integer sessionCount;
 	private Integer totalUsersOnline;
-	
-	private Integer customCat1Ops;
-	private Long customCat1Duration;
 
-	private Integer customCat2Ops;
-	private Long customCat2Duration;
+	//trace stats held in JSON format:
+	//{
+	//  {name:whateverNameYouWant - the name of the category you are tracing
+	//   ops:5  - the number of operations
+	//   duration: 1000 - total duration of the operations
+	//  },
+	//  {name:
+	//   ops:
+	//   duration:
+	//  }
+	//}
+	//
+	private String jsonStats;
 
-	private Integer customCat3Ops;
-	private Long customCat3Duration;
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getFromDate()
 	 */
 	public Date getFromDate() {
 		return fromDate;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setFromDate(java.util.Date)
 	 */
 	public void setFromDate(Date fromDate) {
 		this.fromDate = fromDate;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getToDate()
 	 */
 	public Date getToDate() {
 		return toDate;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setToDate(java.util.Date)
 	 */
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getAverageResponseTime()
 	 */
 	public Double getAverageResponseTime() {
 		return averageResponseTime;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setAverageResponseTime(java.lang.Double)
 	 */
 	public void setAverageResponseTime(Double averageResponseTime) {
 		this.averageResponseTime = averageResponseTime;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getTotalResponseTime()
 	 */
 	public Long getTotalResponseTime() {
 		return totalResponseTime;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setTotalResponseTime(java.lang.Long)
 	 */
 	public void setTotalResponseTime(Long totalResponseTime) {
 		this.totalResponseTime = totalResponseTime;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getResponseCount()
 	 */
 	public Integer getResponseCount() {
 		return responseCount;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setResponseCount(java.lang.Integer)
 	 */
 	public void setResponseCount(Integer responseCount) {
 		this.responseCount = responseCount;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getTotalDAOops()
 	 */
 	public Integer getTotalDAOops() {
 		return totalDAOops;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setTotalDAOops(java.lang.Integer)
 	 */
 	public void setTotalDAOops(Integer totalDAOops) {
 		this.totalDAOops = totalDAOops;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getTotalDAODuration()
 	 */
 	public Long getTotalDAODuration() {
 		return totalDAODuration;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setTotalDAODuration(java.lang.Long)
 	 */
 	public void setTotalDAODuration(Long totalDAODuration) {
 		this.totalDAODuration = totalDAODuration;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getMemoryUsed()
 	 */
 	public Long getMemoryUsed() {
 		return memoryUsed;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setMemoryUsed(java.lang.Long)
 	 */
 	public void setMemoryUsed(Long memoryUsed) {
 		this.memoryUsed = memoryUsed;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getActiveUsers()
 	 */
 	public Integer getActiveUsers() {
 		return activeUsers;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setActiveUsers(java.lang.Integer)
 	 */
 	public void setActiveUsers(Integer activeUsers) {
 		this.activeUsers = activeUsers;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getSessionCount()
 	 */
 	public Integer getSessionCount() {
 		return sessionCount;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setSessionCount(java.lang.Integer)
 	 */
 	public void setSessionCount(Integer sessionCount) {
 		this.sessionCount = sessionCount;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getTotalUsersOnline()
 	 */
 	public Integer getTotalUsersOnline() {
 		return totalUsersOnline;
 	}
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setTotalUsersOnline(java.lang.Integer)
 	 */
 	public void setTotalUsersOnline(Integer totalUsersOnline) {
 		this.totalUsersOnline = totalUsersOnline;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat1Ops()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getHost()
 	 */
-	public Integer getCustomCat1Ops() {
-		return customCat1Ops;
+	@Override
+	public String getHost() {
+		return host;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat1Ops(java.lang.Integer)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setHost(java.lang.String)
 	 */
-	public void setCustomCat1Ops(Integer customCat1Ops) {
-		this.customCat1Ops = customCat1Ops;
+	@Override
+	public void setHost(String host) {
+		this.host = host;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat1Duration()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getInstanceId()
 	 */
-	public Long getCustomCat1Duration() {
-		return customCat1Duration;
+	@Override
+	public String getInstanceId() {
+		return instanceId;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat1Duration(java.lang.Long)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setInstanceId(java.lang.String)
 	 */
-	public void setCustomCat1Duration(Long customCat1Duration) {
-		this.customCat1Duration = customCat1Duration;
+	@Override
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat2Ops()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getJsonStats()
 	 */
-	public Integer getCustomCat2Ops() {
-		return customCat2Ops;
+	@Override
+	public String getJsonStats() {
+		return jsonStats;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat2Ops(java.lang.Integer)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setJsonStats(java.lang.String)
 	 */
-	public void setCustomCat2Ops(Integer customCat2Ops) {
-		this.customCat2Ops = customCat2Ops;
+	@Override
+	public void setJsonStats(String jsonStats) {
+		this.jsonStats = jsonStats;
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat2Duration()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#getTraceStats()
 	 */
-	public Long getCustomCat2Duration() {
-		return customCat2Duration;
+	@Override
+	public List<TraceStats> getTraceStats() {
+		Gson gson = new Gson();
+		return Collections.unmodifiableList(gson.fromJson(jsonStats, List.class));
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat2Duration(java.lang.Long)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.model.entities.ISystemTraceStatistic#setTraceStats(java.util.List)
 	 */
-	public void setCustomCat2Duration(Long customCat2Duration) {
-		this.customCat2Duration = customCat2Duration;
+	@Override
+	public void setTraceStats(List<TraceStats> stats) {
+		Gson gson = new Gson();
+		jsonStats = gson.toJson(stats);
 	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat3Ops()
-	 */
-	public Integer getCustomCat3Ops() {
-		return customCat3Ops;
-	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat3Ops(java.lang.Integer)
-	 */
-	public void setCustomCat3Ops(Integer customCat3Ops) {
-		this.customCat3Ops = customCat3Ops;
-	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#getCustomCat3Duration()
-	 */
-	public Long getCustomCat3Duration() {
-		return customCat3Duration;
-	}
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.model.entities.impl.ISystemTraceStatistic#setCustomCat3Duration(java.lang.Long)
-	 */
-	public void setCustomCat3Duration(Long customCat3Duration) {
-		this.customCat3Duration = customCat3Duration;
-	}
-	
-	
-	
+
 }

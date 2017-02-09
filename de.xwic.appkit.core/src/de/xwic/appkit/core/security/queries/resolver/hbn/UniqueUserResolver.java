@@ -51,7 +51,7 @@ public class UniqueUserResolver implements IEntityQueryResolver {
 		  .append("obj.logonName LIKE ?");
 
 		Query q = session.createQuery(sb.toString());
-		q.setInteger(0, query.getUserId());
+		q.setLong(0, query.getUserId());
 		q.setString(1, query.getUserLogonName());
 		
 		return q;

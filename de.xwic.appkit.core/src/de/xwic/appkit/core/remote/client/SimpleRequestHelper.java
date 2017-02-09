@@ -63,8 +63,8 @@ class SimpleRequestHelper implements IRequestHelper {
 			for (Entry<String, String> entry : param.entrySet()) {
 				urlParametersList.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
 			}
-			entity = new UrlEncodedFormEntity(urlParametersList);
-			entity.setContentType("application/x-www-form-urlencoded");
+			entity = new UrlEncodedFormEntity(urlParametersList, "UTF-8");
+			entity.setContentType("application/x-www-form-urlencoded; charset=UTF-8");
 
 		} catch (Exception e) {
 			throw new RemoteDataAccessException(e);

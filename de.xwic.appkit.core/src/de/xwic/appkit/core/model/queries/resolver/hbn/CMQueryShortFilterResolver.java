@@ -55,11 +55,11 @@ public class CMQueryShortFilterResolver extends QueryResolver {
     	
 		String name = query.getNachname();
 		String vorname = query.getVorname();
-		int einheitID = query.getEinheitPeID();
-		int salesTeamID = query.getSalesTeamID();
+		long einheitID = query.getEinheitPeID();
+		long salesTeamID = query.getSalesTeamID();
 		String logonName = query.getLogonName();
-		int dokID = query.getDokID();
-		int svID = query.getSvID();
+		long dokID = query.getDokID();
+		long svID = query.getSvID();
 		
 		// hide all entries with "ausgeschieden" flag - probably later based upon Query object.
 		sb.append(" AND obj.ausgeschieden = '0'");
@@ -114,10 +114,10 @@ public class CMQueryShortFilterResolver extends QueryResolver {
 			q.setString(pos++, newName);
 		}
 		if (einheitID > 0) {
-			q.setInteger(pos++, einheitID);
+			q.setLong(pos++, einheitID);
 		}
 		if (salesTeamID > 0) {
-			q.setInteger(pos++, salesTeamID);
+			q.setLong(pos++, salesTeamID);
 		}
 		if (logonName != null && logonName.length() > 0) {
 			String newName = logonName.replace('*', '%');
@@ -125,9 +125,9 @@ public class CMQueryShortFilterResolver extends QueryResolver {
 		}
 		
 		if (svID > 0) {
-			q.setInteger(pos++, svID);
+			q.setLong(pos++, svID);
 		} else if (dokID > 0) {
-			q.setInteger(pos++, dokID);
+			q.setLong(pos++, dokID);
 		}
 		
     	return q;

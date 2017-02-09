@@ -92,7 +92,7 @@ public abstract class BaseBrowserView extends ControlContainer {
 			public void elementSelected(ElementSelectedEvent event) {
 				// the key is the id of the object.
 				String key = (String) event.getElement();
-				selectedEntity = getDaoClass().getEntity(Integer.parseInt(key));
+				selectedEntity = getDaoClass().getEntity(Long.parseLong(key));
 				//site.getSelectionService().fireElementSelected(BaseBrowserView.this, selectedEntity);
 			}
 		});

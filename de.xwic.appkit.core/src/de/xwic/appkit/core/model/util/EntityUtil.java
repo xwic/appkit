@@ -48,10 +48,10 @@ public final class EntityUtil {
 	@SuppressWarnings("unchecked")
 	private static final Collection<Class<? extends IEntity>> INVALID_TYPES = Arrays.asList(IEntity.class, IHistory.class);
 
-	public final static Function<IEntity, Integer> ENTITY_ID_EVALUATOR = new Function<IEntity, Integer>() {
+	public final static Function<IEntity, Long> ENTITY_ID_EVALUATOR = new Function<IEntity, Long>() {
 
 		@Override
-		public Integer evaluate(final IEntity obj) {
+		public Long evaluate(final IEntity obj) {
 			return obj.getId();
 		}
 
@@ -61,7 +61,7 @@ public final class EntityUtil {
 	 * @param collection
 	 * @return
 	 */
-	public static <E extends IEntity> Set<Integer> getIds(final Collection<E> collection) {
+	public static <E extends IEntity> Set<Long> getIds(final Collection<E> collection) {
 		return CollectionUtil.createSet(collection, ENTITY_ID_EVALUATOR);
 	}
 
@@ -70,11 +70,11 @@ public final class EntityUtil {
 	 * @param id
 	 * @return
 	 */
-	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Integer id) {
-		if (id == null || id.intValue() == Entities.NEW_ENTITY_ID){
+	public static <E extends IEntity> E getEntity(final Class<E> entityClass, final Long id) {
+		if (id == null || id.longValue() == Entities.NEW_ENTITY_ID){
 			return null;
 		}
-		return findDAOforEntity(entityClass).getEntity(id.intValue());
+		return findDAOforEntity(entityClass).getEntity(id.longValue());
 	}
 
 	/**
@@ -82,8 +82,8 @@ public final class EntityUtil {
 	 * @param id
 	 * @return
 	 */
-	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Integer id) {
-		if (id == null || id.intValue() < Entities.LOWEST_POSSIBLE_ID) {
+	public static <E extends IEntity> E getOrCreateEntity(final Class<E> entityClass, final Long id) {
+		if (id == null || id.longValue() < Entities.LOWEST_POSSIBLE_ID) {
 			return createEntity(entityClass);
 		}
 		return getEntity(entityClass, id);
@@ -145,7 +145,7 @@ public final class EntityUtil {
 	 * @param ids
 	 * @return
 	 */
-	public static <E extends IEntity> List<E> getEntities(final Class<E> entityClass, final Collection<Integer> ids) {
+	public static <E extends IEntity> List<E> getEntities(final Class<E> entityClass, final Collection<Long> ids) {
 		if (CollectionUtil.isEmpty(ids)) {
 			return Collections.emptyList();
 		}

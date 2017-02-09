@@ -32,9 +32,9 @@ import de.xwic.appkit.core.dao.Limit;
  */
 public class EntityContentProvider implements IContentProvider<RowData> {
 
-	private DAO dao;
-	private final EntityTableModel model;
-	private int lastTotal = 0;
+	protected DAO dao;
+	protected final EntityTableModel model;
+	protected int lastTotal = 0;
 
 	/**
 	 * @param dao

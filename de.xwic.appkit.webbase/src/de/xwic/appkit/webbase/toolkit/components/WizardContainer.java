@@ -61,20 +61,20 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	protected Button btFinish;
 	protected Button btAbort;
 	
-	private Label lblPageTitle;
-	private Label lblPageSubTitle;
+	protected Label lblPageTitle;
+	protected Label lblPageSubTitle;
 	
-	private ErrorWarning errorWarning;
+	protected ErrorWarning errorWarning;
 	
-	private StackedContainer pages;
+	protected StackedContainer pages;
 	
-	private W wizard;
-	private WP currentPage;
+	protected W wizard;
+	protected WP currentPage;
+	
+	protected InnerPage innerPage;
 	
 	private Map pageMap = new HashMap();
 
-	
-	
 	public WizardContainer(IControlContainer parent, W wizard) {
 		this.parent = parent;
 		this.wizard = wizard;
@@ -174,17 +174,17 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 
 		new Messages(container.getSessionContext().getLocale(), "de.jwic.controls.wizard.messages");
 		
-		InnerPage win = new InnerPage(container, null);
-		win.setTitle(wizard.getTitle());
+		this.innerPage = new InnerPage(container, null);
+		innerPage.setTitle(wizard.getTitle());
 
-		if(wizard.getWidth() > 0){
-			win.setMaxWidth(wizard.getWidth());
-		}else {
+		if (wizard.getWidth() > 0) {
+			innerPage.setMaxWidth(wizard.getWidth());
+		} else {
 			// default width
-			win.setMaxWidth(900);
+			innerPage.setMaxWidth(900);
 		}
 		
-		ControlContainer winContainer = new ControlContainer(win);
+		ControlContainer winContainer = new ControlContainer(innerPage);
 		winContainer.setTemplateName(getContainerTemplate());
 		
 		lblPageTitle = new Label(winContainer, "lblPageTitle");
@@ -309,7 +309,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 		
 	}
 
-	private String validationExceptionToString(ValidationException ve) {
+	protected String validationExceptionToString(ValidationException ve) {
 		
 		StringBuffer excString = new StringBuffer();
 		
@@ -369,6 +369,7 @@ public class WizardContainer<WP extends WizardPage, W extends AbstractWizard<WP>
 	 * @version $Revision: 1.1 $
 	 */
 	private class NavigationController implements SelectionListener {
+		@Override
 		public void objectSelected(SelectionEvent event) {
 			if (event.getEventSource() == btBack) {
 				performBack();

@@ -282,7 +282,7 @@ public class XmlExport {
 			IPickliste pl = (IPickliste)it.next();
 			Element elPl = data.addElement("pickliste");
 			elPl.addAttribute("key", pl.getKey());
-			elPl.addAttribute("id", Integer.toString(pl.getId()));
+			elPl.addAttribute("id", Long.toString(pl.getId()));
 			elPl.addAttribute("version", Long.toString(pl.getVersion()));
 			if (pl.isDeleted()) {
 				elPl.addAttribute("deleted", "1");
@@ -298,7 +298,7 @@ public class XmlExport {
 				IPicklistEntry entry = (IPicklistEntry)itE.next();
 				if (!entry.isDeleted()) {
 					Element elEntry = elEntries.addElement("entry");
-					elEntry.addAttribute("id", Integer.toString(entry.getId()));
+					elEntry.addAttribute("id", Long.toString(entry.getId()));
 					elEntry.addAttribute("version", Long.toString(entry.getVersion()));
 					if (entry.isDeleted()) {
 						elEntry.addAttribute("deleted", "1");
@@ -315,7 +315,7 @@ public class XmlExport {
 						IPicklistText pt = dao.getPicklistText(entry, language.getId());
 						if (pt != null) {
 							Element elText = elEntry.addElement("text");
-							elText.addAttribute("id", Integer.toString(pt.getId()));
+							elText.addAttribute("id", Long.toString(pt.getId()));
 							elText.addAttribute("version", Long.toString(pt.getVersion()));
 							elText.addAttribute("lang", pt.getLanguageID());
 							if (pt.getBeschreibung() != null && pt.getBeschreibung().length() != 0) {
@@ -370,7 +370,7 @@ public class XmlExport {
 		
 		try {
 			Element elm = entities.addElement(ELM_ENTITY);
-			elm.addAttribute("id", Integer.toString(entity.getId()));
+			elm.addAttribute("id", Long.toString(entity.getId()));
 			
 			for (Iterator<String> it = descr.getProperties().keySet().iterator(); it.hasNext(); ) {
 				
@@ -431,14 +431,14 @@ public class XmlExport {
 				elm.addAttribute("key", entry.getKey());
 			}
 			elm.addAttribute("picklistid", entry.getPickliste().getKey());
-			elm.addAttribute("entryid", Integer.toString(entry.getId()));
+			elm.addAttribute("entryid", Long.toString(entry.getId()));
 			elm.addAttribute("langid", "de");
 			elm.setText(entry.getBezeichnung("de")); // use german language in export, as it is most common
 
 		} else if (value instanceof IEntity) {
 			IEntity entity = (IEntity)value;
 			typeInfo = entity.type().getName();
-			elm.addAttribute("id", Integer.toString(entity.getId()));
+			elm.addAttribute("id", Long.toString(entity.getId()));
 			DAO dao = DAOSystem.findDAOforEntity(entity.type());
 			elm.setText(dao.buildTitle(entity));
 			

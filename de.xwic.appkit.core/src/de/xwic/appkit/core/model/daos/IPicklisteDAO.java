@@ -7,12 +7,12 @@
  *
  * 		http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software 
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and 
+ * See the License for the specific language governing permissions and
  * limitations under the License.
- *  
+ *
  *******************************************************************************/
 /*
  * de.xwic.appkit.core.model.daos.IPicklisteDAO
@@ -24,8 +24,8 @@ package de.xwic.appkit.core.model.daos;
 import java.util.Collection;
 import java.util.Set;
 
-import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityList;
+import de.xwic.appkit.core.dao.event.DAOWithEvent;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 import de.xwic.appkit.core.model.entities.IPicklistText;
 import de.xwic.appkit.core.model.entities.IPickliste;
@@ -37,7 +37,7 @@ import de.xwic.appkit.core.model.entities.IPickliste;
  *
  * @author Florian Lippisch
  */
-public interface IPicklisteDAO extends DAO<IPickliste> {
+public interface IPicklisteDAO extends DAOWithEvent<IPickliste> {
 
 	/**
  	 * Create a new IPickliste instance. <p>
@@ -108,20 +108,20 @@ public interface IPicklisteDAO extends DAO<IPickliste> {
      * @param id
      * @return IPicklistEntry
      */
-    public IPicklistEntry getPickListEntryByID(int id);
+    public IPicklistEntry getPickListEntryByID(long id);
 
     /**
      * @param id
      * @return
      */
-    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Integer> id);
+    Set<IPicklistEntry> getPicklistEntriesByID(Collection<Long> id);
 
     /**
      * Returns the picklistText object with the specified id.
      * @param id
      * @return
      */
-    public IPicklistText getPickListTextByID(int id);
+    public IPicklistText getPickListTextByID(long id);
 
     /**
      * Get a Pickliste from the database by the given key. <p>

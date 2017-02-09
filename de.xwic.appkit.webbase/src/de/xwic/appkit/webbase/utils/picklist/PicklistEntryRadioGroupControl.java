@@ -38,7 +38,7 @@ public class PicklistEntryRadioGroupControl extends RadioGroup implements IPickl
 
 	private String lang = "DE";
 
-	private Map<Integer, IPicklistEntry> entries;
+	private Map<Long, IPicklistEntry> entries;
 
 	private IPicklisteDAO plDao = null;
 	private String picklistKey = null;
@@ -81,11 +81,11 @@ public class PicklistEntryRadioGroupControl extends RadioGroup implements IPickl
 		List<IPicklistEntry> entryList = plDao.getAllEntriesToList(picklistKey);
 
 		if (null != entryList) {
-			entries = new HashMap<Integer, IPicklistEntry>();
+			entries = new HashMap<Long, IPicklistEntry>();
 			for (Iterator<IPicklistEntry> it = entryList.iterator(); it.hasNext();) {
 				IPicklistEntry entry = (IPicklistEntry) it.next();
 				if (!entry.isVeraltet()) {
-					entries.put(new Integer(entry.getId()), entry);
+					entries.put(new Long(entry.getId()), entry);
 				}
 			}
 			// sort the list
@@ -95,7 +95,7 @@ public class PicklistEntryRadioGroupControl extends RadioGroup implements IPickl
 			for (int i = 0; i < entryList.size(); i++) {
 				IPicklistEntry entry = (IPicklistEntry) entryList.get(i);
 				if (!entry.isVeraltet()) {
-					addElement(entry.getBezeichnung(lang), Integer.toString(entry.getId()));
+					addElement(entry.getBezeichnung(lang), Long.toString(entry.getId()));
 				}
 			}
 		}
@@ -110,14 +110,14 @@ public class PicklistEntryRadioGroupControl extends RadioGroup implements IPickl
 		if (null != entries && null != pEntry) {
 			boolean found = false;
 
-			if (entries.containsKey(new Integer(pEntry.getId()))) {
+			if (entries.containsKey(new Long(pEntry.getId()))) {
 				found = true;
-				setSelectedKey(Integer.toString(pEntry.getId()));
+				setSelectedKey(Long.toString(pEntry.getId()));
 			}
 
 			if (!found && pEntry.isVeraltet()) {
-				entries.put(new Integer(pEntry.getId()), pEntry);
-				addElement("[" + pEntry.getBezeichnung(lang) + "]", Integer.toString(pEntry.getId()));
+				entries.put(new Long(pEntry.getId()), pEntry);
+				addElement("[" + pEntry.getBezeichnung(lang) + "]", Long.toString(pEntry.getId()));
 				setSelectedKey(Integer.toString(entries.size() - 1));
 			}
 
@@ -152,11 +152,11 @@ public class PicklistEntryRadioGroupControl extends RadioGroup implements IPickl
 			return null;
 		}
 
-		int i = Integer.parseInt(getSelectedKey());
+		long l = Long.parseLong(getSelectedKey());
 
 		if (null != entries) {
-			if (entries.containsKey(new Integer(i))) {
-				IPicklistEntry entry = (IPicklistEntry) entries.get(new Integer(i));
+			if (entries.containsKey(new Long(l))) {
+				IPicklistEntry entry = (IPicklistEntry) entries.get(new Long(l));
 				return entry;
 			}
 		}

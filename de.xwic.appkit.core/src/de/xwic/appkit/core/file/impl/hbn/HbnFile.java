@@ -24,7 +24,7 @@ import java.sql.Blob;
  */
 public class HbnFile {
 	
-	private int id = 0;
+	private long id = 0;
 	private String filename = null;
 	private String contentType = null;
 	private long filesize = 0;
@@ -70,13 +70,13 @@ public class HbnFile {
 	/**
 	 * @return Returns the id.
 	 */
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 	/**
 	 * @param id The id to set.
 	 */
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 	/**

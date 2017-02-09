@@ -111,12 +111,7 @@ public class TraceTrapAgent implements Runnable {
 					log.error("Error during trace trap", t);
 				}
 				
-			}
-			
-		}
-		
+			}			
+		}		
 	}
-
-
-
 }

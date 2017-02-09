@@ -23,7 +23,7 @@ public interface IAttachmentWrapper {
 
 	public abstract boolean isDeleted();
 
-	public abstract int getFileId();
+	public abstract long getFileId();
 
 	public abstract String getFileName();
 
@@ -33,7 +33,7 @@ public interface IAttachmentWrapper {
 	
 	public abstract long getContentLength();
 
-	public abstract int getEntityId();
+	public abstract long getEntityId();
 
 	public abstract String getEntityType();
 
@@ -51,7 +51,7 @@ public interface IAttachmentWrapper {
 
 	public abstract void setContentType(String contentType);
 
-	public void setFileId(int fileId);
+	public void setFileId(long fileId);
 	
 	public void setDeleted(boolean deleted);
 

@@ -34,7 +34,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFile(java.lang.String)
 	 */
 	@Override
-	public final int storeFile(final String filename) throws DataAccessException {
+	public final long storeFile(final String filename) throws DataAccessException {
 		try {
 			File file = new File(filename);
 			if (!file.exists()) {
@@ -53,7 +53,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	protected abstract int storeFile(File file) throws IOException;
+	protected abstract long storeFile(File file) throws IOException;
 
 	/**
 	 * @param filename
@@ -67,7 +67,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 * @see de.xwic.appkit.core.dao.IFileHandler#loadFile(int, java.lang.String)
 	 */
 	@Override
-	public File loadFile(final int id, final String destination) throws DataAccessException {
+	public File loadFile(final long id, final String destination) throws DataAccessException {
 		throw new DataAccessException("This method is not supported on the server.");
 	}
 
@@ -75,7 +75,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 * @see de.xwic.appkit.core.dao.IFileHandler#storeFileInUC(java.lang.String)
 	 */
 	@Override
-	public int storeFileInUC(final String fileName) throws DataAccessException {
+	public long storeFileInUC(final String fileName) throws DataAccessException {
 		return storeFile(fileName);
 	}
 
@@ -83,7 +83,7 @@ public abstract class RemoteFileDAO implements IFileHandler {
 	 * @see de.xwic.appkit.core.dao.IFileHandler#deleteFileInUC(int)
 	 */
 	@Override
-	public void deleteFileInUC(final int id) {
+	public void deleteFileInUC(final long id) {
 		deleteFile(id);
 	}
 }

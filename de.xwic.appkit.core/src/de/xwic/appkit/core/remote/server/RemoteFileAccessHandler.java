@@ -120,7 +120,7 @@ public class RemoteFileAccessHandler implements IRequestHandler {
 			}
 			out = new FileOutputStream(file);
 			IOUtils.copy(in, out);
-			int storeFile = DAOSystem.getFileHandler().storeFile(newFilePath);
+			long storeFile = DAOSystem.getFileHandler().storeFile(newFilePath);
 			PrintWriter pwOut = resp.getWriter();
 			pwOut.write(String.valueOf(storeFile));
 			pwOut.close();

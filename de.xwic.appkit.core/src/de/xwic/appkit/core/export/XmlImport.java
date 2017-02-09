@@ -63,7 +63,7 @@ import de.xwic.appkit.core.model.util.ServerConfig;
  */
 public class XmlImport {
 
-	private Map<EntityKey, Integer> importedEntities = new HashMap<EntityKey, Integer>();
+	private Map<EntityKey, Long> importedEntities = new HashMap<EntityKey, Long>();
 	
 	private Element elmData = null;
 	private Iterator<?> itRead = null;
@@ -119,7 +119,7 @@ public class XmlImport {
 				Pickliste pickliste = new Pickliste();
 				
 				pickliste.setKey(key);
-				pickliste.setId(Integer.parseInt(id));
+				pickliste.setId(Long.parseLong(id));
 				pickliste.setVersion(Long.parseLong(version));
 				
 				Element elBeschr = elPl.element("beschreibung");
@@ -143,7 +143,7 @@ public class XmlImport {
 							PicklistEntry entry = new PicklistEntry();
 							String peId = elEntry.attributeValue("id");
 							String peVersion = elEntry.attributeValue("version");
-							entry.setId(Integer.parseInt(peId));
+							entry.setId(Long.parseLong(peId));
 							entry.setVersion(Long.parseLong(peVersion));
 							entry.setPickliste(pickliste);
 							entry.setPickTextValues(new HashSet<IPicklistText>());
@@ -167,7 +167,7 @@ public class XmlImport {
 								String description = elText.attributeValue("description");
 								
 								PicklistText pt = new PicklistText();
-								pt.setId(Integer.parseInt(ptId));
+								pt.setId(Long.parseLong(ptId));
 								pt.setVersion(Long.parseLong(ptVersion));
 								pt.setLanguageID(langId);
 								pt.setBezeichnung(elText.getTextTrim());
@@ -374,7 +374,7 @@ public class XmlImport {
 							IPicklistEntry entry = dao.createPickListEntry(pickliste);
 							String oldId = elEntry.attributeValue("id");
 							if (oldId != null) {
-								importedEntities.put(new EntityKey(IPicklistEntry.class.getName(), Integer.parseInt(oldId)), new Integer(entry.getId()));
+								importedEntities.put(new EntityKey(IPicklistEntry.class.getName(), Long.parseLong(oldId)), new Long(entry.getId()));
 							}
 							boolean modified = false;
 							if (elEntry.attributeValue("key") != null) {
@@ -432,13 +432,13 @@ public class XmlImport {
 		for (Iterator<?> it = elEntities.elementIterator(XmlExport.ELM_ENTITY); it.hasNext(); ) {
 			
 			Element elEntity = (Element)it.next();
-			int id = Integer.parseInt(elEntity.attributeValue("id"));
+			long id = Long.parseLong(elEntity.attributeValue("id"));
 			
 			IEntity entity = dao.createEntity();
 			readEntityProperties(descr, elEntity, entity);
 			
 			dao.update(entity);
-			importedEntities.put(new EntityKey(type, id), new Integer(entity.getId()));
+			importedEntities.put(new EntityKey(type, id), new Long(entity.getId()));
 			//System.out.println((count++) + " imp " + type + " id: "+ id + " as " + entity.getId());
 			count++;
 		}
@@ -494,12 +494,12 @@ public class XmlImport {
 				for (Iterator<?> itSet = elSet.elementIterator(XmlExport.ELM_ELEMENT); itSet.hasNext(); ) {
 					Element elSetElement = (Element)itSet.next();
 					String typeElement = elSetElement.attributeValue("type");
-					int refId = Integer.parseInt(elSetElement.getText());
+					long refId = Long.parseLong(elSetElement.getText());
 
-					Integer newId = importedEntities.get(new EntityKey(typeElement, refId));
+					Long newId = importedEntities.get(new EntityKey(typeElement, refId));
 					if (newId != null) {
 						// its an imported object
-						refId = newId.intValue();
+						refId = newId.longValue();
 					}
 					DAO refDAO = DAOSystem.findDAOforEntity(typeElement);
 					IEntity refEntity = refDAO.getEntity(refId);
@@ -556,11 +556,11 @@ public class XmlImport {
 				
 			} else if (IEntity.class.isAssignableFrom(type)){
 				// entity type
-				int refId = Integer.parseInt(elProp.attributeValue("id"));
-				Integer newId = importedEntities.get(new EntityKey(type.getName(), refId));
+				long refId = Long.parseLong(elProp.attributeValue("id"));
+				Long newId = importedEntities.get(new EntityKey(type.getName(), refId));
 				if (newId != null) {
 					// its an imported object
-					refId = newId.intValue();
+					refId = newId.longValue();
 				}
 				DAO refDAO = DAOSystem.findDAOforEntity((Class<? extends IEntity>) type);
 				IEntity refEntity = refDAO.getEntity(refId);

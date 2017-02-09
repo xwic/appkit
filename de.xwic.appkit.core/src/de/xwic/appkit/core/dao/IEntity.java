@@ -34,13 +34,13 @@ public interface IEntity {
      * Returns the unique ID that identifies the object of the specified type.
      * @return
      */
-    public int getId();
+    public long getId();
     
     /**
      * Set the unique ID of the objecft. 
      * @param id
      */
-    public void setId(int id);
+    public void setId(long id);
     
     /**
      * @return Returns the changed.

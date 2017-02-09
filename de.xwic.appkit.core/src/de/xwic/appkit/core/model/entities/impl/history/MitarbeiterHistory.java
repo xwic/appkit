@@ -26,7 +26,7 @@ import de.xwic.appkit.core.model.entities.impl.MitarbeiterBase;
 public class MitarbeiterHistory extends MitarbeiterBase implements IMitarbeiter, IHistory {
 
 	private int historyReason = 0;
-	private int entityID = 0;
+	private long entityID = 0L;
 	private long entityVersion = 0;
 	
 	
@@ -47,14 +47,14 @@ public class MitarbeiterHistory extends MitarbeiterBase implements IMitarbeiter,
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IHistory#getEntityID()
 	 */
-	public int getEntityID() {
+	public long getEntityID() {
 		return entityID;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.IHistory#setEntityID(int)
 	 */
-	public void setEntityID(int id) {
+	public void setEntityID(long id) {
 		this.entityID = id;
 	}
 

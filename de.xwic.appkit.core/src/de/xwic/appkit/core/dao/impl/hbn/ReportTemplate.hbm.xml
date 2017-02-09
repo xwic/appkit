@@ -7,7 +7,7 @@
 
     <class name="de.xwic.appkit.core.model.entities.impl.ReportTemplate" table="REPORT_TEMPLATE">
     
-            <id name="id" type="int">
+            <id name="id" type="long">
             <column name="RT_ID" not-null="true"/>
             <generator class="native"/>
         </id>
