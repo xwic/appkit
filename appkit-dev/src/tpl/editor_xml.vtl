@@ -32,7 +32,7 @@
 #elseif ($prop.type == "IPicklistEntry")
 					<plCombo property="$prop.name" template="field"/>
 #elseif ($prop.type == "Integer" || $prop.type == "int" || $prop.type == "Long" || $prop.type == "long")
-					<number property="$prop.name" template="field" format="integer"/>
+					<number property="$prop.name" template="field" format="long"/>
 #elseif ($prop.type == "Double" || $prop.type == "double" || $prop.type == "Float" || $prop.type == "float")
 					<number property="$prop.name" template="field" format="double"/>
 #elseif ($prop.type == "Date")
