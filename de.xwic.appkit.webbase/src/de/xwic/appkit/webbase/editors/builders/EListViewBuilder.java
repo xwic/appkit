@@ -18,6 +18,7 @@ package de.xwic.appkit.webbase.editors.builders;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
+import de.jwic.base.Page;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.editor.EListView;
 import de.xwic.appkit.core.config.model.Property;
@@ -52,7 +53,8 @@ public class EListViewBuilder extends Builder<EListView> {
 			entityListViewConfiguration.setBaseFilter(query);
 			
 			EntityListView listView = new EntityListView(parent, entityListViewConfiguration);
-			
+			Page page = Page.findPage((IControl)parent);
+			listView.setHeightDecrease(page.getPageSize().getHeight() / 2);
 			context.registerField(null, listView, element, ListViewMapper.MAPPER_ID);
 
 			return listView;

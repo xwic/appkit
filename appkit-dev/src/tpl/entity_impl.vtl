@@ -30,6 +30,7 @@ public class ${entity.name} extends Entity implements I${entity.name}  {
 	/**
 	 * Returns the value of ${prop.name}.
 	 */
+	@Override
 	public $prop.resolvedType ${prop.nameGetter}() {
 		return $prop.name;
 	}
@@ -37,6 +38,7 @@ public class ${entity.name} extends Entity implements I${entity.name}  {
 	/**
 	 * Set value for ${prop.name}.
 	 */
+	@Override
 	public void ${prop.nameSetter}($prop.resolvedType $prop.name) {
 		this.${prop.name} = ${prop.name};
 	}
