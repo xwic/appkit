@@ -70,7 +70,7 @@ public class PropertyQueryTest {
 		{
 			final List<QueryElement> values = new ArrayList<QueryElement>();
 			final PropertyQuery pq = new PropertyQuery();
-			final List<Integer> ids = Arrays.asList(1, 2, 3, 4, 5);
+			final List<Long> ids = Arrays.asList(1L, 2L, 3L, 4L, 5L);
 			pq.addIn("id", ids);
 
 			final String expectedQuery = BASIC_QUERY + "AND obj.id IN (?,?,?,?,?) ";
@@ -134,9 +134,9 @@ public class PropertyQueryTest {
 			assertSame(2, values.size());
 
 //			test arguments
-			final Set<Integer> ints = new HashSet<Integer>();
+			final Set<Long> ints = new HashSet<Long>();
 			for (final QueryElement integer : values) {
-				ints.addAll((Collection<Integer>) integer.getValue());
+				ints.addAll((Collection<Long>) integer.getValue());
 			}
 			assertEquals(cloneToSet(ids), ints);
 		}
