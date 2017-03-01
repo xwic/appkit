@@ -208,10 +208,10 @@ public class PropertyQueryTest {
 	@Test
 	public void testEntityEquals() {
 		final PropertyQuery pq = new PropertyQuery();
-		pq.addEquals("supervisor.id", 10);
+		pq.addEquals("supervisor.id", 10L);
 
 		final Entity supervisor = new Entity();
-		supervisor.setId(20);
+		supervisor.setId(20L);
 		pq.addEquals("supervisor", supervisor);
 
 		final List<QueryElement> values = new ArrayList<QueryElement>();
