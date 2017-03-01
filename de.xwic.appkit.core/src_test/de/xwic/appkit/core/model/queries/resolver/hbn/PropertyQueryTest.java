@@ -79,9 +79,9 @@ public class PropertyQueryTest {
 
 //			test arguments
 			assertSame(1, values.size());
-			final Set<Integer> ints = new HashSet<Integer>();
+			final Set<Long> ints = new HashSet<Long>();
 			for (final QueryElement integer : values) {
-				ints.addAll((Collection<Integer>) integer.getValue());
+				ints.addAll((Collection<Long>) integer.getValue());
 			}
 			assertEquals(cloneToSet(ids), ints);
 		}
@@ -89,7 +89,7 @@ public class PropertyQueryTest {
 		{
 			final List<QueryElement> values = new ArrayList<QueryElement>();
 			final PropertyQuery pq = new PropertyQuery();
-			final List<Integer> ids = countTo(1001);
+			final List<Long> ids = countTo(1001L);
 			pq.addIn("id", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
@@ -101,9 +101,9 @@ public class PropertyQueryTest {
 			assertSame(2, values.size());
 
 //			test arguments
-			final Set<Integer> ints = new HashSet<Integer>();
+			final Set<Long> ints = new HashSet<Long>();
 			for (final QueryElement integer : values) {
-				ints.addAll((Collection<Integer>) integer.getValue());
+				ints.addAll((Collection<Long>) integer.getValue());
 			}
 			assertEquals(cloneToSet(ids), ints);
 		}
@@ -122,7 +122,7 @@ public class PropertyQueryTest {
 		{
 			final List<QueryElement> values = new ArrayList<QueryElement>();
 			final PropertyQuery pq = new PropertyQuery();
-			final List<Integer> ids = countTo(1001);
+			final List<Long> ids = countTo(1001L);
 			pq.addNotIn("comfortLevel", ids);
 
 			final String thousandQs = StringUtils.join(Collections.nCopies(1000, '?'), ',');
@@ -146,9 +146,9 @@ public class PropertyQueryTest {
 	 * @param to
 	 * @return
 	 */
-	private static List<Integer> countTo(final int to) {
-		final List<Integer> ids = new ArrayList<Integer>();
-		for (int i = 0; i < to; i++) {
+	private static List<Long> countTo(final long to) {
+		final List<Long> ids = new ArrayList<Long>();
+		for (long i = 0; i < to; i++) {
 			ids.add(i);
 		}
 		return ids;
