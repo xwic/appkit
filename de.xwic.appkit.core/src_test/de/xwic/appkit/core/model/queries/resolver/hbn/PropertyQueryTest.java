@@ -221,8 +221,8 @@ public class PropertyQueryTest {
 		printQuery(expected);
 
 		for (final QueryElement queryElement : values) {
-			final int id = ((Integer) queryElement.getValue()).intValue();
-			assertTrue(id == 10 || id == 20);
+			final long id = ((Long) queryElement.getValue()).longValue();
+			assertTrue(id == 10L || id == 20L);
 		}
 	}
 
