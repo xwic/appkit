@@ -132,5 +132,13 @@ public class ImageLibrary {
     
     public static final ImageRef ICON_PAGE_OPEN = new ImageRef("icons/page_white_magnify.png");
     public static final ImageRef ICON_PAGE_OPEN_INACTIVE = new ImageRef("icons/page_white_magnify_i.png");
-	
+
+    public static final ImageRef FILEICON_M_GENERAL = new ImageRef("appkit/file_general_m.png");
+    public static final ImageRef FILEICON_M_PDF = new ImageRef("appkit/file_pdf_m.png");
+    public static final ImageRef FILEICON_M_XLS = new ImageRef("appkit/file_xls_m.png");
+    public static final ImageRef FILEICON_M_DOC = new ImageRef("appkit/file_doc_m.png");
+    public static final ImageRef FILEICON_M_PPT = new ImageRef("appkit/file_ppt_m.png");
+    public static final ImageRef FILEICON_M_ZIP = new ImageRef("appkit/file_zip_m.png");
+    public static final ImageRef FILEICON_M_IMG = new ImageRef("appkit/file_img_m.png");
+
 }
