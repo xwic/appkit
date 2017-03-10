@@ -1,6 +1,17 @@
-
+#set($hasDate = "0")
+#set($hasMitarbeiter = 0)
+#foreach($prop in $entity.properties)
+#if($prop.type == "Date")#set($hasDate = "1")#end
+#if($prop.type == "Mitarbeiter")#set($hasMitarbeiter = "1")#end
+#end
 package ${package}.entities;
 
+#if($hasDate == "1")
+import java.util.Date;
+#end
+#if($hasMitarbeiter == "1")
+import de.xwic.appkit.core.model.entities.IMitarbeiter;
+#end
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
@@ -21,10 +32,10 @@ public interface I${entity.name} extends IEntity {
 #else
 	#set($pid = $prop.picklistId)
 #end
-	public final static String PL_${pid.toUpperCase().replace(".", "_")} = "${pid}";
+	public final static String PL_${pid.toUpperCase().replace(".", "_").replace("-", "_")} = "${pid}";
 #foreach($pe in $prop.picklistEntries)
 #if($!pe.key != "")
-	public final static String PE_${pid.toUpperCase().replace(".", "_")}_${pe.key.toUpperCase()} = "$pe.key";
+	public final static String PE_${pid.toUpperCase().replace(".", "_").replace("-", "_")}_${pe.key.toUpperCase().replace(".", "_").replace("-", "_")} = "$pe.key";
 #end
 #end
 #end

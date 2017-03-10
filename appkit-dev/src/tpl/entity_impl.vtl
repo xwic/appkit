@@ -1,6 +1,18 @@
+#set($hasDate = "0")
+#set($hasMitarbeiter = 0)
+#foreach($prop in $entity.properties)
+#if($prop.type == "Date")#set($hasDate = "1")#end
+#if($prop.type == "Mitarbeiter")#set($hasMitarbeiter = "1")#end
+#end
 
 package ${package}.entities.impl;
 
+#if($hasDate == "1")
+import java.util.Date;
+#end
+#if($hasMitarbeiter == "1")
+import de.xwic.appkit.core.model.entities.IMitarbeiter;
+#end
 import ${package}.entities.*;
 import de.xwic.appkit.core.dao.Entity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
