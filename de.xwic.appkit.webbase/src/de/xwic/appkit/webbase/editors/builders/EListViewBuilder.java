@@ -88,6 +88,10 @@ public class EListViewBuilder extends Builder<EListView> {
 			Class<? extends IEntity> entityClass = (Class<? extends IEntity>) Class.forName(element.getType());
 			EntityListViewConfiguration entityListViewConfiguration = new EntityListViewConfiguration(entityClass);
 			
+			if (element.getListProfile() != null && !element.getListProfile().isEmpty()) {
+				entityListViewConfiguration.setListId(element.getListProfile());
+			}
+			
 			// set a base filter here, which will later be manipulated in the mapper
 			PropertyQuery query = new PropertyQuery();
 			if (element.getFilterOn() != null && !element.getFilterOn().isEmpty()) {
