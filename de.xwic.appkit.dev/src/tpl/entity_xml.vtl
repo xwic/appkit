@@ -20,7 +20,7 @@
 #end
 		</property>
 #else
-		<property name="$prop.name" #if($!prop.length != "")maxLength="$prop.length"#end #if($prop.required)required="true" #end/>
+		<property name="$prop.name" #if($!prop.length != "" && $!prop.length != "max")maxLength="$prop.length"#end #if($prop.required)required="true" #end/>
 #end
 #end
 

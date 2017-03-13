@@ -1,0 +1,26 @@
+## list attachments
+<iframe name="dlFrame" style="width: 1px; height: 1px; display: none;" src="blank.html"></iframe>
+<div class="appkit_attachments" style="#if($control.width != -1) width: ${control.width}px; #end #if($control.height != -1) height: ${control.height}px; #end">
+#if($control.hasAttachments())
+	#foreach($attm in $control.getAttachments())
+		#if(!$attm.deleted)
+			<div class="appkit_attm_file">			
+				<div class="appkit_attm_fileicon"  onClick="window.open('$control.getDownloadURL($attm)', 'dlFrame')">$!control.getFileIcon($attm).toImgTag()</div>
+				<div class="appkit_attm_filedetails"  onClick="window.open('$control.getDownloadURL($attm)', 'dlFrame')">				
+					<span class="appkit_attm_fn"><nobr>$attm.fileName</nobr></span><br>
+					<span class="appkit_attm_cl">$control.getFileInfo($attm)</span>
+				</div>
+			#if($control.isReadonlyView() == false)
+			 	<div class="appkit_attm_delete" onClick="$control.createActionURL("delete", $attm.getKey())">
+					
+				</div>
+			#end
+			</div>
+		#end
+	#end
+#end
+#if($control.isReadonlyView() == false)
+<div class="appkit_attm_add" onclick="$control.createActionURL("addAttm", "")"><div class="appkit_attm_lnk">Upload Attachment</div></div>
+#end
+<div style="clear: both;"></div>
+</div>

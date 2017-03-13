@@ -23,7 +23,22 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import de.xwic.appkit.core.config.editor.*;
+import de.xwic.appkit.core.config.editor.EAttachments;
+import de.xwic.appkit.core.config.editor.EComposite;
+import de.xwic.appkit.core.config.editor.ECustom;
+import de.xwic.appkit.core.config.editor.EDate;
+import de.xwic.appkit.core.config.editor.EEntityField;
+import de.xwic.appkit.core.config.editor.EGroup;
+import de.xwic.appkit.core.config.editor.EHtmlEditor;
+import de.xwic.appkit.core.config.editor.ELabel;
+import de.xwic.appkit.core.config.editor.EListView;
+import de.xwic.appkit.core.config.editor.ENumberInputField;
+import de.xwic.appkit.core.config.editor.EPicklistCheckbox;
+import de.xwic.appkit.core.config.editor.EPicklistCombo;
+import de.xwic.appkit.core.config.editor.EPicklistRadio;
+import de.xwic.appkit.core.config.editor.EText;
+import de.xwic.appkit.core.config.editor.EYesNoRadio;
+import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.registry.ExtensionRegistry;
 import de.xwic.appkit.core.registry.IExtension;
 
@@ -65,6 +80,7 @@ public class BuilderRegistry {
 		registerBuilder(EYesNoRadio.class, new EYesNoRadioBuilder());
 		registerBuilder(ENumberInputField.class, new ENumberInputBuilder());
 		registerBuilder(ECustom.class, new ECustomBuilder());
+		registerBuilder(EAttachments.class, new EAttachmentsBuilder());
 
 		
 		// register 'extensions'

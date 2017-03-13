@@ -30,12 +30,23 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class EntityActionNew extends AbstractEntityAction {
 
+	private IEntityCreator creator;
+
 	/**
 	 * @param site
 	 * @param entityDao
 	 * @param entityProvider 
 	 */
 	public EntityActionNew(Site site, DAO entityDao, IEntityProvider entityProvider) {
+		this(site, entityDao, entityProvider, null);
+	}
+
+	/**
+	 * @param site
+	 * @param entityDao
+	 * @param entityProvider 
+	 */
+	public EntityActionNew(Site site, DAO entityDao, IEntityProvider entityProvider, IEntityCreator creator) {
 		setTitle("New");
 		setIconEnabled(ImageLibrary.ICON_NEW_ACTIVE);
 		setIconDisabled(ImageLibrary.ICON_NEW_INACTIVE);
@@ -45,6 +56,8 @@ public class EntityActionNew extends AbstractEntityAction {
 		this.site = site;
 		this.entityDao = entityDao;
 		this.entityProvider = entityProvider;
+		this.creator = creator;
+
 	}
 
 	/*
@@ -54,7 +67,10 @@ public class EntityActionNew extends AbstractEntityAction {
 	@Override
 	public void run() {
 		try {
-			EditorHelper.getInstance().openEditor(site, entityDao.createEntity(), entityProvider.getBaseEntity());
+			EditorHelper.openEditor(
+					site, 
+					creator != null ? creator.createEntity() : entityDao.createEntity(), 
+					entityProvider.getBaseEntity());
 		} catch (Exception e) {
 			log.error("Error while executing EntityActionNew", e);
 			throw new RuntimeException(e);

@@ -16,18 +16,18 @@
  *******************************************************************************/
 package de.xwic.appkit.webbase.editors.builders;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
-import de.jwic.controls.InputBox;
 import de.jwic.controls.ckeditor.CKEditor;
+import de.jwic.controls.ckeditor.ToolBarBand;
 import de.xwic.appkit.core.config.editor.EHtmlEditor;
-import de.xwic.appkit.core.config.editor.EText;
 import de.xwic.appkit.core.config.editor.Style;
-import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.HtmlEditorMapper;
-import de.xwic.appkit.webbase.editors.mappers.InputboxMapper;
 
 /**
  * Defines the CKEditor builder class.
@@ -45,7 +45,17 @@ public class EHtmlEditorBuilder extends Builder<EHtmlEditor> {
 	 */
 	public IControl buildComponents(EHtmlEditor text, IControlContainer parent, IBuilderContext context) {
 
+		List<ToolBarBand> toolbar = new ArrayList<>();
+		toolbar.add(new ToolBarBand(ToolBarBand.Default_BasicStyles));
+		toolbar.add(new ToolBarBand(ToolBarBand.Default_Styles));
+		toolbar.add(new ToolBarBand(ToolBarBand.Default_Colors));
+		toolbar.add(new ToolBarBand(ToolBarBand.Default_Paragraph));
+		toolbar.add(new ToolBarBand(ToolBarBand.Default_Links));
+		
 		CKEditor ckEditor = new CKEditor(parent, null);
+		
+		ckEditor.setCustomToolBar(toolbar);
+		
 		ckEditor.addValueChangedListener(new FieldChangeListener(context, text.getProperty()));
 		Style style = text.getStyle();
 		if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
