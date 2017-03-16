@@ -40,7 +40,7 @@
       
 #foreach($prop in $entity.properties)
 #if($prop.basicType)
-		<property name="$prop.name" column="$prop.columnName" #if($!prop.length != "")length="$prop.length"#end/>
+		<property name="$prop.name" column="$prop.columnName" #if($!prop.length != "") #if($!prop.length == "max")  type="org.hibernate.type.TextType" #else length="$prop.length"#end #end/>
 #else
 #if($prop.type == "IPicklistEntry")
 	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="$prop.columnName" not-null="false" lazy="false"/>

@@ -19,16 +19,5 @@ public interface IEntityCreator {
 	 */
 	public IEntity createEntity();
 	
-	/**
-	 * The base entity is a reference to the entity that is in context of the new entity. If, for example, a user
-	 * edits a company record and wants to add a contact, the company would be the base entity and the contact 
-	 * the new entity.
-	 * 
-	 * Legacy editors are using the base entity to create a connection between them. The new editor though does
-	 * expect the created entity to be already properly connected.
-	 * 	
-	 * @return the base entity or <code>null</code>
-	 */
-	public IEntity getBaseEntity();
-	
+
 }

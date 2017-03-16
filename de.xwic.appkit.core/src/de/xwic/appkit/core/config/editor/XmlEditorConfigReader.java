@@ -82,6 +82,7 @@ public class XmlEditorConfigReader {
 	private final static String NODE_DATE_RANGE = "dateRange";
 	private final static String NODE_DATETIMERANGE = "dateTimeRange";
 
+	private final static String NODE_ATTACHMENTS = "attachments";
 	private final static String NODE_SINGLE_ATTACHMENT = "singleAttachment";
 
 	private EditorConfiguration config = null;
@@ -126,6 +127,7 @@ public class XmlEditorConfigReader {
 		TYPE_MAP.put(NODE_DATE_RANGE, EDateRange.class);
 		TYPE_MAP.put(NODE_DATETIMERANGE, EDateTimeRange.class);
 		TYPE_MAP.put(NODE_SINGLE_ATTACHMENT, ESingleAttachmentField.class);
+		TYPE_MAP.put(NODE_ATTACHMENTS, EAttachments.class);
 	}
 
 	/**

@@ -59,6 +59,7 @@ import de.xwic.appkit.webbase.actions.EntityActionNew;
 import de.xwic.appkit.webbase.actions.EntityActionOpen;
 import de.xwic.appkit.webbase.actions.EntityActionsHelper;
 import de.xwic.appkit.webbase.actions.IEntityAction;
+import de.xwic.appkit.webbase.actions.IEntityCreator;
 import de.xwic.appkit.webbase.actions.IEntityProvider;
 import de.xwic.appkit.webbase.controls.export.ExcelExportControl;
 import de.xwic.appkit.webbase.dialog.DialogEvent;
@@ -79,7 +80,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * 
  * @author Adrian Ionescu
  */
-public class EntityListView<I extends IEntity> extends ControlContainer implements IEntityProvider {
+public class EntityListView<I extends IEntity> extends ControlContainer implements IEntityProvider, IEntityCreator {
 
 	protected EntityListViewConfiguration configuration;
 	
@@ -98,6 +99,8 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 	protected List<IEntityAction> extensionActions;
 
 	protected ErrorWarning errorWarning;
+	
+	protected IEntityCreator entityCreator = null;
 
 	private DAO dao;
 	
@@ -257,6 +260,17 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 		
 		btUserConfig.setTitle(title);
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.actions.IEntityCreator#createEntity()
+	 */
+	@Override
+	public IEntity createEntity() {
+		if (entityCreator != null) {
+			return entityCreator.createEntity();
+		}
+		return dao.createEntity();
+	}
 
 	/**
 	 * Add the New, Edit, Delete actions
@@ -273,7 +287,7 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 		
 		boolean showAction = actions.contains(ListSetup.ACTION_CREATE) && secMan.hasRight(className, ApplicationData.SECURITY_ACTION_CREATE);
 		if (showAction) {
-			IEntityAction actionNew = new EntityActionNew(site, dao, this);
+			IEntityAction actionNew = new EntityActionNew(site, dao, this, this);
 			standardActions.add(actionNew);
 			tg.addAction(actionNew);
 		}
@@ -765,5 +779,19 @@ public class EntityListView<I extends IEntity> extends ControlContainer implemen
 	 */
 	public EntityListViewConfiguration getConfiguration() {
 		return configuration;
+	}
+
+	/**
+	 * @return the entityCreator
+	 */
+	public IEntityCreator getEntityCreator() {
+		return entityCreator;
+	}
+
+	/**
+	 * @param entityCreator the entityCreator to set
+	 */
+	public void setEntityCreator(IEntityCreator entityCreator) {
+		this.entityCreator = entityCreator;
 	}
 }
