@@ -131,7 +131,7 @@ public class PojoEditorFactory {
 					field.setAccessible(true);
 					Object pojoProperty = field.get(pojo);
 					if (pojoProperty == null) {
-						pojoProperty = field.getClass().newInstance();
+						pojoProperty = field.getType().newInstance();
 						field.set(pojo, pojoProperty);
 					}
 					PojoEditorControl childEditor = createEditor(editor, field.getName(), pojoProperty, fieldRenderLogic);
@@ -146,7 +146,11 @@ public class PojoEditorFactory {
 					PojoEditorTable table = new PojoEditorTable(editor, field.getName(), clazz, fieldRenderLogic);
 					
 					field.setAccessible(true);
-					List<?> contents = (List) field.get(pojo);					
+					List<?> contents = (List) field.get(pojo);
+					if (contents == null) {
+						contents = new ArrayList();
+						field.set(pojo, contents);
+					}
 					table.setData(contents);
 
 					PojoEditorField editorField = new PojoEditorField(field.getName(), table, field.getName());
