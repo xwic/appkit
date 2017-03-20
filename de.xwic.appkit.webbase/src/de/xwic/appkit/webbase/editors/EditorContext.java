@@ -420,9 +420,53 @@ public class EditorContext implements IBuilderContext {
 			fireValidated(result, getEntityDescriptor().getClassname(), true);
 
 			if (!result.hasErrors()) {
-				model.commit();
 				boolean isNew = model.getOriginalEntity().getId() == 0;
-				dao.update(model.getOriginalEntity());
+				// run as UseCase to make all updates as a single transaction.
+				UseCase uc = new UseCase() {
+					/* (non-Javadoc)
+					 * @see de.xwic.appkit.core.dao.UseCase#execute(de.xwic.appkit.core.dao.DAOProviderAPI)
+					 */
+					@Override
+					protected Object execute(DAOProviderAPI api) {
+						
+						// check if there is any sub-property which is a model that was modified
+						EntityDescriptor ed = dao.getEntityDescriptor();
+						for (String prop : ed.getProperties().keySet()) {
+							Property p = ed.getProperty(prop);
+							if (p.isEntity()) {
+								try {
+									Object o = model.getProperty(prop);
+									if (o instanceof IEntityModel) {
+										IEntityModel subModel = (IEntityModel)o;
+										if (subModel.isModified()) { // dirt -> needs to be saved
+											subModel.commit();
+											IEntity subEntity = subModel.getOriginalEntity();
+											DAO subDAO =DAOSystem.findDAOforEntity(subEntity.type());
+											subDAO.update(subEntity);
+										}
+									}
+								} catch (Exception e) {
+									throw new RuntimeException("Error saving subModel", e);
+								}
+								
+							}
+						}
+						
+						try {
+							model.commit();
+							dao.update(model.getOriginalEntity());
+						} catch (EntityModelException em) {
+							return em;
+						}
+						return null;
+					}
+				};
+				Object ucResult = uc.execute();
+				if (ucResult instanceof EntityModelException) {
+					throw (EntityModelException)ucResult;
+				}
+				
+				
 				inTransaction = false;
 				setDirty(false);
 				fireEvent(EVENT_AFTERSAVE, isNew); // revalidate

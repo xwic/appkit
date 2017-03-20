@@ -23,6 +23,7 @@ import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.editor.EEntityField;
 import de.xwic.appkit.core.config.editor.EGroup;
 import de.xwic.appkit.core.config.editor.EPicklistCombo;
+import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.EntityQuery;
@@ -81,6 +82,13 @@ public class EEntitySelectorBuilder extends Builder<EEntityField> {
         final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
         context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);
+        
+		Style style = entityField.getStyle();
+		if (style.isStyleSpecified(Style.WIDTH_HINT)) {
+			comboSelector.setWidth(style.getStyleInt(Style.WIDTH_HINT));
+		}
+
+        
         return comboSelector;
     }
 
