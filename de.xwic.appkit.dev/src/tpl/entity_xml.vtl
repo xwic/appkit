@@ -14,7 +14,7 @@
 #end
 		<property name="$prop.name" picklistId="$pid">
 #foreach($pe in $prop.picklistEntries)
-		     <picklistentry #if($!pe.key != "") key="$pe.key" #end>
+		     <picklistentry #if($!pe.key != "") key="$pe.key" #end #if($!pe.order != "") index="$!pe.order" #end>
 		         <name lang="en">$pe.defaultTitle</name>
 		     </picklistentry>
 #end
