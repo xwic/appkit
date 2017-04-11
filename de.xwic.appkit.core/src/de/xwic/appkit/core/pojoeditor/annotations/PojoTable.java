@@ -31,4 +31,6 @@ public @interface PojoTable {
 	 * @return
 	 */
 	Class<?> clazz();
+	
+	String tableClass() default "";
 }

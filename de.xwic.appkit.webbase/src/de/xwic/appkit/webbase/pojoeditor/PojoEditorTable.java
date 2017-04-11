@@ -26,6 +26,7 @@ import de.jwic.events.ElementSelectedEvent;
 import de.jwic.events.ElementSelectedListener;
 import de.jwic.events.SelectionEvent;
 import de.jwic.events.SelectionListener;
+import de.xwic.appkit.core.pojoeditor.IPojoEditorTable;
 import de.xwic.appkit.core.pojoeditor.annotations.PojoControl;
 import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 
@@ -33,16 +34,16 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * @author Andrei Pat
  *
  */
-public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
+public class PojoEditorTable extends ControlContainer implements IHaveEnabled, IPojoEditorTable {
 
-	private PojoEditorTableModel editorModel;
+	protected PojoEditorTableModel editorModel;
 
-	private boolean enabled;
+	protected boolean enabled;
 
-	private TableViewer table;
-	private Button newButton;
-	private Button editButton;
-	private Button deleteButton;
+	protected TableViewer table;
+	protected Button newButton;
+	protected Button editButton;
+	protected Button deleteButton;
 
 	private PojoEditorControl editor;
 
@@ -65,7 +66,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 	/**
 	 * 
 	 */
-	private void createEditorButtons() {
+	protected void createEditorButtons() {
 		Button saveButton;
 		Button cancelButton;
 
@@ -102,7 +103,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 	/**
 	 * 
 	 */
-	private void createTable() {
+	protected void createTable() {
 		createTableButtons();
 
 		table = new TableViewer(this, "table");
@@ -132,7 +133,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 	/**
 	 * 
 	 */
-	private void createTableButtons() {
+	protected void createTableButtons() {
 
 		ToolBar t = new ToolBar(this, "toolbar");
 		ToolBarGroup tg = t.addGroup();
@@ -187,7 +188,7 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 
 	}
 
-	private void createEditor(Object pojo, IPojoEditorFieldRenderLogic fieldRenderLogic) {
+	protected void createEditor(Object pojo, IPojoEditorFieldRenderLogic fieldRenderLogic) {
 		try {
 			this.removeControl("editor");
 			editor = PojoEditorFactory.createEditor(this, "editor", pojo, fieldRenderLogic);
@@ -216,8 +217,8 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 		}
 	}
 
-	/**
-	 * @return the table
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.pojoeditor.IPojoEditorTable#getTable()
 	 */
 	public TableViewer getTable() {
 		return table;
@@ -230,8 +231,8 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 		return editMode;
 	}
 
-	/**
-	 * @return the editor
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.pojoeditor.IPojoEditorTable#getEditor()
 	 */
 	public PojoEditorControl getEditor() {
 		return editor;
@@ -267,16 +268,17 @@ public class PojoEditorTable extends ControlContainer implements IHaveEnabled {
 	/**
 	 * 
 	 */
-	private void toggleButtons() {
+	protected void toggleButtons() {
 		newButton.setEnabled(enabled);
 		boolean rowSelected = table.getModel().getFirstSelectedKey() != null;
 		editButton.setEnabled(rowSelected && enabled);
 		deleteButton.setEnabled(rowSelected && enabled);
 	}
 
-	/**
-	 * @param contents
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.pojoeditor.IPojoEditorTable#setData(java.util.List)
 	 */
+	@Override
 	public void setData(List<?> data) {
 		editorModel.setData(data);
 		table.setContentProvider(new ListContentProvider(data));

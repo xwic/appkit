@@ -9,14 +9,16 @@
 
 package de.xwic.appkit.webbase.pojoeditor;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
-import de.jwic.data.ListContentProvider;
+import de.xwic.appkit.core.pojoeditor.IPojoEditorTable;
 import de.xwic.appkit.core.pojoeditor.annotations.CustomRenderer;
 import de.xwic.appkit.core.pojoeditor.annotations.GridRenderer;
 import de.xwic.appkit.core.pojoeditor.annotations.PojoControl;
@@ -42,9 +44,12 @@ public class PojoEditorFactory {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
 	 */
-	public static PojoEditorControl createEditor(IControlContainer container, String name, Object pojo)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+	public static PojoEditorControl createEditor(IControlContainer container, String name, Object pojo) throws PojoEditorCreationException {
 
 		IPojoEditorFieldRenderLogic defaultFieldRenderLogic = new IPojoEditorFieldRenderLogic() {
 
@@ -70,9 +75,13 @@ public class PojoEditorFactory {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 * @throws ClassNotFoundException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
 	 */
 	public static PojoEditorControl createEditor(IControlContainer container, String name, Object pojo,
-			IPojoEditorFieldRenderLogic fieldRenderLogic) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+			IPojoEditorFieldRenderLogic fieldRenderLogic) throws PojoEditorCreationException {
 		Class<?> pojoClass = pojo.getClass();
 		if (pojoClass.isAnnotationPresent(PojoEditor.class)) {
 			PojoEditor editorConfig = (PojoEditor) pojoClass.getAnnotation(PojoEditor.class);
@@ -94,69 +103,86 @@ public class PojoEditorFactory {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws ClassNotFoundException
+	 * @throws SecurityException
+	 * @throws NoSuchMethodException
+	 * @throws InvocationTargetException
+	 * @throws IllegalArgumentException
 	 */
 	private static List<PojoEditorField> createFields(PojoEditorControl editor, Object pojo, EditorToolkit toolkit,
-			AutoLabels autoLabelsStrategy, IPojoEditorFieldRenderLogic fieldRenderLogic)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+			AutoLabels autoLabelsStrategy, IPojoEditorFieldRenderLogic fieldRenderLogic) throws PojoEditorCreationException {
 
 		List<Field> fields = getAllFields(pojo.getClass());
 
 		List<PojoEditorField> editorFields = new ArrayList<PojoEditorField>();
-		for (Field field : fields) {
-			if (fieldRenderLogic.isRenderField(field.getName())) {
+		try {
+			for (Field field : fields) {
+				if (fieldRenderLogic.isRenderField(field.getName())) {
 
-				if (field.isAnnotationPresent(PojoControl.class)) {
-					//this is a simple field that maps to a class property
-					PojoControl ctrlAnnotation = field.getAnnotation(PojoControl.class);
+					if (field.isAnnotationPresent(PojoControl.class)) {
+						//this is a simple field that maps to a class property
+						PojoControl ctrlAnnotation = field.getAnnotation(PojoControl.class);
 
-					String label = ctrlAnnotation.label();
+						String label = ctrlAnnotation.label();
 
-					if (label == null || label.isEmpty()) {
-						label = determineLabel(field.getName(), autoLabelsStrategy);
+						if (label == null || label.isEmpty()) {
+							label = determineLabel(field.getName(), autoLabelsStrategy);
+						}
+						Class<? extends IModelViewTypeConverter> converterClass = ctrlAnnotation.converter();
+						IModelViewTypeConverter converter;
+						if (NullConverter.class.equals(converterClass)) {
+							converter = null;
+						} else {
+							converter = converterClass.newInstance();
+						}
+
+						Control control = toolkit.createControl(ctrlAnnotation.controlClass(), editor, field.getName(), converter);
+
+						PojoEditorField editorField = new PojoEditorField(label, control, field.getName());
+						editorFields.add(editorField);
+					} else if (field.isAnnotationPresent(PojoEditor.class)) {
+						//this is a complex field, we will create a sub editor for it
+						field.setAccessible(true);
+						Object pojoProperty = field.get(pojo);
+						if (pojoProperty == null) {
+							pojoProperty = field.getType().newInstance();
+							field.set(pojo, pojoProperty);
+						}
+						PojoEditorControl childEditor = createEditor(editor, field.getName(), pojoProperty, fieldRenderLogic);
+						editor.addChildControl(childEditor);
+						PojoEditorField editorField = new PojoEditorField(field.getName(), childEditor, field.getName());
+						editorFields.add(editorField);
+					} else if (field.isAnnotationPresent(PojoTable.class)) {
+						// a list field that is edited with a table control
+						PojoTable tableAnnotation = field.getAnnotation(PojoTable.class);
+						Class<?> clazz = tableAnnotation.clazz();
+
+						String tableClassName = tableAnnotation.tableClass();
+						IPojoEditorTable table;
+						if (tableClassName == null || tableClassName.isEmpty()) {
+							table = new PojoEditorTable(editor, field.getName(), clazz, fieldRenderLogic);
+						} else {
+							Class tableClass = Class.forName(tableClassName);
+							Constructor constructor = tableClass.getConstructor(IControlContainer.class, String.class, Class.class,
+									IPojoEditorFieldRenderLogic.class);
+							table = (IPojoEditorTable) constructor.newInstance(editor, field.getName(), clazz, fieldRenderLogic);
+						}
+
+						field.setAccessible(true);
+						List<?> contents = (List) field.get(pojo);
+						if (contents == null) {
+							contents = new ArrayList();
+							field.set(pojo, contents);
+						}
+						table.setData(contents);
+
+						PojoEditorField editorField = new PojoEditorField(field.getName(), (Control) table, field.getName());
+						editorFields.add(editorField);
 					}
-					Class<? extends IModelViewTypeConverter> converterClass = ctrlAnnotation.converter();
-					IModelViewTypeConverter converter;
-					if (NullConverter.class.equals(converterClass)) {
-						converter = null;
-					} else {
-						converter = converterClass.newInstance();
-					}
-
-					Control control = toolkit.createControl(ctrlAnnotation.controlClass(), editor, field.getName(), converter);
-
-					PojoEditorField editorField = new PojoEditorField(label, control, field.getName());
-					editorFields.add(editorField);
-				} else if (field.isAnnotationPresent(PojoEditor.class)) {
-					//this is a complex field, we will create a sub editor for it
-					field.setAccessible(true);
-					Object pojoProperty = field.get(pojo);
-					if (pojoProperty == null) {
-						pojoProperty = field.getType().newInstance();
-						field.set(pojo, pojoProperty);
-					}
-					PojoEditorControl childEditor = createEditor(editor, field.getName(), pojoProperty, fieldRenderLogic);
-					editor.addChildControl(childEditor);
-					PojoEditorField editorField = new PojoEditorField(field.getName(), childEditor, field.getName());
-					editorFields.add(editorField);
-				} else if (field.isAnnotationPresent(PojoTable.class)) {
-					// a list field that is edited with a table control
-					PojoTable tableAnnotation = field.getAnnotation(PojoTable.class);
-					Class<?> clazz = tableAnnotation.clazz();
-
-					PojoEditorTable table = new PojoEditorTable(editor, field.getName(), clazz, fieldRenderLogic);
-					
-					field.setAccessible(true);
-					List<?> contents = (List) field.get(pojo);
-					if (contents == null) {
-						contents = new ArrayList();
-						field.set(pojo, contents);
-					}
-					table.setData(contents);
-
-					PojoEditorField editorField = new PojoEditorField(field.getName(), table, field.getName());
-					editorFields.add(editorField);
 				}
 			}
+		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException | SecurityException
+				| IllegalArgumentException | InvocationTargetException e) {
+			throw new PojoEditorCreationException(e);
 		}
 		return editorFields;
 	}
@@ -211,11 +237,15 @@ public class PojoEditorFactory {
 	 * @throws InstantiationException
 	 */
 	private static void doLayout(Class<?> pojoClass, PojoEditorControl editor, List<PojoEditorField> fields,
-			IPojoEditorFieldRenderLogic fieldRenderLogic) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+			IPojoEditorFieldRenderLogic fieldRenderLogic) throws PojoEditorCreationException {
 		IPojoRenderer renderer = null;
 		if (pojoClass.isAnnotationPresent(CustomRenderer.class)) {
 			String rendererClass = pojoClass.getAnnotation(CustomRenderer.class).clazz();
-			renderer = (IPojoRenderer) Class.forName(rendererClass).newInstance();
+			try {
+				renderer = (IPojoRenderer) Class.forName(rendererClass).newInstance();
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+				throw new PojoEditorCreationException(e);
+			}
 		}
 		if (pojoClass.isAnnotationPresent(GridRenderer.class)) {
 			renderer = new PojoGridRenderer();
