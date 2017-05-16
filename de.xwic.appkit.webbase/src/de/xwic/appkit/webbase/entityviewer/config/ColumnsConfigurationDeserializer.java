@@ -21,8 +21,10 @@ package de.xwic.appkit.webbase.entityviewer.config;
 
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -250,7 +252,16 @@ public class ColumnsConfigurationDeserializer {
 				log.error(e.getMessage(), e);
 				return null;
 			}
-		} else {
+		} else if (str.startsWith(ColumnsConfigurationSerializer.COLLECTION)) {
+			String val = str.replace(ColumnsConfigurationSerializer.COLLECTION, "");
+			String[] values = val.split(",");
+			List result = new ArrayList<>();
+			for (String v: values) {
+				result.add(deserializeValue(v));
+			}
+			return result;			
+		}
+		else {
 			throw new IllegalArgumentException("Invalid value: " + str);
 		}
 	}
