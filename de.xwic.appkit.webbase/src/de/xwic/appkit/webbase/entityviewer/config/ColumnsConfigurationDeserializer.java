@@ -174,6 +174,9 @@ public class ColumnsConfigurationDeserializer {
 				// apparently we don't need to unescape the operations (<, >)
 				el = qeElement.element(ColumnsConfigurationSerializer.OPERATION);
 				result.setOperation(el.getTextTrim());
+				if (QueryElement.IN.equals(result.getOperation()) || QueryElement.NOT_IN.equals(result.getOperation())) {
+					result.setRewriteIn(true);
+				}
 				
 				el = qeElement.element(ColumnsConfigurationSerializer.VALUE);
 				result.setValue(deserializeValue(el.getTextTrim()));
