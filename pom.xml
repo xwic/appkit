@@ -11,7 +11,7 @@
 
     <groupId>de.xwic.appkit</groupId>
     <artifactId>appkit</artifactId>
-    <version>5.3.31-SNAPSHOT</version>
+    <version>5.3.35-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>xWic - AppKit</name>
@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.20</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.28</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 
 		<sonar.language>java</sonar.language>

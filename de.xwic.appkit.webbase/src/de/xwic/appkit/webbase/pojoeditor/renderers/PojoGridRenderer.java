@@ -19,7 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import de.jwic.base.Control;
-import de.jwic.base.ControlContainer;
+import de.jwic.base.IControl;
 import de.jwic.base.IControlRenderer;
 import de.jwic.base.IHaveEnabled;
 import de.jwic.base.JWicRuntime;
