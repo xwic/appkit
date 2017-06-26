@@ -3,11 +3,8 @@ package de.xwic.appkit.webbase.entityselection;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.jwic.base.Field;
-import de.jwic.events.*;
-import de.xwic.appkit.webbase.entityselection.IPageListener.PageEvent ;
-
 import de.jwic.base.ControlContainer;
+import de.jwic.base.Field;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Button;
 import de.jwic.controls.combo.Combo;
@@ -15,10 +12,15 @@ import de.jwic.controls.combo.ComboBehavior;
 import de.jwic.controls.combo.LifeSearchCombo;
 import de.jwic.data.DataLabel;
 import de.jwic.data.IBaseLabelProvider;
+import de.jwic.events.ElementSelectedEvent;
+import de.jwic.events.ElementSelectedListener;
+import de.jwic.events.SelectionEvent;
+import de.jwic.events.SelectionListener;
+import de.jwic.events.ValueChangedListener;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.EntityQuery;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.webbase.entityview.EntityDisplayListModel;
+import de.xwic.appkit.webbase.entityselection.IPageListener.PageEvent ;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.model.IModelListener;
@@ -161,12 +163,6 @@ public class EntityComboSelector<E extends IEntity> extends ControlContainer imp
 		firePageEvent(PageEvent.OPENED);		
 		
 		Site site = ExtendedApplication.getInstance(this).getSite();
-		// here is a bit tricky. we need to reset the query to the model,
-		// because this model is created
-		// before the creation of the control...
-		EntityDisplayListModel listModel = contributor.getListModel();
-		EntityQuery query = listModel.getOriginalQuery();
-		listModel.setQuery(query);
 		EntitySelectionPage<IEntity> contactPage = new EntitySelectionPage<IEntity>(site.getContentContainer(), null, contributor);
 
 		site.pushPage(contactPage);

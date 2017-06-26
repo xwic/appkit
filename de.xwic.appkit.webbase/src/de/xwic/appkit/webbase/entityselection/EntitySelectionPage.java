@@ -41,9 +41,9 @@ public class EntitySelectionPage<I extends IEntity> extends InnerPage implements
 		setSubtitle(contributor.getPageSubTitle());
 	
 		EntityListViewConfiguration config = new EntityListViewConfiguration(contributor.getEntityType());
-		EntityQuery originalQuery = contributor.getListModel().getOriginalQuery();
-		if (originalQuery instanceof PropertyQuery) {
-			config.setBaseFilter((PropertyQuery) originalQuery);
+		EntityQuery query = contributor.getListModel().getQuery();
+		if (query instanceof PropertyQuery) {
+			config.setBaseFilter((PropertyQuery) query);
 		}
 		config.setQuickFilterPanelCreator(new IQuickFilterPanelCreator() {
 			
@@ -53,7 +53,9 @@ public class EntitySelectionPage<I extends IEntity> extends InnerPage implements
 			}
 		});
 		try {
-			new CloseableEntityListView<IEntity>(this, name, config, contributor);
+			CloseableEntityListView<IEntity> view = new CloseableEntityListView<IEntity>(this, name, config, contributor);
+			// always clear the filters, we don't want to save previous filters in the selection page
+			view.getEntityTable().getModel().clearFilters(); 
 		} catch (ConfigurationException e) {
 			throw new IllegalArgumentException("Cannot build entity list view " + e, e);
 		}
