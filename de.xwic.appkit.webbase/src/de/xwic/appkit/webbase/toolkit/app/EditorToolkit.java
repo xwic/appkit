@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +39,9 @@ import de.jwic.controls.InputBox;
 import de.jwic.controls.NumericInputBox;
 import de.jwic.controls.NumericIntegerInputBox;
 import de.jwic.util.IHTMLElement;
+import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.util.IModelViewTypeConverter;
 import de.xwic.appkit.webbase.toolkit.app.helper.ToolkitCheckBoxControl;
@@ -321,7 +325,11 @@ public class EditorToolkit {
 	 */
 	public void saveFieldValues() {
 
-		Object obj = null;
+		if (this.model != null) {
+			//reload the entity from the DB and recreate the adapter to prevent concurrent update issues
+			IEntity entity = model.getEntity(true);
+			modelAdapter = new EditorToolkitEntityModelAdapter(entity);
+		}
 
 		for (IControl control : registeredControls.values()) {
 
