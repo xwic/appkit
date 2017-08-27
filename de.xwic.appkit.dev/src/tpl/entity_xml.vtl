@@ -15,7 +15,7 @@
 		<property name="$prop.name" picklistId="$pid">
 #foreach($pe in $prop.picklistEntries)
 		     <picklistentry #if($!pe.key != "") key="$pe.key" #end #if($!pe.order != "") index="$!pe.order" #end>
-		         <name lang="en">$pe.defaultTitle</name>
+		         <name lang="en">$pe.defaultTitle.replaceAll("&", "&amp;")</name>
 		     </picklistentry>
 #end
 		</property>
