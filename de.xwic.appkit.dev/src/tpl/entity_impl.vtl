@@ -1,14 +1,19 @@
 #set($hasDate = "0")
 #set($hasMitarbeiter = 0)
+#set($hasSet = "0")
 #foreach($prop in $entity.properties)
 #if($prop.type == "Date")#set($hasDate = "1")#end
 #if($prop.type == "Mitarbeiter")#set($hasMitarbeiter = "1")#end
+#if($prop.multivalue)#set($hasSet = "1")#end
 #end
 
 package ${package}.entities.impl;
 
 #if($hasDate == "1")
 import java.util.Date;
+#end
+#if($hasSet == "1")
+import java.util.Set;
 #end
 #if($hasMitarbeiter == "1")
 import de.xwic.appkit.core.model.entities.IMitarbeiter;

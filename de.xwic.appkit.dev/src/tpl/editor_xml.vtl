@@ -30,7 +30,11 @@
 #if($prop.type == "String")
 					<text property = "$prop.name" template="field"/>
 #elseif ($prop.type == "IPicklistEntry")
+#if($prop.multivalue)
+					<plCheck property="$prop.name" cols="3" template="field"/>
+#else
 					<plCombo property="$prop.name" template="field"/>
+#end
 #elseif ($prop.type == "Integer" || $prop.type == "int" || $prop.type == "Long" || $prop.type == "long")
 					<number property="$prop.name" template="field" format="long"/>
 #elseif ($prop.type == "Double" || $prop.type == "double" || $prop.type == "Float" || $prop.type == "float")
