@@ -51,14 +51,28 @@
       
 #foreach($prop in $entity.properties)
 #if($prop.basicType)
-		<property name="$prop.name" column="$prop.columnName" #if($!prop.length != "") #if($!prop.length == "max")  type="org.hibernate.type.TextType" #else length="$prop.length"#end #end/>
+		<property name="$prop.name" column="$prop.columnName" #if($!prop.length != "") #if($!prop.length == "max")  type="materialized_clob" #else length="$prop.length"#end #end/>
 #else
+#if(!$prop.multivalue)
 #if($prop.type == "IPicklistEntry")
 	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="$prop.columnName" not-null="false" lazy="false"/>
 #elseif($prop.type == "Mitarbeiter")
-	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="$prop.columnName" not-null="false" lazy="false"/>
+	    <many-to-one name="$prop.name" class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="$prop.columnName" not-null="false"  #if($prop.lazy)lazy="proxy" #else lazy="false" #end/>
 #else
-	    <many-to-one name="$prop.name" class="${package}.entities.impl.${prop.type}" column="$prop.columnName" not-null="false" lazy="false"/>
+	    <many-to-one name="$prop.name" class="${package}.entities.impl.${prop.type}" column="$prop.columnName" not-null="false" #if($prop.lazy)lazy="proxy" #else lazy="false" #end/>
+#end
+#else
+		<set name="$prop.name" table="${entity.tableName}_${prop.columnName}">
+			<key column="${entity.idColumn}"/>
+#if($prop.type == "IPicklistEntry")
+			<many-to-many class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="${prop.columnName}"/>
+
+#elseif($prop.type == "Mitarbeiter")
+		    <many-to-many class="de.xwic.appkit.core.model.entities.impl.Mitarbeiter" column="$prop.columnName"/>
+#else
+		    <many-to-many class="${package}.entities.impl.${prop.type}" column="$prop.columnName"/>
+#end
+		</set>		
 #end
 #end
 #end
