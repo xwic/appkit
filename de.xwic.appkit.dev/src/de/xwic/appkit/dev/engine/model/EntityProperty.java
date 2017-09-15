@@ -43,6 +43,19 @@ public interface EntityProperty {
 	 * @return the required
 	 */
 	public boolean isRequired();
+
+	/**
+	 * Returns true if lazy loading should be enabled for an entity referencing property. 
+	 * This is true by default.
+	 * @return
+	 */
+	public boolean isLazy();
+	
+	/**
+	 * Returns true if the property should be created as a Set<type> of values.
+	 * @return
+	 */
+	public boolean isMultivalue();
 	
 	/**
 	 * Returns the column name.
@@ -68,7 +81,10 @@ public interface EntityProperty {
 	 */
 	public String getPicklistId();
 	
-	
+	/**
+	 * Return list of picklist entries to be created.
+	 * @return
+	 */
 	public List<EntityPicklistEntry> getPicklistEntries();
 	
 }

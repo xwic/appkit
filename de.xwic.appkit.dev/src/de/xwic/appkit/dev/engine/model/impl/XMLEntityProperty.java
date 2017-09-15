@@ -29,6 +29,8 @@ public class XMLEntityProperty implements EntityProperty {
 	private String columnName;
 	private String picklistId;
 	private boolean required;
+	private boolean proxy;
+	private boolean multivalue;
 
 	private static Set<String> BASIC_TYPES = new HashSet<String>();
 	static {
@@ -75,9 +77,29 @@ public class XMLEntityProperty implements EntityProperty {
 			this.columnName = EngineUtil.toDBName(name);
 		}
 		
+		String proxyValue = pNode.valueOf("@lazy");
+		this.proxy = proxyValue == null || proxyValue.equals("true") || proxyValue.equals("") || proxyValue.equals("proxy");  
+		
+		this.multivalue = "true".equals(pNode.valueOf("@multivalue"));
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#isLazy()
+	 */
+	@Override
+	public boolean isLazy() {
+		return proxy;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#isMultivalue()
+	 */
+	@Override
+	public boolean isMultivalue() {
+		return multivalue;
+	}
+	
 	/**
 	 * @return the name
 	 */
@@ -174,10 +196,17 @@ public class XMLEntityProperty implements EntityProperty {
 		if (isBasicType()) {
 			return type;
 		} else {
+			String t;
 			if (type.equals("IPicklistEntry")) {
-				return type;
+				t = type;
+			} else {
+				t = "I" + type;
 			}
-			return "I" + type;
+			
+			if (multivalue) {
+				t = "Set<" + t + ">";
+			}
+			return t;
 		}
 	}
 	
