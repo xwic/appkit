@@ -62,7 +62,7 @@
 	    <many-to-one name="$prop.name" class="${package}.entities.impl.${prop.type}" column="$prop.columnName" not-null="false" #if($prop.lazy)lazy="proxy" #else lazy="false" #end/>
 #end
 #else
-		<set name="$prop.name" table="${entity.tableName}_${prop.columnName}">
+		<set name="$prop.name" table="${entity.tableName}_${prop.columnName}_H">
 			<key column="${entity.idColumn}"/>
 #if($prop.type == "IPicklistEntry")
 			<many-to-many class="de.xwic.appkit.core.model.entities.impl.PicklistEntry" column="${prop.columnName}"/>
