@@ -36,10 +36,13 @@ public class BuilderEngine {
 
 	private Template tplEntity;
 	private Template tplEntityInterface;
+	private Template tplEntityHistory;
+	private Template tplEntityFromBase;
 	private Template tplDAOImpl;
 	private Template tplHeader;
 	private Template tplDAOInterface;
 	private Template tplHbmXml;
+	private Template tplHbmHisXml;
 	private Template tplEntityXml;
 	private Template tplListsetupXml;
 	private Template tplEditorXml;
@@ -71,7 +74,10 @@ public class BuilderEngine {
 
 		tplHeader = ve.getTemplate("tpl/java_header.vtl");
 		tplEntity = ve.getTemplate("tpl/entity_impl.vtl");
+		tplEntityHistory = ve.getTemplate("tpl/entity_historyimpl.vtl");
+		tplEntityFromBase = ve.getTemplate("tpl/entity_implfrombase.vtl");
 		tplHbmXml = ve.getTemplate("tpl/hbmxml.vtl");
+		tplHbmHisXml = ve.getTemplate("tpl/hbmhistoryxml.vtl");
 		tplEntityInterface = ve.getTemplate("tpl/entity_interface.vtl");
 		tplDAOImpl = ve.getTemplate("tpl/dao_impl.vtl");
 		tplDAOInterface = ve.getTemplate("tpl/dao_interface.vtl");
@@ -135,11 +141,28 @@ public class BuilderEngine {
 			veCtx.put("entity", entity);
 
 			if (daoFiles) {
-				File entityJavaFile = new File(entityImplFolder, entity.getName() + ".java");
+				if(entity.isHistoryEntity()) {
+					File entityHisImplFolder = new File(srcBase, "entities/impl/history");
+					if (!entityHisImplFolder.exists()) {
+						entityHisImplFolder.mkdirs();
+					}
+					File entityFromBaseJavaFile = new File(entityImplFolder, entity.getName() + ".java");
+					generateFile(entityFromBaseJavaFile, veCtx, tplEntityFromBase);
+					
+					File entityHistoryJavaFile = new File(entityHisImplFolder, entity.getName() + "History.java");
+					generateFile(entityHistoryJavaFile, veCtx, tplEntityHistory);
+				}
+				
+				File entityJavaFile = new File(entityImplFolder, entity.getName() + (entity.isHistoryEntity() ? "Base.java" : ".java"));
 				generateFile(entityJavaFile, veCtx, tplEntity);
 				
 				File hbmXmlFile = new File(entityImplFolder, entity.getName() + ".hbm.xml");
 				generateFile(hbmXmlFile, veCtx, tplHbmXml, false);
+				
+				if(entity.isHistoryEntity()) {
+					File hbmHisXmlFile = new File(entityImplFolder, entity.getName() + "_HIS.hbm.xml");
+					generateFile(hbmHisXmlFile, veCtx, tplHbmHisXml, false);
+				}
 				
 				// generate the interface file
 				File entityFolder = new File(srcBase, "entities");

@@ -1,10 +1,16 @@
-
+#set($isHistoryEntity = $entity.historyEntity)
 package ${package}.dao.impl;
 
 import ${package}.dao.I${entity.name}DAO;
 import ${package}.entities.I${entity.name};
 import ${package}.entities.impl.${entity.name};
+#if($isHistoryEntity)
+import ${package}.entities.impl.history.${entity.name}History;
+import de.xwic.appkit.core.dao.AbstractHistoryDAO;
+import de.xwic.appkit.core.dao.IHistory;
+#else
 import de.xwic.appkit.core.dao.AbstractDAO;
+#end
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
 
 /**
@@ -15,7 +21,11 @@ import de.xwic.appkit.core.model.entities.IPicklistEntry;
  * TODO: Add ${entity.name} DAO implementation class description.
 #end
  */
+#if($isHistoryEntity)
+public class ${entity.name}DAO extends AbstractHistoryDAO<I${entity.name}, ${entity.name}> implements I${entity.name}DAO  {
+#else
 public class ${entity.name}DAO extends AbstractDAO<I${entity.name}, ${entity.name}> implements I${entity.name}DAO  {
+#end
 
 
 	/**
@@ -25,4 +35,15 @@ public class ${entity.name}DAO extends AbstractDAO<I${entity.name}, ${entity.nam
 		super(I${entity.name}.class, ${entity.name}.class);
 	}
 
+#if($isHistoryEntity)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.dao.AbstractHistoryDAO#getHistoryImplClass()
+	 */
+	@Override
+	public Class<? extends IHistory> getHistoryImplClass() {
+		return ${entity.name}History.class;
+	}
+#end
 }

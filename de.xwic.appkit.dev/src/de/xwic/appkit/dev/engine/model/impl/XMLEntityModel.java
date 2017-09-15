@@ -23,12 +23,14 @@ public class XMLEntityModel implements EntityModel {
 	private String name;
 	private String defaultDisplayProperty;
 	private String description;
-	
+	private boolean historyEntity;
+
 	public XMLEntityModel(Node node) {
 		this.node = node;
 		this.name = node.valueOf("@name");
 		this.defaultDisplayProperty = node.valueOf("@defaultDisplayProperty");
 		this.description = node.valueOf("@description");
+		this.historyEntity = Boolean.parseBoolean(node.valueOf("@history"));
 	}
 
 	/**
@@ -38,50 +40,64 @@ public class XMLEntityModel implements EntityModel {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.dev.engine.model.EntityModel#getProperties()
 	 */
 	@Override
 	public List<EntityProperty> getProperties() throws ConfigurationException {
 
 		List<EntityProperty> properties = new ArrayList<EntityProperty>();
-		
+
 		List<Node> nodes = node.selectNodes("property");
 		for (Node pNode : nodes) {
 			properties.add(new XMLEntityProperty(pNode));
 		}
-		
+
 		return properties;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#getIdColumn()
+	/**
+	 * @return idColumn name for DB column.
 	 */
-	@Override
-	public String getIdColumn() {
-		
+	private String getIdName() {
 		String idCol = node.valueOf("@idColumn");
 		if (idCol != null && !idCol.isEmpty()) {
 			return idCol;
 		}
-		return EngineUtil.toDBName(name) + "_ID";
+		return EngineUtil.toDBName(name);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#getIdColumn()
+	 */
+	@Override
+	public String getIdColumn() {
+		return getIdName() + "_ID";
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.dev.engine.model.EntityProperty#getTableName()
 	 */
 	@Override
 	public String getTableName() {
-		
+
 		String table = node.valueOf("@table");
 		if (table != null && !table.isEmpty()) {
 			return table;
 		}
-		
+
 		return EngineUtil.toDBName(name);
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.dev.engine.model.EntityModel#getDefaultDisplayProperty()
 	 */
 	@Override
@@ -89,12 +105,32 @@ public class XMLEntityModel implements EntityModel {
 		return defaultDisplayProperty;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.dev.engine.model.EntityModel#getDescription()
 	 */
 	@Override
 	public String getDescription() {
 		return description;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.dev.engine.model.EntityModel#isHistoryEntity()
+	 */
+	@Override
+	public boolean isHistoryEntity() {
+		return historyEntity;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.dev.engine.model.EntityModel#getHisIdColumn()
+	 */
+	@Override
+	public String getHisIdColumn() {
+		return getIdName() + "_HIS_ID";
+	}
+
 }

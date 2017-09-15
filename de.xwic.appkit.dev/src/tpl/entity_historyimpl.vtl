@@ -1,0 +1,76 @@
+package ${package}.entities.impl.history;
+
+import de.xwic.appkit.core.dao.IHistory;
+import ${package}.entities.impl.${entity.name}Base;
+
+/**
+#if ($!entity.description != "")
+ * $!{entity.description} 
+#else
+ * ${entity.name} history implementation class.
+#end
+ */
+public class ${entity.name}History extends ${entity.name}Base implements IHistory  {
+
+	private int historyReason = 0;
+	private long entityID = 0;
+	private long entityVersion = 0;
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.pol.crm.dao.IHistory#getHistoryReason()
+	 */
+	@Override
+	public int getHistoryReason() {
+		return historyReason;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.pol.crm.dao.IHistory#setHistoryReason(int)
+	 */
+	@Override
+	public void setHistoryReason(int reason) {
+		this.historyReason = reason;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.pol.crm.dao.IHistory#getEntityID()
+	 */
+	@Override
+	public long getEntityID() {
+		return entityID;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see de.pol.crm.dao.IHistory#setEntityID(int)
+	 */
+	@Override
+	public void setEntityID(long id) {
+		this.entityID = id;
+	}
+
+	/**
+	 * @return Returns the entityVersion.
+	 */
+	@Override
+	public long getEntityVersion() {
+		return entityVersion;
+	}
+
+	/**
+	 * @param entityVersion
+	 *            The entityVersion to set.
+	 */
+	@Override
+	public void setEntityVersion(long entityVersion) {
+		this.entityVersion = entityVersion;
+	}
+
+}

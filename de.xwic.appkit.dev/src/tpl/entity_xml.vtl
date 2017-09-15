@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entities>
-	<entity class="${package}.entities.I${entity.name}" autoLoadProperties="true" history="false" defaultDisplayProperty="${entity.defaultDisplayProperty}">
+	<entity class="${package}.entities.I${entity.name}" autoLoadProperties="true" history="${entity.historyEntity}" defaultDisplayProperty="${entity.defaultDisplayProperty}">
 #if("$!entity.defaultDisplayProperty" != "")
 		<title>${${entity.defaultDisplayProperty}}</title>
 #end

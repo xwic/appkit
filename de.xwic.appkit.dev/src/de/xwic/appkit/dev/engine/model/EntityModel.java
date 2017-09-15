@@ -33,6 +33,12 @@ public interface EntityModel {
 	public String getIdColumn();
 	
 	/**
+	 * Returns the name of the ID column on history table.
+	 * @return
+	 */
+	public String getHisIdColumn();
+	
+	/**
 	 * Returns the tablename of the entity.
 	 * @return
 	 */
@@ -49,5 +55,11 @@ public interface EntityModel {
 	 * @return
 	 */
 	public String getDescription();
+	
+	/**
+	 * Returns true if history dao should be generated.
+	 * @return
+	 */
+	public boolean isHistoryEntity();
 	
 }
