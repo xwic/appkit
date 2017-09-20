@@ -325,11 +325,11 @@ public class EditorToolkit {
 	 */
 	public void saveFieldValues() {
 
-		if (this.model != null) {
-			//reload the entity from the DB and recreate the adapter to prevent concurrent update issues
-			IEntity entity = model.getEntity(true);
-			modelAdapter = new EditorToolkitEntityModelAdapter(entity);
-		}
+//		if (this.model != null) {
+//			//reload the entity from the DB and recreate the adapter to prevent concurrent update issues
+//			IEntity entity = model.getEntity(true);
+//			modelAdapter = new EditorToolkitEntityModelAdapter(entity);
+//		}
 
 		for (IControl control : registeredControls.values()) {
 
