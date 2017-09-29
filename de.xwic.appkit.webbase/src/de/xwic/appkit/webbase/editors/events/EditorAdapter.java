@@ -50,4 +50,12 @@ public class EditorAdapter implements EditorListener {
 	public void pagesCreated(EditorEvent event) {
 		
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.events.EditorListener#messagesUpdated(de.xwic.appkit.webbase.editors.events.EditorEvent)
+	 */
+	@Override
+	public void messagesUpdated(EditorEvent event) {
+		
+	}
 }

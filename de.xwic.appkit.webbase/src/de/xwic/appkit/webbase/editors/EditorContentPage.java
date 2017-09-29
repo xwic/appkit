@@ -23,9 +23,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  */
 public class EditorContentPage extends ControlContainer {
 	
-	private EditorMessagesControl msgError;
-	private EditorMessagesControl msgWarn;
-	private EditorMessagesControl msgInfo;
+	private EditorMessagesControl editorMessages;
 	
 	private String title = null;
 	private Severity stateIndicator = null;
@@ -39,14 +37,7 @@ public class EditorContentPage extends ControlContainer {
 	public EditorContentPage(IControlContainer container, String name) {
 		super(container, name);
 		
-		msgError = new EditorMessagesControl(this, "msgError");
-		msgError.setStyleClass(EditorMessagesControl.CLASS_ERROR);
-
-		msgWarn = new EditorMessagesControl(this, "msgWarn");
-		msgWarn.setStyleClass(EditorMessagesControl.CLASS_WARN);
-
-		msgInfo = new EditorMessagesControl(this, "msgInfo");
-		msgInfo.setStyleClass(EditorMessagesControl.CLASS_INFO);
+		editorMessages = new EditorMessagesControl(this, "editorMessages");
 
 	}
 	
@@ -55,9 +46,7 @@ public class EditorContentPage extends ControlContainer {
 	 * Clear all warnings, errors and info messages. 
 	 */
 	public void resetMessages() {
-		msgError.clear();
-		msgWarn.clear();
-		msgInfo.clear();
+		editorMessages.clear();
 	}
 	
 	/**
@@ -65,7 +54,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @param message
 	 */
 	public void addError(String message) {
-		msgError.addMessage(message);
+		editorMessages.addMessage(new EditorMessage(message, EditorMessage.Severity.ERROR));
 	}
 
 	/**
@@ -73,7 +62,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @param message
 	 */
 	public void addWarn(String message) {
-		msgWarn.addMessage(message);
+		editorMessages.addMessage(new EditorMessage(message, EditorMessage.Severity.WARNING));
 	}
 	
 	/**
@@ -81,7 +70,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @param message
 	 */
 	public void addInfo(String message) {
-		msgInfo.addMessage(message);
+		editorMessages.addMessage(new EditorMessage(message, EditorMessage.Severity.INFO));
 	}
 
 	/**
@@ -89,7 +78,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @return
 	 */
 	public boolean hasErrors() {
-		return !msgError.getMessages().isEmpty();
+		return editorMessages.hasMessages(EditorMessage.Severity.ERROR);
 	}
 
 	/**
@@ -97,7 +86,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @return
 	 */
 	public boolean hasWarnings() {
-		return !msgWarn.getMessages().isEmpty();
+		return editorMessages.hasMessages(EditorMessage.Severity.WARNING);
 	}
 
 	/**
@@ -105,7 +94,7 @@ public class EditorContentPage extends ControlContainer {
 	 * @return
 	 */
 	public boolean hasInfos() {
-		return !msgInfo.getMessages().isEmpty();
+		return editorMessages.hasMessages(EditorMessage.Severity.INFO);
 	}
 	
 	/* (non-Javadoc)
@@ -150,9 +139,7 @@ public class EditorContentPage extends ControlContainer {
 				+ ((contentControlIds == null) ? 0 : contentControlIds
 						.hashCode());
 		result = prime * result
-				+ ((msgError == null) ? 0 : msgError.hashCode());
-		result = prime * result + ((msgInfo == null) ? 0 : msgInfo.hashCode());
-		result = prime * result + ((msgWarn == null) ? 0 : msgWarn.hashCode());
+				+ ((editorMessages == null) ? 0 : editorMessages.hashCode());
 		return result;
 	}
 
@@ -173,20 +160,10 @@ public class EditorContentPage extends ControlContainer {
 				return false;
 		} else if (!contentControlIds.equals(other.contentControlIds))
 			return false;
-		if (msgError == null) {
-			if (other.msgError != null)
+		if (editorMessages == null) {
+			if (other.editorMessages != null)
 				return false;
-		} else if (!msgError.equals(other.msgError))
-			return false;
-		if (msgInfo == null) {
-			if (other.msgInfo != null)
-				return false;
-		} else if (!msgInfo.equals(other.msgInfo))
-			return false;
-		if (msgWarn == null) {
-			if (other.msgWarn != null)
-				return false;
-		} else if (!msgWarn.equals(other.msgWarn))
+		} else if (!editorMessages.equals(other.editorMessages))
 			return false;
 		return true;
 	}

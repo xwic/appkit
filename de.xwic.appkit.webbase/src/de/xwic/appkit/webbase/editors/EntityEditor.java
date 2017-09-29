@@ -65,6 +65,14 @@ public class EntityEditor extends ControlContainer {
 				bottomTabs.setVisible(!context.isNew() && !bottomTabs.getTabs().isEmpty());
 			}
 		});
+
+	}
+	
+	/**
+	 * Loads the data from the entity that is to be edited. This needs to be invoked by the editor host as the
+	 * last step of the initialization.
+	 */
+	public void loadFromEntity() {
 		
 		try {
 			context.loadFromEntity();
@@ -74,8 +82,6 @@ public class EntityEditor extends ControlContainer {
 		}
 	}
 
-	
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -97,6 +103,8 @@ public class EntityEditor extends ControlContainer {
 				context.setCurrPage(page);
 				createPage(page, eTab);
 				context.setCurrPage(null);
+				
+				context.registerWidget(tab, eTab);
 			}
 			
 			bottomTabs = new TabStrip(this, "bottom");
@@ -109,6 +117,8 @@ public class EntityEditor extends ControlContainer {
 				context.setCurrPage(page);
 				createPage(page, eSubTab);
 				context.setCurrPage(null);
+				
+				context.registerWidget(tab, eSubTab);
 			}
 			
 			bottomTabs.setVisible(false);
@@ -125,7 +135,7 @@ public class EntityEditor extends ControlContainer {
 	 * @param page
 	 * @param eTab
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void createPage(EditorContentPage page, UIElement eTab) {
 		Builder builder = BuilderRegistry.getBuilderByClass(EContainerBuilder.class);
 		builder.buildComponents(eTab, page, context);

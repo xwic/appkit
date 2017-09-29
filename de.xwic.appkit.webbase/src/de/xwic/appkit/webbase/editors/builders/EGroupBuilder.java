@@ -38,6 +38,7 @@ public class EGroupBuilder extends EContainerBuilder<EGroup> {
 		
 		super.buildComponents(group, gc, context);
 		
+		context.registerWidget(gc, group);
 		return gc;
 	}
 	

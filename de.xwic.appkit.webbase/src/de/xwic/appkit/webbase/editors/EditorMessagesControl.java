@@ -10,20 +10,13 @@ import de.jwic.base.Control;
 import de.jwic.base.IControlContainer;
 
 /**
- * Displays a list of messages in an error, warning or info state. An EditorMessagesControl can only 
- * display messages in a single style.
+ * Displays a list of messages in an error, warning or info state. Messages are grouped by severity.
  * 
  * @author lippisch
  */
 public class EditorMessagesControl extends Control {
-
-	public final static String CLASS_ERROR = "xwic-ed-msg-error";
-	public final static String CLASS_WARN = "xwic-ed-msg-warn";
-	public final static String CLASS_INFO = "xwic-ed-msg-info";
-
-	private String styleClass = CLASS_INFO;
 	
-	private List<String> messages = new ArrayList<String>();
+	private List<EditorMessage> messages = new ArrayList<EditorMessage>();
 	
 	/**
 	 * @param container
@@ -31,20 +24,6 @@ public class EditorMessagesControl extends Control {
 	 */
 	public EditorMessagesControl(IControlContainer container, String name) {
 		super(container, name);
-	}
-
-	/**
-	 * @return the styleClass
-	 */
-	public String getStyleClass() {
-		return styleClass;
-	}
-
-	/**
-	 * @param styleClass the styleClass to set
-	 */
-	public void setStyleClass(String styleClass) {
-		this.styleClass = styleClass;
 	}
 
 	/**
@@ -58,27 +37,50 @@ public class EditorMessagesControl extends Control {
 	}
 	
 	/**
+	 * Returns true if the control has messages of the specified severity.
+	 * @param severity
+	 * @return
+	 */
+	public boolean hasMessages(EditorMessage.Severity severity) {
+		for (EditorMessage msg : messages) {
+			if (msg.getSeverity() == severity) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Add a message to the list of messages, causing a re-draw of the control.
 	 * @param message
 	 */
 	public void addMessage(String message) {
-		messages.add(message);
+		messages.add(new EditorMessage(message));
 		requireRedraw();
 	}
-	
+
+	/**
+	 * Add a message.
+	 * @param msg
+	 */
+	public void addMessage(EditorMessage msg) {
+		messages.add(msg);
+		requireRedraw();
+	}
 	
 	/**
 	 * @return the messages
 	 */
-	public List<String> getMessages() {
+	public List<EditorMessage> getMessages() {
 		return messages;
 	}
 
 	/**
-	 * @param messages the messages to set
+	 * @param staticMessages
 	 */
-	public void setMessages(List<String> messages) {
+	public void setMessages(List<EditorMessage> messages) {
 		this.messages = messages;
+		requireRedraw();
 	}
 	
 }

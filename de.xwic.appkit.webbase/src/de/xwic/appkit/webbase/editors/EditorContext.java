@@ -17,8 +17,10 @@
 package de.xwic.appkit.webbase.editors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.script.Bindings;
@@ -26,9 +28,6 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import de.xwic.appkit.core.dao.*;
-import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
-import de.xwic.appkit.webbase.editors.events.ValidationEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,6 +38,14 @@ import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.core.dao.DAO;
+import de.xwic.appkit.core.dao.DAOProviderAPI;
+import de.xwic.appkit.core.dao.DAOSystem;
+import de.xwic.appkit.core.dao.DataAccessException;
+import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.dao.IHistory;
+import de.xwic.appkit.core.dao.UseCase;
+import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.dao.ValidationResult.Severity;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
@@ -46,9 +53,11 @@ import de.xwic.appkit.core.model.IEntityModel;
 import de.xwic.appkit.core.script.ScriptEngineProvider;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
+import de.xwic.appkit.webbase.editors.events.IEditorListenerFactory;
+import de.xwic.appkit.webbase.editors.events.ValidationEvent;
+import de.xwic.appkit.webbase.editors.mappers.MapperFactory;
 import de.xwic.appkit.webbase.editors.mappers.MappingException;
 import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
-import de.xwic.appkit.webbase.editors.mappers.MapperFactory;
 
 /**
  * Contains the widgtes and property-mappers for the editor session.
@@ -57,10 +66,21 @@ import de.xwic.appkit.webbase.editors.mappers.MapperFactory;
  */
 public class EditorContext implements IBuilderContext {
 
-	static final int EVENT_AFTERSAVE = 0;
-	static final int EVENT_LOADED = 1;
-	static final int EVENT_BEFORESAVE = 2;
-	static final int EVENT_PAGES_CREATED = 3;
+	private enum EventType {
+		AFTERSAVE("onAfterSave"),
+		LOADED("onEntityLoaded"),
+		BEFORESAVE("onBeforeSave"),
+		PAGES_CREATED("onPagesCreated"),
+		MESSAGES_UPDATED("onMessagesUpdated");
+		
+		private final String jsFunctionName;
+		EventType(String jsFunctionName) {
+			this.jsFunctionName = jsFunctionName;
+		}
+		String getJsFunctionName() {
+			return jsFunctionName;
+		}
+	}
 
 	private final static Log log = LogFactory.getLog(EditorContext.class);
 	/**
@@ -93,8 +113,11 @@ public class EditorContext implements IBuilderContext {
 
 	/** This list contains errors that happened during the start. They are displayed to the user. */
 	private List<String> initErrors = new ArrayList<String>();
-
+	
+	private List<EditorMessage> staticMessages = new ArrayList<>();
+	
 	private ScriptEngine scriptEngine;
+	private IEditorHost hostCallback;
 
 	/**
 	 * @param input
@@ -118,6 +141,8 @@ public class EditorContext implements IBuilderContext {
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
 		bindings.put("bundle", bundle);
+		bindings.put("user", new EditorContextUser());
+		bindings.put("util", new EditorScriptUtil(Locale.US));
 		bindings.put("ctx", this);
 
 		try {
@@ -153,34 +178,96 @@ public class EditorContext implements IBuilderContext {
 	public synchronized void removeEditorListener(EditorListener listener) {
 		listeners.remove(listener);
 	}
-
+	
 	/**
 	 * Fire an event.
 	 *
 	 * @param event
 	 */
-	void fireEvent(int eventId, boolean isNewEntity) {
+	void fireEvent(EventType eventType, boolean isNewEntity) {
 		Object[] tmp = listeners.toArray();
 		EditorEvent event = new EditorEvent(this, isNewEntity);
 		for (int i = 0; i < tmp.length; i++) {
 			EditorListener listener = (EditorListener) tmp[i];
-			switch (eventId) {
-				case EVENT_AFTERSAVE:
+			switch (eventType) {
+				case AFTERSAVE:
 					listener.afterSave(event);
 					break;
-				case EVENT_LOADED:
+				case LOADED:
 					listener.entityLoaded(event);
 					break;
-				case EVENT_BEFORESAVE:
+				case BEFORESAVE:
 					listener.beforeSave(event);
 					break;
-				case EVENT_PAGES_CREATED:
+				case PAGES_CREATED:
 					listener.pagesCreated(event);
+					break;
+				case MESSAGES_UPDATED:
+					listener.messagesUpdated(event);
 					break;
 			}
 		}
+		
+		// delegate the events into the JavaScript engine - if a function is defined.
+		
+		if (scriptEngine.get(eventType.getJsFunctionName()) != null) {
+			try {
+				scriptEngine.eval(eventType.getJsFunctionName() + "()");
+			} catch (ScriptException e) {
+				log.error("Error executing event function " + eventType.getJsFunctionName(), e);
+				if (eventType != EventType.MESSAGES_UPDATED) {
+					removeStaticMessage("eventScriptError");
+					addStaticMessage(new EditorMessage("An error occured while executing an event based script (" + e.getMessage() + ")", EditorMessage.Severity.ERROR, "eventScriptError"));
+				}
+			}
+		}
+		
 	}
 
+	public void addStaticMessage(String message) {
+		addStaticMessage(new EditorMessage(message));
+	}
+	
+	/**
+	 * @param editorMessage
+	 */
+	public void addStaticMessage(EditorMessage editorMessage) {
+		staticMessages.add(editorMessage);
+		fireEvent(EventType.MESSAGES_UPDATED, false);
+	}
+	
+	/**
+	 * Remove the message passed.
+	 * @param editorMessage
+	 */
+	public void removeStaticMessage(EditorMessage editorMessage) {
+		if (staticMessages.remove(editorMessage)) {
+			fireEvent(EventType.MESSAGES_UPDATED, false);
+		}
+	}
+
+	/**
+	 * Removes the first message found with the specified id.
+	 * @param id
+	 */
+	public void removeStaticMessage(String id) {
+		for (EditorMessage msg : staticMessages) {
+			if (id.equals(msg.getId())) {
+				staticMessages.remove(msg);
+				fireEvent(EventType.MESSAGES_UPDATED, false);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * Returns an unmodifiable list of static messages.
+	 * @return
+	 */
+	public List<EditorMessage> getStaticMessages() {
+		return Collections.unmodifiableList(staticMessages);
+	}
+	
 	/**
 	 * Register a field that uses a custom mapper.
 	 *
@@ -307,7 +394,7 @@ public class EditorContext implements IBuilderContext {
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.loadContent(entity);
 			}
-			fireEvent(EVENT_LOADED, entity.getId() == 0);
+			fireEvent(EventType.LOADED, entity.getId() == 0);
 
 			// if not new, validate
 			if (entity.getId() != 0) {
@@ -409,7 +496,7 @@ public class EditorContext implements IBuilderContext {
 		inTransaction = true;
 		try {
 			IEntity entity = (IEntity) model;
-			fireEvent(EVENT_BEFORESAVE, entity.getId() == 0);
+			fireEvent(EventType.BEFORESAVE, entity.getId() == 0);
 			updateModel();
 
 			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
@@ -469,7 +556,7 @@ public class EditorContext implements IBuilderContext {
 				
 				inTransaction = false;
 				setDirty(false);
-				fireEvent(EVENT_AFTERSAVE, isNew); // revalidate
+				fireEvent(EventType.AFTERSAVE, isNew); // revalidate
 				if (isNew) {
 					//EntityBroker.getEntityBroker().fireEntitySavedNew(model.getOriginalEntity());
 				} else {
@@ -723,5 +810,39 @@ public class EditorContext implements IBuilderContext {
 		return ((IEntity)model).getId() == 0;
 	}
 
+	/**
+	 * Set the callback class for the control that hosts the editor.
+	 * @param entityEditorPage
+	 */
+	public void setHostCallback(IEditorHost hostCallback) {
+		this.hostCallback = hostCallback;
+	}
+
+	/**
+	 * Request that the host control is performing a save. This allows the host control to do some additional 
+	 * UI updates that would be missed if only <code>saveToEntity()</code> is called, which is only the backend
+	 * part of it.
+	 * 
+	 * @return
+	 */
+	public boolean requestSave() {
+		if (hostCallback != null) {
+			return hostCallback.requestSave();
+		}
+		return false;
+	}
+	
+	/**
+	 * Request the host control to close the editor as appropriate.
+	 * @return false if no hostCallback is available.
+	 */
+	public boolean requestEditorClosure() {
+		if (hostCallback != null) {
+			hostCallback.requestClosure();
+			return true;
+		}
+		return false;
+	}
+	
 }
 

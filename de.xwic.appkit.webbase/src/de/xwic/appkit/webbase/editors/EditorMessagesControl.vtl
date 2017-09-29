@@ -1,8 +1,8 @@
 #if($control.messages.size() > 0)
-<div class="xwic-ed-msg $!control.styleClass">
+<div class="xwic-ed-msg">
 	<ul>
 	#foreach($msg in $control.messages)
-		<li>$msg</li>
+		<li class="xwic-ed-msg-${msg.severity}">$msg.message</li>
 	#end
 	</ul>
 </div>

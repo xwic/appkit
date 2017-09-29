@@ -32,9 +32,9 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
-import de.xwic.appkit.core.registry.ExtensionRegistry;
-import de.xwic.appkit.core.registry.IExtension;
 import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
+import de.xwic.appkit.webbase.editors.events.EditorAdapter;
+import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
 import de.xwic.appkit.webbase.toolkit.app.InnerPage;
 import de.xwic.appkit.webbase.toolkit.app.Site;
@@ -44,7 +44,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
  * Provides a standard Page 'frame' for the EntityEditor.
  * @author Lippisch
  */
-public class EntityEditorPage extends InnerPage {
+public class EntityEditorPage extends InnerPage implements IEditorHost {
 
 	public final static String EXTENSION_POINT_EDITOR_EXT = "enityEditorExtension";
 
@@ -59,6 +59,8 @@ public class EntityEditorPage extends InnerPage {
 	
 	private List<IEntityEditorExtension> extensions = new ArrayList<IEntityEditorExtension>();
 	private ToolBar toolbar;
+
+	private EditorMessagesControl staticMessages;
 
 	/**
 	 * @param container
@@ -89,9 +91,15 @@ public class EntityEditorPage extends InnerPage {
 		
 		createActions();
 		createToolbar();
+		
+		staticMessages = new EditorMessagesControl(this, "staticMessages");
+		
 		createContent(entity, editorConfig);
 		
 		createExtensions(entity.getId());
+		
+		// as a final step, load the data so that everything initializes...
+		editor.loadFromEntity();
 	}
 	
 	/**
@@ -243,6 +251,13 @@ public class EntityEditorPage extends InnerPage {
 			GenericEditorInput input = new GenericEditorInput(entity, editorConfig);
 			editor = new EntityEditor(this, "editor", input);
 			context = editor.getContext();
+			context.setHostCallback(this);
+			context.addEditorListener(new EditorAdapter() {
+				@Override
+				public void messagesUpdated(EditorEvent event) {
+					onMessagesUpdated();
+				}
+			});
 		
 			if (context.isEditable()) {
 				editEntity();
@@ -260,9 +275,32 @@ public class EntityEditorPage extends InnerPage {
 	}
 
 	/**
+	 * 
+	 */
+	protected void onMessagesUpdated() {
+		staticMessages.setMessages(context.getStaticMessages());
+	}
+
+	/**
 	 * Returns the underlying EditorContext.
 	 */
 	public EditorContext getContext() {
 		return context;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.IEditorHost#requestSave()
+	 */
+	@Override
+	public boolean requestSave() {
+		return performSave();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.webbase.editors.IEditorHost#requestClosure()
+	 */
+	@Override
+	public void requestClosure() {
+		closeEditor();
 	}
 }

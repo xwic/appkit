@@ -48,5 +48,13 @@ public interface EditorListener {
 	 * @param event
 	 */
 	public void pagesCreated(EditorEvent event);
+	
+	/**
+	 * Fired when a static message was added or removed from the context.
+	 * @param event
+	 */
+	default void messagesUpdated(EditorEvent event) {
+		
+	}
 
 }

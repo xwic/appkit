@@ -48,7 +48,7 @@ public class EContainerBuilder<T extends EComposite> extends Builder<T> {
 		ControlContainer control = null;
 		
 		TableLayoutContainer table = null;
-		if (composite.getCols() > 1) {
+		if (composite.getCols() > 0) {
 			table = new TableLayoutContainer(parent); 
 			control = table;
 			
