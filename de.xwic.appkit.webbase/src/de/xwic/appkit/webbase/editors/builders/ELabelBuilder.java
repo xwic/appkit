@@ -40,19 +40,23 @@ public class ELabelBuilder extends Builder<ELabel> {
 	 */
 	public IControl buildComponents(ELabel eLabel, IControlContainer parent, IBuilderContext context) {
 		String text = "unnamed";
+		String cssClass = null;
 		if (eLabel.getTitle() != null) {
 			text = context.getResString(eLabel.getTitle());
 		} else if (eLabel.getProperty() != null) {
 			Property finalProperty = eLabel.getFinalProperty();
 			text = context.getResString(finalProperty);
+			cssClass = "xwic-ed-lbl-prop";
 			if (finalProperty.getRequired()) {
 				text += "&nbsp;<span class=\"xwic-ed-lbl-required\">*</span>";
 			}
+			
 		}
 
 		Label label = null;
 		label = new Label(parent);
 		label.setText(text);
+		label.setCssClass(cssClass);
 		
 		context.registerWidget(label, eLabel);
 
