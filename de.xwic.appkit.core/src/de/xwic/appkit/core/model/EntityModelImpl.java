@@ -230,7 +230,7 @@ class EntityModelImpl implements IEntityModel {
 			ChangeLogHelper helper = new ChangeLogHelper();
 			helper.setOrigValue(origValue);
 			helper.setNewValue(newValue);
-			helper.setFieldNameKey(entity.getClass() + "." + name);
+			helper.setFieldNameKey(entity.type().getName() + "." + name);
 			result.add(helper);
 		}
 		return result;
