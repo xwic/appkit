@@ -33,6 +33,9 @@ public class EditorConfiguration {
 	/** default list and editor id name */
 	public final static String DEFAULT = "default";
 	
+	public final static String SHOW_COMMENT = "showComment";
+	public final static String ENTITY_HISTORY = "entityHistory";
+	
 	private String id = DEFAULT;
 	private EntityDescriptor entityType = null;
 	
@@ -42,6 +45,7 @@ public class EditorConfiguration {
 	private Map<String, Style> styleTemplates = new HashMap<String, Style>();
 	
 	private String globalScript = null;
+	private Map<String, String> properties = new HashMap<>();
 	
 	/**
 	 * Constructor.
@@ -149,5 +153,22 @@ public class EditorConfiguration {
 
 	public List<ESubTab> getSubTabs() {
 		return subTabs;
+	}
+
+	/**
+	 * Add property with given id and values.
+	 * @param id
+	 * @param value
+	 */
+	public void addProperty(String id, String value) {
+		properties.put(id, value);
+	}
+
+	
+	/**
+	 * @return the properties
+	 */
+	public Map<String, String> getProperties() {
+		return properties;
 	}
 }

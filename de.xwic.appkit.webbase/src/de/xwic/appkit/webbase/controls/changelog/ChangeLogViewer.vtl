@@ -1,0 +1,6 @@
+#set($field = $control.getField("data"))
+<input type="hidden" name="$field.id" id="$field.id" value="$jwic.formatInp(${field.value})">
+<div id="changeLog_$control.controlID">
+</div>
+
+The $!control.objectTitle was created on <b>$jwic.formatDate($control.createdAt)</b> #if($!control.createdFrom != "")by $!control.createdFrom#end.

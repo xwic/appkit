@@ -37,4 +37,26 @@ public class StringUtils {
 
 		return false;
 	}
+	
+	/**
+	 * @param s
+	 * @param length
+	 * @return
+	 */
+	public static String trimToSize(String s, int length) {
+		if (isEmpty(s)) {
+			return s;
+		}
+		int trimTo = s.length() < length ? s.length() : length;
+		return s.substring(0, trimTo);
+	}
+
+	/**
+	 * @param s
+	 * @return
+	 */
+	public static boolean isEmpty(String s) {
+		return s == null || s.trim().isEmpty();
+	}
+
 }

@@ -28,6 +28,7 @@ import de.xwic.appkit.core.config.editor.ETab;
 import de.xwic.appkit.core.config.editor.EditorConfiguration;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.model.EntityModelException;
+import de.xwic.appkit.webbase.controls.comment.EntityShoutBox;
 import de.xwic.appkit.webbase.editors.builders.Builder;
 import de.xwic.appkit.webbase.editors.builders.BuilderRegistry;
 import de.xwic.appkit.webbase.editors.builders.EContainerBuilder;
@@ -41,6 +42,7 @@ import de.xwic.appkit.webbase.editors.mappers.MappingException;
  * @author lippisch
  */
 public class EntityEditor extends ControlContainer {
+
 	private GenericEditorInput input = null;
 	private EditorContext context = null;
 	private TabStrip bottomTabs;
@@ -48,18 +50,20 @@ public class EntityEditor extends ControlContainer {
 	/**
 	 * @param container
 	 * @param name
-	 * @param input 
-	 * @throws EntityModelException 
-	 * @throws ConfigurationException 
+	 * @param input
+	 * @throws EntityModelException
+	 * @throws ConfigurationException
 	 */
-	public EntityEditor(IControlContainer container, String name, GenericEditorInput input) throws ConfigurationException, EntityModelException {
+	public EntityEditor(IControlContainer container, String name, GenericEditorInput input)
+			throws ConfigurationException, EntityModelException {
 		super(container, name);
 		this.input = input;
 		this.context = new EditorContext(input, getSessionContext().getLocale().getLanguage());
-		
+
 		createControls();
-		
+
 		context.addEditorListener(new EditorAdapter() {
+
 			@Override
 			public void entityLoaded(EditorEvent event) {
 				bottomTabs.setVisible(!context.isNew() && !bottomTabs.getTabs().isEmpty());
@@ -67,13 +71,13 @@ public class EntityEditor extends ControlContainer {
 		});
 
 	}
-	
+
 	/**
-	 * Loads the data from the entity that is to be edited. This needs to be invoked by the editor host as the
-	 * last step of the initialization.
+	 * Loads the data from the entity that is to be edited. This needs to be invoked by the editor host as the last step of the
+	 * initialization.
 	 */
 	public void loadFromEntity() {
-		
+
 		try {
 			context.loadFromEntity();
 		} catch (MappingException e) {
@@ -103,13 +107,13 @@ public class EntityEditor extends ControlContainer {
 				context.setCurrPage(page);
 				createPage(page, eTab);
 				context.setCurrPage(null);
-				
+
 				context.registerWidget(tab, eTab);
 			}
-			
+
 			bottomTabs = new TabStrip(this, "bottom");
 			List<ESubTab> subTabs = config.getSubTabs();
-			for(ESubTab eSubTab : subTabs) {
+			for (ESubTab eSubTab : subTabs) {
 				Tab tab = bottomTabs.addTab(eSubTab.getTitle());
 				EditorContentPage page = new EditorContentPage(tab, null);
 				page.setTitle(eSubTab.getTitle());
@@ -117,16 +121,26 @@ public class EntityEditor extends ControlContainer {
 				context.setCurrPage(page);
 				createPage(page, eSubTab);
 				context.setCurrPage(null);
-				
+
 				context.registerWidget(tab, eSubTab);
 			}
-			
+
 			bottomTabs.setVisible(false);
 			
+			if (showComment()) {
+				new EntityShoutBox(this, "entityShoutBox", context.getModel().getOriginalEntity());
+			}
+
 		} catch (Exception e) {
 			log.error("Error opening editor", e);
 			getSessionContext().notifyMessage("An error occured while initializing controls from the editor:" + e);
 		}
+	}
+	
+	public boolean showComment() {
+		EditorConfiguration editorConfig = context.getEditorConfiguration();
+		return editorConfig.getProperties().containsKey(EditorConfiguration.SHOW_COMMENT)
+				&& editorConfig.getProperties().get(EditorConfiguration.SHOW_COMMENT).toLowerCase().equals("true");
 	}
 
 	/**

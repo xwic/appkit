@@ -84,6 +84,8 @@ public class XmlEditorConfigReader {
 
 	private final static String NODE_ATTACHMENTS = "attachments";
 	private final static String NODE_SINGLE_ATTACHMENT = "singleAttachment";
+	private final static String NODE_PROPERTIES = "properties";
+	private final static String NODE_PROPERTY = "property";
 
 	private EditorConfiguration config = null;
 
@@ -261,6 +263,8 @@ public class XmlEditorConfigReader {
 					readTemplates(element);
 				} else if (name.equals("layout")) {
 					buildLayout(element);
+				} else if(name.equals(NODE_PROPERTIES)) {
+					readProperties(element);
 				}
 			}
 		}
@@ -291,6 +295,29 @@ public class XmlEditorConfigReader {
 					}
 					style.readStyles(getNodeText(element));
 					config.addStyleTemplate(id, style);
+				}
+			}
+		}
+
+	}
+	
+	/**
+	 * @param element
+	 * @throws ParseException
+	 */
+	private void readProperties(Element tplElement) throws ParseException {
+
+		NodeList nl = tplElement.getChildNodes();
+		for (int i = 0; i < nl.getLength(); i++) {
+			Node node = nl.item(i);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+				if (element.getNodeName().equals(NODE_PROPERTY)) {
+					String id = element.getAttribute("id");
+					if (id == null || id.length() == 0) {
+						throw new ParseException("A style must have an id attribute.");
+					}
+					config.addProperty(id, getNodeText(element));
 				}
 			}
 		}

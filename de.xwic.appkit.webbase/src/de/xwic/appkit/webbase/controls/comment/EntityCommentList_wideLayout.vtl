@@ -1,0 +1,8 @@
+#if($control.editableCommentControls.size() != 0)
+	#foreach ($cmt in $control.editableCommentControls)
+		$insert.control($cmt.name)
+	#end
+#else
+ - No Comments -
+#end
+

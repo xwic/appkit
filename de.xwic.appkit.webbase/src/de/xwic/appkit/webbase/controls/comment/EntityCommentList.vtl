@@ -1,0 +1,33 @@
+#set($list = $control.getComments())
+#set($commentSize = $control.maxCommentDisplaySize)
+
+#if($list.size() != 0)
+
+#foreach ($cmt in $list)
+	<div class="shoutBox_comment #if($velocityCount % 2 == 0) comment-even #end">
+	#set($comment = $cmt.comment)
+
+    $control.parseComment($comment)
+	#if($comment.length() > $commentSize)
+		...(<a href="$control.createActionURL("ShowAllComments", "")">Read All</a>)
+	#end
+	<div class="shoutBox_commentFooter" style="white-space: nowrap;">
+	$cmt.createdFrom - $control.dateTime($cmt.createdAt)
+	</div>
+	</div>
+	
+#end
+
+<div>
+<span class="subLabel"><br>All comments are in time zone: <br> $control.getTimeZoneName()</span>
+</div>
+	
+<div class="shoutListAll">
+<a href="$control.createActionURL("ShowAllComments", "")">Show all $control.getTotalCommentsCount() Comments...</a>
+</div>
+
+#else
+
+ - No Comments -
+
+#end

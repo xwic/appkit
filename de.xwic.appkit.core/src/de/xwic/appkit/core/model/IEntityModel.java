@@ -17,6 +17,7 @@
 package de.xwic.appkit.core.model;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import de.xwic.appkit.core.dao.IEntity;
 
@@ -63,4 +64,11 @@ public interface IEntityModel {
 
 	@SuppressWarnings("unchecked")
 	Object getProperty(String name) throws Exception;
+	
+	/**
+	 * Generates a list of changed values of the entity to be used to generate the entity change log.
+	 * @return
+	 * @throws Exception
+	 */
+	List<ChangeLogHelper> generateChangeLogHelpers() throws Exception;
 }

@@ -33,6 +33,7 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
+import de.xwic.appkit.webbase.controls.comment.EntityShoutBox;
 import de.xwic.appkit.webbase.editors.events.EditorAdapter;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
@@ -42,6 +43,7 @@ import de.xwic.appkit.webbase.toolkit.util.ImageLibrary;
 
 /**
  * Provides a standard Page 'frame' for the EntityEditor.
+ * 
  * @author Lippisch
  */
 public class EntityEditorPage extends InnerPage implements IEditorHost {
@@ -54,9 +56,9 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 	private IAction actionSave;
 	private IAction actionSaveClose;
 	private IAction actionClose;
-	
+
 	private IAction actionEdit;
-	
+
 	private List<IEntityEditorExtension> extensions = new ArrayList<IEntityEditorExtension>();
 	private ToolBar toolbar;
 
@@ -65,12 +67,12 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 	/**
 	 * @param container
 	 * @param name
-	 * @throws EditorConfigurationException 
+	 * @throws EditorConfigurationException
 	 */
-	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
+	public EntityEditorPage(IControlContainer container, String name, IEntity entity, EditorConfiguration editorConfig)
+			throws EditorConfigurationException {
 		super(container, name);
-		
-		
+
 		String title;
 		if (entity.getId() == 0) { // new entity
 			String entityType = entity.type().getName();
@@ -86,26 +88,28 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 			DAO<? extends IEntity> dao = DAOSystem.findDAOforEntity(entity.type());
 			title = dao.buildTitle(entity);
 		}
-			
+
 		setTitle(title);
-		
+
 		createActions();
 		createToolbar();
-		
+
 		staticMessages = new EditorMessagesControl(this, "staticMessages");
-		
+
 		createContent(entity, editorConfig);
-		
+
 		createExtensions(entity.getId());
-		
+
 		// as a final step, load the data so that everything initializes...
 		editor.loadFromEntity();
 	}
-	
+
 	/**
 	 * Search for editor extensions and initialize them.
-     * @param id editor entity id
-     */
+	 * 
+	 * @param id
+	 *            editor entity id
+	 */
 	private void createExtensions(Long id) {
 
 		// Step 1 - find and instantiate extensions...
@@ -128,7 +132,8 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 
 		List<ICustomEntityActionCreator> tabExtensions = EditorExtensionUtils.getExtensions("entityEditorActions", entityType);
 		for (ICustomEntityActionCreator entityActionCreator : tabExtensions) {
-			toolbar.addGroup().addAction(entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite(), entityType, String.valueOf(id)));
+			toolbar.addGroup().addAction(
+					entityActionCreator.createAction(ExtendedApplication.getInstance(this).getSite(), entityType, String.valueOf(id)));
 		}
 	}
 
@@ -138,6 +143,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 	private void createActions() {
 
 		actionSave = new Action() {
+
 			@Override
 			public void run() {
 				performSave();
@@ -148,6 +154,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		actionSave.setIconDisabled(ImageLibrary.ICON_SAVE_INACTIVE);
 
 		actionSaveClose = new Action() {
+
 			@Override
 			public void run() {
 				if (performSave()) {
@@ -160,6 +167,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		actionSaveClose.setIconDisabled(ImageLibrary.ICON_SAVECLOSE_INACTIVE);
 
 		actionClose = new Action() {
+
 			@Override
 			public void run() {
 				closeEditor();
@@ -170,6 +178,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		actionClose.setIconDisabled(ImageLibrary.ICON_CLOSED_INACTIVE);
 
 		actionEdit = new Action() {
+
 			@Override
 			public void run() {
 				editEntity();
@@ -201,7 +210,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 
 		Site site = ExtendedApplication.getInstance(this).getSite();
 		site.popPage(this);
-		
+
 	}
 
 	/**
@@ -211,14 +220,16 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		try {
 			ValidationResult validationResult = context.saveToEntity();
 			if (validationResult.hasErrors()) {
-				getSessionContext().notifyMessage("The changes could not be saved due to validation errors. Please review the issues below and try again.", "error");
+				getSessionContext().notifyMessage(
+						"The changes could not be saved due to validation errors. Please review the issues below and try again.", "error");
 			} else {
 				getSessionContext().notifyMessage("Your changes have been saved...");
 				return true;
 			}
 		} catch (Exception e) {
 			getSessionContext().notifyMessage("A Problem occured while saving your changes. (" + e + ")", "error");
-			log.error("An error occured when saving an entity (" + context.getEntityDescriptor().getClassname() + ":#" + context.getInput().getEntity().getId() + ")", e);
+			log.error("An error occured when saving an entity (" + context.getEntityDescriptor().getClassname() + ":#"
+					+ context.getInput().getEntity().getId() + ")", e);
 		}
 		return false;
 	}
@@ -227,7 +238,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 	 * 
 	 */
 	private void createToolbar() {
-		
+
 		toolbar = new ToolBar(this, "toolbar");
 		ToolBarGroup grpDefault = toolbar.addGroup();
 
@@ -235,30 +246,31 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		grpDefault.addAction(actionSaveClose);
 		grpDefault.addAction(actionSave);
 		grpDefault.addAction(actionEdit);
-		
-		
+
 	}
 
 	/**
 	 * Create the editor.
+	 * 
 	 * @param editorModel
-	 * @throws EditorConfigurationException 
+	 * @throws EditorConfigurationException
 	 */
 	private void createContent(IEntity entity, EditorConfiguration editorConfig) throws EditorConfigurationException {
-		
+
 		try {
-			
+
 			GenericEditorInput input = new GenericEditorInput(entity, editorConfig);
 			editor = new EntityEditor(this, "editor", input);
 			context = editor.getContext();
 			context.setHostCallback(this);
 			context.addEditorListener(new EditorAdapter() {
+
 				@Override
 				public void messagesUpdated(EditorEvent event) {
 					onMessagesUpdated();
 				}
 			});
-		
+
 			if (context.isEditable()) {
 				editEntity();
 			} else {
@@ -266,7 +278,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 				actionSave.setEnabled(false);
 				actionSaveClose.setEnabled(false);
 			}
-			
+
 		} catch (Exception e) {
 			log.error("Error creating editor", e);
 			getSessionContext().notifyMessage("Error: " + e.toString());
@@ -288,7 +300,9 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		return context;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.webbase.editors.IEditorHost#requestSave()
 	 */
 	@Override
@@ -296,7 +310,9 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		return performSave();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.webbase.editors.IEditorHost#requestClosure()
 	 */
 	@Override

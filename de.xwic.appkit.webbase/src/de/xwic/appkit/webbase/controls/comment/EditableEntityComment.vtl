@@ -1,0 +1,41 @@
+<div class="shoutBox_comment_wide">
+
+	<table width="100%">
+		<tr>
+			<td class="shoutBox_commentInfo" valign="top">
+				#set($ma = $!employee)
+				
+				#if($ef.id)
+					<p class="shoutBox_commentUser">$!ma.nachname, $!ma.vorname</p>
+					#if($ma.zusatz)<p class="shoutBox_commentTitle">$!ma.zusatz</p>#end
+			
+				#else
+					<span class="shoutBox_commentUser">$!control.comment.createdFrom</span>
+				#end
+				
+				<br>
+				
+				<p class="shoutBox_commentDate">$control.dateTime($control.comment.createdAt)</p>				
+				
+				#if($control.allowEdit)
+					<div>
+						$insert.control('btnEdit')
+						$insert.control('btnDelete')
+					</div>
+				#end
+				
+			</td>
+			
+			<td class="shoutBox_comment_content" valign="top">
+				#if($control.editMode)
+					$insert.control('ibComment')
+					$insert.control('btnSave')
+					$insert.control('btnCancel')
+				#else
+					$control.getCommentText()
+				#end
+			</td>
+		</tr>
+	</table>
+	
+</div>

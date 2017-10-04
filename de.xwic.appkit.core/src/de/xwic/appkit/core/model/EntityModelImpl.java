@@ -16,16 +16,20 @@
  *******************************************************************************/
 package de.xwic.appkit.core.model;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import de.xwic.appkit.core.dao.IEntity;
@@ -205,5 +209,32 @@ class EntityModelImpl implements IEntityModel {
 		firePropertyChange(name, oldValue, value);
 		
 	}
+	
+	/**
+	 * @return
+	 * @throws Exception 
+	 */
+	public List<ChangeLogHelper> generateChangeLogHelpers() throws Exception {
+		List<ChangeLogHelper> result = new ArrayList<>();
+		for (Entry<String, Object> dataElem : data.entrySet()) {
+			
+			String name = dataElem.getKey();
+			char chars[] = name.toCharArray();
+			chars[0] = Character.toUpperCase(chars[0]);
+			String readMethodName = "is" + new String(chars);
+			
+			PropertyDescriptor pd = new PropertyDescriptor(name, entity.getClass(), readMethodName, null);
+			Method mRead = pd.getReadMethod();
+			Object origValue = mRead.invoke(entity, (Object[]) null);
+			Object newValue = dataElem.getValue();
+			ChangeLogHelper helper = new ChangeLogHelper();
+			helper.setOrigValue(origValue);
+			helper.setNewValue(newValue);
+			helper.setFieldNameKey(entity.getClass() + "." + name);
+			result.add(helper);
+		}
+		return result;
+	}
+	
 
 }

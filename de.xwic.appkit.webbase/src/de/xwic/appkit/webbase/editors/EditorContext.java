@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -47,9 +48,16 @@ import de.xwic.appkit.core.dao.IHistory;
 import de.xwic.appkit.core.dao.UseCase;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.core.dao.ValidationResult.Severity;
+import de.xwic.appkit.core.model.ChangeLogHelper;
 import de.xwic.appkit.core.model.EntityModelException;
 import de.xwic.appkit.core.model.EntityModelFactory;
 import de.xwic.appkit.core.model.IEntityModel;
+import de.xwic.appkit.core.model.daos.IEntityChangeLogDAO;
+import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
+import de.xwic.appkit.core.model.entities.IEntityChangeLog;
+import de.xwic.appkit.core.model.entities.IMitarbeiter;
+import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.model.entities.util.Picklists;
 import de.xwic.appkit.core.script.ScriptEngineProvider;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
@@ -67,16 +75,15 @@ import de.xwic.appkit.webbase.editors.mappers.PropertyMapper;
 public class EditorContext implements IBuilderContext {
 
 	private enum EventType {
-		AFTERSAVE("onAfterSave"),
-		LOADED("onEntityLoaded"),
-		BEFORESAVE("onBeforeSave"),
-		PAGES_CREATED("onPagesCreated"),
-		MESSAGES_UPDATED("onMessagesUpdated");
-		
+		AFTERSAVE("onAfterSave"), LOADED("onEntityLoaded"), BEFORESAVE("onBeforeSave"), PAGES_CREATED("onPagesCreated"), MESSAGES_UPDATED(
+				"onMessagesUpdated");
+
 		private final String jsFunctionName;
+
 		EventType(String jsFunctionName) {
 			this.jsFunctionName = jsFunctionName;
 		}
+
 		String getJsFunctionName() {
 			return jsFunctionName;
 		}
@@ -113,19 +120,20 @@ public class EditorContext implements IBuilderContext {
 
 	/** This list contains errors that happened during the start. They are displayed to the user. */
 	private List<String> initErrors = new ArrayList<String>();
-	
+
 	private List<EditorMessage> staticMessages = new ArrayList<>();
-	
+
 	private ScriptEngine scriptEngine;
 	private IEditorHost hostCallback;
+	private IEntityChangeLogDAO changeLogDao = DAOSystem.getDAO(IEntityChangeLogDAO.class);
+	private IEntityChangeLog changeLog = null;
 
 	/**
 	 * @param input
 	 * @throws ConfigurationException
 	 * @throws EntityModelException
 	 */
-	public EditorContext(GenericEditorInput input, String langId) throws ConfigurationException,
-			EntityModelException {
+	public EditorContext(GenericEditorInput input, String langId) throws ConfigurationException, EntityModelException {
 		this.input = input;
 		this.config = input.getConfig();
 		this.bundle = config.getEntityType().getDomain().getBundle(langId);
@@ -133,11 +141,11 @@ public class EditorContext implements IBuilderContext {
 		this.dirty = input.getEntity().getId() == 0; // is a new entity.
 
 		DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
-		this.editable = dao.hasRight(input.getEntity(), "UPDATE")
-							&& !input.getEntity().isDeleted()
-							&& !(input.getEntity() instanceof IHistory);
-		
-		scriptEngine = ScriptEngineProvider.instance().createEngine("Editor(" + config.getEntityType().getId() + ":" + config.getId() + ")");
+		this.editable = dao.hasRight(input.getEntity(), "UPDATE") && !input.getEntity().isDeleted()
+				&& !(input.getEntity() instanceof IHistory);
+
+		scriptEngine = ScriptEngineProvider.instance()
+				.createEngine("Editor(" + config.getEntityType().getId() + ":" + config.getId() + ")");
 		Bindings bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
 		bindings.put("entity", model);
 		bindings.put("bundle", bundle);
@@ -153,13 +161,13 @@ public class EditorContext implements IBuilderContext {
 			initErrors.add("ScriptException in GlobalScript for editor configuration (" + se + ")");
 			log.error("Error evaluating global script in Editor(" + config.getEntityType() + ":" + config.getId() + ")", se);
 		}
-        final String entityType = getEntityDescriptor().getClassname();
-        final List<IEditorListenerFactory> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_LISTENER, entityType);
-        for (IEditorListenerFactory listenerExtension : listenerExtensions) {
-            EditorListener editorListener = listenerExtension.createListener();
-            addEditorListener(editorListener);
-        }
-    }
+		final String entityType = getEntityDescriptor().getClassname();
+		final List<IEditorListenerFactory> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_LISTENER, entityType);
+		for (IEditorListenerFactory listenerExtension : listenerExtensions) {
+			EditorListener editorListener = listenerExtension.createListener();
+			addEditorListener(editorListener);
+		}
+	}
 
 	/**
 	 * Add an EditorListener.
@@ -178,7 +186,7 @@ public class EditorContext implements IBuilderContext {
 	public synchronized void removeEditorListener(EditorListener listener) {
 		listeners.remove(listener);
 	}
-	
+
 	/**
 	 * Fire an event.
 	 *
@@ -190,26 +198,26 @@ public class EditorContext implements IBuilderContext {
 		for (int i = 0; i < tmp.length; i++) {
 			EditorListener listener = (EditorListener) tmp[i];
 			switch (eventType) {
-				case AFTERSAVE:
-					listener.afterSave(event);
-					break;
-				case LOADED:
-					listener.entityLoaded(event);
-					break;
-				case BEFORESAVE:
-					listener.beforeSave(event);
-					break;
-				case PAGES_CREATED:
-					listener.pagesCreated(event);
-					break;
-				case MESSAGES_UPDATED:
-					listener.messagesUpdated(event);
-					break;
+			case AFTERSAVE:
+				listener.afterSave(event);
+				break;
+			case LOADED:
+				listener.entityLoaded(event);
+				break;
+			case BEFORESAVE:
+				listener.beforeSave(event);
+				break;
+			case PAGES_CREATED:
+				listener.pagesCreated(event);
+				break;
+			case MESSAGES_UPDATED:
+				listener.messagesUpdated(event);
+				break;
 			}
 		}
-		
+
 		// delegate the events into the JavaScript engine - if a function is defined.
-		
+
 		if (scriptEngine.get(eventType.getJsFunctionName()) != null) {
 			try {
 				scriptEngine.eval(eventType.getJsFunctionName() + "()");
@@ -217,17 +225,18 @@ public class EditorContext implements IBuilderContext {
 				log.error("Error executing event function " + eventType.getJsFunctionName(), e);
 				if (eventType != EventType.MESSAGES_UPDATED) {
 					removeStaticMessage("eventScriptError");
-					addStaticMessage(new EditorMessage("An error occured while executing an event based script (" + e.getMessage() + ")", EditorMessage.Severity.ERROR, "eventScriptError"));
+					addStaticMessage(new EditorMessage("An error occured while executing an event based script (" + e.getMessage() + ")",
+							EditorMessage.Severity.ERROR, "eventScriptError"));
 				}
 			}
 		}
-		
+
 	}
 
 	public void addStaticMessage(String message) {
 		addStaticMessage(new EditorMessage(message));
 	}
-	
+
 	/**
 	 * @param editorMessage
 	 */
@@ -235,9 +244,10 @@ public class EditorContext implements IBuilderContext {
 		staticMessages.add(editorMessage);
 		fireEvent(EventType.MESSAGES_UPDATED, false);
 	}
-	
+
 	/**
 	 * Remove the message passed.
+	 * 
 	 * @param editorMessage
 	 */
 	public void removeStaticMessage(EditorMessage editorMessage) {
@@ -248,6 +258,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Removes the first message found with the specified id.
+	 * 
 	 * @param id
 	 */
 	public void removeStaticMessage(String id) {
@@ -259,15 +270,16 @@ public class EditorContext implements IBuilderContext {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns an unmodifiable list of static messages.
+	 * 
 	 * @return
 	 */
 	public List<EditorMessage> getStaticMessages() {
 		return Collections.unmodifiableList(staticMessages);
 	}
-	
+
 	/**
 	 * Register a field that uses a custom mapper.
 	 *
@@ -280,8 +292,11 @@ public class EditorContext implements IBuilderContext {
 		registerField(property, widget, uiDef, mapperId, false);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[], org.eclipse.swt.widgets.Widget, java.lang.String, java.lang.String, boolean)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#registerField(de.xwic.appkit.core.config.model.Property[],
+	 * org.eclipse.swt.widgets.Widget, java.lang.String, java.lang.String, boolean)
 	 */
 	public void registerField(Property[] property, IControl widget, UIElement uiDef, String mapperId, boolean infoMode) {
 
@@ -329,10 +344,9 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * Register a widget with the given id. If the id is <code>null</code>, the widget
-	 * will not be registered but no exception is thrown.
-	 * <p>This is useful for widgets that should be accessible from script but are not a field by
-	 * itself, like a container.
+	 * Register a widget with the given id. If the id is <code>null</code>, the widget will not be registered but no exception is thrown.
+	 * <p>
+	 * This is useful for widgets that should be accessible from script but are not a field by itself, like a container.
 	 *
 	 * @param id
 	 * @param widget
@@ -359,6 +373,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Changes the editable flag of all registered widgets/properties.
+	 * 
 	 * @param editable
 	 */
 	public void setAllEditable(boolean editable) {
@@ -371,6 +386,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Change the editable flag of a specified property.
+	 * 
 	 * @param editable
 	 * @param propertyKey
 	 */
@@ -390,7 +406,7 @@ public class EditorContext implements IBuilderContext {
 	public void loadFromEntity() throws MappingException {
 		inTransaction = true;
 		try {
-			IEntity entity = (IEntity)model;
+			IEntity entity = (IEntity) model;
 			for (PropertyMapper<IControl> mapper : mappers.values()) {
 				mapper.loadContent(entity);
 			}
@@ -415,8 +431,7 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * Run through all widgets with a hideWhen formula and execute it to
-	 * hide/show those widgets.
+	 * Run through all widgets with a hideWhen formula and execute it to hide/show those widgets.
 	 */
 	private void evaluateHideWhens() {
 
@@ -468,17 +483,23 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * Validate entity model using extension validator.
-	 * Iterate all possible validation extensions and perform validation.
+	 * Validate entity model using extension validator. Iterate all possible validation extensions and perform validation.
 	 *
-	 * @param result validation result
-	 * @param entityType type of entity to validate
+	 * @param result
+	 *            validation result
+	 * @param entityType
+	 *            type of entity to validate
 	 */
 	private void fireValidated(ValidationResult result, String entityType, boolean onSave) {
 		final List<IEditorValidatorListener> listenerExtensions = EditorExtensionUtils.getExtensions(EP_EDITOR_VALIDATOR, entityType);
 		for (IEditorValidatorListener editorValidator : listenerExtensions) {
 			editorValidator.modelValidated(new ValidationEvent(model, result, onSave));
 		}
+	}
+
+	private boolean isEntityHistoryEnabled() {
+		return config.getProperties().containsKey(EditorConfiguration.ENTITY_HISTORY)
+				&& config.getProperties().get(EditorConfiguration.ENTITY_HISTORY).toLowerCase().equals("true");
 	}
 
 	/**
@@ -497,6 +518,26 @@ public class EditorContext implements IBuilderContext {
 		try {
 			IEntity entity = (IEntity) model;
 			fireEvent(EventType.BEFORESAVE, entity.getId() == 0);
+
+			if (isEntityHistoryEnabled()) {
+				try {
+					IMitarbeiter empl = DAOSystem.getDAO(IMitarbeiterDAO.class).getByCurrentUser();
+					changeLog = changeLogDao.startLog(entity, empl, null);
+					
+
+					List<ChangeLogHelper> changeLogList = model.generateChangeLogHelpers();
+					if (!changeLogList.isEmpty()) {
+						for (ChangeLogHelper helper : changeLogList) {
+							addChangeLogEntry(helper.getOrigValue(), helper.getNewValue(), helper.getFieldNameKey(), bundle);
+						}
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+
+			}
+
 			updateModel();
 
 			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
@@ -507,39 +548,47 @@ public class EditorContext implements IBuilderContext {
 			fireValidated(result, getEntityDescriptor().getClassname(), true);
 
 			if (!result.hasErrors()) {
+
 				boolean isNew = model.getOriginalEntity().getId() == 0;
 				// run as UseCase to make all updates as a single transaction.
 				UseCase uc = new UseCase() {
-					/* (non-Javadoc)
+
+					/*
+					 * (non-Javadoc)
+					 * 
 					 * @see de.xwic.appkit.core.dao.UseCase#execute(de.xwic.appkit.core.dao.DAOProviderAPI)
 					 */
 					@Override
 					protected Object execute(DAOProviderAPI api) {
-						
+
 						// check if there is any sub-property which is a model that was modified
 						EntityDescriptor ed = dao.getEntityDescriptor();
+
 						for (String prop : ed.getProperties().keySet()) {
 							Property p = ed.getProperty(prop);
 							if (p.isEntity()) {
 								try {
 									Object o = model.getProperty(prop);
 									if (o instanceof IEntityModel) {
-										IEntityModel subModel = (IEntityModel)o;
+										IEntityModel subModel = (IEntityModel) o;
 										if (subModel.isModified()) { // dirt -> needs to be saved
 											subModel.commit();
 											IEntity subEntity = subModel.getOriginalEntity();
-											DAO subDAO =DAOSystem.findDAOforEntity(subEntity.type());
+											DAO subDAO = DAOSystem.findDAOforEntity(subEntity.type());
 											subDAO.update(subEntity);
 										}
 									}
 								} catch (Exception e) {
 									throw new RuntimeException("Error saving subModel", e);
 								}
-								
+
 							}
 						}
-						
+
 						try {
+							if(changeLog != null) {
+								changeLog.saveIfChanged();
+							}
 							model.commit();
 							dao.update(model.getOriginalEntity());
 						} catch (EntityModelException em) {
@@ -550,10 +599,9 @@ public class EditorContext implements IBuilderContext {
 				};
 				Object ucResult = uc.execute();
 				if (ucResult instanceof EntityModelException) {
-					throw (EntityModelException)ucResult;
+					throw (EntityModelException) ucResult;
 				}
-				
-				
+
 				inTransaction = false;
 				setDirty(false);
 				fireEvent(EventType.AFTERSAVE, isNew); // revalidate
@@ -565,7 +613,7 @@ public class EditorContext implements IBuilderContext {
 				loadFromEntity(); // load probably modified data.
 				result = dao.validateEntity(entity); // revalidate after
 														// save.
-			}else{
+			} else {
 				// RCPErrorDialog.openError(UIToolsPlugin.getResourceString("error.dialog.EditorContext.validationfail"));
 			}
 			displayValidationResults(result);
@@ -576,7 +624,68 @@ public class EditorContext implements IBuilderContext {
 		}
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Adds a new change log entry.
+	 * 
+	 * @param originalValue
+	 * @param newValue
+	 * @param fieldNameKey
+	 */
+	private void addChangeLogEntry(Object originalValue, Object newValue, String fieldNameKey, Bundle bundle) {
+		String fieldName = bundle.getString(fieldNameKey);
+		Object sample = originalValue == null ? newValue : originalValue;
+		if (sample instanceof IPicklistEntry) {
+			changeLog.evaluate(fieldName, originalValue, newValue);
+		} else if (sample instanceof IEntity) {
+			DAO<?> dao = DAOSystem.findDAOforEntity(((IEntity) sample).type());
+			changeLog.evaluate(fieldName, originalValue != null ? dao.buildTitle((IEntity) originalValue) : "",
+					newValue != null ? dao.buildTitle((IEntity) newValue) : "");
+		} else if (sample instanceof Set) {
+			String sb1 = generateSetChangeString(originalValue);
+			String sb2 = generateSetChangeString(newValue);
+
+			changeLog.evaluate(fieldName, sb1, sb2);
+		} else {
+			changeLog.evaluate(fieldName, originalValue, newValue);
+		}
+
+	}
+	
+	/**
+	 * @param originalValue
+	 * @param sb1
+	 */
+	private String generateSetChangeString(Object originalSetValue) {
+		StringBuilder sb1 = new StringBuilder();
+		boolean isFirst = true;
+		DAO<?> dao = null;
+		if (originalSetValue != null) {
+			Set<?> set = (Set<?>) originalSetValue;
+			for (Object origObj : set) {
+				if (!isFirst) {
+					sb1.append(", ");
+				}
+				isFirst = false;
+
+				if (origObj instanceof IPicklistEntry) {
+					IPicklistEntry pe = (IPicklistEntry) origObj;
+					sb1.append(Picklists.getTextEn(pe));
+				} else if (origObj instanceof IEntity) {
+					if (dao == null) {
+						dao = DAOSystem.findDAOforEntity(((IEntity) origObj).type());
+					}
+					sb1.append(dao.buildTitle((IEntity) origObj));
+				} else {
+					sb1.append(origObj.toString());
+				}
+			}
+		}
+		return sb1.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.webbase.editors.IBuilderContext#fieldChanged(de.xwic.appkit.core.config.model.Property[])
 	 */
 	@Override
@@ -614,12 +723,14 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Write the property values to the model without saving (commiting) the model.
+	 * 
 	 * @throws MappingException
 	 * @throws ValidationException
 	 */
 	public void updateModel() throws MappingException, ValidationException {
 
 		IEntity entity = (IEntity) model;
+
 		for (PropertyMapper<IControl> mapper : mappers.values()) {
 			mapper.storeContent(entity);
 		}
@@ -726,9 +837,8 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * When a page is rendered, it must set itself as current page so that the
-	 * context can assign created properties to the page. Warnings and Error
-	 * messages for properties can then be assigned to the right page.
+	 * When a page is rendered, it must set itself as current page so that the context can assign created properties to the page. Warnings
+	 * and Error messages for properties can then be assigned to the right page.
 	 *
 	 * @param currPage
 	 *            the currPage to set
@@ -747,6 +857,7 @@ public class EditorContext implements IBuilderContext {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.client.uitools.editors.IBuilderContext#getEntityDescriptor()
 	 */
 	public EntityDescriptor getEntityDescriptor() {
@@ -761,7 +872,8 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * @param inTransaction the inTransaction to set
+	 * @param inTransaction
+	 *            the inTransaction to set
 	 */
 	public void setInTransaction(boolean inTransaction) {
 		this.inTransaction = inTransaction;
@@ -769,6 +881,7 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Returns the model.
+	 * 
 	 * @return
 	 */
 	public IEntityModel getModel() {
@@ -804,14 +917,16 @@ public class EditorContext implements IBuilderContext {
 
 	/**
 	 * Returns true if the entity being edited is new and unsaved.
+	 * 
 	 * @return
 	 */
 	public boolean isNew() {
-		return ((IEntity)model).getId() == 0;
+		return ((IEntity) model).getId() == 0;
 	}
 
 	/**
 	 * Set the callback class for the control that hosts the editor.
+	 * 
 	 * @param entityEditorPage
 	 */
 	public void setHostCallback(IEditorHost hostCallback) {
@@ -819,9 +934,8 @@ public class EditorContext implements IBuilderContext {
 	}
 
 	/**
-	 * Request that the host control is performing a save. This allows the host control to do some additional 
-	 * UI updates that would be missed if only <code>saveToEntity()</code> is called, which is only the backend
-	 * part of it.
+	 * Request that the host control is performing a save. This allows the host control to do some additional UI updates that would be
+	 * missed if only <code>saveToEntity()</code> is called, which is only the backend part of it.
 	 * 
 	 * @return
 	 */
@@ -831,9 +945,10 @@ public class EditorContext implements IBuilderContext {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Request the host control to close the editor as appropriate.
+	 * 
 	 * @return false if no hostCallback is available.
 	 */
 	public boolean requestEditorClosure() {
@@ -843,6 +958,5 @@ public class EditorContext implements IBuilderContext {
 		}
 		return false;
 	}
-	
-}
 
+}
