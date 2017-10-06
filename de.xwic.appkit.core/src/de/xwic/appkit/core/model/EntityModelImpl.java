@@ -34,10 +34,10 @@ import java.util.Set;
 
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.model.entities.IPicklistEntry;
+import de.xwic.appkit.core.util.Equals;
 
 /**
- * Implementation of the EntityModel. This class is used by the EntityModelInvocationHandler
- * to manage the IEntityModel methods.
+ * Implementation of the EntityModel. This class is used by the EntityModelInvocationHandler to manage the IEntityModel methods.
  * 
  * @author Florian Lippisch
  */
@@ -46,10 +46,10 @@ class EntityModelImpl implements IEntityModel {
 	private IEntity entity = null;
 	private PropertyChangeSupport listeners = null;
 	private boolean modified = false;
-	
+
 	/** stores the modified properties */
 	private Map<String, Object> data = new HashMap<String, Object>();
-	
+
 	/**
 	 * Constructor.
 	 */
@@ -57,39 +57,42 @@ class EntityModelImpl implements IEntityModel {
 		this.entity = entity;
 		this.listeners = new PropertyChangeSupport(this);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.IEntityModel#addPropertyChangeListener(java.beans.PropertyChangeListener)
 	 */
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener pListener) {
-		
+
 		PropertyChangeListener[] list = listeners.getPropertyChangeListeners();
 		for (int i = 0; i < list.length; i++) {
-			if (list[i].equals(pListener)){
+			if (list[i].equals(pListener)) {
 				return;
-			}	
-		} 
+			}
+		}
 		listeners.addPropertyChangeListener(pListener);
-		
+
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.IEntityModel#commit()
 	 */
 	@Override
 	public void commit() throws EntityModelException {
-		
+
 		try {
-			for (Iterator<String> it = data.keySet().iterator(); it.hasNext(); ) {
+			for (Iterator<String> it = data.keySet().iterator(); it.hasNext();) {
 				String key = it.next();
 				Object value = data.get(key);
 				PropertyDescriptor pd = new PropertyDescriptor(key, entity.getClass());
 				Method mWrite = pd.getWriteMethod();
 				IEntityModel model = null;
 				if (value != null && value instanceof IEntityModel) {
-					model = (IEntityModel)value;
+					model = (IEntityModel) value;
 					value = model.getOriginalEntity();
 				}
 				try {
@@ -110,25 +113,30 @@ class EntityModelImpl implements IEntityModel {
 		}
 		data.clear();
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.IEntityModel#getOriginalEntity()
 	 */
 	@Override
 	public IEntity getOriginalEntity() {
 		return entity;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.xwic.appkit.core.model.IEntityModel#isModified()
 	 */
 	@Override
 	public boolean isModified() {
 		return modified;
 	}
-	
+
 	/**
 	 * Fire the propertyChangeEvent.
+	 * 
 	 * @param pPropName
 	 * @param pOldValue
 	 * @param pNewValue
@@ -148,6 +156,7 @@ class EntityModelImpl implements IEntityModel {
 
 	/**
 	 * Remove a PropertyChangeListener.
+	 * 
 	 * @param pListener
 	 */
 	@Override
@@ -156,24 +165,24 @@ class EntityModelImpl implements IEntityModel {
 	}
 
 	/**
-	 * Returns the value of the specified property. If the property has been
-	 * modified, it is returned from the internal temporary table.
+	 * Returns the value of the specified property. If the property has been modified, it is returned from the internal temporary table.
+	 * 
 	 * @param name
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object getProperty(String name) throws Exception {
-		
+
 		if (data.containsKey(name)) {
 			return data.get(name);
 		}
-		
+
 		char chars[] = name.toCharArray();
 		chars[0] = Character.toUpperCase(chars[0]);
 		String readMethodName = "is" + new String(chars);
-		
+
 		PropertyDescriptor pd = new PropertyDescriptor(name, entity.getClass(), readMethodName, null);
 		Method mRead = pd.getReadMethod();
 		Object value = mRead.invoke(entity, (Object[]) null);
@@ -182,19 +191,19 @@ class EntityModelImpl implements IEntityModel {
 			// to the collection. As improvement we could create a collection proxy
 			// that would check changes, but that is not required at the moment.
 			if (value instanceof Set) {
-				return Collections.unmodifiableSet((Set<?>)value);
+				return Collections.unmodifiableSet((Set<?>) value);
 			}
-			return Collections.unmodifiableCollection((Collection<?>)value);
+			return Collections.unmodifiableCollection((Collection<?>) value);
 		} else if (value instanceof IPicklistEntry) {
 			// use value as it is, dont transform into a model!
 		} else if (value instanceof IEntity) {
 			// a proxy is required 
-			IEntityModel refModel = EntityModelFactory.createModel((IEntity)value);
+			IEntityModel refModel = EntityModelFactory.createModel((IEntity) value);
 			data.put(name, refModel);
 			value = refModel;
 		}
 		return value;
-		
+
 	}
 
 	/**
@@ -207,34 +216,42 @@ class EntityModelImpl implements IEntityModel {
 		Object oldValue = getProperty(name);
 		data.put(name, value);
 		firePropertyChange(name, oldValue, value);
-		
+
 	}
-	
+
 	/**
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public List<ChangeLogHelper> generateChangeLogHelpers() throws Exception {
 		List<ChangeLogHelper> result = new ArrayList<>();
 		for (Entry<String, Object> dataElem : data.entrySet()) {
-			
+
 			String name = dataElem.getKey();
 			char chars[] = name.toCharArray();
 			chars[0] = Character.toUpperCase(chars[0]);
 			String readMethodName = "is" + new String(chars);
-			
+
 			PropertyDescriptor pd = new PropertyDescriptor(name, entity.getClass(), readMethodName, null);
 			Method mRead = pd.getReadMethod();
 			Object origValue = mRead.invoke(entity, (Object[]) null);
 			Object newValue = dataElem.getValue();
-			ChangeLogHelper helper = new ChangeLogHelper();
-			helper.setOrigValue(origValue);
-			helper.setNewValue(newValue);
-			helper.setFieldNameKey(entity.type().getName() + "." + name);
-			result.add(helper);
+
+			if (newValue instanceof IEntity && EntityModelFactory.isModel((IEntity) newValue)) {
+				newValue = EntityModelFactory.getOriginalEntity((IEntity) newValue);
+			}
+
+			if (!Equals.equal(origValue, newValue)) {
+				if (!(newValue instanceof String && origValue == null && "".equals(newValue))) {
+					ChangeLogHelper helper = new ChangeLogHelper();
+					helper.setOrigValue(origValue);
+					helper.setNewValue(newValue);
+					helper.setFieldNameKey(entity.type().getName() + "." + name);
+					result.add(helper);
+				}
+			}
 		}
 		return result;
 	}
-	
 
 }

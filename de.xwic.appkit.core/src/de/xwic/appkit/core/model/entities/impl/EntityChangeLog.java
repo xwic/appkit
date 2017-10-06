@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -102,9 +103,11 @@ public class EntityChangeLog extends Entity implements IEntityChangeLog {
 				// Any basic type is stored as string, which includes Integer, Long etc.
 				oldValData = oldValue != null ? String.valueOf(oldValue) : "";
 				newValData = newValue != null ? String.valueOf(newValue) : "";
+				oldValData = StringEscapeUtils.escapeHtml(oldValData);
 				if (newValData.length() > 255) {
 					newValData = newValData.substring(0, 255) + "...";
 				}
+				newValData = StringEscapeUtils.escapeHtml(newValData);
 			}
 
 

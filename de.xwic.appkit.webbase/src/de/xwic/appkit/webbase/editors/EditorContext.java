@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -56,8 +55,6 @@ import de.xwic.appkit.core.model.daos.IEntityChangeLogDAO;
 import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
 import de.xwic.appkit.core.model.entities.IEntityChangeLog;
 import de.xwic.appkit.core.model.entities.IMitarbeiter;
-import de.xwic.appkit.core.model.entities.IPicklistEntry;
-import de.xwic.appkit.core.model.entities.util.Picklists;
 import de.xwic.appkit.core.script.ScriptEngineProvider;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.events.EditorListener;
@@ -516,6 +513,7 @@ public class EditorContext implements IBuilderContext {
 
 		inTransaction = true;
 		try {
+			updateModel();
 			IEntity entity = (IEntity) model;
 			fireEvent(EventType.BEFORESAVE, entity.getId() == 0);
 
@@ -523,22 +521,15 @@ public class EditorContext implements IBuilderContext {
 				try {
 					IMitarbeiter empl = DAOSystem.getDAO(IMitarbeiterDAO.class).getByCurrentUser();
 					changeLog = changeLogDao.startLog(entity, empl, null);
-					
 
 					List<ChangeLogHelper> changeLogList = model.generateChangeLogHelpers();
-					if (!changeLogList.isEmpty()) {
-						for (ChangeLogHelper helper : changeLogList) {
-							addChangeLogEntry(helper.getOrigValue(), helper.getNewValue(), helper.getFieldNameKey(), bundle);
-						}
-					}
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					ChangeLogHelper.fillChangeLogEntries(changeLogList, changeLog, bundle);
+
+				} catch (Exception ex) {
+					log.error("Error while building change log.", ex);
 				}
 
 			}
-
-			updateModel();
 
 			DAO<?> dao = DAOSystem.findDAOforEntity(config.getEntityType().getClassname());
 			if (dao == null) {
@@ -586,7 +577,7 @@ public class EditorContext implements IBuilderContext {
 						}
 
 						try {
-							if(changeLog != null) {
+							if (changeLog != null && !isNew) {
 								changeLog.saveIfChanged();
 							}
 							model.commit();
@@ -622,65 +613,6 @@ public class EditorContext implements IBuilderContext {
 		} finally {
 			inTransaction = false;
 		}
-	}
-
-	/**
-	 * Adds a new change log entry.
-	 * 
-	 * @param originalValue
-	 * @param newValue
-	 * @param fieldNameKey
-	 */
-	private void addChangeLogEntry(Object originalValue, Object newValue, String fieldNameKey, Bundle bundle) {
-		String fieldName = bundle.getString(fieldNameKey);
-		Object sample = originalValue == null ? newValue : originalValue;
-		if (sample instanceof IPicklistEntry) {
-			changeLog.evaluate(fieldName, originalValue, newValue);
-		} else if (sample instanceof IEntity) {
-			DAO<?> dao = DAOSystem.findDAOforEntity(((IEntity) sample).type());
-			changeLog.evaluate(fieldName, originalValue != null ? dao.buildTitle((IEntity) originalValue) : "",
-					newValue != null ? dao.buildTitle((IEntity) newValue) : "");
-		} else if (sample instanceof Set) {
-			String sb1 = generateSetChangeString(originalValue);
-			String sb2 = generateSetChangeString(newValue);
-
-			changeLog.evaluate(fieldName, sb1, sb2);
-		} else {
-			changeLog.evaluate(fieldName, originalValue, newValue);
-		}
-
-	}
-	
-	/**
-	 * @param originalValue
-	 * @param sb1
-	 */
-	private String generateSetChangeString(Object originalSetValue) {
-		StringBuilder sb1 = new StringBuilder();
-		boolean isFirst = true;
-		DAO<?> dao = null;
-		if (originalSetValue != null) {
-			Set<?> set = (Set<?>) originalSetValue;
-			for (Object origObj : set) {
-				if (!isFirst) {
-					sb1.append(", ");
-				}
-				isFirst = false;
-
-				if (origObj instanceof IPicklistEntry) {
-					IPicklistEntry pe = (IPicklistEntry) origObj;
-					sb1.append(Picklists.getTextEn(pe));
-				} else if (origObj instanceof IEntity) {
-					if (dao == null) {
-						dao = DAOSystem.findDAOforEntity(((IEntity) origObj).type());
-					}
-					sb1.append(dao.buildTitle((IEntity) origObj));
-				} else {
-					sb1.append(origObj.toString());
-				}
-			}
-		}
-		return sb1.toString();
 	}
 
 	/*
