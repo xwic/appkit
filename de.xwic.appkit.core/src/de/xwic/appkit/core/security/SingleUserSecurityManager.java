@@ -19,6 +19,7 @@ package de.xwic.appkit.core.security;
 import java.util.Set;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import de.xwic.appkit.core.ApplicationData;
 import de.xwic.appkit.core.dao.ISecurityManager;
 
 /**

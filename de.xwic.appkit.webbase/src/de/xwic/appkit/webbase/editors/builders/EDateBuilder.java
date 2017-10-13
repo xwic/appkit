@@ -75,7 +75,7 @@ public class EDateBuilder extends Builder<EDate> {
             datePicker = new DatePicker(parent);
         }
         datePicker.setReadonly(eDate.isReadonly());
-        context.registerField(eDate.getProperty(), datePicker, eDate, DatePickerMapper.MAPPER_ID);
+        context.registerField(eDate.getProperty(), datePicker, eDate, DatePickerMapper.MAPPER_ID, eDate.isReadonly());
         return datePicker;
     }
 

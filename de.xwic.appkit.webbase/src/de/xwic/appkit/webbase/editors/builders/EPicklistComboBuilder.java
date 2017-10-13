@@ -46,7 +46,7 @@ public class EPicklistComboBuilder extends Builder<EPicklistCombo> {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryControl pe = new PicklistEntryControl(parent, null, finalProperty.getPicklistId());
 			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
-			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID);
+			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID, ePl.isReadonly());
 
 			return pe;
 			

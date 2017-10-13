@@ -79,7 +79,7 @@ public class ENumberInputBuilder extends Builder<ENumberInputField> {
 			numericInputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT));
 		}
 
-		context.registerField(text.getProperty(), numericInputBox, text, NumericInputboxMapper.MAPPER_ID);
+		context.registerField(text.getProperty(), numericInputBox, text, NumericInputboxMapper.MAPPER_ID, text.isReadonly());
 		
 		return numericInputBox;
 	}

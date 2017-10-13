@@ -337,7 +337,7 @@ public class EditorContext implements IBuilderContext {
 		registerWidget(widget, uiDef);
 
 		// set initial editable flag.
-		mapper.setEditable(widget, property, editable && (finalprop == null || finalprop.hasReadWriteAccess()));
+		mapper.setEditable(widget, property, editable && !infoMode && (finalprop == null || finalprop.hasReadWriteAccess()));
 	}
 
 	/**

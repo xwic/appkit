@@ -81,7 +81,7 @@ public class EEntitySelectorBuilder extends Builder<EEntityField> {
         
         final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
-        context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);
+        context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID, entityField.isReadonly());
         
 		Style style = entityField.getStyle();
 		if (style.isStyleSpecified(Style.WIDTH_HINT)) {

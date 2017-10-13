@@ -20,10 +20,16 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.EPicklistCheckbox;
+import de.xwic.appkit.core.config.editor.EUserRoles;
 import de.xwic.appkit.core.config.model.Property;
+import de.xwic.appkit.webbase.editors.EditorContext;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
+import de.xwic.appkit.webbase.editors.controls.UserRolesEditorControl;
+import de.xwic.appkit.webbase.editors.events.EditorAdapter;
+import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.editors.mappers.PicklistEntrySetMapper;
+import de.xwic.appkit.webbase.editors.mappers.UserRolesMapper;
 import de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckboxControl;
 
 /**
@@ -31,7 +37,7 @@ import de.xwic.appkit.webbase.utils.picklist.PicklistEntryCheckboxControl;
  * 
  * @author lippisch
  */
-public class EPicklistCheckboxBuilder extends Builder<EPicklistCheckbox> {
+public class EUserRolesBuilder extends Builder<EUserRoles> {
 
 	/*
 	 * (non-Javadoc)
@@ -40,22 +46,31 @@ public class EPicklistCheckboxBuilder extends Builder<EPicklistCheckbox> {
 	 *      de.jwic.base.IControlContainer,
 	 *      de.xwic.appkit.webbase.editors.IBuilderContext)
 	 */
-	public IControl buildComponents(EPicklistCheckbox ePl, IControlContainer parent, IBuilderContext context) {
+	public IControl buildComponents(EUserRoles eUR, IControlContainer parent, IBuilderContext context) {
 
-		if (ePl.getProperty() != null) {
-			Property finalProperty = ePl.getFinalProperty();
-			PicklistEntryCheckboxControl pe = new PicklistEntryCheckboxControl(parent, null, finalProperty.getPicklistId());
-			pe.setColumns(ePl.getCols());
-			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
-			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntrySetMapper.MAPPER_ID, ePl.isReadonly());
+		if (eUR.getProperty() != null) {
+			UserRolesEditorControl urEditor = new UserRolesEditorControl(parent, null);
+			urEditor.setColumns(eUR.getCols());
+			
+			context.registerField(eUR.getProperty(), urEditor, eUR, UserRolesMapper.MAPPER_ID);
+			
+			if (context instanceof EditorContext) {
+				EditorContext ex = (EditorContext)context;
+				ex.addEditorListener(new EditorAdapter() {
+					@Override
+					public void afterSave(EditorEvent event) {
+						urEditor.saveRoles();
+					}
+				});
+			}
 
-			return pe;
+			return urEditor;
 			
 		} else {
 
 			Label label = null;
 			label = new Label(parent);
-			label.setText("No Property Specified");
+			label.setText("You need to specify a property that contains the logonName");
 			return label;
 			
 		}

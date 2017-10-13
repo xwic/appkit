@@ -59,7 +59,7 @@ public class EYesNoRadioBuilder extends Builder<EYesNoRadio> {
 			rg.addElement("No", KEY_NO);
 			
 			rg.addElementSelectedListener(new FieldChangeListener(context, radio.getProperty()));
-			context.registerField(radio.getProperty(), rg, radio, YesNoRadioGroupMapper.MAPPER_ID);
+			context.registerField(radio.getProperty(), rg, radio, YesNoRadioGroupMapper.MAPPER_ID, radio.isReadonly());
 			return rg;
 		} else {
 			Label label = new Label(parent);
