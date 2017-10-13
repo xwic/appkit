@@ -61,12 +61,12 @@ public class EntityComboSelector<E extends IEntity> extends ControlContainer imp
 		createControls();
 	}
 
-	public EntityComboSelector(IControlContainer container, String name, IEntitySelectionContributor contributor,
-			boolean lifeSearch) {
+	public EntityComboSelector(IControlContainer container, String name, IEntitySelectionContributor contributor, boolean lifeSearch) {
 		super(container, name);
+		
 		this.contributor = contributor;
 		this.selectionModel = contributor.getSelectionModel();
-
+		this.field = new Field(this);
 		selectionModel.addModelListener(this);
 
 		this.lifeSearch = lifeSearch;

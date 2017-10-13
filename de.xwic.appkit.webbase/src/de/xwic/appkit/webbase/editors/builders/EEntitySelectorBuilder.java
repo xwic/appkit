@@ -78,8 +78,15 @@ public class EEntitySelectorBuilder extends Builder<EEntityField> {
         GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType,
                 entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName(), queryProp);
         
+        // set the sorting
+        if (entityField.getSortBy() != null) {
+        	selectionContributor.getListModel().getOriginalQuery().setSortField(entityField.getSortBy());
+        } else if (queryProp.length > 0) {
+        	selectionContributor.getListModel().getOriginalQuery().setSortField(queryProp[0]);
+        }
         
-        final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
+        
+        final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor, entityField.isLifeSearch());
         comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
         context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID, entityField.isReadonly());
         

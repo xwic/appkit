@@ -66,7 +66,9 @@ public class EntityEditor extends ControlContainer {
 
 			@Override
 			public void entityLoaded(EditorEvent event) {
-				bottomTabs.setVisible(!context.isNew() && !bottomTabs.getTabs().isEmpty());
+				if (bottomTabs != null) {
+					bottomTabs.setVisible(!context.isNew() && !bottomTabs.getTabs().isEmpty());
+				}
 			}
 		});
 
