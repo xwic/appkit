@@ -20,6 +20,7 @@ import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
 import de.jwic.controls.Label;
 import de.xwic.appkit.core.config.editor.EPicklistCombo;
+import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
@@ -46,6 +47,12 @@ public class EPicklistComboBuilder extends Builder<EPicklistCombo> {
 			Property finalProperty = ePl.getFinalProperty();
 			PicklistEntryControl pe = new PicklistEntryControl(parent, null, finalProperty.getPicklistId());
 			pe.addElementSelectedListener(new FieldChangeListener(context, ePl.getProperty()));
+			
+			Style style = ePl.getStyle();
+			if (style.getStyleInt(Style.WIDTH_HINT) != 0) {
+				pe.setWidth(style.getStyleInt(Style.WIDTH_HINT) );
+			}
+
 			context.registerField(ePl.getProperty(), pe, ePl, PicklistEntryMapper.MAPPER_ID, ePl.isReadonly());
 
 			return pe;
