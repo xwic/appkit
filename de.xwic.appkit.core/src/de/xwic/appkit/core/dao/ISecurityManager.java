@@ -16,6 +16,7 @@
  *******************************************************************************/
 package de.xwic.appkit.core.dao;
 
+import de.xwic.appkit.core.ApplicationData;
 import de.xwic.appkit.core.security.IUser;
 
 
@@ -54,6 +55,17 @@ public interface ISecurityManager {
 	 * @return
 	 */
 	public boolean hasRight(String scope, String action);
+
+
+	/**
+	 * Returns true if the current user has the action 'ACCESS' to the 
+	 * specified scope.
+	 * @param canManageAllRoles
+	 * @return
+	 */
+	public default boolean hasAccess(String scope) {
+		return hasRight(scope, ApplicationData.SECURITY_ACTION_ACCESS);
+	}
 
 	/**
 	 * Returns the access to the specified subscope.

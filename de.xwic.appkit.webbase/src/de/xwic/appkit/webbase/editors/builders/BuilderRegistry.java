@@ -37,6 +37,7 @@ import de.xwic.appkit.core.config.editor.EPicklistCheckbox;
 import de.xwic.appkit.core.config.editor.EPicklistCombo;
 import de.xwic.appkit.core.config.editor.EPicklistRadio;
 import de.xwic.appkit.core.config.editor.EText;
+import de.xwic.appkit.core.config.editor.EUserRoles;
 import de.xwic.appkit.core.config.editor.EYesNoRadio;
 import de.xwic.appkit.core.config.editor.UIElement;
 import de.xwic.appkit.core.registry.ExtensionRegistry;
@@ -81,6 +82,7 @@ public class BuilderRegistry {
 		registerBuilder(ENumberInputField.class, new ENumberInputBuilder());
 		registerBuilder(ECustom.class, new ECustomBuilder());
 		registerBuilder(EAttachments.class, new EAttachmentsBuilder());
+		registerBuilder(EUserRoles.class, new EUserRolesBuilder());
 
 		
 		// register 'extensions'

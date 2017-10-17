@@ -25,13 +25,11 @@ import de.xwic.appkit.core.config.editor.EEntityField;
 import de.xwic.appkit.core.config.editor.Style;
 import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.model.entities.IMitarbeiter;
 import de.xwic.appkit.webbase.editors.FieldChangeListener;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
 import de.xwic.appkit.webbase.editors.mappers.EntitySelectorMapper;
 import de.xwic.appkit.webbase.entityselection.EntityComboSelector;
 import de.xwic.appkit.webbase.entityselection.GenericEntitySelectionContributor;
-import de.xwic.appkit.webbase.entityselection.people.EmployeeComboSelector;
 
 /**
  * The Builder for the EEntityField.
@@ -63,13 +61,21 @@ public class EEntitySelectorBuilder extends Builder<EEntityField> {
 			log.error("Error resolving referenced entity type", ce);
 		}
 
-		GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType,
-				entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName(), queryProp);
-
-		final EntityComboSelector<?> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor);
-		comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
-
-		context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID);
+        GenericEntitySelectionContributor selectionContributor = new GenericEntitySelectionContributor(entityType,
+                entityType.getSimpleName() + " Selection", "Please select " + entityType.getSimpleName(), queryProp);
+        
+        // set the sorting
+        if (entityField.getSortBy() != null) {
+        	selectionContributor.getListModel().getOriginalQuery().setSortField(entityField.getSortBy());
+        } else if (queryProp.length > 0) {
+        	selectionContributor.getListModel().getOriginalQuery().setSortField(queryProp[0]);
+        }
+        
+        
+        final EntityComboSelector<IEntity> comboSelector = new EntityComboSelector<IEntity>(parent, null, selectionContributor, entityField.isLifeSearch());
+        comboSelector.addValueChangedListener(new FieldChangeListener(context, entityField.getProperty()));
+        context.registerField(entityField.getProperty(), comboSelector, entityField, EntitySelectorMapper.MAPPER_ID, entityField.isReadonly());
+        
 
 		Style style = entityField.getStyle();
 		if (style.isStyleSpecified(Style.WIDTH_HINT)) {

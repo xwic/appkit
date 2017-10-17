@@ -66,6 +66,7 @@ public class MapperFactory {
 		knownMappers.put(DatePickerMapper.MAPPER_ID, DatePickerMapper.class);
 		knownMappers.put(ListViewMapper.MAPPER_ID, ListViewMapper.class);
 		knownMappers.put(AttachmentsMapper.MAPPER_ID, AttachmentsMapper.class);
+		knownMappers.put(UserRolesMapper.MAPPER_ID, UserRolesMapper.class);
 		
 		
 		// register 'extensions'

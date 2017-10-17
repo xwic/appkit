@@ -29,6 +29,9 @@ public class EEntityField extends EField {
 	private String selectMessage = null;
 	private String parameters = null;
 
+	private boolean lifeSearch = true;
+	private String sortBy = null;
+	
 	/**
 	 * @return the titlePattern
 	 */
@@ -73,6 +76,34 @@ public class EEntityField extends EField {
 	 */
 	public void setParameters(String parameters) {
 		this.parameters = parameters;
+	}
+
+	/**
+	 * @return the lifeSearch
+	 */
+	public boolean isLifeSearch() {
+		return lifeSearch;
+	}
+
+	/**
+	 * @param lifeSearch the lifeSearch to set
+	 */
+	public void setLifeSearch(boolean lifeSearch) {
+		this.lifeSearch = lifeSearch;
+	}
+
+	/**
+	 * @return the sortBy
+	 */
+	public String getSortBy() {
+		return sortBy;
+	}
+
+	/**
+	 * @param sortBy the sortBy to set
+	 */
+	public void setSortBy(String sortBy) {
+		this.sortBy = sortBy;
 	}
 	
 }

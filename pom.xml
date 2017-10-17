@@ -87,7 +87,7 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.31</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.32-SNAPSHOT</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 
 		<sonar.language>java</sonar.language>

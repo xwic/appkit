@@ -67,7 +67,7 @@ public class EInputboxBuilder extends Builder<EText> {
 			inputBox.setHeight(style.getStyleInt(Style.HEIGHT_HINT) );
 		}
 
-		context.registerField(text.getProperty(), inputBox, text, InputboxMapper.MAPPER_ID);
+		context.registerField(text.getProperty(), inputBox, text, InputboxMapper.MAPPER_ID, text.isReadonly());
 		
 		return inputBox;
 	}

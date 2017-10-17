@@ -44,7 +44,8 @@ public class ControlProperty<T extends IControl> {
 	 */
 	public ControlProperty(T control, Property[] property, boolean infoMode) {
 		this.control = control;
-		this.property = property;		
+		this.property = property;	
+		this.infoMode = infoMode;
 	}
 	
 	/**

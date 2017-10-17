@@ -127,7 +127,7 @@ public abstract class PropertyMapper<T extends IControl> {
 	 */
 	public void setEditable(boolean editable) {
 		for (ControlProperty<T> wp : widgets) {
-			setEditable(wp.getWidget(), wp.getProperty(), editable);
+			setEditable(wp.getWidget(), wp.getProperty(), editable && !wp.isInfoMode());
 		}
 	}
 	
@@ -285,6 +285,20 @@ public abstract class PropertyMapper<T extends IControl> {
 					value = new BigDecimal(iValue);
 				}
 			}
+		} else if (value == null && targetType.isPrimitive()) {
+			// Methods with primitive types such as int cause an exception
+			// if they are written with null. Therefore these values are mapped to a default value
+			// instead.
+			if (targetType.isAssignableFrom(int.class)) {
+				value = new Integer(0);
+			} else if (targetType.isAssignableFrom(double.class)) {
+				value = new Double(0);
+			} else if (targetType.isAssignableFrom(long.class)) {
+				value = new Long(0);
+			} else if (targetType.isAssignableFrom(boolean.class)) {
+				value = Boolean.FALSE;
+			}
+			
 		}
 		
 		try {
@@ -305,7 +319,7 @@ public abstract class PropertyMapper<T extends IControl> {
 		for (ControlProperty<T> wp : widgets) {
 			String propKey = getPropertyKey(wp.getProperty());
 			if (propKey.equals(propertyKey) || propKey.startsWith(pkStartsWith)) {
-				setEditable(wp.getWidget(), wp.getProperty(), editable);
+				setEditable(wp.getWidget(), wp.getProperty(), editable && !wp.isInfoMode());
 			}
 		}
 	}
