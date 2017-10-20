@@ -1,0 +1,20 @@
+<div class="linkConfig">$insert.control("linkConfig")</div>
+
+#set($fld = $control.getField("qlItemOrder"))
+<input id="$fld.id" type="hidden" name="$fld.id" value="$jwic.formatInp($fld.value)">
+
+<ul id="gtQuickLaunchItems">
+	#foreach($qlItem in $control.getQuickLaunchItems())
+		<li class="gtQLItem roundAll" pQlItemRes="$qlItem.reference" pQlCtrlId="$control.controlID" pQlItemId="$qlItem.getQuickLinkId()">
+			#if($qlItem.icon)
+				<div class="qlItemIcon">
+					$qlItem.icon.toImgTag()
+				</div>
+			#else
+				<div class="qlItemNoIcon">#if($qlItem.title.length() > 0)$qlItem.title.substring(0, 1)#end</div>
+			#end
+			<h3>$qlItem.title</h3>
+			<div class="qtQLItem-content">$!qlItem.content</div>
+		</li>
+	#end
+</ul>

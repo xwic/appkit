@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="de.xwic.appkit.core.model.entities.impl.News" table="START_NEWS">
+
+		 <id name="id" type="long">
+            <column name="NEWS_ID" not-null="true"/>
+            <generator class="native"/>
+        </id>
+
+		<version column="VERSION" name="version" type="long"/>
+
+ 		<property name="deleted" column="DELETED" not-null="true"/>
+ 
+        <property name="downloadVersion" type="long">
+        	<column name="DOWNLOAD_VERSION"/>
+        </property>
+        <property name="serverEntityId" column="SRVENTITY_ID" not-null="true" type="int"/>
+
+		<property name="createdAt" type="timestamp">
+			<column name="CREATED_AT" />
+		</property>
+		
+		<property name="changed" type="boolean">
+			<column name="CHANGED" />
+		</property>
+		<property name="createdFrom">
+			<column name="CREATED_FROM" length="50" />
+		</property>
+		<property name="lastModifiedFrom">
+			<column name="LASTMODIFIED_FROM" length="50" />
+		</property>
+		<property name="lastModifiedAt" type="timestamp">
+			<column name="LASTMODIFIED_AT" />
+		</property>
+		<!-- Entity fields -->
+      
+		<property name="author" column="AUTHOR" length="150"/>
+
+		<property name="title">
+			<column name="TITLE" length="150" />
+		</property>
+
+		<property name="visible" type="boolean" column="VISIBLE"/>
+
+		<property name="publishDate" type="timestamp" column="PUBLISH_DATE"/>
+		<property name="visibleUntil" type="timestamp" column="VISIBLE_UNTIL"/>
+		
+		<property name="body" type="org.hibernate.type.TextType">
+        	<column name="BODY" />
+        </property>
+        
+        <property name="appId">
+			<column name="APP_ID" length="100" />
+		</property>
+		<!-- End entity fields -->
+		
+	</class>
+</hibernate-mapping>

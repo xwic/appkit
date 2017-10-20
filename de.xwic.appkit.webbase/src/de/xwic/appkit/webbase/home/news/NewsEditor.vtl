@@ -1,0 +1,32 @@
+<table>
+	<colgroup>
+		<col width="120"/>
+	</colgroup>
+	<tr>
+		<td>Title</td>
+		<td>$insert.control("inpTitle")</td>
+	</tr>
+	<tr>
+		<td>Author</td>
+		<td>$insert.control("inpAuthor")</td>
+	</tr>
+	<tr>
+		<td>Content</td>
+		<td>$insert.control("inpBody")</td>
+	</tr>
+	<tr>
+		<td>Visibility</td>
+		<td>
+			<table cellspacing="0" cellpadding="0">
+				<tr>
+					<td width="200">$insert.control("visible")</td>
+					<td>From $insert.control("publishDate") to $insert.control("visibleUntil")</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td align="right">$insert.control("btSave") $insert.control("btAbort")</td>
+	</tr>
+</table>

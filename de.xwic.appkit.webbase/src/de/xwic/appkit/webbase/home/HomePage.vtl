@@ -1,0 +1,29 @@
+
+## The entire layout (including the usage of a table) should be reviewed by the designer and optimized.
+## This is right now only aimed to "make it work" and pass the idea
+
+<div class="homePageNew">
+	<div class="homePageHeader">
+		<div class="contentHeader roundAll">
+			<div class="pageTitle"><h1>$insert.control("lbWelcome")</h1></div>
+			<div class="pageSubtitle">Home</div>
+			<div class="pulseLogo"></div>
+		</div>
+	</div>
+	
+	<div class="homePageBody">
+		#* ---------------------- Primary CONTENT ----------------- *#
+		<div id="gsQuickLaunchPanel">
+			$insert.control("qlPanel")
+		</div>
+		#* --------------------- /Primary CONTENT ----------------- *#
+		
+		#* --------------------- News Area ------------------------ *#
+		<div id="gsNewsFeed">
+			$insert.control("newsFeed")
+		</div>
+		#* --------------------- /News Area ------------------------ *#	
+	</div>
+	$insert.control("ckRestore")
+</div>
+
