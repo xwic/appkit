@@ -37,7 +37,9 @@ import de.xwic.appkit.core.model.daos.IEntityCommentDAO;
 import de.xwic.appkit.core.model.daos.IMitarbeiterDAO;
 import de.xwic.appkit.core.model.daos.IMitarbeiterRelationDAO;
 import de.xwic.appkit.core.model.daos.IMonitoringElementDAO;
+import de.xwic.appkit.core.model.daos.INewsDAO;
 import de.xwic.appkit.core.model.daos.IPicklisteDAO;
+import de.xwic.appkit.core.model.daos.IQuickLaunchDAO;
 import de.xwic.appkit.core.model.daos.IReportFolderDAO;
 import de.xwic.appkit.core.model.daos.IReportTemplateDAO;
 import de.xwic.appkit.core.model.daos.ISalesTeamDAO;
@@ -52,7 +54,9 @@ import de.xwic.appkit.core.model.daos.impl.EntityCommentDAO;
 import de.xwic.appkit.core.model.daos.impl.MitarbeiterDAO;
 import de.xwic.appkit.core.model.daos.impl.MitarbeiterRelationDAO;
 import de.xwic.appkit.core.model.daos.impl.MonitoringElementDAO;
+import de.xwic.appkit.core.model.daos.impl.NewsDAO;
 import de.xwic.appkit.core.model.daos.impl.PicklisteDAO;
+import de.xwic.appkit.core.model.daos.impl.QuickLaunchDAO;
 import de.xwic.appkit.core.model.daos.impl.ReportFolderDAO;
 import de.xwic.appkit.core.model.daos.impl.ReportTemplateDAO;
 import de.xwic.appkit.core.model.daos.impl.SalesTeamDAO;
@@ -236,6 +240,8 @@ public class DefaultDAOFactory implements DAOFactory {
 		registerDao(IUserListProfileDAO.class, new UserListProfileDAO());
 		registerDao(IUserViewConfigurationDAO.class, new UserViewConfigurationDAO());
 		registerDao(IEntityChangeLogDAO.class, new EntityChangeLogDAO());
+		registerDao(INewsDAO.class, new NewsDAO());
+		registerDao(IQuickLaunchDAO.class, new QuickLaunchDAO());
 		
         provider.registerQuery(UserQuery.class, new UserQueryResolver());
         provider.registerQuery(RightQuery.class, new RightQueryResolver());

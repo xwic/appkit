@@ -1,0 +1,13 @@
+#* Admin Controls *#
+ 
+<div class="newsFeedHeader"><span class="newsTitle" style="display:none">Whats New?</span> $insert.control("btAdmin")</div>
+
+<div class="newsFeed">
+#foreach($item in $control.getNewsToDisplay())
+<div class="newsItem">
+	<h3>$item.title</h4>
+	<p>$item.body</p>
+	<div class="newsFooter">$control.formatDate($item.publishDate) - $!item.author</div>
+</div>
+#end
+</div>

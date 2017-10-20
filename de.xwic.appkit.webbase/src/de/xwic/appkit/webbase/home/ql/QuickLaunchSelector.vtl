@@ -1,0 +1,19 @@
+<div class="qlFilterSettings">
+$insert.control("cbAllItems")
+</div>
+
+#set($oldGroup = "")
+
+#foreach($itm in $control.items)
+
+#if($oldGroup != $itm.group)
+	<div class="qlGroup">$itm.group</div>
+	#set($oldGroup = $itm.group)
+#end
+
+<div class="qlSelItem">
+	<div class="qlSelSelector">$insert.control("cbql${itm.tempId}")</div>
+	<h4>$itm.title</h4>
+	#if($itm.content)<p>$!itm.content</p>#end
+</div>
+#end
