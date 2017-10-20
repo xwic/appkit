@@ -9,7 +9,6 @@
 package de.xwic.appkit.webbase.home;
 
 import de.jwic.base.ImageRef;
-import de.xwic.appkit.webbase.toolkit.app.LaunchCardSubModule;
 import de.xwic.appkit.webbase.toolkit.app.SubModule;
 
 /**
@@ -31,19 +30,14 @@ public class QuickLaunchUIItem {
 	 */
 	public QuickLaunchUIItem(SubModule sm) {
 
-		if (sm instanceof LaunchCardSubModule) {
-			LaunchCardSubModule psm = (LaunchCardSubModule)sm;
-			String qlTitle = psm.getFullTitle();
-			if (qlTitle == null) {
-				qlTitle = psm.getTitle();
-			}
-			setTitle(qlTitle);
-			setContent(psm.getDescription());
-			setIcon(psm.getIconLarge());
-			setMostCommon(true);
-		} else {
-			setTitle(sm.getTitle());
+		String qlTitle = sm.getFullTitle();
+		if (qlTitle == null) {
+			qlTitle = sm.getTitle();
 		}
+		setTitle(qlTitle);
+		setContent(sm.getDescription());
+		setIcon(sm.getIconLarge());
+		setMostCommon(sm.isCommonModule());
 
 	}
 

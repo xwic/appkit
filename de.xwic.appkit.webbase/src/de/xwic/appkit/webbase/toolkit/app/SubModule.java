@@ -24,6 +24,7 @@ import java.util.List;
 
 import de.jwic.base.IControl;
 import de.jwic.base.IControlContainer;
+import de.jwic.base.ImageRef;
 
 /**
  * Submodule for Modules.
@@ -36,7 +37,13 @@ public abstract class SubModule {
     private String title;
     protected List<SubModule> subModules = new ArrayList<SubModule>();
 	protected Site site;
-    
+  
+	protected String description = null;
+	protected String fullTitle = null;
+	protected ImageRef iconLarge = null;
+	protected boolean defaultQuickLaunch = false;
+	protected boolean commonModule = true;
+
     /**
      * Creates the submodule.
      * 
@@ -57,10 +64,13 @@ public abstract class SubModule {
     public abstract IControl createControls(IControlContainer container);
 
     /**
-     * 
+     * Must return a unique key of the submodule used for the navigation. Uses the
+     * simple classname by default, but can be overriden to make it unique.
      * @return the unique key of this submodule
      */
-    public abstract String getKey();
+    public String getKey() {
+    	return getClass().getSimpleName();
+    }
 
 	/**
 	 * @return the title
@@ -111,5 +121,76 @@ public abstract class SubModule {
 
 		return null;
 	}
-    
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the moduleTitle
+	 */
+	public String getFullTitle() {
+		return fullTitle;
+	}
+
+	/**
+	 * @param moduleTitle the moduleTitle to set
+	 */
+	public void setFullTitle(String moduleTitle) {
+		this.fullTitle = moduleTitle;
+	}
+
+	/**
+	 * @return the largeIcon
+	 */
+	public ImageRef getIconLarge() {
+		return iconLarge;
+	}
+
+	/**
+	 * @param largeIcon the largeIcon to set
+	 */
+	public void setIconLarge(ImageRef largeIcon) {
+		this.iconLarge = largeIcon;
+	}
+
+	/**
+	 * @return the qlDefault
+	 */
+	public boolean isDefaultQuickLaunch() {
+		return defaultQuickLaunch;
+	}
+
+	/**
+	 * @param qlDefault the qlDefault to set
+	 */
+	public void setDefaultQuickLaunch(boolean qlDefault) {
+		this.defaultQuickLaunch = qlDefault;
+	}
+
+	/**
+	 * @return the commonModule
+	 */
+	public boolean isCommonModule() {
+		return commonModule;
+	}
+
+	/**
+	 * @param commonModule the commonModule to set
+	 */
+	public void setCommonModule(boolean commonModule) {
+		this.commonModule = commonModule;
+	}
+
+
 }

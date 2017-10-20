@@ -29,7 +29,6 @@ import de.xwic.appkit.core.security.IUser;
 import de.xwic.appkit.webbase.core.Platform;
 import de.xwic.appkit.webbase.home.ql.IQuickLaunchFunction;
 import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
-import de.xwic.appkit.webbase.toolkit.app.LaunchCardSubModule;
 import de.xwic.appkit.webbase.toolkit.app.Module;
 import de.xwic.appkit.webbase.toolkit.app.Site;
 import de.xwic.appkit.webbase.toolkit.app.SubModule;
@@ -144,19 +143,16 @@ public class QuickLaunchModel {
 			if (sm.hasSubModules()) {
 				count = scanAndInit(sm.getSubModules(), path + "/" + sm.getKey(), count);
 			} else {
-				if (sm instanceof LaunchCardSubModule) {
-					LaunchCardSubModule psm = (LaunchCardSubModule)sm;
-					if (psm.isDefaultQuickLaunch()) {
-						// create an entry
+				if (sm.isDefaultQuickLaunch()) {
+					// create an entry
 
-						IQuickLaunch ql = qlDAO.createEntity();
-						ql.setUsername(username);
-						ql.setOrder(count);
-						ql.setReference(RESTYPE_SUBMODULE + ":" + path + "/" + sm.getKey());
-						ql.setAppId(appId);
-						qlDAO.update(ql);
-						count++;
-					}
+					IQuickLaunch ql = qlDAO.createEntity();
+					ql.setUsername(username);
+					ql.setOrder(count);
+					ql.setReference(RESTYPE_SUBMODULE + ":" + path + "/" + sm.getKey());
+					ql.setAppId(appId);
+					qlDAO.update(ql);
+					count++;
 				}
 			}
 		}
