@@ -34,8 +34,8 @@ import de.jwic.base.IControlContainer;
 public abstract class SubModule {
 
     private String title;
-
     protected List<SubModule> subModules = new ArrayList<SubModule>();
+	protected Site site;
     
     /**
      * Creates the submodule.
@@ -43,6 +43,7 @@ public abstract class SubModule {
      * @param site
      */
     public SubModule(Site site) {
+		this.site = site;
 
     }
 

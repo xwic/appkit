@@ -45,6 +45,8 @@ import de.xwic.appkit.webbase.prefstore.IPreferenceStore;
  */
 public class Site extends Page {
 	
+	protected String applicationId = "default";
+	
     protected List<Module> modules = new ArrayList<Module>();
 
     protected StackedContainerWithEvent controlStack;
@@ -490,5 +492,24 @@ public class Site extends Page {
     		((InnerPage)ctrl).setScrollLeft(clientLeft);
     	}
     }
+
+	/**
+	 * The application id is used for certain common components that are used
+	 * on the same platform (server) to separate their content by application.
+	 * @return the applicationId
+	 */
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	/**
+	 * The application id is used for certain common components that are used
+	 * on the same platform (server) to separate their content by application.
+	 * 
+	 * @param applicationId the applicationId to set
+	 */
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
 
 }

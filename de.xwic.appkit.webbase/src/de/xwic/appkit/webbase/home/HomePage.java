@@ -66,9 +66,9 @@ public class HomePage extends ControlContainer implements IPageControl {
 		
 		IPreferenceStore prefStore = ExtendedApplication.getInstance(this).getSite().getPreferenceStore();
 		ckRestore = new CheckBox(this,  "ckRestore");
-		ckRestore.setLabel("Always open this page when starting Pulse");
+		ckRestore.setLabel("Always open this page when returning");
 		ckRestore.setChecked(!"true".equals(prefStore.getString("restoreNavigation", "false")));
-		ckRestore.setInfoText("If you disable this option, Pulse will open the module you have activated the last time.");
+		ckRestore.setInfoText("If you disable this option, the application will open the module you have activated the last time.");
 		ckRestore.addValueChangedListener(new ValueChangedListener() {
 			@Override
 			public void valueChanged(ValueChangedEvent event) {

@@ -83,9 +83,15 @@ public abstract class Module {
     protected abstract List<SubModule> createSubModules(Site site);
 
     /**	
+     * Returns the module key. Uses the simple name of the class by default, but
+     * can be overridden for a custom key. The module key must be unique across
+     * the application.
+     *  
      * @return the unique module key.
      */
-    protected abstract String getModuleKey();
+    protected String getModuleKey() {
+    	return getClass().getSimpleName();
+    }
 
     /**
      * Returns a list of the subModules.
