@@ -1,0 +1,50 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT model (domain,project,package,entities)>
+<!ATTLIST model
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT domain (#PCDATA)>
+<!ATTLIST domain
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT project (#PCDATA)>
+<!ATTLIST project
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT package (#PCDATA)>
+<!ATTLIST package
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT entities (entity)+>
+<!ATTLIST entities
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT entity (property)+>
+<!ATTLIST entity
+  xmlns CDATA #FIXED ''
+  defaultDisplayProperty NMTOKEN #IMPLIED
+  description CDATA #IMPLIED
+  history NMTOKEN #IMPLIED
+  idColumn NMTOKEN #IMPLIED
+  name NMTOKEN #REQUIRED
+  table NMTOKEN #IMPLIED>
+
+<!ELEMENT property (picklistEntry)*>
+<!ATTLIST property
+  xmlns CDATA #FIXED ''
+  column NMTOKEN #IMPLIED
+  lazy NMTOKEN #IMPLIED
+  length NMTOKEN #IMPLIED
+  multivalue NMTOKEN #IMPLIED
+  name NMTOKEN #REQUIRED
+  picklistId NMTOKEN #IMPLIED
+  required NMTOKEN #IMPLIED
+  type NMTOKEN #REQUIRED>
+
+<!ELEMENT picklistEntry EMPTY>
+<!ATTLIST picklistEntry
+  xmlns CDATA #FIXED ''
+  defaultTitle CDATA #REQUIRED
+  key NMTOKEN #REQUIRED
+  order CDATA #IMPLIED>
