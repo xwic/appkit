@@ -120,7 +120,22 @@ public class CliController {
 
 		// load model
 		DataModel model = DataModelFactory.createModel(modelFile);
-				
+		
+		if (model.getDomainId() == null) {
+			log.error("domain not specified in model file.");
+			return;
+		}
+
+		if (model.getProjectName() == null) {
+			log.error("ProjectName not specified in model file.");
+			return;
+		}
+		
+		if (model.getPackageName() == null) {
+			log.error("Package not specified in model file.");
+			return;
+		}
+
 		BuilderEngine engine = new BuilderEngine(context);
 		engine.start();
 		

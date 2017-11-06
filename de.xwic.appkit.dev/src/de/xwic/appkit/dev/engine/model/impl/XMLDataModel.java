@@ -29,8 +29,14 @@ public class XMLDataModel implements DataModel {
 	 */
 	@Override
 	public String getDomainId() {
+		
+		
 		Node node = document.selectSingleNode("//domain");
-		return node.getText();
+		if (node != null) {
+			return node.getText();
+		} else {
+			return null;
+		}
 	}
 
 	/* (non-Javadoc)
@@ -39,7 +45,7 @@ public class XMLDataModel implements DataModel {
 	@Override
 	public String getProjectName() {
 		Node node = document.selectSingleNode("//project");
-		return node.getText();
+		return node != null ?  node.getText() : null;
 	}
 
 	/* (non-Javadoc)
@@ -48,7 +54,7 @@ public class XMLDataModel implements DataModel {
 	@Override
 	public String getPackageName() {
 		Node node = document.selectSingleNode("//package");
-		return node.getText();
+		return node != null ? node.getText() : null;
 	}
 
 	/* (non-Javadoc)

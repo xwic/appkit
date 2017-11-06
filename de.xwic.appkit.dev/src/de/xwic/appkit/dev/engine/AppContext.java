@@ -4,6 +4,7 @@
 package de.xwic.appkit.dev.engine;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -30,15 +31,16 @@ public class AppContext {
 	 * Instantiate from configuration properties, usually loaded from 
 	 * a file.
 	 * @param prop
+	 * @throws IOException 
 	 */
-	public AppContext(Properties prop) {
+	public AppContext(Properties prop) throws IOException {
 		
 		repositoryRoot = new File(prop.getProperty("root", "."));
-		productConfigFolder = new File(prop.getProperty("config.folder", "./config"));
+		productConfigFolder = new File(repositoryRoot, prop.getProperty("config.folder", "./config"));
 		sourceFolderName = prop.getProperty("src.foldername", sourceFolderName);
 		
-		System.out.println("Root:        " + repositoryRoot.getAbsolutePath());
-		System.out.println("Config:      " + productConfigFolder.getAbsolutePath());
+		System.out.println("Root:        " + repositoryRoot.getCanonicalPath());
+		System.out.println("Config:      " + productConfigFolder.getCanonicalPath());
 		
 		if (!repositoryRoot.exists()) {
 			log.warn("The repository root directory specified does not exist!");
