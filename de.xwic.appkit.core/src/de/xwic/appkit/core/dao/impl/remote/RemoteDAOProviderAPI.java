@@ -77,28 +77,26 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	@Override
 	public void update(IEntity entity) throws DataAccessException {
 		try {
+			EntityTransferObject etoToUpdate = new EntityTransferObject(entity, true);
+			
+			// the responseEto has the values from the server
+			EntityTransferObject responseEto = client.updateETO(etoToUpdate);
+			
+			// the hibernate API on the server will update these fields on the entity before saving it
+			// after the update we need to copy the values on the client entity as well
+			entity.setId(responseEto.getEntityId());
+			entity.setVersion(responseEto.getEntityVersion());
+			entity.setCreatedAt((Date) responseEto.getPropertyValue("createdAt").getValue());
+			entity.setCreatedFrom((String) responseEto.getPropertyValue("createdFrom").getValue());
+			entity.setLastModifiedAt((Date) responseEto.getPropertyValue("lastModifiedAt").getValue());
+			entity.setLastModifiedFrom((String) responseEto.getPropertyValue("lastModifiedFrom").getValue());
+			
 			EntityKey key = new EntityKey(entity);
-
-			EntityTransferObject eto = ETOSessionCache.getInstance().getSessionCache().get(key);
-			boolean cachedEto = eto != null;
-			if (!cachedEto) {
-				eto = new EntityTransferObject(entity, true);
-			}
-
-			EntityTransferObject response = client.updateETO(eto);
-
-			eto.refresh(response);
-
-			// TODO AI re-create the whole entity, maybe some other fields were updated!
-			entity.setId(eto.getEntityId());
-			entity.setLastModifiedAt((Date) eto.getPropertyValue("lastModifiedAt").getValue());
-			entity.setLastModifiedFrom((String) eto.getPropertyValue("lastModifiedFrom").getValue());
-			entity.setCreatedAt((Date) eto.getPropertyValue("createdAt").getValue());
-			entity.setCreatedFrom((String) eto.getPropertyValue("createdFrom").getValue());
-			entity.setVersion(eto.getEntityVersion());
-
-			if (cachedEto) {
-				ETOSessionCache.getInstance().refreshInCache(entity, key);
+			EntityTransferObject etoInCache = ETOSessionCache.getInstance().getSessionCache().get(key);
+			if (etoInCache != null) {
+				// copy the values from the server on the local cached ETO
+				etoInCache.refresh(responseEto);
+				ETOSessionCache.getInstance().refreshReferencesInCache(entity, etoInCache, key);
 			}
 
 		} catch (Exception e) {
@@ -129,7 +127,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 
 			EntityList objects = client.getList(trueClass.getName(), limit, filter);
 
-			List<Object> list = new ArrayList<Object>();
+			List<Object> list = new ArrayList<>();
 
 			boolean isObjectArray = filter.getColumns() != null;
 
@@ -191,7 +189,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);
 			List<EntityTransferObject> entityTransferObjects = (List<EntityTransferObject>) client
 					.getETOCollection(trueClass.getName(), entityId, propertyId);
-			List<IEntity> entities = new ArrayList<IEntity>(entityTransferObjects.size());
+			List<IEntity> entities = new ArrayList<>(entityTransferObjects.size());
 			for (EntityTransferObject entityTransferObject : entityTransferObjects) {
 				entities.add(EntityProxyFactory.createEntityProxy(entityTransferObject));
 			}

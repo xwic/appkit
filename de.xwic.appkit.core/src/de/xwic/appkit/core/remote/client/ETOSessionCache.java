@@ -14,7 +14,6 @@ import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.EntityKey;
 import de.xwic.appkit.core.dao.IEntity;
-import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.core.transfer.EntityTransferObject;
 import de.xwic.appkit.core.transfer.PropertyValue;
 
@@ -28,7 +27,7 @@ public class ETOSessionCache {
 	private static ETOSessionCache instance = new ETOSessionCache();
 	private boolean isClientSystem;
 
-	private static ThreadLocal<Map<EntityKey, EntityTransferObject>> tlCaches = new ThreadLocal<Map<EntityKey, EntityTransferObject>>();
+	private static ThreadLocal<Map<EntityKey, EntityTransferObject>> tlCaches = new ThreadLocal<>();
 
 	/*
 	 * 
@@ -48,7 +47,7 @@ public class ETOSessionCache {
 	 * 
 	 */
 	public void initCache() {
-		Map<EntityKey, EntityTransferObject> cache = new HashMap<EntityKey, EntityTransferObject>();
+		Map<EntityKey, EntityTransferObject> cache = new HashMap<>();
 		tlCaches.set(cache);
 	}
 
@@ -69,11 +68,13 @@ public class ETOSessionCache {
 		DAO<?> dao = DAOSystem.findDAOforEntity(entity.type());
 		EntityKey key = new EntityKey(entity);
 		Map<EntityKey, EntityTransferObject> sessionCache = getSessionCache();
-		boolean existInCache = sessionCache.remove(key) != null;
+		boolean existedInCache = sessionCache.remove(key) != null;
 		T refreshed = (T) dao.getEntity(entity.getId());
 
-		if (existInCache) {
-			refreshInCache(refreshed, key);
+		if (existedInCache) {
+			// the ETO got added back in the cache by the dao.getEntity method
+			EntityTransferObject refreshedEto = sessionCache.get(key); 
+			refreshReferencesInCache(refreshed, refreshedEto, key);
 		}
 		return refreshed;
 	}
@@ -83,16 +84,19 @@ public class ETOSessionCache {
 	 * @param entity
 	 * @param key
 	 */
-	public void refreshInCache(IEntity refreshedEntity, EntityKey key){
+	public void refreshReferencesInCache(IEntity refreshedEntity, EntityTransferObject refreshedEto, EntityKey key){
 		Class<? extends IEntity> entityType = refreshedEntity.type();
-		EntityTransferObject refreshedEto = getSessionCache().get(key);
 		for (EntityTransferObject eto : getSessionCache().values()) {
 			for (PropertyValue pv : eto.getPropertyValues().values()) {
-				if (pv.isEntityType() && entityType.equals(pv.getType())
-						&& pv.getEntityId() == eto.getEntityId()) {
-					if (pv.getValue() instanceof EntityTransferObject) {
-						pv.setValue(refreshedEto);
-					} else if (pv.getValue() instanceof IEntity) {
+				if (pv.isEntityType() && entityType.equals(pv.getType()) && pv.getEntityId() == refreshedEntity.getId()) {
+					if (pv.isLoaded()) {
+						if (pv.getValue() instanceof EntityTransferObject) {
+							pv.setValue(refreshedEto);
+						} else if (pv.getValue() instanceof IEntity) {
+							pv.setValue(refreshedEntity);
+						}
+					} else {
+						pv.setLoaded(true);
 						pv.setValue(refreshedEntity);
 					}
 				}
@@ -113,7 +117,7 @@ public class ETOSessionCache {
 			}
 			return cache;
 		} else {
-			return new EmptyMap<EntityKey, EntityTransferObject>();
+			return new EmptyMap<>();
 		}
 	}
 
@@ -229,7 +233,7 @@ public class ETOSessionCache {
 		 */
 		@Override
 		public Set<K> keySet() {
-			return new HashSet<K>();
+			return new HashSet<>();
 		}
 
 		/*
@@ -238,7 +242,7 @@ public class ETOSessionCache {
 		 */
 		@Override
 		public Collection<V> values() {
-			return new ArrayList<V>();
+			return new ArrayList<>();
 		}
 
 		/*
@@ -247,7 +251,7 @@ public class ETOSessionCache {
 		 */
 		@Override
 		public Set<java.util.Map.Entry<K, V>> entrySet() {
-			return new HashSet<Map.Entry<K, V>>();
+			return new HashSet<>();
 		}
 
 	}
