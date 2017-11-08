@@ -77,6 +77,11 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 	@Override
 	public void update(IEntity entity) throws DataAccessException {
 		try {
+			EntityKey key = new EntityKey(entity);
+			
+			EntityTransferObject oldCachedEto = ETOSessionCache.getInstance().getSessionCache().get(key);
+			
+			// create a new ETO for the update, don't use the cached one (if it exists)
 			EntityTransferObject etoToUpdate = new EntityTransferObject(entity, true);
 			
 			// the responseEto has the values from the server
@@ -91,12 +96,9 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			entity.setLastModifiedAt((Date) responseEto.getPropertyValue("lastModifiedAt").getValue());
 			entity.setLastModifiedFrom((String) responseEto.getPropertyValue("lastModifiedFrom").getValue());
 			
-			EntityKey key = new EntityKey(entity);
-			EntityTransferObject etoInCache = ETOSessionCache.getInstance().getSessionCache().get(key);
-			if (etoInCache != null) {
-				// copy the values from the server on the local cached ETO
-				etoInCache.refresh(responseEto);
-				ETOSessionCache.getInstance().refreshReferencesInCache(entity, etoInCache, key);
+			if (oldCachedEto != null) {
+				oldCachedEto.refresh(responseEto);
+				ETOSessionCache.getInstance().refreshReferencesInCache(entity, oldCachedEto, key);
 			}
 
 		} catch (Exception e) {
