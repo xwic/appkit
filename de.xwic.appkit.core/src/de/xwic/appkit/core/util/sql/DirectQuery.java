@@ -377,14 +377,14 @@ public class DirectQuery {
 	 * @param seq
 	 * @return
 	 */
-	public static int getNextSequenceValue(Sequence seq) {
+	public static int getNextSequenceValue(ISequence seq) {
 		if (seq == null) {
 			throw new IllegalArgumentException("Missing sequence");
 		}
 		try {
-			return getIntSql(String.format("SELECT %s.NEXTVAL FROM DUAL", seq.sequenceName));
+			return getIntSql(String.format("SELECT %s.NEXTVAL FROM DUAL", seq.getSequenceName()));
 		} catch (Exception e) {
-			throw new IllegalStateException("Failed to fetch the next value from sequence " + seq.sequenceName, e);
+			throw new IllegalStateException("Failed to fetch the next value from sequence " + seq.getSequenceName(), e);
 		}
 	}
 
@@ -423,26 +423,6 @@ public class DirectQuery {
 
 	}
 
-	/**
-	 * @author Alexandru Bledea
-	 * @since Oct 9, 2013
-	 */
-	public enum Sequence {
-		TICKET("SUPPORT_TICKET_NUMBER_SEQ"), FSR_ASSIGNMENT_CODES("FSR_ASSIGNMENT_CODES_SEQ");
-
-		private final String sequenceName;
-
-		/**
-		 * @param sequenceName
-		 */
-		private Sequence(String sequenceName) {
-			this.sequenceName = sequenceName;
-		}
-
-		public String getSequenceName() {
-			return sequenceName;
-		}
-
-	}
+	
 
 }
