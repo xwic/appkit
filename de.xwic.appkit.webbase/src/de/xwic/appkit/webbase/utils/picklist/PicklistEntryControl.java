@@ -221,7 +221,7 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 		if (picklistKey != null) {
 			Collection<IPicklistEntry> values = entries.values();
 			for (IPicklistEntry pe : values) {
-				if (pe.getKey().equals(picklistKey)) {
+				if (pe != null && pe.getKey() != null && pe.getKey().equals(picklistKey)) {
 					selectEntry(pe);
 					return;
 				}
