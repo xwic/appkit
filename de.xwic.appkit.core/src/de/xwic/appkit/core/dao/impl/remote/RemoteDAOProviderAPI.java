@@ -83,13 +83,20 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			boolean cachedEto = eto != null;
 			if (!cachedEto) {
 				eto = new EntityTransferObject(entity, true);
+			} else {
+				// maybe the cached ETO is stale, so make sure it's refreshed with the values from the entity
+				// it's a corner case, but it happened, usually when we are bringing entities to the client in other ways
+				// than through the DAO (e.g. a serialized string)
+				EntityTransferObject tempEto = new EntityTransferObject(entity, true);
+				eto.refresh(tempEto);
 			}
 
 			EntityTransferObject response = client.updateETO(eto);
 
 			eto.refresh(response);
 
-			// TODO AI re-create the whole entity, maybe some other fields were updated!
+			// these values are set by the HibernateDAOProviderAPI on the server side, so we need to make sure they are
+			// populated back on the entity we have on the client side
 			entity.setId(eto.getEntityId());
 			entity.setLastModifiedAt((Date) eto.getPropertyValue("lastModifiedAt").getValue());
 			entity.setLastModifiedFrom((String) eto.getPropertyValue("lastModifiedFrom").getValue());
@@ -129,7 +136,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 
 			EntityList objects = client.getList(trueClass.getName(), limit, filter);
 
-			List<Object> list = new ArrayList<Object>();
+			List<Object> list = new ArrayList<>();
 
 			boolean isObjectArray = filter.getColumns() != null;
 
@@ -191,7 +198,7 @@ public class RemoteDAOProviderAPI implements DAOProviderAPI {
 			Class<? extends Object> trueClass = EntityUtil.type(entityImplClass);
 			List<EntityTransferObject> entityTransferObjects = (List<EntityTransferObject>) client
 					.getETOCollection(trueClass.getName(), entityId, propertyId);
-			List<IEntity> entities = new ArrayList<IEntity>(entityTransferObjects.size());
+			List<IEntity> entities = new ArrayList<>(entityTransferObjects.size());
 			for (EntityTransferObject entityTransferObject : entityTransferObjects) {
 				entities.add(EntityProxyFactory.createEntityProxy(entityTransferObject));
 			}
