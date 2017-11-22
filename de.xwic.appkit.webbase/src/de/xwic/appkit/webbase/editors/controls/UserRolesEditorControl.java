@@ -211,6 +211,14 @@ public class UserRolesEditorControl extends ControlContainer {
 		
 		if (logonName != null && !logonName.isEmpty()) {
 			editUser = userDAO.getUserByLogonName(logonName);
+			
+			if (editUser == null) {
+				log.info("Creating user '" + logonName + "'...");
+				editUser = userDAO.createEntity();
+				editUser.setLogonName(logonName);
+				editUser.setName(logonName);
+				userDAO.update(editUser);
+			}
 		}
 		
 		if (editUser != null) {
