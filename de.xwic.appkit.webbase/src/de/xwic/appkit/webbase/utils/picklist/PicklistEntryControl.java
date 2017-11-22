@@ -93,6 +93,7 @@ public class PicklistEntryControl extends ListBox implements IPicklistEntryContr
 		plDao = DAOSystem.getDAO(IPicklisteDAO.class);
 		this.lang = getSessionContext().getLocale().getLanguage();
 		this.comparator = comparator == null ? new PicklistEntryComparator(lang) : comparator;
+		this.allowEmptySelection = allowEmptySelection;
 		setTemplateName(ListBox.class.getName());
 	}
 
