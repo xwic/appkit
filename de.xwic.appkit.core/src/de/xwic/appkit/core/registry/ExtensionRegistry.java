@@ -107,9 +107,25 @@ public class ExtensionRegistry {
 			for (Iterator<Element> it = elExtensionPoints.elementIterator("extensionPoint"); it.hasNext();) {
 				Element elExtensionPoint = it.next();
 				String id = elExtensionPoint.attributeValue("id");
+				String description = "";
+				String link = null;
+				Element elDescr = elExtensionPoint.element("description");
+				if (elDescr != null) {
+					description = elDescr.getText();
+				}
+				Element elLink = elExtensionPoint.element("link");
+				if (elLink != null) {
+					link = elLink.getText();
+				}
+
 				if (id != null && !id.isEmpty()) {
 					if (!extensionPoints.containsKey(id)) {
-						registerExtensionPoint(id);
+						registerExtensionPoint(id, description, link);
+					} else {
+						IExtensionPoint ep = extensionPoints.get(id);
+						DefaultExtensionPoint dep = (DefaultExtensionPoint)ep;
+						dep.setDescription(description);
+						dep.setDocumentationLink(link);
 					}
 				} else {
 					log.warn("File '" + fileUrl.getPath() + "' has an invalid format: no id specified for extension point");
@@ -182,8 +198,8 @@ public class ExtensionRegistry {
 	/**
 	 * @param id
 	 */
-	public void registerExtensionPoint(String id) {
-		registerExtensionPoint(new DefaultExtensionPoint(id));
+	public void registerExtensionPoint(String id, String description, String link) {
+		registerExtensionPoint(new DefaultExtensionPoint(id, description, link));
 	}
 	
 	/**
@@ -209,7 +225,7 @@ public class ExtensionRegistry {
 				extension.getId(), extension.getClass().getName(), extension.getExtensionPointId()));
 		
 		if (!extensionPoints.containsKey(extension.getExtensionPointId())) {
-			registerExtensionPoint(extension.getExtensionPointId());
+			registerExtensionPoint(extension.getExtensionPointId(), "Auto-registered extension point", null);
 		}
 
 		Map<String, List<IExtension>> map = null;

@@ -18,6 +18,7 @@ import org.apache.velocity.app.VelocityEngine;
 
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
+import de.xwic.appkit.core.registry.ExtensionRegistry;
 
 /**
  * Generates a single HTML page with a summary of the Product configuration.
@@ -49,7 +50,7 @@ public class ConfigDumpServlet extends HttpServlet {
 			VelocityContext ctx = new VelocityContext();
 			ctx.put("setup", setup);
 			ctx.put("util", new VelocityUtil());
-			
+			ctx.put("exRegistry", ExtensionRegistry.getInstance());
 			
 			VelocityEngine ve = new VelocityEngine();
 			try {

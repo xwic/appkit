@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Describes the extension points available in this module. -->
+<config>
+  <extensionPoints>
+  
+    <extensionPoint id="enityEditorExtension">
+    	<description>Provides the ability to extend the generic entity editor with behavior. Extensions must implement
+    	de.xwic.appkit.webbase.editors.IEntityEditorExtension (or AbstractEntityEditorExtension). Use the attribute 'forEntity'
+    	to specify which editor(s) this extension should be created for.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Extensions</link>
+    </extensionPoint>
+
+    <extensionPoint id="customLabelProviders">
+    	<description>Extensions of this EP will render the content of a cell for the specified entity and attribute. They have
+    	to implement the interface de.xwic.appkit.webbase.table.IColumnLabelProvider.</description>
+    </extensionPoint>
+
+    <extensionPoint id="customColumnFilterCreators">
+    	<description>This extension point provides a way to create your own 'Filter' options in the EntityTableViewer. Extensions 
+    	need to implement the interface de.xwic.appkit.webbase.table.IFilterControlCreator.</description>
+    </extensionPoint>
+
+    <extensionPoint id="entityEditorActions">
+    	<description>Provides the ability to add actions to the toolbar of the generic editor.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Extensions</link>
+    </extensionPoint>
+
+    <extensionPoint id="editorListener">
+    	<description>Provides the ability to add a listener to a Generic Entity Editor instance that can listen to events 
+    	like afterSave, entityLoaded, beforeSave or pagesCreated.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Extensions</link>
+    </extensionPoint>
+  
+    <extensionPoint id="editorValidator">
+    	<description>Provides a way to add additional validations that get performed directly in the editor.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Extensions</link>
+    </extensionPoint>
+
+    <extensionPoint id="entityEditors">
+    	<description>This extension point provides a way to register a custom editor for a specified entity.
+    	Extensions must implement the interface de.xwic.appkit.webbase.actions.editors.IEntityEditorCreator to
+    	create the editor when an entity is to be edited. This provides an alternative way to the Generic Editor</description>
+    </extensionPoint>
+
+    <extensionPoint id="entityEditorBuilder">
+    	<description>Can be used to create custom controls on a GenericEditor which are referenced by the 
+    	custom tag. Extensions must implement de.xwic.appkit.webbase.editors.builders.Builder. They usually
+    	come along with a custom mapper, that must also be registered as an extension.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Widget-List#custom-control</link>
+    </extensionPoint>
+    
+    
+    <extensionPoint id="entityEditorMapper">
+    	<description>Used to register a custom mapper that is usually used in conjunction with a custom editor builder.
+    	The extension must extend the de.xwic.appkit.webbase.editors.mappers.PropertyMapper class.</description>
+    	<link>https://github.com/xwic/appkit/wiki/Entity-Editor-Widget-List#custom-control</link>
+    </extensionPoint>
+
+
+  </extensionPoints>
+</config>

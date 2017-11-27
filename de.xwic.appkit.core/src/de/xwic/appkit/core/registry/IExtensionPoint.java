@@ -28,4 +28,19 @@ public interface IExtensionPoint {
 	 * @return
 	 */
 	public String getId();
+	
+	/**
+	 * Returns a brief description of this extension point.
+	 * 
+	 * @return
+	 */
+	public String getDescription();
+	
+	/**
+	 * Returns a URL to the documentation.
+	 * 
+	 * @return
+	 */
+	public String getDocumentationLink();
+	
 }

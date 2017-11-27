@@ -101,13 +101,18 @@
 		<h3>Domains</h3>
 		#foreach($domainId in $util.sorted($setup.domains))
 			#set($domain = $setup.getDomain($domainId))
-			#set($bundle = $domain.getBundle("en"))
+			#if($domain.hasBundle("en"))
+				#set($bundle = $domain.getBundle("en"))
+			#else
+				#set($bundle = "")
+			#end
 			
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h3 class="panel-title">$domainId</h3>
 				</div>
 				<div class="panel-body">
+			#if($domain.model)
 					<h4>Model</h4>
 					#set($model = $domain.model)
 					
@@ -130,6 +135,9 @@
 					#end
 					</table>
 					
+			#else
+				<p>This domain has no model defined.</p>
+			#end
 				</div>
 			</div>
 		#end
@@ -191,7 +199,26 @@
 			#end
 		</table>
 		
+		<h3>Extension Points</h3>
+		<table class="table table-striped">
+			<tr>
+				<th>Extension Point</th><th>Description</th><th></th>
+			</tr>
+			#foreach($ep in $exRegistry.getAllExtensionPoints())
+				<tr>
+					<td>$ep.id</td>
+					<td>$!ep.description</td>
+					<td>#if($ep.documentationLink)<a href="$ep.documentationLink" target="_blank">Documentation</a>#end</td>
+				</tr>
+			#end
+		</table>
+
+		<div style="padding-top: 20px; text-align: center">
+		<p>xWic AppKit - ConfigDumpServlet</p>
+		</div>
+
 	</div>
+	
 	
 	
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
