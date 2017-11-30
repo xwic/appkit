@@ -27,6 +27,8 @@ import de.xwic.appkit.core.registry.IExtensionPoint;
 public class DefaultExtensionPoint implements IExtensionPoint {
 
 	private String id;
+	private String description;
+	private String documentationLink;
 	
 	/**
 	 * 
@@ -35,6 +37,23 @@ public class DefaultExtensionPoint implements IExtensionPoint {
 		this.id = id;
 	}
 
+	/**
+	 * 
+	 */
+	public DefaultExtensionPoint(String id, String description) {
+		this.id = id;
+		this.description = description;
+	}
+
+	/**
+	 * 
+	 */
+	public DefaultExtensionPoint(String id, String description, String docuLink) {
+		this.id = id;
+		this.description = description;
+		this.documentationLink = docuLink;
+		
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see de.xwic.appkit.core.registry.IExtensionPoint#getId()
@@ -42,5 +61,33 @@ public class DefaultExtensionPoint implements IExtensionPoint {
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description the description to set
+	 */
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	/**
+	 * @return the documentationLink
+	 */
+	public String getDocumentationLink() {
+		return documentationLink;
+	}
+
+	/**
+	 * @param documentationLink the documentationLink to set
+	 */
+	public void setDocumentationLink(String documentationLink) {
+		this.documentationLink = documentationLink;
 	}
 }

@@ -77,6 +77,15 @@ public class Domain {
 	}
 	
 	/**
+	 * Returns true if a bundle for the given language exists.
+	 * @param langId
+	 * @return
+	 */
+	public boolean hasBundle(String langId) {
+		return bundles.containsKey(langId);
+	}
+	
+	/**
 	 * Returns the bundle for the specified language.
 	 * @param langId
 	 * @return
