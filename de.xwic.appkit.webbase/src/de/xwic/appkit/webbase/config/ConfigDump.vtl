@@ -127,7 +127,7 @@
 						#set($title = $bundle.getString($entityId))
 						#if($title.charAt(0) == "!") #set($title = "<i>Unnamed</i>") #end
 						<tr>
-							<td>$entityId</td>
+							<td><a href="cfgDump?entity=$entityId">$entityId</a></td>
 							<td>$title</td>
 							<td>
 								$!ed.titlePattern

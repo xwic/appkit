@@ -35,6 +35,7 @@ import de.xwic.appkit.core.config.list.ListSetup;
 public class Profile {
 	
 	private Profile baseProfile = null;
+	private String name = null;
 	
 	private Map<String, Map<String, ListSetup>> listMap = new HashMap<String, Map<String, ListSetup>>();
 	private Map<String, Map<String, EditorConfiguration>> editorMap = new HashMap<String, Map<String, EditorConfiguration>>();
@@ -166,6 +167,19 @@ public class Profile {
 	}
 	
 	/**
+	 * Returns the list of ListSetups in this profile for the specified entity type. 
+	 * @param classname
+	 * @return
+	 */
+	public Collection<ListSetup> getListSetups(String classname) {
+		Map<?, ?> map = listMap.get(classname);
+		if (map != null) {
+			return (Collection<ListSetup>) map.values();
+		}
+		return null;
+	}
+	
+	/**
 	 * Returns the default editor configuration for the specified entitytype.
 	 * @param classname
 	 * @return
@@ -285,6 +299,20 @@ public class Profile {
 			return configs.keySet();
 		}
 		return null;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

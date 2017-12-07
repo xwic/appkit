@@ -16,8 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
+import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
 import de.xwic.appkit.core.config.Setup;
+import de.xwic.appkit.core.config.model.EntityDescriptor;
 import de.xwic.appkit.core.registry.ExtensionRegistry;
 
 /**
@@ -34,9 +36,23 @@ public class ConfigDumpServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		
-		
 		Setup setup = ConfigurationManager.getSetup();
-		InputStream tpl = getClass().getResourceAsStream("ConfigDump.vtl");
+		EntityDescriptor ed = null;
+		
+		String template = "ConfigDump.vtl";
+		String entity = req.getParameter("entity");
+		
+		if (entity != null) {
+			template = "ConfigDump-Entity.vtl";
+			try {
+				 ed = setup.getEntityDescriptor(entity);
+			} catch (ConfigurationException e) {
+				resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Entity not found.");
+				return;
+			}
+		}
+		
+		InputStream tpl = getClass().getResourceAsStream(template);
 		
 		if (setup == null) {
 			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The Setup is not available or not loaded yet.");
@@ -51,6 +67,20 @@ public class ConfigDumpServlet extends HttpServlet {
 			ctx.put("setup", setup);
 			ctx.put("util", new VelocityUtil());
 			ctx.put("exRegistry", ExtensionRegistry.getInstance());
+			ctx.put("ed", ed);
+			
+			
+			if (ed != null) {
+				if (ed.getDomain().hasBundle("en")) {
+					try {
+						ctx.put("entityTitle", ed.getDomain().getBundle("en").getString(ed.getId()));
+					} catch (ConfigurationException e) {
+						ctx.put("entityTitle", ed.getId());
+					}
+				} else {
+					ctx.put("entityTitle", ed.getId());
+				}
+			}
 			
 			VelocityEngine ve = new VelocityEngine();
 			try {

@@ -514,6 +514,7 @@ public class XmlConfigLoader {
 				
 				ls.setIconKey(lFile.getIconKey());
 				profile.addListSetup(ls);
+				
 			}
 			// load editors
 			for (Iterator<URL> it = editorFiles.iterator(); it.hasNext(); ) {

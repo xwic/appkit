@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+<title>$!entityTitle</title>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<style type="text/css">
+
+	.tbl-label {
+		font-weight: bold;
+	}
+	
+	.tag {
+		color: #fff;
+		font-weight: bold;
+		background-color: #55f;
+		border-radius: 5px;
+		padding: 3px;
+		font-size: 11px;
+	}
+
+</style>
+
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="page-header">
+		  <h1>$entityTitle</h1>
+		  <p class="lead">$ed.id</p>
+		</div>
+
+
+		<h3>Properties</h3>
+		#set($domain = $ed.getDomain())
+		#if($domain.hasBundle("en"))
+			#set($bundle = $domain.getBundle("en"))
+		#else
+			#set($bundle = "")
+		#end
+			
+			<div class="panel panel-default">
+				<div class="panel-body">
+				
+					<table class="table table-striped">
+						<tr>
+							<th>Property</th>
+							<th>Title</th>
+							<th>Type</th>
+							<th>Required</th>
+							<th>Details</th>
+						</tr>
+					#foreach($prop in $util.sorted($ed.properties.keySet()))
+						#set($pDes = $ed.getProperty($prop))
+						#set($titleKey = $ed.id + "." + $prop)
+						#set($title = $bundle.getString($titleKey))
+						#if($title.charAt(0) == "!") #set($title = "<i>Unnamed</i>") #end
+						<tr>
+							<td>$prop</td>
+							<td>$title</td>
+							<td>
+								#if($pDes.entityType == "java.lang.String")String #else 
+									#if($pDes.isEntity())
+										<a href="cfgDump?entity=$pDes.entityType">$pDes.entityType</a>
+									#else
+										$pDes.entityType
+									#end 
+								#end
+							</td>
+							<td>#if($pDes.required)Y #else N #end</td>
+							<td>
+								
+								#if($pDes.entityType == "java.lang.String" && $pDes.maxLength != 0) Max Length: $pDes.maxLength #end
+								#if($pDes.picklistId) PicklistId: $pDes.picklistId <br> #end
+								#if($pDes.isEntity()) 
+									onRefDelete: #if($pDes.onRefDeletion == 0) DENY #end
+									#if($pDes.onRefDeletion == 1) DELETE #end
+									#if($pDes.onRefDeletion == 2) CLEAR_REFERENCE #end 
+									<br>
+									Lazy: #if($pDes.lazy) True #else False #end <br>
+								#end
+							</td>
+					#end
+					</table>
+					
+				</div>
+			</div>
+
+
+		<h3>List Configuration</h3>
+		<table class="table table-striped">
+			<tr>
+				<th>Profile</th>
+				<th>Id</th>
+				<th># of Columns</th>
+			</tr>
+			## Default Profile
+			#set($profile = $setup.defaultProfile)
+			
+			#foreach($ls in $profile.getListSetups($ed.id))
+				<tr>
+					<td><i>Default Profile</i></td>
+					<td>$ls.listId</td>
+					<td>$!ls.columns.size()</td>
+				</tr>
+			#end
+						
+			#foreach($profile in $setup.getProfiles().values())
+			#foreach($ls in $profile.getListSetups($ed.id))
+				<tr>
+					<td>$!profile.name</td>
+					<td>$ls.listId</td>
+					<td>$!ls.columns.size()</td>
+				</tr>
+			#end
+			#end
+		</table>
+
+
+		<h3>References from other Entities</h3>
+		<table class="table table-striped">
+			<tr>
+				<th>Domain</th>
+				<th>Entity</th>
+				<th>Property</th>
+			</tr>
+			#foreach($domName in $setup.domains)
+				#set($dom = $setup.getDomain($domName))
+				#foreach($entity in $dom.model.managedEntities)
+					#set($refED = $dom.model.getEntityDescriptor($entity))
+					#foreach($prop in $refED.properties.keySet())
+						#set($pd = $refED.getProperty($prop))
+						#if($pd.isEntity() && $pd.entityType == $ed.id)
+							<tr>
+								<td>$!dom.id</td>
+								<td><a href="cfgDump?entity=$entity">$!entity</a></td>
+								<td>$prop</td>
+							</tr>
+						#end
+					#end
+				#end
+			#end
+		</table>
+		
+
+		<div style="padding-top: 20px; text-align: center">
+		<p>xWic AppKit - ConfigDumpServlet</p>
+		</div>
+
+	</div>
+	
+	
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+</body>
+</html>
