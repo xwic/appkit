@@ -27,6 +27,7 @@ import de.xwic.appkit.core.config.model.Property;
 import de.xwic.appkit.core.dao.DAO;
 import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
+import de.xwic.appkit.core.model.IEntityModel;
 import de.xwic.appkit.core.model.queries.PropertyQuery;
 import de.xwic.appkit.webbase.actions.IEntityCreator;
 import de.xwic.appkit.webbase.editors.IBuilderContext;
@@ -66,6 +67,12 @@ public class EListViewBuilder extends Builder<EListView> {
 			IEntity newEntity = dao.createEntity();
 			IEntity baseEntity = listCfg.getBaseEntity();
 			if (baseEntity != null) {
+				
+				if (baseEntity instanceof IEntityModel) {
+					IEntityModel eModel = (IEntityModel)baseEntity;
+					baseEntity = eModel.getOriginalEntity();
+				}
+				
 				Property tgProp = dao.getEntityDescriptor().getProperty(targetPropertyName);
 				if (tgProp != null) {
 					try {

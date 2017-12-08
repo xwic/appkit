@@ -239,6 +239,7 @@ public class XmlConfigLoader {
 					
 					URL profileURL = new URL(location, file);
 					Profile newProfile = new Profile(profile);
+					newProfile.setName(name);
 					setup.addProfile(name, newProfile);
 					fileList.add(profileURL);
 					
