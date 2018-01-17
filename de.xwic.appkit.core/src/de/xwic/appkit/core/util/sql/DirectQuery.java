@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Query;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.type.StandardBasicTypes;
@@ -28,6 +30,38 @@ import de.xwic.appkit.core.util.Evaluators;
  */
 public class DirectQuery {
 
+	/**
+	 * Returns the result as a ScrollableResults in FORWARD_ONLY mode. This allows for a 
+	 * memory consumption friendly way of iterating over a large data set instead of returning
+	 * the entire result as a List. 
+	 * 
+	 * Make sure to evict the objects as you traverse through the list to avoid a reference to each
+	 * entity in the HibernateSession (if you use entities). 
+	 */
+	public static ScrollableResults executeScrollQuery(String hql, Object... params) {
+
+		ITraceOperation traceOp = null;
+		if (Trace.isEnabled()) {
+			traceOp = Trace.startOperation("DirectQuery");
+			traceOp.setInfo(hql);
+		}
+
+		try {
+			Session session = HibernateUtil.currentSession();
+			Query query = session.createQuery(hql);
+
+			setParams(query, params);
+
+			return query.scroll(ScrollMode.FORWARD_ONLY);
+		} finally {
+			if (traceOp != null) {
+				traceOp.finished();
+			}
+		}
+
+	}
+
+	
 	/**
 	 * Use {@link #getCustomHql(Class, String, Object...)} instead
 	 */
