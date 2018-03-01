@@ -61,6 +61,7 @@ public class ColumnsConfigurationSerializer {
 	public static final String BOOLEAN = "{b}";
 	public static final String DATE_TIME = "{t}";
 	public static final String COLLECTION = "{c}";
+	public static final String COLLECTION_ITEM = "{ci}";
 	public static final String DATE = "{da}";
 
 	public static final SimpleDateFormat SDF_DATE = new SimpleDateFormat("dd-MM-yyyy");
@@ -231,7 +232,7 @@ public class ColumnsConfigurationSerializer {
 			StringBuilder sb = new StringBuilder(COLLECTION);
 			for (Object val: (Collection) value) {
 				sb.append(serializeValue(val, qe.isTimestamp()));
-				sb.append(",");
+				sb.append(COLLECTION_ITEM);
 			}
 			if (sb.length() > 0) {
 				sb.setLength(sb.length() - 1);

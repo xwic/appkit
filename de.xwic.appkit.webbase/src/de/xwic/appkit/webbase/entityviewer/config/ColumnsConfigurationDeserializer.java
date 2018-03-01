@@ -257,7 +257,7 @@ public class ColumnsConfigurationDeserializer {
 			}
 		} else if (str.startsWith(ColumnsConfigurationSerializer.COLLECTION)) {
 			String val = str.replace(ColumnsConfigurationSerializer.COLLECTION, "");
-			String[] values = val.split(",");
+			String[] values = val.split(ColumnsConfigurationSerializer.COLLECTION_ITEM);
 			List result = new ArrayList<>();
 			for (String v: values) {
 				result.add(deserializeValue(v));
