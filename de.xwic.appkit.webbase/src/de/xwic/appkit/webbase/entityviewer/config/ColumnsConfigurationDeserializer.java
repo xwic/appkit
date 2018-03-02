@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -257,7 +258,7 @@ public class ColumnsConfigurationDeserializer {
 			}
 		} else if (str.startsWith(ColumnsConfigurationSerializer.COLLECTION)) {
 			String val = str.replace(ColumnsConfigurationSerializer.COLLECTION, "");
-			String[] values = val.split(ColumnsConfigurationSerializer.COLLECTION_ITEM);
+			String[] values = val.split(Pattern.quote(ColumnsConfigurationSerializer.COLLECTION_ITEM));
 			List result = new ArrayList<>();
 			for (String v: values) {
 				result.add(deserializeValue(v));

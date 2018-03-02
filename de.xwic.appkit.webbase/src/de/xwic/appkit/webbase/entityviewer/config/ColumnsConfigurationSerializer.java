@@ -230,12 +230,13 @@ public class ColumnsConfigurationSerializer {
 			return NULL;
 		} else if (value instanceof Collection) {
 			StringBuilder sb = new StringBuilder(COLLECTION);
+			boolean first = true;
 			for (Object val: (Collection) value) {
+				if (!first) {
+					sb.append(COLLECTION_ITEM);
+				}
+				first = false;
 				sb.append(serializeValue(val, qe.isTimestamp()));
-				sb.append(COLLECTION_ITEM);
-			}
-			if (sb.length() > 0) {
-				sb.setLength(sb.length() - 1);
 			}
 			return sb.toString();
 		} else {
