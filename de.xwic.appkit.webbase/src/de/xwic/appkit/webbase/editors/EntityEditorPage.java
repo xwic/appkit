@@ -23,6 +23,7 @@ import de.jwic.controls.ToolBar;
 import de.jwic.controls.ToolBarGroup;
 import de.jwic.controls.actions.Action;
 import de.jwic.controls.actions.IAction;
+import de.xwic.appkit.core.ApplicationData;
 import de.xwic.appkit.core.config.Bundle;
 import de.xwic.appkit.core.config.ConfigurationException;
 import de.xwic.appkit.core.config.ConfigurationManager;
@@ -33,7 +34,6 @@ import de.xwic.appkit.core.dao.DAOSystem;
 import de.xwic.appkit.core.dao.IEntity;
 import de.xwic.appkit.core.dao.ValidationResult;
 import de.xwic.appkit.webbase.actions.ICustomEntityActionCreator;
-import de.xwic.appkit.webbase.controls.comment.EntityShoutBox;
 import de.xwic.appkit.webbase.editors.events.EditorAdapter;
 import de.xwic.appkit.webbase.editors.events.EditorEvent;
 import de.xwic.appkit.webbase.toolkit.app.ExtendedApplication;
@@ -91,7 +91,7 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 
 		setTitle(title);
 
-		createActions();
+		createActions(entity);
 		createToolbar();
 
 		staticMessages = new EditorMessagesControl(this, "staticMessages");
@@ -138,9 +138,10 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 	}
 
 	/**
+	 * @param entity 
 	 * 
 	 */
-	private void createActions() {
+	private void createActions(IEntity entity) {
 
 		actionSave = new Action() {
 
@@ -187,6 +188,9 @@ public class EntityEditorPage extends InnerPage implements IEditorHost {
 		actionEdit.setTitle("Edit");
 		actionEdit.setIconEnabled(ImageLibrary.ICON_EDIT_ACTIVE);
 		actionEdit.setIconDisabled(ImageLibrary.ICON_EDIT_INACTIVE);
+		
+		DAO<? extends IEntity> dao = DAOSystem.findDAOforEntity(entity.type());
+		actionEdit.setVisible(dao.hasRight(entity, ApplicationData.SECURITY_ACTION_UPDATE));
 	}
 
 	/**
