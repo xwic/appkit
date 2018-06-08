@@ -139,6 +139,11 @@ public class XmlListSetupReader  {
 						currColumn.setSortMode(defaultSort);
 					}
 				}
+				
+				String hideFilter = element.getAttribute("hideFilter");
+				if("true".equalsIgnoreCase(hideFilter) || "1".equals(hideFilter)) {
+					currColumn.setHideFilter(true);
+				}
 				listSetup.addColumn(currColumn);
 				
 			} else if (node.getNodeName().equals("table")) {
