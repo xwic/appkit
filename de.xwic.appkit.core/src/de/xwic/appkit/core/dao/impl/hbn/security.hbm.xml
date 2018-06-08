@@ -303,6 +303,9 @@
         <property name="key">
             <column name="KEYSTRING" length="512"/>
         </property>
+        <property name="refreshToken">
+            <column name="REFRESH_TOKEN" length="512"/>
+        </property>
 
         <property name="username">
             <column name="USERNAME" length="50"/>

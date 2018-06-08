@@ -58,5 +58,16 @@ public interface IUserSession extends IEntity {
 	 * @param username the username to set
 	 */
 	public abstract void setUsername(String username);
+	
+	/**
+	 * @return the refreshToken
+	 */
+	public String getRefreshToken();
+	
+	/**
+	 * @param refreshToken the refreshToken to set
+	 */
+	public void setRefreshToken(String refreshToken);
+	
 
 }
