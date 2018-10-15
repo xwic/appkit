@@ -398,6 +398,9 @@ public class ColumnFilterControl extends ControlContainer implements IFilterCont
 		positionIdx = tableColumn.getIndex();
 		setColumn((Column) tableColumn.getUserObject());
 		
+		if(column.getListColumn().isHideFilter()) {
+			return;
+		}
 
 		final Property finalProperty = column.getListColumn().getFinalProperty();
 		rdExcludeEmpty.setVisible( finalProperty != null );

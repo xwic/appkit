@@ -54,6 +54,8 @@ public class ListColumn {
 	private String customLabelProviderClass = null;
 
 	private int sortMode = SORT_CLIENT;
+	
+	private boolean hideFilter = false;
 
 	/**
 	 * Default constructor.
@@ -167,6 +169,21 @@ public class ListColumn {
 	public void setCustomLabelProviderClass(String customLabelProviderClass) {
 		this.customLabelProviderClass = customLabelProviderClass;
 	}
+	
+	/**
+	 * @return the hideFilter
+	 */
+	public boolean isHideFilter() {
+		return hideFilter;
+	}
+
+	
+	/**
+	 * @param hideFilter the hideFilter to set
+	 */
+	public void setHideFilter(boolean hideFilter) {
+		this.hideFilter = hideFilter;
+	}
 
 	/**
 	 * @return
@@ -253,6 +270,7 @@ public class ListColumn {
 		column.setProperty(property);
 		column.setSortMode(sortMode);
 		column.setTitleId(titleId);
+		column.setHideFilter(hideFilter);
 		
 		return column;
 	}

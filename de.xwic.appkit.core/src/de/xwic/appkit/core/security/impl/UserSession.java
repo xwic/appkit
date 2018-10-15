@@ -32,6 +32,7 @@ import de.xwic.appkit.core.security.IUserSession;
 public class UserSession extends Entity implements IUserSession {
 
 	private String key = null;
+	private String refreshToken = null;
 	private Date lastAccess = null;
 	private String username = null;
 	
@@ -70,6 +71,22 @@ public class UserSession extends Entity implements IUserSession {
 	 */
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IUserSession#getRefreshToken()
+	 */
+	@Override
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.xwic.appkit.core.security.IUserSession#setRefreshToken(java.lang.String)
+	 */
+	@Override
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 	
 }
