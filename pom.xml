@@ -87,13 +87,13 @@
 		<jwicUpdateApplication />
 		<jwicUpdateVersion />
         <cubeUpdateVersion />
-		<mvnDependencyVersionxWicjWic>5.3.33</mvnDependencyVersionxWicjWic>
+		<mvnDependencyVersionxWicjWic>5.3.39</mvnDependencyVersionxWicjWic>
    		<mvnDependencyVersionxWicCube>5.2.15</mvnDependencyVersionxWicCube>
 
 		<sonar.language>java</sonar.language>
 		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
 		<hibernate.version>4.3.11.Final</hibernate.version>
-		<poi.version>3.14</poi.version>
+		<poi.version>3.17</poi.version>
 		<sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
 		<sonar.jacoco.reportPath>../.target-mvn/jacoco.exec</sonar.jacoco.reportPath>				
 		<additionalparam>-Xdoclint:none</additionalparam>

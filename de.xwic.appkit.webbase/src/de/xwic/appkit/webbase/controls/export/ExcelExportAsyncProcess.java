@@ -17,17 +17,14 @@
 package de.xwic.appkit.webbase.controls.export;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -109,8 +106,8 @@ public class ExcelExportAsyncProcess extends AbstractAsyncProcess{
 
 		// Style for title cells
 		Font font = wb.createFont();
-		font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
-		font.setColor(HSSFColor.BLUE.index);
+		font.setBold(true);
+		font.setColor(HSSFColorPredefined.BLUE.getIndex());
 
 		CellStyle styleTitle = wb.createCellStyle();
 		styleTitle.setFont(font);
