@@ -126,6 +126,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#createEntity(java.lang.String)
 	 */
+	@Override
 	public IEntity createEntity(String subtype) {
 		if (subtype.equals(getEntityClass().getName()) || subtype.equals(getEntityImplClass().getName())) {
 			return createEntity(); // return default entity
@@ -138,6 +139,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#handlesEntity(java.lang.Class)
 	 */
+	@Override
 	public boolean handlesEntity(String entityClass) {
 		if (getEntityClass().getName().equals(entityClass) || getEntityImplClass().getName().equals(entityClass)) {
 			return true; // no need to instanciate if its the same classname.
@@ -156,11 +158,13 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getEntity(int)
 	 */
+	@Override
 	public I getEntity(final long id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
 		return (I) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getEntity(getEntityImplClass(), id);
 			}
@@ -172,6 +176,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @return
 	 */
+	@Override
 	public EntityDescriptor getEntityDescriptor() {
 		try {
 			return DAOSystem.getEntityDescriptor(getEntityClass().getName());
@@ -185,6 +190,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getEntityDescriptor(java.lang.String)
 	 */
+	@Override
 	public EntityDescriptor getEntityDescriptor(String subtype) {
 		return getEntityDescriptor();
 	}
@@ -194,11 +200,13 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#getHistoryEntity(int)
 	 */
+	@Override
 	public IEntity getHistoryEntity(final long id) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
 		return (IEntity) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getEntity(getHistoryImplClass(), id);
 			}
@@ -210,12 +218,14 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#update(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public void update(final IEntity entity) throws DataAccessException {
 
 		checkRights(entity.getId() == 0 ? ApplicationData.SECURITY_ACTION_CREATE
 				: ApplicationData.SECURITY_ACTION_UPDATE, entity);
 
 		provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				api.update(entity);
 				handleHistory(api, entity, entity.getId() == 0 ? IHistory.REASON_CREATED : IHistory.REASON_UPDATED);
@@ -229,11 +239,13 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * 
 	 * @see de.xwic.appkit.core.dao.DAO#remove(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public void delete(final IEntity entity) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_DELETE, entity);
 
 		provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				api.delete(entity);
 				handleHistory(api, entity, IHistory.REASON_DELETED);
@@ -248,11 +260,13 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see
 	 * de.xwic.appkit.core.dao.DAO#softDelete(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public void softDelete(final IEntity entity) throws DataAccessException {
 
 		checkRights(ApplicationData.SECURITY_ACTION_DELETE, entity);
 		try {
 			provider.execute(new DAOCallback() {
+				@Override
 				public Object run(DAOProviderAPI api) {
 					api.softDelete(entity);
 					handleHistory(api, entity, IHistory.REASON_UPDATED);
@@ -271,11 +285,13 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see
 	 * de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit)
 	 */
+	@Override
 	public EntityList<I> getEntities(final Limit limit) {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
 		return (EntityList<I>) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getEntityImplClass(), limit);
 			}
@@ -285,6 +301,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
+	@Override
 	public EntityList<I> getEntities(Limit limit, EntityQuery filter) {
 
 		return getEntities(limit, filter, true);
@@ -293,6 +310,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/* (non-Javadoc)
 	 * @see de.xwic.appkit.core.dao.DAO#getEntities(de.xwic.appkit.core.dao.Limit, de.xwic.appkit.core.dao.EntityQuery, boolean)
 	 */
+	@Override
 	public EntityList<I> getEntities(final Limit limit, final EntityQuery filter, boolean checkReadRights) {
 		
 		
@@ -301,6 +319,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 		}
 
 		return (EntityList<I>) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getEntityImplClass(), limit, filter);
 			}
@@ -317,6 +336,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
 		return (Collection<?>) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getCollectionProperty(getEntityImplClass(), entityId, propertyId);
 			}
@@ -330,10 +350,12 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * de.xwic.appkit.core.dao.DAO#getHistoryEntities(de.xwic.appkit.core.dao
 	 * .Limit, de.xwic.appkit.core.dao.EntityQuery)
 	 */
+	@Override
 	public EntityList getHistoryEntities(final Limit limit, final EntityQuery filter) {
 		checkRights(ApplicationData.SECURITY_ACTION_READ);
 
 		return (EntityList) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				return api.getEntities(getHistoryImplClass(), limit, filter);
 			}
@@ -343,6 +365,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/**
 	 * @return Returns the provider.
 	 */
+	@Override
 	public DAOProvider getProvider() {
 		return provider;
 	}
@@ -351,6 +374,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @param provider
 	 *            The provider to set.
 	 */
+	@Override
 	public void setProvider(DAOProvider provider) {
 		this.provider = provider;
 	}
@@ -362,6 +386,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * de.xwic.appkit.core.dao.DAO#validateEntity(de.xwic.appkit.core.dao.IEntity
 	 * )
 	 */
+	@Override
 	public ValidationResult validateEntity(IEntity entity) {
 		ValidationResult result = new ValidationResult(entity.type().getName());
 
@@ -466,6 +491,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @param entity
 	 * @return
 	 */
+	@Override
 	public String buildTitle(IEntity entity) {
 
 		try {
@@ -526,8 +552,8 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 
 		if (user != null && !result) {
 			StringBuffer sb = new StringBuffer();
-			sb.append("Fehlendes Recht: ").append(rightName);
-			sb.append("... Bei Entit�t: ").append(getEntityClass().getName());
+			sb.append("Missing right: ").append(rightName);
+			sb.append("... for entity: ").append(getEntityClass().getName());
 			log.error("SECURITY EXCEPTION: " + sb.toString());
 			throw new SecurityException(sb.toString());
 		}
@@ -539,12 +565,14 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @see
 	 * de.xwic.appkit.core.dao.DAO#getHistory(de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	@SuppressWarnings("unchecked")
 	public List<IEntity> getHistory(final IEntity entity) {
 
 		checkRights(ApplicationData.SECURITY_ACTION_READ, entity);
 
 		return (EntityList) provider.execute(new DAOCallback() {
+			@Override
 			public Object run(DAOProviderAPI api) {
 				PropertyQuery query = new PropertyQuery();
 				query.addEquals("entityID", new Long(entity.getId()));
@@ -563,6 +591,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * de.xwic.appkit.core.dao.DAO#findCorrectVersionForEntityRelation(de.xwic
 	 * .appkit.core.dao.IEntity, de.xwic.appkit.core.dao.IEntity)
 	 */
+	@Override
 	public IEntity findCorrectVersionForEntityRelation(IEntity mainObject, IEntity relationObject) {
 		if (mainObject == null) {
 			throw new IllegalArgumentException("Parameter is null in: " + getClass().getName());
@@ -605,6 +634,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * de.xwic.appkit.core.dao.DAO#hasRight(de.xwic.appkit.core.dao.IEntity,
 	 * java.lang.String)
 	 */
+	@Override
 	public boolean hasRight(IEntity entity, String action) {
 		return DAOSystem.getSecurityManager().hasRight(entity.type().getName(), action);
 	}
@@ -612,6 +642,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	/**
 	 * @return the handleHistory
 	 */
+	@Override
 	public boolean isHandleHistory() {
 		return handleHistory;
 	}
@@ -620,6 +651,7 @@ public abstract class AbstractDAO<I extends IEntity, E extends Entity> implement
 	 * @param handleHistory
 	 *            the handleHistory to set
 	 */
+	@Override
 	public void setHandleHistory(boolean handleHistory) {
 		this.handleHistory = handleHistory;
 	}
